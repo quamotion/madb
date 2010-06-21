@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Managed.Adb {
 	public class AdbHelper {
-		private const string TAG = typeof ( AdbHelper ).Name;
+		private const string TAG = "AdbHelper";
 		private AdbHelper ( ) {
 
 		}
@@ -63,14 +63,14 @@ namespace Managed.Adb {
 
 				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
-					Log.e(TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message );
+					Log.e ( TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message );
 					adbChan.Close ( );
 					return -1;
 				}
 
 				reply = new byte[4];
 				if ( !Read ( adbChan, reply ) ) {
-					Log.e(TAG, "error in getting data length" );
+					Log.e ( TAG, "error in getting data length" );
 
 					adbChan.Close ( );
 					return -1;
@@ -316,7 +316,7 @@ namespace Managed.Adb {
 			try {
 				result = Encoding.Default.GetString ( reply );
 			} catch ( DecoderFallbackException uee ) {
-				Log.e(TAG, uee );
+				Log.e ( TAG, uee );
 				result = "";
 			}
 			return result;
@@ -455,62 +455,77 @@ namespace Managed.Adb {
 		}
 
 
-		// not yet tested
-		public void ExecuteRemoteCommand ( IPEndPoint adbSockAddr, String command, Device device, IShellOutputReceiver rcvr ) {
+		/// <summary>
+		/// Executes a shell command on the remote device
+		/// </summary>
+		/// <param name="endPoint">The socket end point</param>
+		/// <param name="command">The command to execute</param>
+		/// <param name="device">The device to execute on</param>
+		/// <param name="rcvr">The shell output receiver</param>
+		/// <exception cref="FileNotFoundException">Throws if the result is 'command': not found</exception>
+		/// <exception cref="IOException">Throws if there is a problem reading / writing to the socket</exception>
+		/// <exception cref="OperationCanceledException">Throws if the execution was canceled</exception>
+		/// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
+		public void ExecuteRemoteCommand ( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr ) {
 			Console.WriteLine ( "execute: running " + command );
 
-			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+			Socket socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
-				adbChan.Connect ( adbSockAddr );
-				adbChan.Blocking = true;
+				socket.Connect ( endPoint );
+				socket.Blocking = true;
 
-				// if the device is not -1, then we first tell adb we're looking to
-				// talk
-				// to a specific device
-				SetDevice ( adbChan, device );
+				SetDevice ( socket, device );
 
 				byte[] request = FormAdbRequest ( "shell:" + command ); //$NON-NLS-1$
-				if ( !Write ( adbChan, request ) )
+				if ( !Write ( socket, request ) ) {
 					throw new IOException ( "failed submitting shell command" );
+				}
 
-				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
+				AdbResponse resp = ReadAdbResponse ( socket, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
 					Console.WriteLine ( "ADB rejected shell command (" + command + "): " + resp.Message );
 					throw new IOException ( "sad result from adb: " + resp.Message );
 				}
 
 				byte[] data = new byte[16384];
-				using ( var buf = new MemoryStream ( data.Length ) ) {
-					while ( true ) {
-						int count;
+				int count = -1;
+				while ( count != 0 ) {
 
-						if ( rcvr != null && rcvr.IsCancelled ) {
-							Log.w ( TAG, "execute: cancelled" );
-							break;
+					if ( rcvr != null && rcvr.IsCancelled ) {
+						Log.w ( TAG, "execute: cancelled" );
+						throw new OperationCanceledException ( );
+					}
+
+					count = socket.Receive ( data );
+					if ( count < 0 ) {
+						// we're at the end, we flush the output
+						rcvr.Flush ( );
+						Log.w ( TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count );
+						throw new EndOfStreamException ( );
+					} else if ( count == 0 ) {
+						Console.WriteLine ( "No More Data" );
+					} else {
+
+						string[] cmd = command.Trim().Split ( new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries );
+						string sdata = Encoding.Default.GetString ( data, 0, count );
+						if ( string.Compare ( sdata.Trim(), string.Format ( "{0}: not found", cmd[0] ), false ) == 0 ) {
+							Console.WriteLine ( "The remote execution returned: '{0}: not found'", cmd[0] );
+							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}: not found'", cmd[0] ) );
 						}
 
-						count = adbChan.Receive ( data );
-						if ( count < 0 ) {
-							buf.Write ( data, 0, count );
-							// we're at the end, we flush the output
-							rcvr.Flush ( );
-							Log.w ( TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: "
-											+ count );
-							break;
-						} else if ( count == 0 ) {
-							Thread.Sleep ( WAIT_TIME * 5 );
-						} else {
-							if ( rcvr != null ) {
-								byte[] outData = buf.ToArray ( );
-								rcvr.AddOutput ( outData, 0, (int)outData.Length );
-							}
-							buf.Position = 0;
+						// Add the data to the receiver
+						if ( rcvr != null ) {
+							rcvr.AddOutput ( data, 0, count );
 						}
+
+						// wait before we continue and try to read again
+						// we will always read 1 more time from here, since count != 0
+						Thread.Sleep ( WAIT_TIME );
 					}
 				}
 			} finally {
-				if ( adbChan != null ) {
-					adbChan.Close ( );
+				if ( socket != null ) {
+					socket.Close ( );
 				}
 				Log.d ( TAG, "execute: returning" );
 			}

@@ -13,12 +13,12 @@ namespace Managed.Adb {
 			void WriteAndPromptLog ( LogLevel.LogLevelInfo logLevel, String tag, String message );
 		}
 
-		private static LogLevel.LogLevelInfo mLevel = DdmPreferences.LogLevel;
+		private static LogLevel.LogLevelInfo mLevel = /*DdmPreferences.LogLevel*/ LogLevel.Verbose;
 
 		private static ILogOutput sLogOutput;
 
-		private const char[] mSpaceLine = new char[72];
-		private const char[] mHexDigit = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+		private static char[] mSpaceLine = new char[72];
+		private static readonly char[] mHexDigit = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 		/// <summary>
 		/// Static Initializer for the <see cref="Log"/> class.
 		/// </summary>
@@ -29,9 +29,12 @@ namespace Managed.Adb {
 				mSpaceLine[i--] = ' ';
 			mSpaceLine[0] = mSpaceLine[1] = mSpaceLine[2] = mSpaceLine[3] = '0';
 			mSpaceLine[4] = '-';
+			mLevel = LogLevel.Verbose;
 		}
 
-		private Log ( ) { }
+		private Log ( ) {
+			
+		}
 
 		sealed class Config {
 			public const bool LOGV = true;

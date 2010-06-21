@@ -37,17 +37,18 @@ namespace Managed.Adb {
 
 
 		#region statics
-		private static IPAddress _hostAddr;
-		private static IPEndPoint _socketAddr;
 		private static AndroidDebugBridge _instance;
 		private static bool _clientSupport;
+
+		public static IPEndPoint SocketAddress { get; private set; }
+		public static IPAddress HostAddress { get; private set; }
 
 		static AndroidDebugBridge ( ) {
 			// built-in local address/port for ADB.
 			try {
-				_hostAddr = IPAddress.Parse ( ADB_HOST );
+				HostAddress = IPAddress.Parse ( ADB_HOST );
 
-				_socketAddr = new IPEndPoint ( _hostAddr, ADB_PORT );
+				SocketAddress = new IPEndPoint ( HostAddress, ADB_PORT );
 			} catch ( ArgumentOutOfRangeException e ) {
 
 			}
@@ -81,7 +82,7 @@ namespace Managed.Adb {
 		public static void Initialize ( bool clientSupport ) {
 			ClientSupport = clientSupport;
 
-			MonitorThread monitorThread = MonitorThread.createInstance ( );
+			/*MonitorThread monitorThread = MonitorThread.createInstance ( );
 			monitorThread.start ( );
 
 			HandleHello.register ( monitorThread );
@@ -90,7 +91,7 @@ namespace Managed.Adb {
 			HandleThread.register ( monitorThread );
 			HandleHeap.register ( monitorThread );
 			HandleWait.register ( monitorThread );
-			HandleProfiling.register ( monitorThread );
+			HandleProfiling.register ( monitorThread );*/
 		}
 
 		/**
@@ -98,7 +99,7 @@ namespace Managed.Adb {
 		*/
 		public static void Terminate ( ) {
 			// kill the monitoring services
-			if ( Instance != null && Instance.DeviceMonitor != null ) {
+			/*if ( Instance != null && Instance.DeviceMonitor != null ) {
 				Instance.DeviceMonitor.Stop ( );
 				Instance.DeviceMonitor = null;
 			}
@@ -106,7 +107,7 @@ namespace Managed.Adb {
 			MonitorThread monitorThread = MonitorThread.getInstance ( );
 			if ( monitorThread != null ) {
 				monitorThread.quit ( );
-			}
+			}*/
 		}
 
 
@@ -286,7 +287,7 @@ namespace Managed.Adb {
      * @return true if success.
      */
 		public bool Start ( ) {
-			if ( AdbOsLocation != null && ( VersionCheck == false || StartAdb ( ) == false ) ) {
+			/*if ( AdbOsLocation != null && ( VersionCheck == false || StartAdb ( ) == false ) ) {
 				return false;
 			}
 
@@ -295,7 +296,7 @@ namespace Managed.Adb {
 			// now that the bridge is connected, we start the underlying services.
 			DeviceMonitor = new DeviceMonitor ( this );
 			DeviceMonitor.Start ( );
-
+			*/
 			return true;
 		}
 
@@ -305,7 +306,7 @@ namespace Managed.Adb {
      */
 		public bool Stop ( ) {
 			// if we haven't started we return false;
-			if ( Started == false ) {
+			/*if ( Started == false ) {
 				return false;
 			}
 
@@ -317,7 +318,7 @@ namespace Managed.Adb {
 				return false;
 			}
 
-			Started = false;
+			Started = false;*/
 			return true;
 		}
 
@@ -331,7 +332,7 @@ namespace Managed.Adb {
 				return false;
 			}
 
-			if ( VersionCheck == false ) {
+			/*if ( VersionCheck == false ) {
 				Log.LogAndDisplay ( LogLevel.ERROR, ADB, "Attempting to restart adb, but version check failed!" ); //$NON-NLS-1$
 				return false;
 			}
@@ -346,7 +347,10 @@ namespace Managed.Adb {
 				}
 
 				return restart;
-			}
+			}*/
+
+
+			return false;
 		}
 
 
@@ -365,9 +369,9 @@ namespace Managed.Adb {
 		/// <value>The devices.</value>
 		public List<IDevice> Devices {
 			get {
-				if ( DeviceMonitor != null ) {
+				/*if ( DeviceMonitor != null ) {
 					return DeviceMonitor.Devices;
-				}
+				}*/
 				return new List<IDevice> ( );
 			}
 		}
@@ -387,9 +391,9 @@ namespace Managed.Adb {
 		/// 	<c>true</c> if [has initial device list]; otherwise, <c>false</c>.
 		/// </returns>
 		public bool HasInitialDeviceList ( ) {
-			if ( DeviceMonitor != null ) {
+			/*if ( DeviceMonitor != null ) {
 				return DeviceMonitor.HasInitialDeviceList;
-			}
+			}*/
 			return false;
 		}
 
@@ -397,19 +401,19 @@ namespace Managed.Adb {
      * Sets the client to accept debugger connection on the custom "Selected debug port".
      * @param selectedClient the client. Can be null.
      */
-		public Client SelectedClient {
+		public IClient SelectedClient {
 			get {
-				MonitorThread monitorThread = MonitorThread.Instance;
+				/*MonitorThread monitorThread = MonitorThread.Instance;
 				if ( monitorThread != null ) {
 					return monitorThread.SelectedClient = selectedClient;
-				}
+				}*/
 				return null;
 			}
 			set {
-				MonitorThread monitorThread = MonitorThread.Instance;
+				/*MonitorThread monitorThread = MonitorThread.Instance;
 				if ( monitorThread != null ) {
 					monitorThread.SelectedClient = value;
-				}
+				}*/
 			}
 		}
 		/// <summary>
@@ -420,10 +424,10 @@ namespace Managed.Adb {
 		/// </value>
 		public bool IsConnected {
 			get {
-				MonitorThread monitorThread = MonitorThread.Instance;
+				/*MonitorThread monitorThread = MonitorThread.Instance;
 				if ( DeviceMonitor != null && monitorThread != null ) {
 					return DeviceMonitor.IsMonitoring && monitorThread.State != State.TERMINATED;
-				}
+				}*/
 				return false;
 			}
 		}
@@ -434,9 +438,9 @@ namespace Managed.Adb {
 		/// <value>The connection attempt count.</value>
 		public int ConnectionAttemptCount {
 			get {
-				if ( DeviceMonitor != null ) {
+				/*if ( DeviceMonitor != null ) {
 					return DeviceMonitor.ConnectionAttemptCount;
-				}
+				}*/
 				return -1;
 			}
 		}
@@ -448,9 +452,9 @@ namespace Managed.Adb {
 		/// <value>The restart attempt count.</value>
 		public int RestartAttemptCount {
 			get {
-				if ( DeviceMonitor != null ) {
+				/*if ( DeviceMonitor != null ) {
 					return DeviceMonitor.RestartAttemptCount;
-				}
+				}*/
 				return -1;
 			}
 		}
@@ -458,7 +462,7 @@ namespace Managed.Adb {
 		//public DeviceMonitor DeviceMonitor { get; private set; }
 		#endregion
 
-
+		private bool VersionCheck { get; set; }
 		#region private methods
 
 		/**
@@ -474,9 +478,9 @@ namespace Managed.Adb {
 			}
 
 			try {
-				String[] command = new String[ 2 ];
-				command[ 0 ] = AdbOsLocation;
-				command[ 1 ] = "version"; //$NON-NLS-1$
+				String[] command = new String[2];
+				command[0] = AdbOsLocation;
+				command[1] = "version"; //$NON-NLS-1$
 				Log.d ( DDMS, String.Format ( "Checking '{0} version'", AdbOsLocation ) ); //$NON-NLS-1$
 				Process process = Process.Start ( command[0], command[1] );
 
@@ -518,7 +522,7 @@ namespace Managed.Adb {
 			} catch ( IOException e ) {
 				Log.LogAndDisplay ( LogLevel.Error, ADB,
 								"Failed to get the adb version: " + e.Message ); //$NON-NLS-1$
-			} catch ( InterruptedException e ) {
+			} catch ( ThreadAbortException e ) {
 			} finally {
 
 			}
@@ -540,29 +544,29 @@ namespace Managed.Adb {
 		private bool ScanVersionLine ( String line ) {
 			if ( !string.IsNullOrEmpty ( line ) ) {
 
-				Match matcher = Regex.Match ( line, sAdbVersion );
+				Match matcher = Regex.Match ( line, ADB_VERSION_PATTERN );
 				if ( matcher.Success ) {
-					int majorVersion = int.Parse ( matcher.Groups[ 1 ].Value );
-					int minorVersion = int.Parse ( matcher.Groups[ 2 ].Value );
-					int microVersion = int.Parse ( matcher.Groups[ 3 ].Value );
+					int majorVersion = int.Parse ( matcher.Groups[1].Value );
+					int minorVersion = int.Parse ( matcher.Groups[2].Value );
+					int microVersion = int.Parse ( matcher.Groups[3].Value );
 
 					// check only the micro version for now.
 					if ( microVersion < ADB_VERSION_MICRO_MIN ) {
-						String message = String.format (
+						String message = String.Format (
 										"Required minimum version of adb: {0}.{1}.{2}." //$NON-NLS-1$
 										+ "Current version is {0}.{1}.{3}", //$NON-NLS-1$
 										majorVersion, minorVersion, ADB_VERSION_MICRO_MIN,
 										microVersion );
-						Log.LogAndDisplay ( LogLevel.ERROR, ADB, message );
+						Log.LogAndDisplay ( LogLevel.Error, ADB, message );
 					} else if ( ADB_VERSION_MICRO_MAX != -1 && microVersion > ADB_VERSION_MICRO_MAX ) {
-						String message = String.format (
+						String message = String.Format (
 										"Required maximum version of adb: {0}.{1}.{2}." //$NON-NLS-1$
 										+ "Current version is {0}.{1}.{3}", //$NON-NLS-1$
 										majorVersion, minorVersion, ADB_VERSION_MICRO_MAX,
 										microVersion );
-						Log.LogAndDisplay ( LogLevel.ERROR, ADB, message );
+						Log.LogAndDisplay ( LogLevel.Error, ADB, message );
 					} else {
-						mVersionCheck = true;
+						VersionCheck = true;
 					}
 					return true;
 				}
@@ -580,13 +584,13 @@ namespace Managed.Adb {
 			int status = -1;
 
 			try {
-				String[] command = new String[ 2 ];
-				command[ 0 ] = mAdbOsLocation;
-				command[ 1 ] = "start-server"; //$NON-NLS-1$
+				String[] command = new String[2];
+				command[0] = AdbOsLocation;
+				command[1] = "start-server"; //$NON-NLS-1$
 				Log.d ( DDMS,
 								String.Format ( "Launching '{0} {1}' to ensure ADB is running.", //$NON-NLS-1$
-								mAdbOsLocation, command[ 1 ] ) );
-				proc = Runtime.getRuntime ( ).exec ( command );
+								AdbOsLocation, command[1] ) );
+				proc = Process.Start ( command[0], command[1] );
 
 				List<String> errorOutput = new List<String> ( );
 				List<String> stdOutput = new List<String> ( );
@@ -595,7 +599,7 @@ namespace Managed.Adb {
 			} catch ( IOException ioe ) {
 				Log.d ( DDMS, "Unable to run 'adb': " + ioe.Message ); //$NON-NLS-1$
 				// we'll return false;
-			} catch ( InterruptedException ie ) {
+			} catch ( ThreadInterruptedException ie ) {
 				Log.d ( DDMS, "Unable to run 'adb': " + ie.Message ); //$NON-NLS-1$
 				// we'll return false;
 			}
@@ -624,9 +628,9 @@ namespace Managed.Adb {
 			int status = -1;
 
 			try {
-				String[] command = new String[ 2 ];
-				command[ 0 ] = AdbOsLocation;
-				command[ 1 ] = "kill-server"; //$NON-NLS-1$
+				String[] command = new String[2];
+				command[0] = AdbOsLocation;
+				command[1] = "kill-server"; //$NON-NLS-1$
 				proc = Process.Start ( command[0], command[1] );
 				proc.WaitForExit ( );
 				status = proc.ExitCode;

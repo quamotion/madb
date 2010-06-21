@@ -28,7 +28,7 @@ namespace Managed.Adb {
     /**
      * Returns the device properties. It contains the whole output of 'getprop'
      */
-    Dictionary<String, String> getProperties();
+		Dictionary<String, String> Properties { get; }
 
     /**
      * Returns the number of property for this device.
