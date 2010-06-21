@@ -455,7 +455,7 @@ namespace Managed.Adb {
 			}
 		}
 
-		public DeviceMonitor DeviceMonitor { get; private set; }
+		//public DeviceMonitor DeviceMonitor { get; private set; }
 		#endregion
 
 

@@ -4,15 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 using System.Net;
-using System.Drawing;
-using System.Threading;
 using System.IO;
-using Managed.Adb.Exceptions;
-using Managed.Adb.Utilities.IO;
-using Managed.Adb.Utilities.Conversion;
+using System.Threading;
 
 namespace Managed.Adb {
-	internal class AdbHelper {
+	public class AdbHelper {
+		private const string TAG = typeof ( AdbHelper ).Name;
 		private AdbHelper ( ) {
 
 		}
@@ -29,12 +26,15 @@ namespace Managed.Adb {
 
 		private const int WAIT_TIME = 5;
 
-		public Socket Open ( IPAddress address, int port ) {
+		public Socket Open ( IPAddress address, IDevice device, int port ) {
 			Socket s = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
 				s.Connect ( address, port );
-				s.Blocking = false;
-				s.NoDelay = true;
+				s.Blocking = true;
+				s.NoDelay = false;
+
+				SetDevice ( s, device );
+
 				byte[] req = CreateAdbForwardRequest ( null, port );
 				if ( !Write ( s, req ) ) {
 					throw new IOException ( "failed submitting request to ADB" );
@@ -51,6 +51,52 @@ namespace Managed.Adb {
 			return s;
 		}
 
+		public int GetAdbVersion ( IPEndPoint address ) {
+			byte[] request = FormAdbRequest ( "host:version" );
+			byte[] reply;
+			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+			try {
+				adbChan.Connect ( address );
+				adbChan.Blocking = true;
+				if ( !Write ( adbChan, request ) )
+					throw new IOException ( "failed asking for adb version" );
+
+				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
+				if ( !resp.IOSuccess || !resp.Okay ) {
+					Log.e(TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message );
+					adbChan.Close ( );
+					return -1;
+				}
+
+				reply = new byte[4];
+				if ( !Read ( adbChan, reply ) ) {
+					Log.e(TAG, "error in getting data length" );
+
+					adbChan.Close ( );
+					return -1;
+				}
+
+				String lenHex = Encoding.Default.GetString ( reply );
+				int len = int.Parse ( lenHex, System.Globalization.NumberStyles.HexNumber );
+
+				// the protocol version.
+				reply = new byte[len];
+				if ( !Read ( adbChan, reply ) ) {
+					Log.e ( TAG, "did not get the version info" );
+
+					adbChan.Close ( );
+					return -1;
+				}
+
+				String sReply = Encoding.Default.GetString ( reply );
+				return int.Parse ( sReply, System.Globalization.NumberStyles.HexNumber );
+
+			} catch ( Exception ex ) {
+				Console.WriteLine ( ex );
+				throw;
+			}
+		}
+
 		public byte[] CreateAdbForwardRequest ( String address, int port ) {
 			String request;
 
@@ -62,17 +108,16 @@ namespace Managed.Adb {
 		}
 
 		private byte[] FormAdbRequest ( String req ) {
-			String resultStr = String.Format ( "{0}{1}", req.Length.ToString ( "X4" ), req ); //$NON-NLS-1$
-			Console.WriteLine ( resultStr );
+			String resultStr = String.Format ( "{0}{1}\n", req.Length.ToString ( "X4" ), req ); //$NON-NLS-1$
 			byte[] result;
 			try {
 				result = Encoding.Default.GetBytes ( resultStr );
 			} catch ( EncoderFallbackException efe ) {
-				Console.WriteLine ( efe );
+				Log.e ( TAG, efe );
 				return null;
 			}
 
-			System.Diagnostics.Debug.Assert ( result.Length == req.Length + 4, String.Format ( "result: {0}\nreq: {0}", result.Length, req.Length ) );
+			System.Diagnostics.Debug.Assert ( result.Length == req.Length + 5, String.Format ( "result: {1}{0}\nreq: {3}{2}", result.Length, Encoding.Default.GetString ( result ), req.Length, req ) );
 			return result;
 		}
 
@@ -80,7 +125,7 @@ namespace Managed.Adb {
 			try {
 				Write ( socket, data, -1, 5 * 1000 );
 			} catch ( IOException e ) {
-				Console.WriteLine ( e );
+				Log.e ( TAG, e );
 				return false;
 			}
 
@@ -88,33 +133,32 @@ namespace Managed.Adb {
 		}
 
 		private void Write ( Socket socket, byte[] data, int length, int timeout ) {
-			using ( var buf = new MemoryStream ( data, 0, length != -1 ? length : data.Length ) ) {
-				int numWaits = 0;
+			//using ( var buf = new MemoryStream ( data, 0, length != -1 ? length : data.Length ) ) {
+			int numWaits = 0;
+			int count = -1;
 
-				//while ( buf.Position != buf.Length ) {
-				try {
-					int count;
-					Console.WriteLine ( Encoding.Default.GetString ( data ) );
-					count = socket.Send ( buf.ToArray ( ) );
-					if ( count < 0 ) {
-						throw new IOException ( "channel EOF" );
-					} else if ( count == 0 ) {
-						// TODO: need more accurate timeout?
-						if ( timeout != 0 && numWaits * WAIT_TIME > timeout ) {
-							throw new IOException ( "timeout" );
-						}
-						// non-blocking spin
-						Thread.Sleep ( WAIT_TIME );
-						numWaits++;
-					} else {
-						numWaits = 0;
+			//while ( buf.Position != buf.Length ) {
+			try {
+				count = socket.Send ( data, 0, length != -1 ? length : data.Length, SocketFlags.None );
+				if ( count < 0 ) {
+					throw new IOException ( "channel EOF" );
+				} else if ( count == 0 ) {
+					// TODO: need more accurate timeout?
+					if ( timeout != 0 && numWaits * WAIT_TIME > timeout ) {
+						throw new IOException ( "timeout" );
 					}
-				} catch ( SocketException sex ) {
-					Console.WriteLine ( sex );
-					throw;
+					// non-blocking spin
+					Thread.Sleep ( WAIT_TIME );
+					numWaits++;
+				} else {
+					numWaits = 0;
 				}
-				//}
+			} catch ( SocketException sex ) {
+				Console.WriteLine ( sex );
+				throw;
 			}
+			//}
+			//}
 		}
 
 		AdbResponse ReadAdbResponse ( Socket socket, bool readDiagString ) {
@@ -122,7 +166,7 @@ namespace Managed.Adb {
 			AdbResponse resp = new AdbResponse ( );
 
 			byte[] reply = new byte[4];
-			if ( Read ( socket, reply ) == false ) {
+			if ( !Read ( socket, reply ) ) {
 				return resp;
 			}
 			resp.IOSuccess = true;
@@ -138,7 +182,7 @@ namespace Managed.Adb {
 			while ( readDiagString ) {
 				// length string is in next 4 bytes
 				byte[] lenBuf = new byte[4];
-				if ( Read ( socket, lenBuf ) == false ) {
+				if ( !Read ( socket, lenBuf ) ) {
 					Console.WriteLine ( "Expected diagnostic string not found" );
 					break;
 				}
@@ -150,21 +194,21 @@ namespace Managed.Adb {
 					len = int.Parse ( lenStr, System.Globalization.NumberStyles.HexNumber );
 
 				} catch ( FormatException nfe ) {
-					Console.WriteLine ( "Expected digits, got '" + lenStr + "': "
+					Log.e ( TAG, "Expected digits, got '" + lenStr + "': "
 										+ lenBuf[0] + " " + lenBuf[1] + " " + lenBuf[2] + " "
 										+ lenBuf[3] );
-					Console.WriteLine ( "reply was " + ReplyToString ( reply ) );
+					Log.e ( TAG, "reply was " + ReplyToString ( reply ) );
 					break;
 				}
 
 				byte[] msg = new byte[len];
-				if ( Read ( socket, msg ) == false ) {
-					Console.WriteLine ( "Failed reading diagnostic string, len=" + len );
+				if ( !Read ( socket, msg ) ) {
+					Log.e ( TAG, "Failed reading diagnostic string, len=" + len );
 					break;
 				}
 
 				resp.Message = ReplyToString ( msg );
-				Console.WriteLine ( "Got reply '" + ReplyToString ( reply ) + "', diag='"
+				Log.e ( TAG, "Got reply '" + ReplyToString ( reply ) + "', diag='"
 								+ resp.Message + "'" );
 
 				break;
@@ -175,9 +219,9 @@ namespace Managed.Adb {
 
 		private bool Read ( Socket socket, byte[] data ) {
 			try {
-				Read ( socket, data, -1, 5 * 1000 );
+				Read ( socket, data, -1, 15 * 1000 );
 			} catch ( IOException e ) {
-				Console.WriteLine ( "readAll: IOException: " + e.Message );
+				Log.e ( TAG, "readAll: IOException: " + e.Message );
 				return false;
 			}
 
@@ -185,32 +229,48 @@ namespace Managed.Adb {
 		}
 
 		private void Read ( Socket socket, byte[] data, int length, int timeout ) {
-			using ( var buf = new MemoryStream ( data, 0, length != -1 ? length : data.Length ) ) {
+			int expLen = length != -1 ? length : data.Length;
+			using ( var buf = new MemoryStream ( expLen ) ) {
+				buf.Position = 0;
 				int numWaits = 0;
-
-				while ( buf.Position != buf.Length ) {
-					int count;
+				int count = -1;
+				while ( count != 0 ) {
 					try {
-						count = socket.Receive ( data );
+						socket.ReceiveBufferSize = expLen;
+						byte[] buffer = new byte[socket.ReceiveBufferSize];
+						count = socket.Receive ( buffer );
 						if ( count < 0 ) {
-							Console.WriteLine ( "read: channel EOF" );
+							Log.e ( TAG, "read: channel EOF" );
 							throw new IOException ( "EOF" );
 						} else if ( count == 0 ) {
 							// TODO: need more accurate timeout?
 							if ( timeout != 0 && numWaits * WAIT_TIME > timeout ) {
-								Console.WriteLine ( "read: timeout" );
+								Log.e ( TAG, "read: timeout" );
 								throw new IOException ( "timeout" );
 							}
 							// non-blocking spin
 							Thread.Sleep ( WAIT_TIME );
 							numWaits++;
 						} else {
+							//Console.WriteLine ( Encoding.Default.GetString ( buffer ) );
+							buf.Write ( buffer, 0, count );
 							numWaits = 0;
+
+							if ( buf.Position == buf.Length ) {
+								if ( buf.Length >= expLen ) {
+									byte[] outBuffer = buf.ToArray ( );
+									Array.Copy ( outBuffer, data, data.Length );
+									count = -1;
+									break;
+								}
+							}
 						}
 					} catch ( SocketException sex ) {
-						throw new IOException ( "No Data to read" );
+						throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
 					}
 				}
+
+
 			}
 		}
 
@@ -224,12 +284,12 @@ namespace Managed.Adb {
 			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
 				adbChan.Connect ( adbSockAddr );
-				adbChan.Blocking = false;
+				adbChan.Blocking = true;
 
 				byte[] request = FormAdbRequest ( String.Format ( "host-serial:{0}:forward:tcp:{1};tcp:{2}", //$NON-NLS-1$
-								device.getSerialNumber ( ), localPort, remotePort ) );
+								device.SerialNumber, localPort, remotePort ) );
 
-				if ( Write ( adbChan, request ) == false ) {
+				if ( !Write ( adbChan, request ) ) {
 					throw new IOException ( "failed to submit the forward command." );
 				}
 
@@ -256,13 +316,58 @@ namespace Managed.Adb {
 			try {
 				result = Encoding.Default.GetString ( reply );
 			} catch ( DecoderFallbackException uee ) {
-				Console.WriteLine ( uee );
+				Log.e(TAG, uee );
 				result = "";
 			}
 			return result;
 		}
 
-		public RawImage GetFrameBuffer ( IPEndPoint adbSockAddr ) {
+		public List<Device> GetDevices ( IPEndPoint address ) {
+			byte[] request = FormAdbRequest ( "host:devices" ); //$NON-NLS-1$
+			byte[] reply;
+			Socket socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+
+			try {
+				socket.Connect ( address );
+				socket.Blocking = true;
+				if ( !Write ( socket, request ) )
+					throw new IOException ( "failed asking for devices" );
+
+				AdbResponse resp = ReadAdbResponse ( socket, false /* readDiagString */);
+				if ( !resp.IOSuccess || !resp.Okay ) {
+					Log.e ( TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message );
+					socket.Close ( );
+					return null;
+				}
+
+				reply = new byte[4];
+				if ( !Read ( socket, reply ) ) {
+					Log.e ( TAG, "error in getting data length" );
+					socket.Close ( );
+					return null;
+				}
+				String lenHex = Encoding.Default.GetString ( reply );
+				int len = int.Parse ( lenHex, System.Globalization.NumberStyles.HexNumber );
+
+				reply = new byte[len];
+				if ( !Read ( socket, reply ) ) {
+					Log.e ( TAG, "error in getting data" );
+					socket.Close ( );
+					return null;
+				}
+
+				List<Device> s = new List<Device> ( );
+				String[] data = Encoding.Default.GetString ( reply ).Split ( new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries );
+				foreach ( var item in data ) {
+					s.Add ( Device.CreateFromAdbData ( item ) );
+				}
+				return s;
+			} finally {
+				socket.Close ( );
+			}
+		}
+
+		public RawImage GetFrameBuffer ( IPEndPoint adbSockAddr, IDevice device ) {
 
 			RawImage imageParams = new RawImage ( );
 			byte[] request = FormAdbRequest ( "framebuffer:" ); //$NON-NLS-1$
@@ -274,36 +379,33 @@ namespace Managed.Adb {
 			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
 				adbChan.Connect ( adbSockAddr );
-				adbChan.Blocking = false;
-				adbChan.NoDelay = true;
+				adbChan.Blocking = true;
 
 				// if the device is not -1, then we first tell adb we're looking to talk
 				// to a specific device
-				//setDevice(adbChan, device);
-
-				if ( Write ( adbChan, request ) == false )
+				SetDevice ( adbChan, device );
+				if ( !Write ( adbChan, request ) )
 					throw new IOException ( "failed asking for frame buffer" );
 
 				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
-					Console.WriteLine ( "Got timeout or unhappy response from ADB fb req: "
-									+ resp.Message );
+					Log.e ( TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message );
 					adbChan.Close ( );
 					return null;
 				}
 
 				// first the protocol version.
 				reply = new byte[4];
-				if ( Read ( adbChan, reply ) == false ) {
-					Console.WriteLine ( "got partial reply from ADB fb:" );
+				if ( !Read ( adbChan, reply ) ) {
+					Log.e ( TAG, "got partial reply from ADB fb:" );
 
 					adbChan.Close ( );
 					return null;
 				}
-				EndianBinaryReader buf;
+				BinaryReader buf;
 				int version = 0;
 				using ( MemoryStream ms = new MemoryStream ( reply ) ) {
-					buf = new EndianBinaryReader ( EndianBitConverter.Little, ms );
+					buf = new BinaryReader ( ms );
 
 					version = buf.ReadInt32 ( );
 				}
@@ -312,32 +414,32 @@ namespace Managed.Adb {
 				int headerSize = RawImage.GetHeaderSize ( version );
 				// read the header
 				reply = new byte[headerSize * 4];
-				if ( Read ( adbChan, reply ) == false ) {
-					Console.WriteLine ( "got partial reply from ADB fb:" );
+				if ( !Read ( adbChan, reply ) ) {
+					Log.w ( TAG, "got partial reply from ADB fb:" );
 
 					adbChan.Close ( );
 					return null;
 				}
 				using ( MemoryStream ms = new MemoryStream ( reply ) ) {
-					buf = new EndianBinaryReader ( EndianBitConverter.Little, ms );
+					buf = new BinaryReader ( ms );
 
 					// fill the RawImage with the header
 					if ( imageParams.ReadHeader ( version, buf ) == false ) {
-						Console.WriteLine ( "Screenshot", "Unsupported protocol: " + version );
+						Log.w ( TAG, "Unsupported protocol: " + version );
 						return null;
 					}
 				}
 
-				Console.WriteLine ( "ddms", "image params: bpp=" + imageParams.Bpp + ", size="
+				Log.d ( TAG, "image params: bpp=" + imageParams.Bpp + ", size="
 								+ imageParams.Size + ", width=" + imageParams.Width
 								+ ", height=" + imageParams.Height );
 
-				if ( Write ( adbChan, nudge ) == false )
+				if ( !Write ( adbChan, nudge ) )
 					throw new IOException ( "failed nudging" );
 
 				reply = new byte[imageParams.Size];
-				if ( Read ( adbChan, reply ) == false ) {
-					Console.WriteLine ( "got truncated reply from ADB fb data" );
+				if ( !Read ( adbChan, reply ) ) {
+					Log.w ( TAG, "got truncated reply from ADB fb data" );
 					adbChan.Close ( );
 					return null;
 				}
@@ -352,14 +454,76 @@ namespace Managed.Adb {
 			return imageParams;
 		}
 
-		private void setDevice ( Socket adbChan, Device device ) {
+
+		// not yet tested
+		public void ExecuteRemoteCommand ( IPEndPoint adbSockAddr, String command, Device device, IShellOutputReceiver rcvr ) {
+			Console.WriteLine ( "execute: running " + command );
+
+			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+			try {
+				adbChan.Connect ( adbSockAddr );
+				adbChan.Blocking = true;
+
+				// if the device is not -1, then we first tell adb we're looking to
+				// talk
+				// to a specific device
+				SetDevice ( adbChan, device );
+
+				byte[] request = FormAdbRequest ( "shell:" + command ); //$NON-NLS-1$
+				if ( !Write ( adbChan, request ) )
+					throw new IOException ( "failed submitting shell command" );
+
+				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
+				if ( !resp.IOSuccess || !resp.Okay ) {
+					Console.WriteLine ( "ADB rejected shell command (" + command + "): " + resp.Message );
+					throw new IOException ( "sad result from adb: " + resp.Message );
+				}
+
+				byte[] data = new byte[16384];
+				using ( var buf = new MemoryStream ( data.Length ) ) {
+					while ( true ) {
+						int count;
+
+						if ( rcvr != null && rcvr.IsCancelled ) {
+							Log.w ( TAG, "execute: cancelled" );
+							break;
+						}
+
+						count = adbChan.Receive ( data );
+						if ( count < 0 ) {
+							buf.Write ( data, 0, count );
+							// we're at the end, we flush the output
+							rcvr.Flush ( );
+							Log.w ( TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: "
+											+ count );
+							break;
+						} else if ( count == 0 ) {
+							Thread.Sleep ( WAIT_TIME * 5 );
+						} else {
+							if ( rcvr != null ) {
+								byte[] outData = buf.ToArray ( );
+								rcvr.AddOutput ( outData, 0, (int)outData.Length );
+							}
+							buf.Position = 0;
+						}
+					}
+				}
+			} finally {
+				if ( adbChan != null ) {
+					adbChan.Close ( );
+				}
+				Log.d ( TAG, "execute: returning" );
+			}
+		}
+
+		private void SetDevice ( Socket adbChan, IDevice device ) {
 			// if the device is not -1, then we first tell adb we're looking to talk
 			// to a specific device
 			if ( device != null ) {
-				String msg = "host:transport:" + device.GetSerialNumber ( ); //$NON-NLS-1$
+				String msg = "host:transport:" + device.SerialNumber; //$NON-NLS-1$
 				byte[] device_query = FormAdbRequest ( msg );
 
-				if ( Write ( adbChan, device_query ) == false ) {
+				if ( !Write ( adbChan, device_query ) ) {
 					throw new IOException ( "failed submitting device (" + device + ") request to ADB" );
 				}
 
@@ -382,13 +546,13 @@ namespace Managed.Adb {
 			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
 				adbChan.Connect ( adbSockAddr );
-				adbChan.Blocking = false;
+				adbChan.Blocking = true;
 
 				// if the device is not -1, then we first tell adb we're looking to talk
 				// to a specific device
-				setDevice ( adbChan, device );
+				SetDevice ( adbChan, device );
 
-				if ( Write ( adbChan, request ) == false ) {
+				if ( !Write ( adbChan, request ) ) {
 					throw new IOException ( "failed asking for reboot" );
 				}
 			} finally {
@@ -400,3 +564,4 @@ namespace Managed.Adb {
 
 	}
 }
+

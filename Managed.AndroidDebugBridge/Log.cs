@@ -13,7 +13,7 @@ namespace Managed.Adb {
 			void WriteAndPromptLog ( LogLevel.LogLevelInfo logLevel, String tag, String message );
 		}
 
-		private static LogLevel.LogLevelInfo mLevel = DdmPreferences.getLogLevel ( );
+		private static LogLevel.LogLevelInfo mLevel = DdmPreferences.LogLevel;
 
 		private static ILogOutput sLogOutput;
 
@@ -33,7 +33,7 @@ namespace Managed.Adb {
 
 		private Log ( ) { }
 
-		static sealed class Config {
+		sealed class Config {
 			public const bool LOGV = true;
 			public const bool LOGD = true;
 		};
@@ -72,6 +72,10 @@ namespace Managed.Adb {
 		 */
 		public static void w ( String tag, String message ) {
 			WriteLine ( LogLevel.Warn, tag, message );
+		}
+
+		public static void w ( String tag, Exception exception ) {
+			WriteLine ( LogLevel.Warn, tag, exception.Message + '\n' + exception.StackTrace );
 		}
 
 		/**

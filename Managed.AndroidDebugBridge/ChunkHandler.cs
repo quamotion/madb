@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Managed.Adb.Utilities.IO;
-using Managed.Adb.Utilities.Conversion;
 
 namespace Managed.Adb {
 	public abstract class ChunkHandler {
 		public enum ByteOrder {
-			LittleEndian
-			BigEndian,
+			LittleEndian,
+			BigEndian
 		}
 
 		public const int CHUNK_HEADER_LEN = 8;   // 4-byte type, 4-byte len

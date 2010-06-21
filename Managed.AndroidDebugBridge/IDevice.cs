@@ -68,19 +68,19 @@ namespace Managed.Adb {
     /**
      * Returns whether the {@link Device} has {@link Client}s.
      */
-		bool HasClients { get; }
+		//bool HasClients { get; }
 
     /**
      * Returns the array of clients.
      */
-		Client[] Clients { get; }
+		//Client[] Clients { get; }
 
     /**
      * Returns a {@link Client} by its application name.
      * @param applicationName the name of the application
      * @return the <code>Client</code> object or <code>null</code> if no match was found.
      */
-    Client GetClient(String applicationName);
+    //Client GetClient(String applicationName);
 
     /**
      * Returns a {@link SyncService} object to push / pull files to and from the device.
@@ -88,12 +88,12 @@ namespace Managed.Adb {
      * refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
      * @throws IOException if the connection with adb failed.
      */
-		SyncService SyncService { get; }
+		//SyncService SyncService { get; }
 
     /**
      * Returns a {@link FileListingService} for this device.
      */
-		FileListingService FileListingService { get; }
+		//FileListingService FileListingService { get; }
 
     /**
      * Takes a screen shot of the device and returns it as a {@link RawImage}.
@@ -116,7 +116,7 @@ namespace Managed.Adb {
      * @param receiver the receiver to receive the event log entries.
      * @throws IOException
      */
-    void RunEventLogService(LogReceiver receiver);
+    //void RunEventLogService(LogReceiver receiver);
 
     /**
      * Runs the log service for the given log and outputs the log to the {@link LogReceiver}.
@@ -124,7 +124,7 @@ namespace Managed.Adb {
      * @param receiver the receiver to receive the event log entries.
      * @throws IOException
      */
-    void RunLogService(String logname, LogReceiver receiver);
+    //void RunLogService(String logname, LogReceiver receiver);
 
     /**
      * Creates a port forwarding between a local and a remote port.
@@ -132,7 +132,7 @@ namespace Managed.Adb {
      * @param remotePort the remote port.
      * @return <code>true</code> if success.
      */
-    bool CreateForward(int localPort, int remotePort);
+    //bool CreateForward(int localPort, int remotePort);
 
     /**
      * Removes a port forwarding between a local and a remote port.
@@ -140,13 +140,13 @@ namespace Managed.Adb {
      * @param remotePort the remote port.
      * @return <code>true</code> if success.
      */
-    bool RemoveForward(int localPort, int remotePort);
+    //bool RemoveForward(int localPort, int remotePort);
 
     /**
      * Returns the name of the client by pid or <code>null</code> if pid is unknown
      * @param pid the pid of the client.
      */
-    String GetClientName(int pid);
+    //String GetClientName(int pid);
 
     /**
      * Installs an Android application on device.
@@ -157,7 +157,7 @@ namespace Managed.Adb {
      * @return a {@link String} with an error code, or <code>null</code> if success.
      * @throws IOException
      */
-    String InstallPackage(String packageFilePath, bool reinstall) ;
+    //String InstallPackage(String packageFilePath, bool reinstall) ;
 
     /**
      * Pushes a file to device
@@ -165,7 +165,7 @@ namespace Managed.Adb {
      * @return {@link String} destination path on device for file
      * @throws IOException if fatal error occurred when pushing file
      */
-		String SyncPackageToDevice ( String localFilePath );
+		//String SyncPackageToDevice ( String localFilePath );
 
     /**
      * Installs the application package that was pushed to a temporary location on the device.
@@ -173,14 +173,14 @@ namespace Managed.Adb {
      * @param reinstall set to <code>true</code> if re-install of app should be performed
      * @throws InstallException if installation failed
      */
-    String InstallRemotePackage(String remoteFilePath, bool reinstall);
+    //String InstallRemotePackage(String remoteFilePath, bool reinstall);
 
     /**
      * Remove a file from device
      * @param remoteFilePath path on device of file to remove
      * @throws IOException if file removal failed
      */
-    void RemoveRemotePackage(String remoteFilePath);
+    //void RemoveRemotePackage(String remoteFilePath);
 
     /**
      * Uninstall an package from the device.
@@ -188,6 +188,6 @@ namespace Managed.Adb {
      * @return a {@link String} with an error code, or <code>null</code> if success.
      * @throws IOException
      */
-    String UninstallPackage(String packageName) ;
+    //String UninstallPackage(String packageName) ;
 	}
 }

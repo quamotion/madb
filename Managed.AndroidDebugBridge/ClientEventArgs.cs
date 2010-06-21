@@ -21,7 +21,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="client">The client.</param>
 		/// <param name="changeMask">The change mask.</param>
-		public ClientEventArgs ( Client client, ClientChangeMask changeMask ) {
+		public ClientEventArgs ( IClient client, ClientChangeMask changeMask ) {
 			this.Client = client;
 			this.ChangeMask = changeMask;
 		}
@@ -35,7 +35,7 @@ namespace Managed.Adb {
 		/// Gets the client.
 		/// </summary>
 		/// <value>The client.</value>
-		public Client Client { get; private set; }
+		public IClient Client { get; private set; }
 
 	}
 }

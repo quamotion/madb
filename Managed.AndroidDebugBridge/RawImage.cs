@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Managed.Adb.Utilities.IO;
 
 namespace Managed.Adb {
 	public class RawImage {
-
 		public int Version { get; set; }
 		public int Bpp { get; set; }
 		public int Size { get; set; }
@@ -21,8 +19,8 @@ namespace Managed.Adb {
 		public int GreenLength { get; set; }
 		public int AlphaOffset { get; set; }
 		public int AlphaLength { get; set; }
-		public byte[] Data { get; set; }
 
+		public byte[] Data { get; set; }
 
 		/**
 		 * Reads the header of a RawImage from a {@link ByteBuffer}.
@@ -31,17 +29,17 @@ namespace Managed.Adb {
 		 * @param buf the buffer to read from.
 		 * @return true if success
 		 */
-		public bool ReadHeader ( int version, EndianBinaryReader buf ) {
+		public bool ReadHeader ( int version, BinaryReader buf ) {
 			this.Version = version;
 
-			if ( Version == 16 ) {
+			if ( version == 16 ) {
 				// compatibility mode with original protocol
 				this.Bpp = 16;
 
 				// read actual values.
-				this.Size = buf.ReadByte ( );
-				this.Width = buf.ReadByte ( );
-				this.Height = buf.ReadByte();
+				this.Size = buf.ReadInt32 ( );
+				this.Width = buf.ReadInt32 ( );
+				this.Height = buf.ReadInt32 ( );
 
 				// create default values for the rest. Format is 565
 				this.RedOffset = 11;
@@ -53,18 +51,18 @@ namespace Managed.Adb {
 				this.AlphaOffset = 0;
 				this.AlphaLength = 0;
 			} else if ( version == 1 ) {
-				this.Bpp = buf.ReadByte();
-				this.Size = buf.ReadByte ( );
-				this.Width = buf.ReadByte ( );
-				this.Height = buf.ReadByte ( );
-				this.RedOffset = buf.ReadByte ( );
-				this.RedLength = buf.ReadByte ( );
-				this.BlueOffset = buf.ReadByte ( );
-				this.BlueLength = buf.ReadByte ( );
-				this.GreenOffset = buf.ReadByte ( );
-				this.GreenLength = buf.ReadByte ( );
-				this.AlphaOffset = buf.ReadByte ( );
-				this.AlphaLength = buf.ReadByte ( );
+				this.Bpp = buf.ReadInt32 ( );
+				this.Size = buf.ReadInt32 ( );
+				this.Width = buf.ReadInt32 ( );
+				this.Height = buf.ReadInt32 ( );
+				this.RedOffset = buf.ReadInt32 ( );
+				this.RedLength = buf.ReadInt32 ( );
+				this.BlueOffset = buf.ReadInt32 ( );
+				this.BlueLength = buf.ReadInt32 ( );
+				this.GreenOffset = buf.ReadInt32 ( );
+				this.GreenLength = buf.ReadInt32 ( );
+				this.AlphaOffset = buf.ReadInt32 ( );
+				this.AlphaLength = buf.ReadInt32 ( );
 			} else {
 				// unsupported protocol!
 				return false;
@@ -117,70 +115,73 @@ namespace Managed.Adb {
 		 * Returns a rotated version of the image
 		 * The image is rotated counter-clockwise.
 		 */
-		public RawImage getRotated ( ) {
-        RawImage rotated = new RawImage();
-        rotated.Version = this.Version;
-        rotated.Bpp  = this.Bpp;
-        rotated.Size = this.Size;
-        rotated.RedOffset = this.RedOffset;
-        rotated.RedLength = this.RedLength;
-        rotated.BlueOffset = this.BlueOffset;
-        rotated.BlueLength = this.BlueLength;
-        rotated.GreenOffset = this.GreenOffset;
-        rotated.GreenLength = this.GreenLength;
-        rotated.AlphaOffset = this.AlphaOffset;
-        rotated.AlphaLength = this.AlphaLength;
+		public RawImage GetRotated ( ) {
+			RawImage rotated = new RawImage ( );
+			rotated.Version = this.Version;
+			rotated.Bpp = this.Bpp;
+			rotated.Size = this.Size;
+			rotated.RedOffset = this.RedOffset;
+			rotated.RedLength = this.RedLength;
+			rotated.BlueOffset = this.BlueOffset;
+			rotated.BlueLength = this.BlueLength;
+			rotated.GreenOffset = this.GreenOffset;
+			rotated.GreenLength = this.GreenLength;
+			rotated.AlphaOffset = this.AlphaOffset;
+			rotated.AlphaLength = this.AlphaLength;
 
-        rotated.Width = this.Height;
-        rotated.Height = this.Width;
+			rotated.Width = this.Height;
+			rotated.Height = this.Width;
 
-        int count = this.Data.Length;
-        rotated.Data = new byte[count];
+			int count = this.Data.Length;
+			rotated.Data = new byte[count];
 
-        int byteCount = this.bpp >> 3; // bpp is in bits, we want bytes to match our array
-        int w = this.Width;
-        int h = this.Height;
-        for (int y = 0 ; y < h ; y++) {
-            for (int x = 0 ; x < w ; x++) {
-                System.arraycopy(
-                        this.data, (y * w + x) * byteCount,
-                        rotated.data, ((w-x-1) * h + y) * byteCount,
-                        byteCount);
-            }
-        }
+			int byteCount = this.Bpp >> 3; // bpp is in bits, we want bytes to match our array
+			int w = this.Width;
+			int h = this.Height;
+			for ( int y = 0; y < h; y++ ) {
+				for ( int x = 0; x < w; x++ ) {
+					Array.Copy ( this.Data, ( y * w + x ) * byteCount,
+						rotated.Data, ( ( w - x - 1 ) * h + y ) * byteCount,
+										byteCount );
+					/*System.arraycopy(
+									this.data, (y * w + x) * byteCount,
+									rotated.data, ((w-x-1) * h + y) * byteCount,
+									byteCount);*/
+				}
+			}
 
-        return rotated;
-    }
+			return rotated;
+		}
 
 		/**
 		 * Returns an ARGB integer value for the pixel at <var>index</var> in {@link #data}.
 		 */
 		public int GetARGB ( int index ) {
-        int value;
-        if (Bpp == 16) {
-            value = data[index] & 0x00FF;
-            value |= (data[index+1] << 8) & 0x0FF00;
-        } else if (bpp == 32) {
-            value = data[index] & 0x00FF;
-            value |= (data[index+1] & 0x00FF) << 8;
-            value |= (data[index+2] & 0x00FF) << 16;
-            value |= (data[index+3] & 0x00FF) << 24;
-        } else {
-            throw new UnsupportedOperationException("RawImage.getARGB(int) only works in 16 and 32 bit mode.");
-        }
+			int value;
+			if ( Bpp == 16 ) {
+				value = Data[index] & 0x00FF;
+				value |= ( Data[index + 1] << 8 ) & 0x0FF00;
+			} else if ( Bpp == 32 ) {
+				value = Data[index] & 0x00FF;
+				value |= ( Data[index + 1] & 0x00FF ) << 8;
+				value |= ( Data[index + 2] & 0x00FF ) << 16;
+				value |= ( Data[index + 3] & 0x00FF ) << 24;
+			} else {
+				throw new ArgumentException ( "RawImage.getARGB(int) only works in 16 and 32 bit mode." );
+			}
 
-        int r = (((uint)value >> RedOffset) & GetMask(RedLength)) << (8 - RedLength);
-				int g = ( ( (uint)value >> GreenOffset ) & GetMask ( GreenLength ) ) << ( 8 - GreenLength );
-				int b = ( ( (uint)value >> BlueOffset ) & GetMask ( BlueLength ) ) << ( 8 - BlueLength );
-        int a;
-        if (AlphaLength == 0) {
-            a = 0xFF; // force alpha to opaque if there's no alpha value in the framebuffer.
-        } else {
-					a = ( ( (uint)value >> AlphaOffset ) & GetMask ( AlphaLength ) ) << ( 8 - AlphaLength );
-        }
+			int r = ( ( value >> RedOffset ) & GetMask ( RedLength ) ) << ( 8 - RedLength );
+			int g = ( ( value >> GreenOffset ) & GetMask ( GreenLength ) ) << ( 8 - GreenLength );
+			int b = ( ( value >> BlueOffset ) & GetMask ( BlueLength ) ) << ( 8 - BlueLength );
+			int a;
+			if ( AlphaLength == 0 ) {
+				a = 0xFF; // force alpha to opaque if there's no alpha value in the framebuffer.
+			} else {
+				a = ( ( value >> AlphaOffset ) & GetMask ( AlphaLength ) ) << ( 8 - AlphaLength );
+			}
 
-        return a << 24 | r << 16 | g << 8 | b;
-    }
+			return a << 24 | r << 16 | g << 8 | b;
+		}
 
 		/**
 		 * creates a mask value based on a length and offset.
@@ -191,29 +192,33 @@ namespace Managed.Adb {
 
 			// if the bpp is 32 bits then we need to invert it because the buffer is in little endian
 			if ( Bpp == 32 ) {
-				byte[] bytes = BitConverter.GetBytes ( res );
-				if ( BitConverter.IsLittleEndian ) {
-					Array.Reverse ( bytes );
-					res = BitConverter.ToInt32(bytes,0);
-				}
-				return res;
+				return BitConverter.ToInt32 ( ReverseBytes ( BitConverter.GetBytes ( res ) ), 0 );
 			}
 
 			return res;
 		}
+
+		private static byte[] ReverseBytes ( byte[] inArray ) {
+			byte temp;
+			int highCtr = inArray.Length - 1;
+
+			for ( int ctr = 0; ctr < inArray.Length / 2; ctr++ ) {
+				temp = inArray[ctr];
+				inArray[ctr] = inArray[highCtr];
+				inArray[highCtr] = temp;
+				highCtr -= 1;
+			}
+			return inArray;
+		}
+
 
 		/**
 		 * Creates a mask value based on a length.
 		 * @param length
 		 * @return
 		 */
-		private int GetMask ( int length ) {
-			int res = 0;
-			for ( int i = 0; i < length; i++ ) {
-				res = ( res << 1 ) + 1;
-			}
-
-			return res;
+		private static int GetMask ( int length ) {
+			return ( 1 << length ) - 1;
 		}
 	}
 }

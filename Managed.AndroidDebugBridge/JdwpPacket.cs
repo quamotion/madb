@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Managed.Adb.Utilities.IO;
-using Managed.Adb.Utilities.Conversion;
 using System.Net.Sockets;
 
 namespace Managed.Adb {
@@ -31,7 +29,7 @@ namespace Managed.Adb {
 
 		public const int HANDSHAKE_LEN = HANDSHAKE.Length;
 
-		public JdwpPacket ( EndianBinaryWriter buf ) {
+		public JdwpPacket ( BinaryWriter buf ) {
 			Buffer = buf;
 			IsNew = true;
 			SerialID = 0x40000000;
@@ -39,7 +37,7 @@ namespace Managed.Adb {
 
 		private int SerialID { get; set; }
 
-		private EndianBinaryWriter Buffer { get; private set; }
+		private BinaryWriter Buffer { get; private set; }
 		public int Length { get; private set; }
 		public int ID { get; private set; }
 		public int Flags { get; private set; }
@@ -62,7 +60,6 @@ namespace Managed.Adb {
 		void finishPacket ( int payloadLength ) {
 			System.Diagnostics.Debug.Assert ( IsNew );
 
-			EndianBitConverter oldOrder = Buffer.BitConverter;
 			if ( ChunkHandler.CHUNK_ORDER == ChunkHandler.ByteOrder.LittleEndian ) {
 				if ( Buffer.BitConverter != EndianBitConverter.Little ) {
 					Buffer = new EndianBinaryWriter ( EndianBitConverter.Little, Buffer.BaseStream );
