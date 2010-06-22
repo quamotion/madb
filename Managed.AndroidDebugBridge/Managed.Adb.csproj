@@ -76,6 +76,9 @@
     <Compile Include="AllocationInfo.cs" />
     <Compile Include="AndroidDebugBridge.cs" />
     <Compile Include="AndroidDebugBridgeEventArgs.cs" />
+    <Compile Include="DateTimeHelper.cs" />
+    <Compile Include="DdmPreferences.cs" />
+    <Compile Include="Extensions\ArrayHelper.cs" />
     <Compile Include="BadPacketException.cs" />
     <Compile Include="ChunkHandler.cs">
       <SubType>Code</SubType>
@@ -85,23 +88,31 @@
     <Compile Include="Debugger.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="DeviceEventArgs.cs" />
+    <Compile Include="ErrorCodeHelper.cs" />
     <Compile Include="Exceptions\UnsupportedEncodingException.cs" />
+    <Compile Include="FileEntry.cs" />
+    <Compile Include="FileListingService.cs" />
     <Compile Include="IClient.cs" />
     <Compile Include="IDevice.cs" />
+    <Compile Include="IListingReceiver.cs" />
     <Compile Include="IPacketConsumer.cs" />
     <Compile Include="IShellOutputReceiver.cs" />
+    <Compile Include="ISyncProgressMonitor.cs" />
+    <Compile Include="ListingServiceReceiver.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogLevel.cs" />
+    <Compile Include="MonitorThread.cs" />
     <Compile Include="MultilineReceiver.cs" />
     <Compile Include="NullOutputReceiver.cs" />
+    <Compile Include="NullSyncProgressMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawImage.cs" />
     <Compile Include="Reflection\ReflectionHelper.cs" />
     <Compile Include="RemoteCommandMultilineReceiver.cs" />
+    <Compile Include="SyncResult.cs" />
+    <Compile Include="SyncService.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>

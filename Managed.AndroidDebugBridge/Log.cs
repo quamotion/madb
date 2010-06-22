@@ -114,7 +114,7 @@ namespace Managed.Adb {
 			}
 		}
 
-		static void SetLevel ( LogLevel.LogLevelInfo logLevel ) {
+		public static void SetLevel ( LogLevel.LogLevelInfo logLevel ) {
 			mLevel = logLevel;
 		}
 

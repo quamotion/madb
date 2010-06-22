@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Managed.Adb {
-	internal class AdbResponse {
+	public class AdbResponse {
 
 		public AdbResponse ( ) {
 			Message = string.Empty;

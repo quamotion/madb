@@ -10,6 +10,8 @@ using System.Threading;
 namespace Managed.Adb {
 	public class AdbHelper {
 		private const string TAG = "AdbHelper";
+		private const int WAIT_TIME = 5;
+
 		private AdbHelper ( ) {
 
 		}
@@ -24,7 +26,6 @@ namespace Managed.Adb {
 			}
 		}
 
-		private const int WAIT_TIME = 5;
 
 		public Socket Open ( IPAddress address, IDevice device, int port ) {
 			Socket s = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
@@ -107,7 +108,7 @@ namespace Managed.Adb {
 			return FormAdbRequest ( request );
 		}
 
-		private byte[] FormAdbRequest ( String req ) {
+		public byte[] FormAdbRequest ( String req ) {
 			String resultStr = String.Format ( "{0}{1}\n", req.Length.ToString ( "X4" ), req ); //$NON-NLS-1$
 			byte[] result;
 			try {
@@ -121,9 +122,9 @@ namespace Managed.Adb {
 			return result;
 		}
 
-		private bool Write ( Socket socket, byte[] data ) {
+		public  bool Write ( Socket socket, byte[] data ) {
 			try {
-				Write ( socket, data, -1, 5 * 1000 );
+				Write ( socket, data, -1, DdmPreferences.Timeout );
 			} catch ( IOException e ) {
 				Log.e ( TAG, e );
 				return false;
@@ -132,7 +133,7 @@ namespace Managed.Adb {
 			return true;
 		}
 
-		private void Write ( Socket socket, byte[] data, int length, int timeout ) {
+		public  void Write ( Socket socket, byte[] data, int length, int timeout ) {
 			//using ( var buf = new MemoryStream ( data, 0, length != -1 ? length : data.Length ) ) {
 			int numWaits = 0;
 			int count = -1;
@@ -161,7 +162,7 @@ namespace Managed.Adb {
 			//}
 		}
 
-		AdbResponse ReadAdbResponse ( Socket socket, bool readDiagString ) {
+		public AdbResponse ReadAdbResponse ( Socket socket, bool readDiagString ) {
 
 			AdbResponse resp = new AdbResponse ( );
 
@@ -217,9 +218,9 @@ namespace Managed.Adb {
 			return resp;
 		}
 
-		private bool Read ( Socket socket, byte[] data ) {
+		public  bool Read ( Socket socket, byte[] data ) {
 			try {
-				Read ( socket, data, -1, 15 * 1000 );
+				Read ( socket, data, -1, DdmPreferences.Timeout );
 			} catch ( IOException e ) {
 				Log.e ( TAG, "readAll: IOException: " + e.Message );
 				return false;
@@ -228,7 +229,7 @@ namespace Managed.Adb {
 			return true;
 		}
 
-		private void Read ( Socket socket, byte[] data, int length, int timeout ) {
+		public  void Read ( Socket socket, byte[] data, int length, int timeout ) {
 			int expLen = length != -1 ? length : data.Length;
 			using ( var buf = new MemoryStream ( expLen ) ) {
 				buf.Position = 0;
@@ -306,12 +307,12 @@ namespace Managed.Adb {
 			return true;
 		}
 
-		private bool IsOkay ( byte[] reply ) {
+		public bool IsOkay ( byte[] reply ) {
 			return reply[0] == (byte)'O' && reply[1] == (byte)'K'
 								&& reply[2] == (byte)'A' && reply[3] == (byte)'Y';
 		}
 
-		private String ReplyToString ( byte[] reply ) {
+		public String ReplyToString ( byte[] reply ) {
 			String result;
 			try {
 				result = Encoding.Default.GetString ( reply );
@@ -531,7 +532,7 @@ namespace Managed.Adb {
 			}
 		}
 
-		private void SetDevice ( Socket adbChan, IDevice device ) {
+		public void SetDevice ( Socket adbChan, IDevice device ) {
 			// if the device is not -1, then we first tell adb we're looking to talk
 			// to a specific device
 			if ( device != null ) {
