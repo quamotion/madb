@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Managed.Adb.Extensions;
 
 namespace Managed.Adb {
 	public class FileEntry {
@@ -56,7 +57,7 @@ namespace Managed.Adb {
 					return true;
 				}
 
-				long current = DateTimeHelper.CurrentMillis ( );
+				long current = DateTime.Now.CurrentTimeMillis();
 				if ( current - FetchTime > FileListingService.REFRESH_TEST ) {
 					return true;
 				}

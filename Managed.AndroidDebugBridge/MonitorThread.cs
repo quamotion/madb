@@ -19,7 +19,7 @@ namespace Managed.Adb {
 		}
 
 		internal void SetDebugSelectedPort ( int value ) {
-			throw new NotImplementedException ( );
+			//throw new NotImplementedException ( );
 		}
 	}
 }

@@ -23,7 +23,7 @@ namespace Managed.Adb {
 		/// Sent to query for possible cancellation.
 		/// </summary>
 		/// <returns><c>true</c> if the transfer should be stopped; otherwise, false</returns>
-		bool IsCanceled ( );
+		bool IsCanceled { get; }
 
 		/// <summary>
 		/// Sent when a sub task is started.

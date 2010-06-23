@@ -45,6 +45,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -54,6 +55,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -76,7 +78,6 @@
     <Compile Include="AllocationInfo.cs" />
     <Compile Include="AndroidDebugBridge.cs" />
     <Compile Include="AndroidDebugBridgeEventArgs.cs" />
-    <Compile Include="DateTimeHelper.cs" />
     <Compile Include="DdmPreferences.cs" />
     <Compile Include="Extensions\ArrayHelper.cs" />
     <Compile Include="BadPacketException.cs" />
@@ -84,17 +85,20 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ClientEventArgs.cs" />
-    <Compile Include="DateTimeExtensions.cs" />
+    <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Debugger.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="DeviceEventArgs.cs" />
     <Compile Include="ErrorCodeHelper.cs" />
     <Compile Include="Exceptions\UnsupportedEncodingException.cs" />
+    <Compile Include="Extensions\FileInfoHelper.cs" />
+    <Compile Include="Extensions\StringHelper.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileListingService.cs" />
     <Compile Include="IClient.cs" />
     <Compile Include="IDevice.cs" />
     <Compile Include="IListingReceiver.cs" />
+    <Compile Include="IO\LinuxPath.cs" />
     <Compile Include="IPacketConsumer.cs" />
     <Compile Include="IShellOutputReceiver.cs" />
     <Compile Include="ISyncProgressMonitor.cs" />
@@ -108,7 +112,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawImage.cs" />
     <Compile Include="Reflection\ReflectionHelper.cs" />
-    <Compile Include="RemoteCommandMultilineReceiver.cs" />
     <Compile Include="SyncResult.cs" />
     <Compile Include="SyncService.cs" />
   </ItemGroup>

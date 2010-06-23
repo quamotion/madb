@@ -6,11 +6,12 @@ using System.Net.Sockets;
 using System.Net;
 using System.IO;
 using System.Threading;
-
+using Managed.Adb.Extensions;
 namespace Managed.Adb {
 	public class AdbHelper {
 		private const string TAG = "AdbHelper";
 		private const int WAIT_TIME = 5;
+		public static String DEFAULT_ENCODING = "ISO-8859-1";
 
 		private AdbHelper ( ) {
 
@@ -77,7 +78,7 @@ namespace Managed.Adb {
 					return -1;
 				}
 
-				String lenHex = Encoding.Default.GetString ( reply );
+				String lenHex = reply.GetString ( AdbHelper.DEFAULT_ENCODING );
 				int len = int.Parse ( lenHex, System.Globalization.NumberStyles.HexNumber );
 
 				// the protocol version.
@@ -89,7 +90,8 @@ namespace Managed.Adb {
 					return -1;
 				}
 
-				String sReply = Encoding.Default.GetString ( reply );
+				//String sReply = Encoding.Default.GetString ( reply );
+				String sReply = reply.GetString ( AdbHelper.DEFAULT_ENCODING );
 				return int.Parse ( sReply, System.Globalization.NumberStyles.HexNumber );
 
 			} catch ( Exception ex ) {
@@ -112,17 +114,17 @@ namespace Managed.Adb {
 			String resultStr = String.Format ( "{0}{1}\n", req.Length.ToString ( "X4" ), req ); //$NON-NLS-1$
 			byte[] result;
 			try {
-				result = Encoding.Default.GetBytes ( resultStr );
+				result = resultStr.GetBytes ( AdbHelper.DEFAULT_ENCODING ); // Encoding.Default.GetBytes ( resultStr );
 			} catch ( EncoderFallbackException efe ) {
 				Log.e ( TAG, efe );
 				return null;
 			}
 
-			System.Diagnostics.Debug.Assert ( result.Length == req.Length + 5, String.Format ( "result: {1}{0}\nreq: {3}{2}", result.Length, Encoding.Default.GetString ( result ), req.Length, req ) );
+			System.Diagnostics.Debug.Assert ( result.Length == req.Length + 5, String.Format ( "result: {1}{0}\nreq: {3}{2}", result.Length, /*Encoding.Default.GetString ( result )*/ result.GetString ( AdbHelper.DEFAULT_ENCODING ), req.Length, req ) );
 			return result;
 		}
 
-		public  bool Write ( Socket socket, byte[] data ) {
+		public bool Write ( Socket socket, byte[] data ) {
 			try {
 				Write ( socket, data, -1, DdmPreferences.Timeout );
 			} catch ( IOException e ) {
@@ -133,7 +135,7 @@ namespace Managed.Adb {
 			return true;
 		}
 
-		public  void Write ( Socket socket, byte[] data, int length, int timeout ) {
+		public void Write ( Socket socket, byte[] data, int length, int timeout ) {
 			//using ( var buf = new MemoryStream ( data, 0, length != -1 ? length : data.Length ) ) {
 			int numWaits = 0;
 			int count = -1;
@@ -218,7 +220,7 @@ namespace Managed.Adb {
 			return resp;
 		}
 
-		public  bool Read ( Socket socket, byte[] data ) {
+		public bool Read ( Socket socket, byte[] data ) {
 			try {
 				Read ( socket, data, -1, DdmPreferences.Timeout );
 			} catch ( IOException e ) {
@@ -229,7 +231,7 @@ namespace Managed.Adb {
 			return true;
 		}
 
-		public  void Read ( Socket socket, byte[] data, int length, int timeout ) {
+		public void Read ( Socket socket, byte[] data, int length, int timeout ) {
 			int expLen = length != -1 ? length : data.Length;
 			using ( var buf = new MemoryStream ( expLen ) ) {
 				buf.Position = 0;
@@ -331,8 +333,9 @@ namespace Managed.Adb {
 			try {
 				socket.Connect ( address );
 				socket.Blocking = true;
-				if ( !Write ( socket, request ) )
+				if ( !Write ( socket, request ) ) {
 					throw new IOException ( "failed asking for devices" );
+				}
 
 				AdbResponse resp = ReadAdbResponse ( socket, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
@@ -507,11 +510,16 @@ namespace Managed.Adb {
 						Console.WriteLine ( "No More Data" );
 					} else {
 
-						string[] cmd = command.Trim().Split ( new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries );
-						string sdata = Encoding.Default.GetString ( data, 0, count );
-						if ( string.Compare ( sdata.Trim(), string.Format ( "{0}: not found", cmd[0] ), false ) == 0 ) {
+						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries );
+						string sdata = data.GetString(0,count,AdbHelper.DEFAULT_ENCODING);
+						if ( string.Compare ( sdata.Trim ( ), string.Format ( "{0}: not found", cmd[0] ), false ) == 0 ) {
 							Console.WriteLine ( "The remote execution returned: '{0}: not found'", cmd[0] );
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}: not found'", cmd[0] ) );
+						}
+
+						if ( sdata.Trim ( ).StartsWith ( "ls:" ) && sdata.Trim ( ).EndsWith ( "No such file or directory" ) ) {
+							Console.WriteLine ( "The remote execution returned: {0}", sdata.Trim ( ) );
+							throw new FileNotFoundException ( String.Format ( "The remote execution returned: {0}", sdata.Trim ( ) ) );
 						}
 
 						// Add the data to the receiver

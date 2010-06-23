@@ -31,6 +31,11 @@ namespace Managed.Adb.Tests {
 			Assert.Throws<FileNotFoundException> ( new Assert.ThrowsDelegate ( delegate ( ) {
 				AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, "notsobusybox", device, creciever );
 			} ) );
+
+			Assert.Throws<FileNotFoundException> ( new Assert.ThrowsDelegate ( delegate ( ) {
+				AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, "ls /system/foo", device, creciever );
+			} ) );
+
 		}
 
 		[Fact]
@@ -47,6 +52,22 @@ namespace Managed.Adb.Tests {
 			Assert.Equal<int> ( 480, rawImage.Height );
 
 		}
+
+		[Fact]
+		public void FileListingServiceTest ( ) {
+			List<Device> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
+			Assert.True ( devices.Count >= 1 );
+			Device device = devices[1];
+
+			FileListingService fls = new FileListingService ( device );
+			//ListingServiceReceiver lsr = new ListingServiceReceiver(null,null,null);
+			FileEntry[] entries = fls.GetChildren ( fls.Root, false, null );
+			foreach ( var item in entries ) {
+				Console.WriteLine ( item.FullPath );
+			}
+		}
+
+
 
 		public class ConsoleReceiver : MultiLineReceiver {
 

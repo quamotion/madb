@@ -17,8 +17,8 @@ namespace Managed.Adb {
 		/// pointed to a file or to a directory.</param>
 		public ListingServiceReceiver ( FileEntry parent, List<FileEntry> entries, List<String> links ) {
 			Parent = parent;
-			Entries = entries;
-			Links = links;
+			Entries = entries ?? new List<FileEntry>();
+			Links = links ?? new List<String> ( );
 			CurrentChildren = Parent.Children.ToArray ( );
 		}
 
@@ -31,21 +31,27 @@ namespace Managed.Adb {
 			foreach ( String line in lines ) {
 				// no need to handle empty lines.
 				if ( line.Length == 0 ) {
+					Console.WriteLine ( "Empty" );
 					continue;
 				}
 
 				// run the line through the regexp
 				Regex regex = new Regex ( FileListingService.LS_PATTERN, RegexOptions.Compiled );
 				Match m = regex.Match ( line );
+
+				Console.WriteLine ( line );
+				continue;
 				if ( !m.Success ) {
 					continue;
 				}
 
 				// get the name
 				String name = m.Groups[7].Value;
-
+				Console.WriteLine ( "Name: {0}", name );
 				// if the parent is root, we only accept selected items
-				if ( Parent.IsRoot ) {
+				
+				// eff that - you get it all...
+				/*if ( Parent.IsRoot ) {
 					bool found = false;
 					foreach ( String approved in FileListingService.RootLevelApprovedItems ) {
 						if ( String.Compare ( approved, name, false ) == 0 ) {
@@ -58,16 +64,23 @@ namespace Managed.Adb {
 					if ( found == false ) {
 						continue;
 					}
-				}
+				}*/
 
 				// get the rest of the groups
 				String permissions = m.Groups[1].Value;
+				Console.WriteLine ( "Perm: {0}", permissions );
 				String owner = m.Groups[2].Value;
+				Console.WriteLine ( "Owner: {0}", owner );
 				String group = m.Groups[3].Value;
+				Console.WriteLine ( "Group: {0}", group );
 				long size = 0;
 				long.TryParse ( m.Groups[4].Value, out size );
+				Console.WriteLine ( "Size: {0}", size );
 				String date = m.Groups[5].Value;
+				Console.WriteLine ( "Date: {0}", date );
 				String time = m.Groups[6].Value;
+				Console.WriteLine ( "Time: {0}", time );
+				
 				String info = null;
 
 				// and the type

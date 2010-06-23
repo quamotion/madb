@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.IO;
+using Managed.Adb.Extensions;
+using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
 	/// <summary>
@@ -22,12 +24,7 @@ namespace Managed.Adb {
 		/// </summary>
 		public const String BB_LS_PATTERN = "^([ldcbp-])([rwxt-]{3}){3}\\s+(\\d{1,})\\s+(\\d{1,}|\\S{1,})\\s+(\\d{1,}|\\S{1,})\\s+(\\d{1,})\\s+(\\w+\\s+\\d{1,2}\\s+(?:\\d{4})?)(\\d{2}:\\d{2})?\\s+(.+?)([/@=*\\|]?)\\s?$";
 
-		/// <summary>
-		/// Pattern to parse the output of the 'pm -lf' command.
-		/// The output format looks like:
-		/// /data/app/myapp.apk=com.mypackage.myapp
-		/// </summary>
-		private const String PM_PATTERN = "^package:(.+?)=(.+)$";
+		public const String LS_PATTERN_EX = @"^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\s+(?:\d{0,})?\s*(\S+)\s+(\S+)\s+(\d{1,})[\s-](\w{3}|\d{2})[\s-](\d{2})\s+(\d{1,2}:\d{2})\s+(.*)([/@=*\|]?)$";
 
 		/// <summary>
 		///  Top level data folder.
@@ -118,6 +115,7 @@ namespace Managed.Adb {
 			// if there's no receiver, then this is a synchronous call, and we
 			// return the result of ls
 			if ( receiver == null ) {
+				Console.WriteLine ( "No receiver" );
 				DoLS ( entry );
 				return entry.Children.ToArray ( );
 			}
@@ -130,9 +128,9 @@ namespace Managed.Adb {
 
 				DoLS ( entry );
 
-				receiver.SetChildren ( entry, entry.Children.ToArray ( ) );
+				receiver.SetChildren ( state.Entry, state.Entry.Children.ToArray ( ) );
 
-				FileEntry[] children = entry.Children.ToArray ( );
+				FileEntry[] children = state.Entry.Children.ToArray ( );
 				if ( children.Length > 0 && children[0].IsApplicationPackage ) {
 					Dictionary<String, FileEntry> map = new Dictionary<String, FileEntry> ( );
 
@@ -144,28 +142,7 @@ namespace Managed.Adb {
 					// call pm.
 					String command = PM_FULL_LISTING;
 					try {
-						/*fls.Device.ExecuteShellCommand(command, new MultiLineReceiver() {
-								@Override
-								public void processNewLines(String[] lines) {
-										for (String line : lines) {
-												if (line.length() > 0) {
-														// get the filepath and package from the line
-														Matcher m = sPmPattern.matcher(line);
-														if (m.matches()) {
-																// get the children with that path
-																FileEntry entry = map.get(m.group(1));
-																if (entry != null) {
-																		entry.info = m.group(2);
-																		receiver.refreshEntry(entry);
-																}
-														}
-												}
-										}
-								}
-								public boolean isCancelled() {
-										return false;
-								}
-						});*/
+						this.Device.ExecuteShellCommand ( command, new PackageManagerReceiver ( map, receiver ) );
 					} catch ( IOException e ) {
 						// adb failed somehow, we do nothing.
 						Log.e ( "FileListingService", e );
@@ -181,7 +158,7 @@ namespace Managed.Adb {
 					// then launch the next one if applicable.
 					if ( Threads.Count > 0 ) {
 						Thread ct = Threads[0];
-						ct.Start ( new ThreadState { Thread = ct } );
+						ct.Start ( new ThreadState { Thread = ct, Entry = entry } );
 					}
 				}
 
@@ -227,11 +204,12 @@ namespace Managed.Adb {
 				// finish the process of the receiver to handle links
 				receiver.FinishLinks ( );
 			} catch ( IOException e ) {
+				Console.WriteLine ( e.ToString ( ) );
 			}
 
 
 			// at this point we need to refresh the viewer
-			entry.FetchTime = DateTimeHelper.CurrentMillis();
+			entry.FetchTime = DateTime.Now.CurrentTimeMillis ( );
 
 			// sort the children and set them as the new children
 			entryList.Sort ( new FileEntry.FileEntryComparer ( ) );
@@ -240,7 +218,44 @@ namespace Managed.Adb {
 
 		private class ThreadState {
 			public Thread Thread;
+			public FileEntry Entry;
 
+		}
+
+		internal class PackageManagerReceiver : MultiLineReceiver {
+			/// <summary>
+			/// Pattern to parse the output of the 'pm -lf' command.
+			/// The output format looks like:
+			/// /data/app/myapp.apk=com.mypackage.myapp
+			/// </summary>
+			private const String PM_PATTERN = "^package:(.+?)=(.+)$";
+
+
+			public PackageManagerReceiver ( Dictionary<String,FileEntry> entryMap, IListingReceiver receiver ) {
+				this.Map = entryMap;
+				this.Receiver = receiver;
+			}
+
+			public Dictionary<String, FileEntry> Map { get; set; }
+			public IListingReceiver Receiver { get; set; }
+
+			public override void ProcessNewLines ( string[] lines ) {
+				foreach ( String line in lines ) {
+					if ( line.Length > 0 ) {
+						// get the filepath and package from the line
+						Match m = new Regex ( PM_PATTERN, RegexOptions.Compiled ).Match ( line );
+						if ( m.Success ) {
+							// get the children with that path
+							FileEntry entry = Map[m.Groups[1].Value];
+							if ( entry != null ) {
+								entry.Info = m.Groups[2].Value;
+								Receiver.RefreshEntry ( entry );
+							}
+						}
+					}
+				}
+
+			}
 		}
 	}
 }

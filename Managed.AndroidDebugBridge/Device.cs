@@ -236,8 +236,7 @@ public FileListingService FileListingService {
 		}
 
 		public void ExecuteShellCommand ( String command, IShellOutputReceiver receiver ) {
-			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, command, this,
-							receiver );
+			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, command, this, receiver );
 		}
 		/*
 		public void RunEventLogService ( LogReceiver receiver ) {

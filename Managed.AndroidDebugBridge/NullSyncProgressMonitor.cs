@@ -7,7 +7,7 @@ namespace Managed.Adb {
 	/// <summary>
 	/// A Sync progress monitor that does nothing
 	/// </summary>
-	internal sealed class NullSyncProgressMonitor : ISyncProgressMonitor {
+	public sealed class NullSyncProgressMonitor : ISyncProgressMonitor {
 
 		public void Start ( long totalWork ) {
 		}
@@ -15,8 +15,10 @@ namespace Managed.Adb {
 		public void Stop ( ) {
 		}
 
-		public bool IsCanceled ( ) {
-			return false;
+		public bool IsCanceled {
+			get {
+				return false;
+			}
 		}
 
 		public void StartSubTask ( string name ) {

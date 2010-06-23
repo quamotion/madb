@@ -5,6 +5,8 @@ using System.Text;
 using System.Net;
 using System.IO;
 using System.Net.Sockets;
+using Managed.Adb.Extensions;
+using Managed.Adb.IO;
 
 namespace Managed.Adb {
 	public class SyncService {
@@ -62,7 +64,8 @@ namespace Managed.Adb {
 			NullSyncMonitor = new NullSyncProgressMonitor ( );
 		}
 
-		private static NullSyncProgressMonitor NullSyncMonitor { get; set; }
+		public static NullSyncProgressMonitor NullSyncMonitor { get; private set; }
+		private static byte[] DataBuffer { get; set; }
 
 		/// <summary>
 		/// Checks the result array starts with the provided code
@@ -256,39 +259,512 @@ namespace Managed.Adb {
 			}
 		}
 
-		public SyncResult Pull(FileEntry[] entries, String localPath, ISyncProgressMonitor monitor) {
+		/// <summary>
+		/// Pulls file(s) or folder(s).
+		/// </summary>
+		/// <param name="entries">the remote item(s) to pull</param>
+		/// <param name="localPath">The local destination. If the entries count is > 1 or if the unique entry is a 
+		/// folder, this should be a folder.</param>
+		/// <param name="monitor">The progress monitor. Cannot be null.</param>
+		/// <returns>a SyncResult object with a code and an optional message.</returns>
+		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
+		public SyncResult Pull ( FileEntry[] entries, String localPath, ISyncProgressMonitor monitor ) {
+			if ( monitor == null ) {
+				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
+			}
+
 			FileAttributes attributes = File.GetAttributes ( localPath );
-			bool isDirectory = (attributes & FileAttributes.Directory) == FileAttributes.Directory;
+			bool isDirectory = ( attributes & FileAttributes.Directory ) == FileAttributes.Directory;
 
-        // first we check the destination is a directory and exists
-        FileInfo f = new FileInfo(localPath);
-        if (!f.Exists) {
-            return new SyncResult(ErrorCodeHelper.RESULT_NO_DIR_TARGET);
-        }
-				if ( !isDirectory ) {
-					return new SyncResult ( ErrorCodeHelper.RESULT_TARGET_IS_FILE );
-        }
+			// first we check the destination is a directory and exists
+			FileInfo f = new FileInfo ( localPath );
+			if ( !f.Exists ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_NO_DIR_TARGET );
+			}
+			if ( !isDirectory ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_TARGET_IS_FILE );
+			}
 
-        // get a FileListingService object
-        FileListingService fls = new FileListingService(Device);
+			// get a FileListingService object
+			FileListingService fls = new FileListingService ( Device );
 
-        // compute the number of file to move
-        long total = GetTotalRemoteFileSize(entries, fls);
+			// compute the number of file to move
+			long total = GetTotalRemoteFileSize ( entries, fls );
 
-        // start the monitor
-        monitor.Start(total);
+			// start the monitor
+			monitor.Start ( total );
 
-        SyncResult result = DoPull(entries, localPath, fls, monitor);
+			SyncResult result = DoPull ( entries, localPath, fls, monitor );
 
-        monitor.Stop();
+			monitor.Stop ( );
 
-        return result;
-    }
-
-		private SyncResult DoPull ( FileEntry[] entries, string localPath, FileListingService fls, ISyncProgressMonitor monitor ) {
-			throw new NotImplementedException ( );
+			return result;
 		}
 
+		/// <summary>
+		/// Pulls a single file.
+		/// </summary>
+		/// <param name="remote">remote the remote file</param>
+		/// <param name="localFilename">The local destination.</param>
+		/// <param name="monitor">The progress monitor. Cannot be null.</param>
+		/// <returns>a SyncResult object with a code and an optional message.</returns>
+		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
+		public SyncResult PullFile ( FileEntry remote, String localFilename, ISyncProgressMonitor monitor ) {
+			if ( monitor == null ) {
+				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
+			}
+
+			long total = remote.Size;
+			monitor.Start ( total );
+
+			SyncResult result = DoPullFile ( remote.FullPath, localFilename, monitor );
+
+			monitor.Stop ( );
+			return result;
+		}
+
+		/// <summary>
+		/// Pulls a single file.
+		/// <para>Because this method just deals with a String for the remote file instead of FileEntry, 
+		/// the size of the file being pulled is unknown and the ISyncProgressMonitor will not properly 
+		/// show the progress</para>
+		/// </summary>
+		/// <param name="remoteFilepath">the full path to the remote file</param>
+		/// <param name="localFilename">The local destination.</param>
+		/// <param name="monitor">The progress monitor. Cannot be null.</param>
+		/// <returns>a SyncResult object with a code and an optional message.</returns>
+		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
+		public SyncResult PullFile ( String remoteFilepath, String localFilename, ISyncProgressMonitor monitor ) {
+			if ( monitor == null ) {
+				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
+			}
+
+			monitor.Start ( 0 );
+			//TODO: use the {@link FileListingService} to get the file size.
+
+			SyncResult result = DoPullFile ( remoteFilepath, localFilename, monitor );
+
+			monitor.Stop ( );
+			return result;
+		}
+
+		/// <summary>
+		/// Push several files.
+		/// </summary>
+		/// <param name="local">An array of loca files to push</param>
+		/// <param name="remote">the remote FileEntry representing a directory.</param>
+		/// <param name="monitor">The progress monitor. Cannot be null.</param>
+		/// <returns>a SyncResult object with a code and an optional message.</returns>
+		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
+		public SyncResult Push ( String[] local, FileEntry remote, ISyncProgressMonitor monitor ) {
+			if ( monitor == null ) {
+				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
+			}
+
+			if ( !remote.IsDirectory ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_REMOTE_IS_FILE );
+			}
+
+			// make a list of File from the list of String
+			List<FileSystemInfo> files = new List<FileSystemInfo> ( );
+			foreach ( String path in local ) {
+				files.Add ( path.GetFileSystemInfo ( ) );
+			}
+
+			// get the total count of the bytes to transfer
+			FileSystemInfo[] fileArray = files.ToArray ( );
+			long total = GetTotalLocalFileSize ( fileArray );
+
+			monitor.Start ( total );
+			SyncResult result = DoPush ( fileArray, remote.FullPath, monitor );
+			monitor.Stop ( );
+
+			return result;
+		}
+
+		/// <summary>
+		/// Push a single file.
+		/// </summary>
+		/// <param name="local">the local filepath.</param>
+		/// <param name="remote">The remote filepath.</param>
+		/// <param name="monitor">The progress monitor. Cannot be null.</param>
+		/// <returns>a SyncResult object with a code and an optional message.</returns>
+		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
+		public SyncResult PushFile ( String local, String remote, ISyncProgressMonitor monitor ) {
+			if ( monitor == null ) {
+				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
+			}
+
+
+			FileInfo f = new FileInfo ( local );
+			if ( !f.Exists ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_NO_LOCAL_FILE );
+			}
+
+			if ( f.IsDirectory ( ) ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_LOCAL_IS_DIRECTORY );
+			}
+
+			monitor.Start ( f.Length );
+			SyncResult result = DoPushFile ( local, remote, monitor );
+			monitor.Stop ( );
+
+			return result;
+		}
+
+		/// <summary>
+		/// Push a single file
+		/// </summary>
+		/// <param name="local">the local file to push</param>
+		/// <param name="remotePath">the remote file (length max is 1024)</param>
+		/// <param name="monitor">the monitor. The monitor must be started already.</param>
+		/// <returns>a SyncResult object with a code and an optional message.</returns>
+		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
+		private SyncResult DoPushFile ( string local, string remotePath, ISyncProgressMonitor monitor ) {
+			if ( monitor == null ) {
+				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
+			}
+
+			FileStream fs = null;
+			byte[] msg;
+
+			int timeOut = DdmPreferences.Timeout;
+
+			try {
+				byte[] remotePathContent = remotePath.GetBytes ( AdbHelper.DEFAULT_ENCODING );
+
+				if ( remotePathContent.Length > REMOTE_PATH_MAX_LENGTH ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_REMOTE_PATH_LENGTH );
+				}
+
+				// this shouldn't happen but still...
+				if ( File.Exists ( local ) ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_NO_LOCAL_FILE );
+				}
+
+				// create the stream to read the file
+				fs = new FileStream ( local, System.IO.FileMode.Open, FileAccess.Read );
+
+				// create the header for the action
+				msg = CreateSendFileRequest ( SEND.GetBytes ( ), remotePathContent, (FileMode)0644 );
+			} catch ( EncoderFallbackException e ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_REMOTE_PATH_ENCODING, e );
+			} catch ( FileNotFoundException e ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_FILE_READ_ERROR, e );
+			}
+
+			// and send it. We use a custom try/catch block to make the difference between
+			// file and network IO exceptions.
+			try {
+				AdbHelper.Instance.Write ( Channel, msg, -1, timeOut );
+			} catch ( IOException e ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
+			}
+
+			// create the buffer used to read.
+			// we read max SYNC_DATA_MAX, but we need 2 4 bytes at the beginning.
+			if ( DataBuffer == null ) {
+				DataBuffer = new byte[SYNC_DATA_MAX + 8];
+			}
+			byte[] bDATA = DATA.GetBytes ( );
+			Array.Copy ( bDATA, 0, DataBuffer, 0, bDATA.Length );
+
+			// look while there is something to read
+			while ( true ) {
+				// check if we're canceled
+				if ( monitor.IsCanceled ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
+				}
+
+				// read up to SYNC_DATA_MAX
+				int readCount = 0;
+				try {
+					readCount = fs.Read ( DataBuffer, 8, SYNC_DATA_MAX );
+				} catch ( IOException e ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_FILE_READ_ERROR, e );
+				}
+
+				if ( readCount == -1 ) {
+					// we reached the end of the file
+					break;
+				}
+
+				// now send the data to the device
+				// first write the amount read
+				ArrayHelper.Swap32bitsToArray ( readCount, DataBuffer, 4 );
+
+				// now write it
+				try {
+					AdbHelper.Instance.Write ( Channel, DataBuffer, readCount + 8, timeOut );
+				} catch ( IOException e ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
+				}
+
+				// and advance the monitor
+				monitor.Advance ( readCount );
+			}
+			// close the local file
+			try {
+				fs.Close ( );
+			} catch ( IOException e ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_FILE_READ_ERROR, e );
+			}
+
+			try {
+				// create the DONE message
+				long time = DateTime.Now.CurrentTimeMillis ( ) / 1000;
+				msg = CreateRequest ( DONE, (int)time );
+
+				// and send it.
+				AdbHelper.Instance.Write ( Channel, msg, -1, timeOut );
+
+				// read the result, in a byte array containing 2 ints
+				// (id, size)
+				byte[] result = new byte[8];
+				AdbHelper.Instance.Read ( Channel, result, -1 /* full length */, timeOut );
+
+				if ( !CheckResult ( result, OKAY.GetBytes() ) ) {
+					if ( CheckResult ( result, FAIL.GetBytes() ) ) {
+						// read some error message...
+						int len = ArrayHelper.Swap32bitFromArray ( result, 4 );
+
+						AdbHelper.Instance.Read ( Channel, DataBuffer, len, timeOut );
+
+						// output the result?
+						String message = DataBuffer.GetString ( 0, len );
+						Log.e ( "ddms", "transfer error: " + message );
+						return new SyncResult ( ErrorCodeHelper.RESULT_UNKNOWN_ERROR, message );
+					}
+
+					return new SyncResult ( ErrorCodeHelper.RESULT_UNKNOWN_ERROR );
+				}
+			} catch ( IOException e ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
+			}
+
+			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
+		}
+
+		private SyncResult DoPush ( FileSystemInfo[] fileArray, string remotePath, ISyncProgressMonitor monitor ) {
+			if ( monitor == null ) {
+				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
+			}
+
+			// check if we're canceled
+			if ( monitor.IsCanceled ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
+			}
+
+			foreach ( FileSystemInfo f in fileArray ) {
+				// check if we're canceled
+				if ( monitor.IsCanceled ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
+				}
+				// append the name of the directory/file to the remote path
+				String dest = LinuxPath.Combine ( remotePath, f.Name );
+				if ( f.Exists ) {
+					if ( f.IsDirectory ( ) ) {
+						DirectoryInfo fsiDir = f as DirectoryInfo;
+						monitor.StartSubTask ( dest );
+						SyncResult result = DoPush ( fsiDir.GetFileSystemInfos ( ), dest, monitor );
+
+						if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
+							return result;
+						}
+
+						monitor.Advance ( 1 );
+					} else if ( f.IsFile ( ) ) {
+						monitor.StartSubTask ( dest );
+						SyncResult result = DoPushFile ( f.FullName, dest, monitor );
+						if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
+							return result;
+						}
+					}
+				}
+			}
+
+			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
+		}
+
+		/// <summary>
+		/// Pulls a remote file
+		/// </summary>
+		/// <param name="remotePath">the remote file (length max is 1024)</param>
+		/// <param name="localPath">the local destination</param>
+		/// <param name="monitor">the monitor. The monitor must be started already.</param>
+		/// <returns>a SyncResult object with a code and an optional message.</returns>
+		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
+		private SyncResult DoPullFile ( string remotePath, string localPath, ISyncProgressMonitor monitor ) {
+			if ( monitor == null ) {
+				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
+			}
+
+
+			byte[] msg = null;
+			byte[] pullResult = new byte[8];
+
+			int timeOut = DdmPreferences.Timeout;
+
+			try {
+				byte[] remotePathContent = remotePath.GetBytes ( Encoding.Default );
+
+				if ( remotePathContent.Length > REMOTE_PATH_MAX_LENGTH ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_REMOTE_PATH_LENGTH );
+				}
+
+				// create the full request message
+				msg = CreateFileRequest ( RECV, remotePath );
+
+				// and send it.
+				AdbHelper.Instance.Write ( Channel, msg, -1, timeOut );
+
+				// read the result, in a byte array containing 2 ints
+				// (id, size)
+				AdbHelper.Instance.Read ( Channel, pullResult, -1, timeOut );
+
+				// check we have the proper data back
+				if ( CheckResult ( pullResult, DATA.GetBytes ( ) ) == false &&
+								CheckResult ( pullResult, DONE.GetBytes ( ) ) == false ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR );
+				}
+			} catch ( EncoderFallbackException e ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_REMOTE_PATH_ENCODING, e );
+			} catch ( IOException e ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
+			}
+
+			// access the destination file
+			FileInfo fi = new FileInfo ( localPath );
+
+			// create the stream to write in the file. We use a new try/catch block to differentiate
+			// between file and network io exceptions.
+			FileStream fos = null;
+			try {
+				fos = new FileStream ( fi.FullName, System.IO.FileMode.Create, FileAccess.Write );
+			} catch ( FileNotFoundException e ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e );
+			}
+
+			using ( fos ) {
+				// the buffer to read the data
+				byte[] data = new byte[SYNC_DATA_MAX];
+
+				// loop to get data until we're done.
+				while ( true ) {
+					// check if we're cancelled
+					if ( monitor.IsCanceled == true ) {
+						return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
+					}
+
+					// if we're done, we stop the loop
+					if ( CheckResult ( pullResult, DONE.GetBytes ( ) ) ) {
+						break;
+					}
+					if ( CheckResult ( pullResult, DATA.GetBytes ( ) ) == false ) {
+						// hmm there's an error
+						return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR );
+					}
+					int length = ArrayHelper.Swap32bitFromArray ( pullResult, 4 );
+					if ( length > SYNC_DATA_MAX ) {
+						// buffer overrun!
+						// error and exit
+						return new SyncResult ( ErrorCodeHelper.RESULT_BUFFER_OVERRUN );
+					}
+
+					try {
+						// now read the length we received
+						AdbHelper.Instance.Read ( Channel, data, length, timeOut );
+
+						// get the header for the next packet.
+						AdbHelper.Instance.Read ( Channel, pullResult, -1, timeOut );
+					} catch ( IOException e ) {
+						return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
+					}
+
+					// write the content in the file
+					try {
+						fos.Write ( data, 0, length );
+					} catch ( IOException e ) {
+						return new SyncResult ( ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e );
+					}
+
+					monitor.Advance ( length );
+				}
+
+				try {
+					fos.Flush ( );
+				} catch ( IOException e ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e );
+				}
+				return new SyncResult ( ErrorCodeHelper.RESULT_OK );
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="entries"></param>
+		/// <param name="localPath"></param>
+		/// <param name="fls"></param>
+		/// <param name="monitor"></param>
+		/// <returns></returns>
+		/// <exception cref="System.IO.IOException">Throws if unable to create a file or folder</exception>
+		/// <exception cref="System.ArgumentNullException">Throws if the ISyncProgressMonitor is null</exception>
+		private SyncResult DoPull ( FileEntry[] entries, string localPath, FileListingService fileListingService, ISyncProgressMonitor monitor ) {
+			if ( monitor == null ) {
+				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
+			}
+
+			// check if we're cancelled
+			if ( monitor.IsCanceled ) {
+				return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
+			}
+
+			// check if we need to create the local directory
+			DirectoryInfo localDir = new DirectoryInfo ( localPath );
+			if ( !localDir.Exists ) {
+				localDir.Create ( );
+			}
+
+			foreach ( FileEntry e in entries ) {
+				// check if we're cancelled
+				if ( monitor.IsCanceled ) {
+					return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
+				}
+
+				// the destination item (folder or file)
+				String dest = Path.Combine ( localPath, e.Name );
+
+				// get type (we only pull directory and files for now)
+				FileListingService.FileTypes type = e.Type;
+				if ( type == FileListingService.FileTypes.Directory ) {
+					monitor.StartSubTask ( e.FullPath );
+					// then recursively call the content. Since we did a ls command
+					// to get the number of files, we can use the cache
+					FileEntry[] children = fileListingService.GetChildren ( e, true, null );
+					SyncResult result = DoPull ( children, dest, fileListingService, monitor );
+					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
+						return result;
+					}
+					monitor.Advance ( 1 );
+				} else if ( type == FileListingService.FileTypes.File ) {
+					monitor.StartSubTask ( e.FullPath );
+					SyncResult result = DoPullFile ( e.FullPath, dest, monitor );
+					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
+						return result;
+					}
+				}
+			}
+
+			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
+		}
+
+		/// <summary>
+		/// compute the recursive file size of all the files in the list. Folder have a weight of 1.
+		/// </summary>
+		/// <param name="entries">The remote files</param>
+		/// <param name="fls">The FileListingService</param>
+		/// <returns>The total number of bytes of the specified remote files</returns>
 		private long GetTotalRemoteFileSize ( FileEntry[] entries, FileListingService fls ) {
 			long count = 0;
 			foreach ( FileEntry e in entries ) {
@@ -308,8 +784,8 @@ namespace Managed.Adb {
 		/// <summary>
 		/// compute the recursive file size of all the files in the list. Folders have a weight of 1.
 		/// </summary>
-		/// <param name="files"></param>
-		/// <returns></returns>
+		/// <param name="files">The local files / folders</param>
+		/// <returns>The total number of bytes</returns>
 		/// <remarks>This does not check for circular links.</remarks>
 		private long GetTotalLocalFileSize ( FileSystemInfo[] fsis ) {
 			long count = 0;
