@@ -75,14 +75,14 @@ namespace Managed.Adb {
 		public const String TOOLBOX_LS = "ls -l {0}";
 
 		public static readonly String[] RootLevelApprovedItems = {
-        DIRECTORY_DATA,
-        DIRECTORY_SDCARD,
-        DIRECTORY_SYSTEM,
-        DIRECTORY_TEMP,
-        DIRECTORY_MNT,
+				DIRECTORY_DATA,
+				DIRECTORY_SDCARD,
+				DIRECTORY_SYSTEM,
+				DIRECTORY_TEMP,
+				DIRECTORY_MNT,
 				// ADDED
 				DIRECTORY_APP
-    };
+		};
 
 		public enum FileTypes {
 			File = 0,

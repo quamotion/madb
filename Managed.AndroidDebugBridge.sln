@@ -1,11 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb", "Managed.AndroidDebugBridge\Managed.Adb.csproj", "{65473257-E70F-410B-9269-D0C0F771EA87}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb.Tests", "Managed.Adb.Tests\Managed.Adb.Tests.csproj", "{2C43B828-BE5E-47B6-93BB-A624B6B36633}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rdParty", "3rdParty", "{3F2F4DFF-41B3-45CA-AC47-E00250DCE930}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xunit", "xunit", "{E9A9E417-965C-461D-ABCA-3A32E5BF15B2}"
+	ProjectSection(SolutionItems) = preProject
+		3rdParty\xunit\xunit.dll = 3rdParty\xunit\xunit.dll
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs02.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Managed.AndroidDebugBridge\\Managed.Adb.csproj
+		SccProjectName1 = Managed.AndroidDebugBridge
+		SccLocalPath1 = Managed.AndroidDebugBridge
+		SccProjectUniqueName2 = Managed.Adb.Tests\\Managed.Adb.Tests.csproj
+		SccProjectName2 = Managed.Adb.Tests
+		SccLocalPath2 = Managed.Adb.Tests
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -23,16 +42,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs02.codeplex.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Managed.AndroidDebugBridge\\Managed.Adb.csproj
-		SccProjectName1 = Managed.AndroidDebugBridge
-		SccLocalPath1 = Managed.AndroidDebugBridge
-		SccProjectUniqueName2 = Utilities\\Managed.Adb.Utilities.csproj
-		SccProjectName2 = Utilities
-		SccLocalPath2 = Utilities
+	GlobalSection(NestedProjects) = preSolution
+		{E9A9E417-965C-461D-ABCA-3A32E5BF15B2} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
 	EndGlobalSection
 EndGlobal

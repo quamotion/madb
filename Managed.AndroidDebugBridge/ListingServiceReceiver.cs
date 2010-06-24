@@ -81,9 +81,9 @@ namespace Managed.Adb {
 					time = date.ToString ( "HH:mm" );
 				}
 				if ( date1.Length == 3 ) {
-					// check if we dont have a year and use current if we don't
+					// check if we don't have a year and use current if we don't
 					String tyear = String.IsNullOrEmpty ( date3 ) ? DateTime.Now.Year.ToString ( ) : date3;
-					date = DateTime.ParseExact ( String.Format ( "{0}-{1}-{2} {3}", date1, date2, date3, time ), "MMM-dd-yyyy HH:mm", CultureInfo.CurrentCulture );
+					date = DateTime.ParseExact ( String.Format ( "{0}-{1}-{2} {3}", date1, date2, tyear, time ), "MMM-dd-yyyy HH:mm", CultureInfo.CurrentCulture );
 				} else if ( date1.Length == 4 ) {
 					date = DateTime.ParseExact ( String.Format ( "{0}-{1}-{2} {3}", date1, date2, date3, time ), "yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture );
 				}
