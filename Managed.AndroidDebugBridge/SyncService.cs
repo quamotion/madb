@@ -9,7 +9,7 @@ using Managed.Adb.Extensions;
 using Managed.Adb.IO;
 
 namespace Managed.Adb {
-	public class SyncService {
+	public class SyncService : IDisposable {
 		private const String OKAY = "OKAY";
 		private const String FAIL = "FAIL";
 		private const String STAT = "STAT";
@@ -74,6 +74,7 @@ namespace Managed.Adb {
 		/// <param name="code">The 4 byte code.</param>
 		/// <returns>true if the code matches.</returns>
 		private static bool CheckResult ( byte[] result, byte[] code ) {
+
 			if ( result.Length >= code.Length ) {
 				for ( int i = 0; i < code.Length; i++ ) {
 					if ( result[i] != code[i] ) {
@@ -198,20 +199,26 @@ namespace Managed.Adb {
 		}
 		#endregion
 
+		public SyncService ( Device device )
+			: this ( AndroidDebugBridge.SocketAddress, device ) {
+
+		}
+
 		public SyncService ( IPEndPoint address, Device device ) {
 			Address = address;
 			Device = device;
+			Open ( );
 		}
 
 		public IPEndPoint Address { get; private set; }
 		public Device Device { get; private set; }
 		private Socket Channel { get; set; }
 
-		public bool OpenSync ( ) {
+		public bool Open ( ) {
 			try {
 				Channel = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 				Channel.Connect ( this.Address );
-				Channel.Blocking = false;
+				Channel.Blocking = true;
 
 				// target a specific device
 				AdbHelper.Instance.SetDevice ( Channel, Device );
@@ -339,8 +346,17 @@ namespace Managed.Adb {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
 
-			monitor.Start ( 0 );
-			//TODO: use the {@link FileListingService} to get the file size.
+			//TODO: use the FileListingService to get the file size.
+			long totalWork = 0;
+			try {
+				FileListingService fls = new FileListingService ( this.Device );
+				FileEntry remoteFileEntry = fls.FindEntry ( remoteFilepath );
+				totalWork = remoteFileEntry.Size;
+			} catch ( FileNotFoundException ffe ) {
+				Console.WriteLine ( ffe.ToString ( ) );
+				Log.w ( "ddms", ffe );
+			}
+			monitor.Start ( totalWork );
 
 			SyncResult result = DoPullFile ( remoteFilepath, localFilename, monitor );
 
@@ -429,7 +445,7 @@ namespace Managed.Adb {
 			byte[] msg;
 
 			int timeOut = DdmPreferences.Timeout;
-
+			Console.WriteLine ( "Remote File: {0}", remotePath );
 			try {
 				byte[] remotePathContent = remotePath.GetBytes ( AdbHelper.DEFAULT_ENCODING );
 
@@ -438,7 +454,7 @@ namespace Managed.Adb {
 				}
 
 				// this shouldn't happen but still...
-				if ( File.Exists ( local ) ) {
+				if ( !File.Exists ( local ) ) {
 					return new SyncResult ( ErrorCodeHelper.RESULT_NO_LOCAL_FILE );
 				}
 
@@ -484,7 +500,7 @@ namespace Managed.Adb {
 					return new SyncResult ( ErrorCodeHelper.RESULT_FILE_READ_ERROR, e );
 				}
 
-				if ( readCount == -1 ) {
+				if ( readCount == 0 ) {
 					// we reached the end of the file
 					break;
 				}
@@ -523,8 +539,8 @@ namespace Managed.Adb {
 				byte[] result = new byte[8];
 				AdbHelper.Instance.Read ( Channel, result, -1 /* full length */, timeOut );
 
-				if ( !CheckResult ( result, OKAY.GetBytes() ) ) {
-					if ( CheckResult ( result, FAIL.GetBytes() ) ) {
+				if ( !CheckResult ( result, OKAY.GetBytes ( ) ) ) {
+					if ( CheckResult ( result, FAIL.GetBytes ( ) ) ) {
 						// read some error message...
 						int len = ArrayHelper.Swap32bitFromArray ( result, 4 );
 
@@ -606,14 +622,14 @@ namespace Managed.Adb {
 			int timeOut = DdmPreferences.Timeout;
 
 			try {
-				byte[] remotePathContent = remotePath.GetBytes ( Encoding.Default );
+				byte[] remotePathContent = remotePath.GetBytes ( AdbHelper.DEFAULT_ENCODING );
 
 				if ( remotePathContent.Length > REMOTE_PATH_MAX_LENGTH ) {
 					return new SyncResult ( ErrorCodeHelper.RESULT_REMOTE_PATH_LENGTH );
 				}
 
 				// create the full request message
-				msg = CreateFileRequest ( RECV, remotePath );
+				msg = CreateFileRequest ( RECV.GetBytes ( ), remotePathContent );
 
 				// and send it.
 				AdbHelper.Instance.Write ( Channel, msg, -1, timeOut );
@@ -628,31 +644,32 @@ namespace Managed.Adb {
 					return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR );
 				}
 			} catch ( EncoderFallbackException e ) {
+				Console.WriteLine ( e );
 				return new SyncResult ( ErrorCodeHelper.RESULT_REMOTE_PATH_ENCODING, e );
 			} catch ( IOException e ) {
+				Console.WriteLine ( e );
 				return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
 			}
 
 			// access the destination file
-			FileInfo fi = new FileInfo ( localPath );
+			FileInfo f = new FileInfo ( localPath );
 
 			// create the stream to write in the file. We use a new try/catch block to differentiate
 			// between file and network io exceptions.
 			FileStream fos = null;
 			try {
-				fos = new FileStream ( fi.FullName, System.IO.FileMode.Create, FileAccess.Write );
+				fos = new FileStream ( f.FullName,System.IO.FileMode.Create,FileAccess.Write );
 			} catch ( FileNotFoundException e ) {
 				return new SyncResult ( ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e );
 			}
 
+			// the buffer to read the data
+			byte[] data = new byte[SYNC_DATA_MAX];
 			using ( fos ) {
-				// the buffer to read the data
-				byte[] data = new byte[SYNC_DATA_MAX];
-
 				// loop to get data until we're done.
 				while ( true ) {
 					// check if we're cancelled
-					if ( monitor.IsCanceled == true ) {
+					if ( monitor.IsCanceled ) {
 						return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
 					}
 
@@ -678,12 +695,12 @@ namespace Managed.Adb {
 						// get the header for the next packet.
 						AdbHelper.Instance.Read ( Channel, pullResult, -1, timeOut );
 					} catch ( IOException e ) {
+						Console.WriteLine ( e );
 						return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
 					}
-
 					// write the content in the file
 					try {
-						fos.Write ( data, 0, length );
+						fos.Write ( data, 0, data.Length );
 					} catch ( IOException e ) {
 						return new SyncResult ( ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e );
 					}
@@ -694,10 +711,11 @@ namespace Managed.Adb {
 				try {
 					fos.Flush ( );
 				} catch ( IOException e ) {
+					Console.WriteLine ( e );
 					return new SyncResult ( ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e );
 				}
-				return new SyncResult ( ErrorCodeHelper.RESULT_OK );
 			}
+			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
 		}
 
 		/// <summary>
@@ -831,6 +849,10 @@ namespace Managed.Adb {
 				Log.w ( "SyncService", e );
 				return FileMode.UNKNOWN;
 			}
+		}
+
+		public void Dispose ( ) {
+			this.Close ( );
 		}
 	}
 }

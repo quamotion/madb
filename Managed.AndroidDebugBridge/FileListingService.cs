@@ -6,6 +6,7 @@ using System.Threading;
 using System.IO;
 using Managed.Adb.Extensions;
 using System.Text.RegularExpressions;
+using Managed.Adb.IO;
 
 namespace Managed.Adb {
 	/// <summary>
@@ -16,40 +17,52 @@ namespace Managed.Adb {
 
 		public const String PM_FULL_LISTING = "pm list packages -f";
 
-		// mine is better
+		// mine is better, it supports both toolbox ls and busybox ls
+		[Obsolete("Use LS_PATTERN_EX, it supports busybox, plus standard ls",true)]
 		public const String LS_PATTERN = "^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\\s+(\\S+)\\s+(\\S+)\\s+([\\d\\s,]*)\\s+(\\d{4}-\\d\\d-\\d\\d)\\s+(\\d\\d:\\d\\d)\\s+(.*)$";
 
 		/// <summary>
-		/// This is the busy box ls pattern (busybox ls -lF --color=never)
+		/// This is the pattern that supports busybox ls and toolbox ls.
+		/// Groups
+		/// <ol>
+		///		<li>Permissions</li>
+		///		<li>Group</li>
+		///		<li>Owner</li>
+		///		<li>Size, if empty or whitespace use 0</li>
+		///		<li>Month Name (or year in toolbox ls)</li>
+		///		<li>Date (or month number in toolbox ls)</li>
+		///		<li>Year, if empty, use current year (or date number in toolbox ls)</li>
+		///		<li>Time, if empty, use 00:00</li>
+		///		<li>Name</li>
+		///		<li>File types (or empty in toolbox ls)</li>
+		/// </ol>
 		/// </summary>
-		public const String BB_LS_PATTERN = "^([ldcbp-])([rwxt-]{3}){3}\\s+(\\d{1,})\\s+(\\d{1,}|\\S{1,})\\s+(\\d{1,}|\\S{1,})\\s+(\\d{1,})\\s+(\\w+\\s+\\d{1,2}\\s+(?:\\d{4})?)(\\d{2}:\\d{2})?\\s+(.+?)([/@=*\\|]?)\\s?$";
-
-		public const String LS_PATTERN_EX = @"^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\s+(?:\d{0,})?\s*(\S+)\s+(\S+)\s+(\d{1,})[\s-](\w{3}|\d{2})[\s-](\d{2})\s+(\d{1,2}:\d{2})\s+(.*)([/@=*\|]?)$";
+		public const String LS_PATTERN_EX = @"^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\s+(?:\d{0,})?\s*(\S+)\s+(\S+)\s+(\d{1,}|\s)\s+(\w{3}|\d{4})[\s-](\d{2})[\s-]\s?(?:(\d{2}|\d{4}|\s)\s*)?(\d{2}:\d{2}|\s)\s*(.*?)([/@=*\|]?)$";
 
 		/// <summary>
 		///  Top level data folder.
 		/// </summary>
-		public const String DIRECTORY_DATA = "data"; //$NON-NLS-1$
+		public const String DIRECTORY_DATA = "data";
 		/// <summary>
 		/// Top level sdcard folder.
 		/// </summary>
-		public const String DIRECTORY_SDCARD = "sdcard"; //$NON-NLS-1$
+		public const String DIRECTORY_SDCARD = "sdcard";
 		/// <summary>
 		/// Top level mount folder.
 		/// </summary>
-		public const String DIRECTORY_MNT = "mnt"; //$NON-NLS-1$
+		public const String DIRECTORY_MNT = "mnt";
 		/// <summary>
 		/// Top level system folder.
 		/// </summary>
-		public const String DIRECTORY_SYSTEM = "system"; //$NON-NLS-1$
+		public const String DIRECTORY_SYSTEM = "system";
 		/// <summary>
 		/// Top level temp folder.
 		/// </summary>
-		public const String DIRECTORY_TEMP = "tmp"; //$NON-NLS-1$
+		public const String DIRECTORY_TEMP = "tmp";
 		/// <summary>
 		/// Application folder. 
 		/// </summary>
-		public const String DIRECTORY_APP = "app"; //$NON-NLS-1$
+		public const String DIRECTORY_APP = "app";
 
 
 		public const long REFRESH_RATE = 5000L;
@@ -57,6 +70,9 @@ namespace Managed.Adb {
 
 		public const String FILE_SEPARATOR = "/";
 		public const String FILE_ROOT = "/";
+
+		public const String BUSYBOX_LS = "busybox ls -lF --color=never {0}";
+		public const String TOOLBOX_LS = "ls -l {0}";
 
 		public static readonly String[] RootLevelApprovedItems = {
         DIRECTORY_DATA,
@@ -82,9 +98,15 @@ namespace Managed.Adb {
 
 		private FileEntry _root = null;
 
-		public FileListingService ( Device device ) {
+		public FileListingService ( Device device, bool forceBusyBox ) {
 			this.Device = device;
 			this.Threads = new List<Thread> ( );
+			this.ForceBusyBox = forceBusyBox;
+		}
+
+		public FileListingService ( Device device )
+			: this ( device, false ) {
+
 		}
 
 		public Device Device { get; private set; }
@@ -103,6 +125,7 @@ namespace Managed.Adb {
 			}
 		}
 
+		public bool ForceBusyBox { get; set; }
 
 
 		public FileEntry[] GetChildren ( FileEntry entry, bool useCache, IListingReceiver receiver ) {
@@ -193,7 +216,7 @@ namespace Managed.Adb {
 
 			try {
 				// create the command
-				String command = "ls -l " + entry.FullPath; //$NON-NLS-1$
+				String command = String.Format ( ForceBusyBox ? BUSYBOX_LS : TOOLBOX_LS, entry.FullPath );
 
 				// create the receiver object that will parse the result from ls
 				ListingServiceReceiver receiver = new ListingServiceReceiver ( entry, entryList, linkList );
@@ -204,7 +227,8 @@ namespace Managed.Adb {
 				// finish the process of the receiver to handle links
 				receiver.FinishLinks ( );
 			} catch ( IOException e ) {
-				Console.WriteLine ( e.ToString ( ) );
+				Log.e ( "ddms", e );
+				throw;
 			}
 
 
@@ -214,12 +238,40 @@ namespace Managed.Adb {
 			// sort the children and set them as the new children
 			entryList.Sort ( new FileEntry.FileEntryComparer ( ) );
 			entry.Children = entryList;
+
+
 		}
 
 		private class ThreadState {
 			public Thread Thread;
 			public FileEntry Entry;
 
+		}
+
+		/// <summary>
+		/// Finds an entry from the path.
+		/// </summary>
+		/// <param name="path">The file path of</param>
+		/// <returns>The FileEntry</returns>
+		/// <exception cref="FileNotFoundException">Throws if unable to locate the file or directory</exception>
+		public FileEntry FindEntry ( String path ) {
+			String[] entriesString = path.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
+			FileEntry current = this.Root;
+			foreach ( var pathItem in entriesString ) {
+				FileEntry[] entries = GetChildren ( current, true, null );
+				foreach ( var e in entries ) {
+					if ( String.Compare ( e.Name, pathItem, false ) == 0 ) {
+						current = e;
+						continue;
+					}
+				}
+			}
+			if ( String.Compare ( current.FullPath, path, false ) == 0 ) {
+				Console.WriteLine ( "returning: {0}", current.FullPath );
+				return current;
+			} else {
+				throw new FileNotFoundException ( String.Format ( "Unable to locate {0}", path ) );
+			}
 		}
 
 		internal class PackageManagerReceiver : MultiLineReceiver {
@@ -231,7 +283,7 @@ namespace Managed.Adb {
 			private const String PM_PATTERN = "^package:(.+?)=(.+)$";
 
 
-			public PackageManagerReceiver ( Dictionary<String,FileEntry> entryMap, IListingReceiver receiver ) {
+			public PackageManagerReceiver ( Dictionary<String, FileEntry> entryMap, IListingReceiver receiver ) {
 				this.Map = entryMap;
 				this.Receiver = receiver;
 			}

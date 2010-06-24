@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Managed.Adb.Extensions;
+using System.Globalization;
 
 namespace Managed.Adb {
 	public class ListingServiceReceiver : MultiLineReceiver {
-
+		private const String LINK_FORMAT = "-> {0}";
 		/// <summary>
 		/// Create an ls receiver/parser.
 		/// </summary>
@@ -36,20 +38,16 @@ namespace Managed.Adb {
 				}
 
 				// run the line through the regexp
-				Regex regex = new Regex ( FileListingService.LS_PATTERN, RegexOptions.Compiled );
-				Match m = regex.Match ( line );
+				Regex regex = new Regex ( FileListingService.LS_PATTERN_EX, RegexOptions.Compiled );
+				Match m = regex.Match ( line.Trim() );
 
-				Console.WriteLine ( line );
-				continue;
 				if ( !m.Success ) {
 					continue;
 				}
 
 				// get the name
-				String name = m.Groups[7].Value;
-				Console.WriteLine ( "Name: {0}", name );
+				String name = m.Groups[9].Value;
 				// if the parent is root, we only accept selected items
-				
 				// eff that - you get it all...
 				/*if ( Parent.IsRoot ) {
 					bool found = false;
@@ -68,19 +66,28 @@ namespace Managed.Adb {
 
 				// get the rest of the groups
 				String permissions = m.Groups[1].Value;
-				Console.WriteLine ( "Perm: {0}", permissions );
 				String owner = m.Groups[2].Value;
-				Console.WriteLine ( "Owner: {0}", owner );
 				String group = m.Groups[3].Value;
-				Console.WriteLine ( "Group: {0}", group );
 				long size = 0;
-				long.TryParse ( m.Groups[4].Value, out size );
-				Console.WriteLine ( "Size: {0}", size );
-				String date = m.Groups[5].Value;
-				Console.WriteLine ( "Date: {0}", date );
-				String time = m.Groups[6].Value;
-				Console.WriteLine ( "Time: {0}", time );
-				
+				String sizeData = m.Groups[4].Value.Trim ( );
+				long.TryParse ( String.IsNullOrEmpty ( sizeData ) ? "0" : sizeData, out size );
+				String date1 = m.Groups[5].Value.Trim ( );
+				String date2 = m.Groups[6].Value.Trim ( );
+				String date3 = m.Groups[7].Value.Trim ( );
+
+				DateTime date = DateTime.Now.GetEpoch ( );
+				String time = m.Groups[8].Value.Trim();
+				if ( String.IsNullOrEmpty ( time ) ) {
+					time = date.ToString ( "HH:mm" );
+				}
+				if ( date1.Length == 3 ) {
+					// check if we dont have a year and use current if we don't
+					String tyear = String.IsNullOrEmpty ( date3 ) ? DateTime.Now.Year.ToString ( ) : date3;
+					date = DateTime.ParseExact ( String.Format ( "{0}-{1}-{2} {3}", date1, date2, date3, time ), "MMM-dd-yyyy HH:mm", CultureInfo.CurrentCulture );
+				} else if ( date1.Length == 4 ) {
+					date = DateTime.ParseExact ( String.Format ( "{0}-{1}-{2} {3}", date1, date2, date3, time ), "yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture );
+				}
+
 				String info = null;
 
 				// and the type
@@ -138,7 +145,7 @@ namespace Managed.Adb {
 					}
 
 					// add an arrow in front to specify it's a link.
-					info = "-> " + info; //$NON-NLS-1$;
+					info = String.Format ( LINK_FORMAT, info );
 				}
 
 				// get the entry, either from an existing one, or a new one
@@ -151,7 +158,6 @@ namespace Managed.Adb {
 				entry.Permissions = permissions;
 				entry.Size = size;
 				entry.Date = date;
-				entry.Time = time;
 				entry.Owner = owner;
 				entry.Group = group;
 				if ( objectType == FileListingService.FileTypes.Link ) {

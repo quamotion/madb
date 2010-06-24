@@ -34,8 +34,7 @@ namespace Managed.Adb {
 		public String Info { get; set; }
 		public String Permissions { get; set; }
 		public long Size { get; set; }
-		public String Date { get; set; }
-		public String Time { get; set; }
+		public DateTime Date { get; set; }
 		public String Owner { get; set; }
 		public String Group { get; set; }
 		public FileListingService.FileTypes Type { get; private set; }

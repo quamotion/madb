@@ -6,7 +6,11 @@ using System.Globalization;
 
 namespace Managed.Adb.Extensions {
 	public static class DateTimeExtensions {
-		private static readonly DateTime Epoch = new DateTime ( 1970, 1, 1 );
+		public static readonly DateTime Epoch = new DateTime ( 1970, 1, 1 );
+
+		public static DateTime GetEpoch ( this DateTime dt ) {
+			return Epoch;
+		}
 
 		public static long CurrentTimeMillis ( this DateTime dateTime ) {
 			return (long)( dateTime.ToUniversalTime() - Epoch ).TotalMilliseconds;

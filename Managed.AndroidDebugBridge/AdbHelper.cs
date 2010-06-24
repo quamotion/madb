@@ -233,48 +233,31 @@ namespace Managed.Adb {
 
 		public void Read ( Socket socket, byte[] data, int length, int timeout ) {
 			int expLen = length != -1 ? length : data.Length;
-			using ( var buf = new MemoryStream ( expLen ) ) {
-				buf.Position = 0;
-				int numWaits = 0;
-				int count = -1;
-				while ( count != 0 ) {
-					try {
-						socket.ReceiveBufferSize = expLen;
-						byte[] buffer = new byte[socket.ReceiveBufferSize];
-						count = socket.Receive ( buffer );
-						if ( count < 0 ) {
-							Log.e ( TAG, "read: channel EOF" );
-							throw new IOException ( "EOF" );
-						} else if ( count == 0 ) {
-							// TODO: need more accurate timeout?
-							if ( timeout != 0 && numWaits * WAIT_TIME > timeout ) {
-								Log.e ( TAG, "read: timeout" );
-								throw new IOException ( "timeout" );
-							}
-							// non-blocking spin
-							Thread.Sleep ( WAIT_TIME );
-							numWaits++;
-						} else {
-							//Console.WriteLine ( Encoding.Default.GetString ( buffer ) );
-							buf.Write ( buffer, 0, count );
-							numWaits = 0;
+			int count = -1;
+			int totalRead = 0;
 
-							if ( buf.Position == buf.Length ) {
-								if ( buf.Length >= expLen ) {
-									byte[] outBuffer = buf.ToArray ( );
-									Array.Copy ( outBuffer, data, data.Length );
-									count = -1;
-									break;
-								}
-							}
-						}
-					} catch ( SocketException sex ) {
-						throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
+			while ( count != 0 && totalRead < expLen ) {
+				try {
+					int left = expLen - totalRead;
+					int buflen = left < socket.ReceiveBufferSize ? left : socket.ReceiveBufferSize;
+
+					byte[] buffer = new byte[buflen];
+					socket.ReceiveBufferSize = expLen;
+					count = socket.Receive ( buffer, buflen, SocketFlags.None );
+					if ( count < 0 ) {
+						Log.e ( TAG, "read: channel EOF" );
+						throw new IOException ( "EOF" );
+					} else if ( count == 0 ) {
+						Console.WriteLine ( "DONE with Read" );
+					} else {
+						Array.Copy ( buffer, 0, data, totalRead, count );
+						totalRead += count;
 					}
+				} catch ( SocketException sex ) {
+					throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
 				}
-
-
 			}
+
 		}
 
 		private byte[] CreateJdwpForwardRequest ( int pid ) {
@@ -511,13 +494,13 @@ namespace Managed.Adb {
 					} else {
 
 						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries );
-						string sdata = data.GetString(0,count,AdbHelper.DEFAULT_ENCODING);
+						string sdata = data.GetString ( 0, count, AdbHelper.DEFAULT_ENCODING );
 						if ( string.Compare ( sdata.Trim ( ), string.Format ( "{0}: not found", cmd[0] ), false ) == 0 ) {
 							Console.WriteLine ( "The remote execution returned: '{0}: not found'", cmd[0] );
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}: not found'", cmd[0] ) );
 						}
 
-						if ( sdata.Trim ( ).StartsWith ( "ls:" ) && sdata.Trim ( ).EndsWith ( "No such file or directory" ) ) {
+						if ( sdata.Trim ( ).EndsWith ( "No such file or directory" ) ) {
 							Console.WriteLine ( "The remote execution returned: {0}", sdata.Trim ( ) );
 							throw new FileNotFoundException ( String.Format ( "The remote execution returned: {0}", sdata.Trim ( ) ) );
 						}
