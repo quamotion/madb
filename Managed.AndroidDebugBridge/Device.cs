@@ -7,96 +7,137 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Reflection;
 using System.ComponentModel;
+using Managed.Adb.Exceptions;
 
 namespace Managed.Adb {
 	public enum DeviceState {
-		//[FieldDisplayName ( "bootloader" )]
+		Recovery,
 		BootLoader,
-		//[FieldDisplayName ( "offline" )]
 		Offline,
-		//[FieldDisplayName ( "device" )]
 		Online,
-		//[FieldDisplayName ( "unknown" )]
 		Unknown
 	}
 
 	public sealed class Device : IDevice {
+		/// <summary>
+		/// 
+		/// </summary>
+		public const String PROP_BUILD_VERSION = "ro.build.version.release";
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public const String PROP_BUILD_API_LEVEL = "ro.build.version.sdk";
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public const String PROP_BUILD_CODENAME = "ro.build.version.codename";
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public const String PROP_DEBUGGABLE = "ro.debuggable";
+
+		/// <summary>
+		/// Serial number of the first connected emulator. 
+		/// </summary>
+		public const String FIRST_EMULATOR_SN = "emulator-5554"; //$NON-NLS-1$
+
+		/** @deprecated Use {@link #PROP_BUILD_API_LEVEL}. */
+		[Obsolete ( "Use PROP_BUILD_API_LEVEL" )]
+		public const String PROP_BUILD_VERSION_NUMBER = PROP_BUILD_API_LEVEL;
+
+		/// <summary>
+		///  Emulator Serial Number regexp.
+		/// </summary>
+		private const String RE_EMULATOR_SN = @"emulator-(\d+)"; //$NON-NLS-1$
+
+		/// <summary>
+		/// Device list info regex
+		/// </summary>
+		private const String RE_DEVICELIST_INFO = @"^([^\s]+)\s+(device|offline|unknown|bootloader|recovery)$";
+		/// <summary>
+		/// Tag
+		/// </summary>
+		private const String LOG_TAG = "Device";
+
+
+		public const String MNT_EXTERNAL_STORAGE = "EXTERNAL_STORAGE";
+		public const String MNT_ROOT = "ANDROID_ROOT";
+		public const String MNT_DATA = "ANDROID_DATA";
+
+
+		/// <summary>
+		/// 
+		/// </summary>
+		private string avdName;
+
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="serial"></param>
+		/// <param name="state"></param>
 		public Device ( String serial, DeviceState state ) {
 			this.SerialNumber = serial;
 			this.State = state;
+			MountPoints = new Dictionary<String, MountPoint> ( );
+			RefreshMountPoints ( );
 		}
-		public const String PROP_BUILD_VERSION = "ro.build.version.release";
-		public const String PROP_BUILD_API_LEVEL = "ro.build.version.sdk";
-		public const String PROP_BUILD_CODENAME = "ro.build.version.codename";
 
-		public const String PROP_DEBUGGABLE = "ro.debuggable";
+		/*public Device ( DeviceMonitor monitor, String serialNumber, DeviceState deviceState ) {
+			//Monitor = monitor;
+			SerialNumber = serialNumber;
+			State = deviceState;
+			//ClientList = new List<IClient> ( );
+		}*/
 
-		/** Serial number of the first connected emulator. */
-		public const String FIRST_EMULATOR_SN = "emulator-5554"; //$NON-NLS-1$
-		/** Device change bit mask: {@link DeviceState} change. */
-		public const int CHANGE_STATE = 0x0001;
-		/** Device change bit mask: {@link Client} list change. */
-		public const int CHANGE_CLIENT_LIST = 0x0002;
-		/** Device change bit mask: build info change. */
-		public const int CHANGE_BUILD_INFO = 0x0004;
-
-		/** @deprecated Use {@link #PROP_BUILD_API_LEVEL}. */
-		public const String PROP_BUILD_VERSION_NUMBER = PROP_BUILD_API_LEVEL;
-
-		/**
-		 * The state of a device.
-		 */
-
-
+		/// <summary>
+		/// Get the device state from the string value
+		/// </summary>
+		/// <param name="state">The device state string</param>
+		/// <returns></returns>
 		public static DeviceState GetStateFromString ( String state ) {
 			if ( Enum.IsDefined ( typeof ( DeviceState ), state ) ) {
 				return (DeviceState)Enum.Parse ( typeof ( DeviceState ), state, true );
 			} else {
 				foreach ( var fi in typeof ( DeviceState ).GetFields ( ) ) {
-					/*
-					FieldDisplayNameAttribute dna = ReflectionHelper.GetCustomAttribute<FieldDisplayNameAttribute> ( fi );
-					if ( dna != null ) {
-						if ( string.Compare ( dna.DisplayName, state, false ) == 0 ) {
-							return (DeviceState)fi.GetValue ( null );
-						}
-					} else { */
 					if ( string.Compare ( fi.Name, state, true ) == 0 ) {
 						return (DeviceState)fi.GetValue ( null );
 					}
-					// }
 				}
 			}
 			return DeviceState.Unknown;
 		}
 
+		/// <summary>
+		/// Create a device from Adb Device list data
+		/// </summary>
+		/// <param name="data">the line data for the device</param>
+		/// <returns></returns>
 		public static Device CreateFromAdbData ( String data ) {
 			Regex re = new Regex ( RE_DEVICELIST_INFO, RegexOptions.Compiled | RegexOptions.IgnoreCase );
 			Match m = re.Match ( data );
 			if ( m.Success ) {
 				return new Device ( m.Groups[1].Value, GetStateFromString ( m.Groups[2].Value ) );
+
 			} else {
 				throw new ArgumentException ( "Invalid device list data" );
 			}
 		}
 
-		/** Emulator Serial Number regexp. */
-		const String RE_EMULATOR_SN = @"emulator-(\d+)"; //$NON-NLS-1$
-		const String RE_DEVICELIST_INFO = @"^([^\s]+)\s+(device|offline|unknown|bootloader)$";
-		private const String LOG_TAG = "Device";
-		private string avdName;
-
-
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.android.ddmlib.IDevice#getSerialNumber()
-		 */
+		/// <summary>
+		/// Gets the device serial number
+		/// </summary>
 		public String SerialNumber { get; private set; }
 
-		/** {@inheritDoc} */
+		/// <summary>
+		/// Gets or sets the Avd name.
+		/// </summary>
 		public String AvdName {
 			get { return avdName; }
-			private set {
+			set {
 				if ( !IsEmulator ) {
 					throw new ArgumentException ( "Cannot set the AVD name of the device is not an emulator" );
 				}
@@ -104,12 +145,15 @@ namespace Managed.Adb {
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see com.android.ddmlib.IDevice#getState()
-		 */
+		/// <summary>
+		/// Gets the device state
+		/// </summary>
 		public DeviceState State { get; private set; }
 
+		/// <summary>
+		/// Gets the device mount points.
+		/// </summary>
+		public Dictionary<String, MountPoint> MountPoints { get; set; }
 
 		/*
 		 * (non-Javadoc)
@@ -127,61 +171,66 @@ namespace Managed.Adb {
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see com.android.ddmlib.IDevice#getProperty(java.lang.String)
-		 */
 		public String GetProperty ( String name ) {
 			return Properties[name];
 		}
 
 
-		//@Override
 		public override String ToString ( ) {
 			return SerialNumber;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see com.android.ddmlib.IDevice#isOnline()
-		 */
 		public bool IsOnline {
 			get {
 				return State == DeviceState.Online;
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see com.android.ddmlib.IDevice#isEmulator()
-		 */
 		public bool IsEmulator {
 			get {
 				return Regex.Match ( SerialNumber, RE_EMULATOR_SN ).Success;
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see com.android.ddmlib.IDevice#isOffline()
-		 */
 		public bool IsOffline {
 			get {
 				return State == DeviceState.Offline;
 			}
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see com.android.ddmlib.IDevice#isBootLoader()
-		 */
 		public bool IsBootLoader {
 			get {
 				return State == DeviceState.BootLoader;
 			}
 		}
 
+		public bool IsRecovery {
+			get { return State == DeviceState.Recovery; }
+		}
 
+		public void RemountMountPoint ( MountPoint mnt, bool readOnly ) {
+			if ( mnt.IsReadOnly == readOnly ) {
+				throw new ArgumentException ( String.Format ( "Mount point is already set as {0}", readOnly ? "ro" : "rw" ) );
+			}
+
+			String command = String.Format ( "mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name );
+			this.ExecuteShellCommand ( command, NullOutputReceiver.Instance );
+
+			RefreshMountPoints ( );
+		}
+
+		public void RefreshMountPoints ( ) {
+			if ( !IsOffline ) {
+				var receiver = new MountPointReceiver ( );
+				this.ExecuteShellCommand ( "mount", receiver );
+				foreach ( var item in receiver.MountPoints.Keys ) {
+					if ( this.MountPoints.ContainsKey ( item ) ) {
+						this.MountPoints.Remove ( item );
+					}
+					this.MountPoints.Add ( item, receiver.MountPoints[item].Clone ( ) );
+				}
+			}
+		}
 
 
 		/*public bool HasClients {
@@ -210,25 +259,25 @@ public Client GetClient ( String applicationName ) {
 	}
 
 	return null;
-}
+}*/
 
-public SyncService SyncService {
-	get {
-		SyncService syncService = new SyncService ( AndroidDebugBridge.SocketAddress, this );
-		if ( syncService.OpenSync ( ) ) {
-			return syncService;
+		public SyncService SyncService {
+			get {
+				SyncService syncService = new SyncService ( AndroidDebugBridge.SocketAddress, this );
+				if ( syncService.Open ( ) ) {
+					return syncService;
+				}
+
+				return null;
+			}
 		}
 
-		return null;
-	}
-}
+		public FileListingService FileListingService {
+			get {
+				return new FileListingService ( this );
+			}
+		}
 
-public FileListingService FileListingService {
-	get {
-		return new FileListingService ( this );
-	}
-}
-*/
 		public RawImage Screenshot {
 			get {
 				return AdbHelper.Instance.GetFrameBuffer ( AndroidDebugBridge.SocketAddress, this );
@@ -236,8 +285,13 @@ public FileListingService FileListingService {
 		}
 
 		public void ExecuteShellCommand ( String command, IShellOutputReceiver receiver ) {
-			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, command, this, receiver );
+			ExecuteShellCommand ( command, receiver, new object[] { } );
 		}
+
+		public void ExecuteShellCommand ( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
+			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, string.Format ( command, commandArgs ), this, receiver );
+		}
+
 		/*
 		public void RunEventLogService ( LogReceiver receiver ) {
 			AdbHelper.RunEventLogService ( AndroidDebugBridge.sSocketAddress, this, receiver );
@@ -246,25 +300,26 @@ public FileListingService FileListingService {
 		public void RunLogService ( String logname, LogReceiver receiver ) {
 			AdbHelper.RunLogService ( AndroidDebugBridge.sSocketAddress, this, logname, receiver );
 		}
-
+		*/
 		public bool CreateForward ( int localPort, int remotePort ) {
 			try {
-				return AdbHelper.CreateForward ( AndroidDebugBridge.SocketAddress, this, localPort, remotePort );
+				return AdbHelper.Instance.CreateForward ( AndroidDebugBridge.SocketAddress, this, localPort, remotePort );
 			} catch ( IOException e ) {
-				Console.WriteLine( e ); //$NON-NLS-1$
+				Log.w ( "ddms", e );
 				return false;
 			}
 		}
 
 		public bool RemoveForward ( int localPort, int remotePort ) {
 			try {
-				return AdbHelper.RemoveForward ( AndroidDebugBridge.SocketAddress, this, localPort, remotePort );
+				return AdbHelper.Instance.RemoveForward ( AndroidDebugBridge.SocketAddress, this, localPort, remotePort );
 			} catch ( IOException e ) {
-				Console.WriteLine ( e ); //$NON-NLS-1$
+				Log.w ( "ddms", e );
 				return false;
 			}
 		}
 
+		/*
 		public String GetClientName ( int pid ) {
 			lock ( ClientList ) {
 				foreach ( Client c in ClientList ) {
@@ -275,14 +330,6 @@ public FileListingService FileListingService {
 			}
 
 			return null;
-		}
-
-
-		public Device ( DeviceMonitor monitor, String serialNumber, DeviceState deviceState ) {
-			Monitor = monitor;
-			SerialNumber = serialNumber;
-			State = deviceState;
-			ClientList = new List<Client> ( );
 		}
 
 		DeviceMonitor Monitor { get; private set; }
@@ -332,37 +379,32 @@ public FileListingService FileListingService {
 		void Update ( Client client, int changeMask ) {
 			Monitor.Server.ClientChanged ( client, changeMask );
 		}
-
+		*/
 		void AddProperty ( String label, String value ) {
 			Properties.Add ( label, value );
 		}
 
-		public String InstallPackage ( String packageFilePath, bool reinstall ) {
+		public void InstallPackage ( String packageFilePath, bool reinstall ) {
 			String remoteFilePath = SyncPackageToDevice ( packageFilePath );
-			String result = InstallRemotePackage ( remoteFilePath, reinstall );
+			InstallRemotePackage ( remoteFilePath, reinstall );
 			RemoveRemotePackage ( remoteFilePath );
-			return result;
 		}
 
 		public String SyncPackageToDevice ( String localFilePath ) {
 			try {
-				String packageFileName = getFileName ( localFilePath );
-				String remoteFilePath = String.Format ( "/data/local/tmp/{0}", packageFileName ); //$NON-NLS-1$
+				String packageFileName = Path.GetFileName ( localFilePath );
+				String remoteFilePath = String.Format ( "/data/local/tmp/{0}", packageFileName );
 
-				Log.d ( packageFileName, String.Format ( "Uploading {0} onto device '{1}'",
-								packageFileName, SerialNumber ) );
+				Log.d ( packageFileName, String.Format ( "Uploading {0} onto device '{1}'", packageFileName, SerialNumber ) );
 
 				SyncService sync = SyncService;
 				if ( sync != null ) {
-					String message = String.Format ( "Uploading file onto device '{0}'",
-									SerialNumber );
+					String message = String.Format ( "Uploading file onto device '{0}'", SerialNumber );
 					Log.d ( LOG_TAG, message );
-					SyncResult result = sync.PushFile ( localFilePath, remoteFilePath,
-									SyncService.NullProgressMonitor );
+					SyncResult result = sync.PushFile ( localFilePath, remoteFilePath, SyncService.NullProgressMonitor );
 
-					if ( result.Code != SyncService.RESULT_OK ) {
-						throw new IOException ( String.Format ( "Unable to upload file: {0}",
-										result.Message ) );
+					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
+						throw new IOException ( String.Format ( "Unable to upload file: {0}", result.Message ) );
 					}
 				} else {
 					throw new IOException ( "Unable to open sync connection!" );
@@ -375,17 +417,18 @@ public FileListingService FileListingService {
 			}
 		}
 
-		private String GetFileName ( String filePath ) {
-			return Path.GetFileName ( filePath );
-		}
-
-		public String InstallRemotePackage ( String remoteFilePath, bool reinstall ) {
+		public void InstallRemotePackage ( String remoteFilePath, bool reinstall ) {
 			InstallReceiver receiver = new InstallReceiver ( );
 			String cmd = String.Format ( reinstall ? "pm install -r \"{0}\"" : "pm install \"{0}\"", remoteFilePath );
 			ExecuteShellCommand ( cmd, receiver );
-			return receiver.ErrorMessage;
+
+			if ( !String.IsNullOrEmpty ( receiver.ErrorMessage ) ) {
+				throw new PackageInstallationException ( receiver.ErrorMessage );
+			}
 		}
-		public void removeRemotePackage ( String remoteFilePath ) {
+
+
+		public void RemoveRemotePackage ( String remoteFilePath ) {
 			// now we delete the app we sync'ed
 			try {
 				ExecuteShellCommand ( "rm " + remoteFilePath, NullOutputReceiver.Instance );
@@ -395,12 +438,14 @@ public FileListingService FileListingService {
 			}
 		}
 
-		public String UninstallPackage ( String packageName ) {
+		public void UninstallPackage ( String packageName ) {
 			InstallReceiver receiver = new InstallReceiver ( );
-			ExecuteShellCommand ( "pm uninstall " + packageName, receiver );
-			return receiver.ErrorMessage;
+			ExecuteShellCommand ( String.Format ( "pm uninstall {0}", packageName ), receiver );
+			if ( !String.IsNullOrEmpty ( receiver.ErrorMessage ) ) {
+				throw new PackageInstallationException ( receiver.ErrorMessage );
+			}
 		}
-		*/
+
 
 	}
 }

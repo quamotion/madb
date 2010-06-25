@@ -19,6 +19,21 @@ namespace Managed.Adb.Extensions {
 			return GetBytes ( str, enc );
 		}
 
+		public static String ToHex ( this byte b ) {
+			StringBuilder hex = new StringBuilder ( 2 );
+			hex.AppendFormat ( "{0:x2}", b );
+			return hex.ToString ( );
+		}
+
+		public static String ToHex ( this byte[] byteArray ) {
+			StringBuilder hex = new StringBuilder ( byteArray.Length * 2 );
+			foreach ( byte b in byteArray ) {
+				hex.AppendFormat ( "{0} ", b.ToHex ( ) );
+			}
+			return hex.ToString ( ).Trim();
+
+		}
+
 		public static String GetString ( this byte[] bytes ) {
 			return GetString ( bytes, Encoding.Default );
 		}

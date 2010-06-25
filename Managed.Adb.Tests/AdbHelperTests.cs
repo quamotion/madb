@@ -13,8 +13,41 @@ namespace Managed.Adb.Tests {
 			List<Device> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
 			Assert.True ( devices.Count >= 1 );
 			foreach ( var item in devices ) {
-				Console.WriteLine ( "{0}-{1}", item.SerialNumber, item.State );
+				Console.WriteLine ( item.SerialNumber );
 			}
+		}
+
+		[Fact]
+		public void DeviceGetMountPointsTest ( ) {
+			Device device = GetFirstDevice ( );
+			foreach ( var item in device.MountPoints.Keys ) {
+				Console.WriteLine ( device.MountPoints[item] );
+			}
+
+			Assert.True ( device.MountPoints.ContainsKey ( "/system" ) );
+		}
+
+		[Fact]
+		public void DeviceRemountMountPointTest ( ) {
+			Device device = GetFirstDevice ( );
+
+			Assert.True ( device.MountPoints.ContainsKey ( "/system" ), "Device does not contain mount point /system" );
+			bool isReadOnly = device.MountPoints["/system"].IsReadOnly;
+
+			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
+				device.RemountMountPoint ( device.MountPoints["/system"], !isReadOnly );
+			} ) );
+
+			Assert.Equal<bool> ( !isReadOnly, device.MountPoints["/system"].IsReadOnly );
+			Console.WriteLine ( "Successfully mounted /system as {0}", !isReadOnly ? "rw" : "ro" );
+
+			// revert it back...
+			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
+				device.RemountMountPoint ( device.MountPoints["/system"], isReadOnly );
+			} ) );
+			Assert.Equal<bool> ( isReadOnly, device.MountPoints["/system"].IsReadOnly );
+			Console.WriteLine ( "Successfully mounted /system as {0}", isReadOnly ? "rw" : "ro" );
+
 		}
 
 		[Fact]
@@ -22,19 +55,21 @@ namespace Managed.Adb.Tests {
 			Device device = GetFirstDevice ( );
 			ConsoleReceiver creciever = new ConsoleReceiver ( );
 
+			Console.WriteLine ( "Executing 'ls':" );
 			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
 				try {
-					AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, "ls -lF --color=never", device, creciever );
-				} catch ( FileNotFoundException fex ) {
-					AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, "ls -l", device, creciever );
+					device.ExecuteShellCommand ( "ls -lF --color=never", creciever );
+				} catch ( FileNotFoundException ) {
+					device.ExecuteShellCommand ( "ls -l", creciever );
 				}
 			} ) );
 
 
+			Console.WriteLine ( "Executing 'busybox':" );
 			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
 				bool hasBB = false;
 				try {
-					AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, "busybox", device, creciever );
+					device.ExecuteShellCommand ( "busybox", creciever );
 					hasBB = true;
 				} catch ( FileNotFoundException ) {
 					hasBB = false;
@@ -43,19 +78,23 @@ namespace Managed.Adb.Tests {
 				}
 			} ) );
 
+			Console.WriteLine ( "Executing 'unknowncommand':" );
 			Assert.Throws<FileNotFoundException> ( new Assert.ThrowsDelegate ( delegate ( ) {
-				AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, "notsobusybox", device, creciever );
+				device.ExecuteShellCommand ( "unknowncommand", creciever );
 			} ) );
 
+			Console.WriteLine ( "Executing 'ls /system/foo'" );
 			Assert.Throws<FileNotFoundException> ( new Assert.ThrowsDelegate ( delegate ( ) {
-				AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, "ls /system/foo", device, creciever );
+				device.ExecuteShellCommand ( "ls /system/foo", creciever );
 			} ) );
 
 		}
 
 		[Fact]
 		public void GetRawImageTest ( ) {
-			RawImage rawImage = AdbHelper.Instance.GetFrameBuffer ( AndroidDebugBridge.SocketAddress, GetFirstDevice ( ) );
+			Device device = GetFirstDevice ( );
+
+			RawImage rawImage = device.Screenshot;
 
 			Assert.NotNull ( rawImage );
 			Assert.Equal<int> ( 16, rawImage.Bpp );
@@ -66,9 +105,8 @@ namespace Managed.Adb.Tests {
 
 		[Fact]
 		public void FileListingServiceTest ( ) {
-			FileListingService fls = new FileListingService ( GetFirstDevice ( ), false );
-			//ListingServiceReceiver lsr = new ListingServiceReceiver(null,null,null);
-			FileEntry[] entries = fls.GetChildren ( fls.Root, false, null );
+			Device device = GetFirstDevice ( );
+			FileEntry[] entries = device.FileListingService.GetChildren ( device.FileListingService.Root, false, null );
 			foreach ( var item in entries ) {
 				Console.WriteLine ( item.FullPath );
 			}
@@ -76,10 +114,10 @@ namespace Managed.Adb.Tests {
 
 		[Fact]
 		public void SyncServicePullFileTest ( ) {
-			using ( SyncService sync = new SyncService ( AndroidDebugBridge.SocketAddress, GetFirstDevice ( ) ) ) {
-				FileListingService fls = new FileListingService ( GetFirstDevice ( ), false );
+			Device device = GetFirstDevice ( );
+			using ( SyncService sync = device.SyncService ) {
 				String rfile = "/sdcard/bootanimations/bootanimation-cm.zip";
-				FileEntry rentry = fls.FindFileEntry ( rfile );
+				FileEntry rentry = device.FileListingService.FindFileEntry ( rfile );
 
 				String lpath = Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory );
 				String lfile = Path.Combine ( lpath, LinuxPath.GetFileName ( rfile ) );
@@ -104,46 +142,52 @@ namespace Managed.Adb.Tests {
 			FileInfo localFile = new FileInfo ( testFile );
 			String remoteFile = String.Format ( "/sdcard/{0}", Path.GetFileName ( testFile ) );
 			Device device = GetFirstDevice ( );
-			using ( SyncService sync = new SyncService ( AndroidDebugBridge.SocketAddress, device ) ) {
-				FileListingService fls = new FileListingService ( device, false );
 
-				SyncResult result = sync.PushFile ( localFile.FullName,
-					remoteFile, new FileSyncProgressMonitor ( ) );
+
+			using ( SyncService sync = device.SyncService ) {
+				SyncResult result = sync.PushFile ( localFile.FullName, remoteFile, new FileSyncProgressMonitor ( ) );
 				Assert.True ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
 				FileEntry remoteEntry = null;
 				Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-					remoteEntry = fls.FindFileEntry ( remoteFile );
+					remoteEntry = device.FileListingService.FindFileEntry ( remoteFile );
 				} ) );
 
 				// check the size
 				Assert.Equal<long> ( localFile.Length, remoteEntry.Size );
 
 				// clean up temp file on sdcard
-				AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, String.Format ( "rm {0}", remoteEntry.FullEscapedPath ), device, new ConsoleReceiver ( ) );
+				device.ExecuteShellCommand ( String.Format ( "rm {0}", remoteEntry.FullEscapedPath ), new ConsoleReceiver ( ) );
 			}
 		}
 
 		[Fact]
 		public void SyncServicePullFilesTest ( ) {
-			// doesn't work yet...
-			using ( SyncService sync = new SyncService ( AndroidDebugBridge.SocketAddress, GetFirstDevice ( ) ) ) {
-				FileListingService fls = new FileListingService ( GetFirstDevice ( ), false );
-				String lpath = Path.Combine(Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ),"data");
-				String rpath = "/data/app";
-				DirectoryInfo ldir = new DirectoryInfo(lpath);
+			Device device = GetFirstDevice ( );
+			using ( SyncService sync = device.SyncService ) {
+				String lpath = Path.Combine ( Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ), "apps" );
+				String rpath = "/system/app";
+				DirectoryInfo ldir = new DirectoryInfo ( lpath );
 				if ( !ldir.Exists ) {
 					ldir.Create ( );
 				}
-				FileEntry fentry = fls.FindFileEntry(rpath);
-				Assert.True(fentry.IsDirectory);
+				FileEntry fentry = device.FileListingService.FindFileEntry ( rpath );
+				Assert.True ( fentry.IsDirectory );
 
-				FileEntry[] entries = fls.GetChildren ( fentry, false, null );
-				Console.WriteLine ( "entry children: {0}", entries.Length );
+				FileEntry[] entries = device.FileListingService.GetChildren ( fentry, false, null );
 				SyncResult result = sync.Pull ( entries, ldir.FullName, new FileSyncProgressMonitor ( ) );
 
 				Assert.True ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
-
 			}
+		}
+
+		public void DeviceInstallPackageTest ( ) {
+			Device device = GetFirstDevice ( );
+			String package = Path.Combine ( Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ), "HttpDump.apk" );
+			Assert.True ( File.Exists ( package ) );
+
+			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
+				device.InstallPackage ( package, false );
+			} ) );
 		}
 
 		private String CreateTestFile ( ) {
@@ -209,7 +253,7 @@ namespace Managed.Adb.Tests {
 
 		public class ConsoleReceiver : MultiLineReceiver {
 
-			public override void ProcessNewLines ( string[] lines ) {
+			protected override void ProcessNewLines ( string[] lines ) {
 				foreach ( var line in lines ) {
 					Console.WriteLine ( line );
 				}

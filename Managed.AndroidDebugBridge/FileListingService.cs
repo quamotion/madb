@@ -288,7 +288,7 @@ namespace Managed.Adb {
 			public Dictionary<String, FileEntry> Map { get; set; }
 			public IListingReceiver Receiver { get; set; }
 
-			public override void ProcessNewLines ( string[] lines ) {
+			protected override void ProcessNewLines ( string[] lines ) {
 				foreach ( String line in lines ) {
 					if ( line.Length > 0 ) {
 						// get the filepath and package from the line

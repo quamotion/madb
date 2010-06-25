@@ -29,7 +29,7 @@ namespace Managed.Adb {
 		public FileEntry[] CurrentChildren { get; private set; }
 		public FileEntry Parent { get; private set; }
 
-		public override void ProcessNewLines ( string[] lines ) {
+		protected override void ProcessNewLines ( string[] lines ) {
 			foreach ( String line in lines ) {
 				// no need to handle empty lines.
 				if ( line.Length == 0 ) {

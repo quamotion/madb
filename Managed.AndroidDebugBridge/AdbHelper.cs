@@ -292,6 +292,33 @@ namespace Managed.Adb {
 			return true;
 		}
 
+		public bool RemoveForward ( IPEndPoint adbSockAddr, Device device, int localPort, int remotePort ) {
+
+			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+			try {
+				adbChan.Connect ( adbSockAddr );
+				adbChan.Blocking = true;
+
+				byte[] request = FormAdbRequest ( String.Format ("host-serial:{0}:killforward:tcp:{1};tcp:{2}",
+								device.SerialNumber, localPort, remotePort ) );
+
+				if ( !Write ( adbChan, request ) ) {
+					throw new IOException ( "failed to submit the remove forward command." );
+				}
+
+				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
+				if ( !resp.IOSuccess || !resp.Okay ) {
+					throw new IOException ( "Device rejected command: " + resp.Message );
+				}
+			} finally {
+				if ( adbChan != null ) {
+					adbChan.Close ( );
+				}
+			}
+
+			return true;
+		}
+
 		public bool IsOkay ( byte[] reply ) {
 			return reply[0] == (byte)'O' && reply[1] == (byte)'K'
 								&& reply[2] == (byte)'A' && reply[3] == (byte)'Y';
@@ -454,8 +481,6 @@ namespace Managed.Adb {
 		/// <exception cref="OperationCanceledException">Throws if the execution was canceled</exception>
 		/// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
 		public void ExecuteRemoteCommand ( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr ) {
-			Console.WriteLine ( "execute: running " + command );
-
 			Socket socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
 				socket.Connect ( endPoint );
@@ -470,7 +495,6 @@ namespace Managed.Adb {
 
 				AdbResponse resp = ReadAdbResponse ( socket, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
-					Console.WriteLine ( "ADB rejected shell command (" + command + "): " + resp.Message );
 					throw new IOException ( "sad result from adb: " + resp.Message );
 				}
 
@@ -496,12 +520,12 @@ namespace Managed.Adb {
 						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries );
 						string sdata = data.GetString ( 0, count, AdbHelper.DEFAULT_ENCODING );
 						if ( string.Compare ( sdata.Trim ( ), string.Format ( "{0}: not found", cmd[0] ), false ) == 0 ) {
-							Console.WriteLine ( "The remote execution returned: '{0}: not found'", cmd[0] );
+							Log.w("AdbHelper", "The remote execution returned: '{0}: not found'", cmd[0] );
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}: not found'", cmd[0] ) );
 						}
 
 						if ( sdata.Trim ( ).EndsWith ( "No such file or directory" ) ) {
-							Console.WriteLine ( "The remote execution returned: {0}", sdata.Trim ( ) );
+							Log.w ( "AdbHelper", "The remote execution returned: {0}", sdata.Trim ( ) );
 							throw new FileNotFoundException ( String.Format ( "The remote execution returned: {0}", sdata.Trim ( ) ) );
 						}
 
@@ -509,17 +533,12 @@ namespace Managed.Adb {
 						if ( rcvr != null ) {
 							rcvr.AddOutput ( data, 0, count );
 						}
-
-						// wait before we continue and try to read again
-						// we will always read 1 more time from here, since count != 0
-						Thread.Sleep ( WAIT_TIME );
 					}
 				}
 			} finally {
 				if ( socket != null ) {
 					socket.Close ( );
 				}
-				Log.d ( TAG, "execute: returning" );
 			}
 		}
 

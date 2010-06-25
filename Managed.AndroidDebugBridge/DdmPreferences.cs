@@ -26,7 +26,7 @@ namespace Managed.Adb {
 			LogLevel = DEFAULT_LOG_LEVEL;
 			SelectedDebugPort = DEFAULT_SELECTED_DEBUG_PORT;
 			DebugPortBase = DEFAULT_DEBUG_PORT_BASE;
-			ThreadUpdate = DEFAULT_INITIAL_THREAD_UPDATE;
+			InitialThreadUpdate = DEFAULT_INITIAL_THREAD_UPDATE;
 			InitialHeapUpdate = DEFAULT_INITIAL_HEAP_UPDATE;
 		}
 
@@ -37,7 +37,7 @@ namespace Managed.Adb {
 			}
 			set {
 				_logLevel = value;
-				Log.SetLevel ( value );
+				Log.Level = value ;
 			}
 		}
 		public static int DebugPortBase { get; set; }
@@ -54,7 +54,7 @@ namespace Managed.Adb {
 				}
 			}
 		}
-		public static bool ThreadUpdate { get; set; }
+		public static bool InitialThreadUpdate { get; set; }
 		public static bool InitialHeapUpdate { get; set; }
 	}
 }

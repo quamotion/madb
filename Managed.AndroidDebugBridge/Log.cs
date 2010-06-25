@@ -6,140 +6,221 @@ using Managed.Adb.Extensions;
 
 namespace Managed.Adb {
 	public sealed class Log {
-		
+		public static LogLevel.LogLevelInfo Level { get; set; }
 
-		public interface ILogOutput {
-			void Write ( LogLevel.LogLevelInfo logLevel, String tag, String message );
-			void WriteAndPromptLog ( LogLevel.LogLevelInfo logLevel, String tag, String message );
-		}
+		/// <summary>
+		/// Gets or sets the <see cref="ILogOutput">LogOutput</see>
+		/// </summary>
+		public static ILogOutput LogOutput { get; set; }
 
-		private static LogLevel.LogLevelInfo mLevel = /*DdmPreferences.LogLevel*/ LogLevel.Verbose;
+		private static char[] SpaceLine = new char[72];
+		private static readonly char[] HEXDIGIT = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-		private static ILogOutput sLogOutput;
-
-		private static char[] mSpaceLine = new char[72];
-		private static readonly char[] mHexDigit = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 		/// <summary>
 		/// Static Initializer for the <see cref="Log"/> class.
 		/// </summary>
 		static Log ( ) {
 			/* prep for hex dump */
-			int i = mSpaceLine.Length - 1;
+			int i = SpaceLine.Length - 1;
 			while ( i >= 0 )
-				mSpaceLine[i--] = ' ';
-			mSpaceLine[0] = mSpaceLine[1] = mSpaceLine[2] = mSpaceLine[3] = '0';
-			mSpaceLine[4] = '-';
-			mLevel = LogLevel.Verbose;
+				SpaceLine[i--] = ' ';
+			SpaceLine[0] = SpaceLine[1] = SpaceLine[2] = SpaceLine[3] = '0';
+			SpaceLine[4] = '-';
+			Level = DdmPreferences.LogLevel;
 		}
 
+		/// <summary>
+		/// Cerates a new Instance of <see cref="Log"/>
+		/// </summary>
 		private Log ( ) {
-			
+
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		sealed class Config {
+			/// <summary>
+			/// Log Verbose
+			/// </summary>
 			public const bool LOGV = true;
+			/// <summary>
+			/// Log Debug
+			/// </summary>
 			public const bool LOGD = true;
 		};
 
-		/**
-     * Outputs a {@link LogLevel#VERBOSE} level message.
-     * @param tag The tag associated with the message.
-     * @param message The message to output.
-     */
+		/// <summary>
+		/// Outputs a Verbose level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="message">The message to output</param>
 		public static void v ( String tag, String message ) {
 			WriteLine ( LogLevel.Verbose, tag, message );
 		}
 
-		/**
-		 * Outputs a {@link LogLevel#DEBUG} level message.
-		 * @param tag The tag associated with the message.
-		 * @param message The message to output.
-		 */
+		/// <summary>
+		/// Outputs a Verbose level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="format">The message to output format string.</param>
+		/// <param name="args">The values for the format message</param>
+		public static void v ( String tag, String format, params object[] args ) {
+			WriteLine ( LogLevel.Verbose, tag, String.Format ( format, args ) );
+		}
+
+		/// <summary>
+		/// Outputs a Debug level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="message">The message to output</param>
 		public static void d ( String tag, String message ) {
 			WriteLine ( LogLevel.Debug, tag, message );
 		}
 
-		/**
-		 * Outputs a {@link LogLevel#INFO} level message.
-		 * @param tag The tag associated with the message.
-		 * @param message The message to output.
-		 */
+		/// <summary>
+		/// Outputs a Debug level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="format">The message to output format string.</param>
+		/// <param name="args">The values for the format message</param>
+		public static void d ( String tag, String format, params object[] args ) {
+			WriteLine ( LogLevel.Debug, tag, String.Format ( format, args ) );
+		}
+
+		/// <summary>
+		/// Outputs a Info level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="format">The message to output.</param>
 		public static void i ( String tag, String message ) {
 			WriteLine ( LogLevel.Info, tag, message );
 		}
 
-		/**
-		 * Outputs a {@link LogLevel#WARN} level message.
-		 * @param tag The tag associated with the message.
-		 * @param message The message to output.
-		 */
+		/// <summary>
+		/// Outputs a Info level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="format">The message to output format string.</param>
+		/// <param name="args">The values for the format message</param>
+		public static void i ( String tag, String format, params object[] args ) {
+			WriteLine ( LogLevel.Info, tag, String.Format ( format, args ) );
+		}
+
+		/// <summary>
+		/// Outputs a Warn level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="message">The message to output.</param>
 		public static void w ( String tag, String message ) {
 			WriteLine ( LogLevel.Warn, tag, message );
 		}
 
-		public static void w ( String tag, Exception exception ) {
-			WriteLine ( LogLevel.Warn, tag, exception.Message + '\n' + exception.StackTrace );
+		/// <summary>
+		/// Outputs a Warn level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="format">The message to output format string.</param>
+		/// <param name="args">The values for the format message</param>
+		public static void w ( String tag, String format, params object[] args ) {
+			WriteLine ( LogLevel.Warn, tag, String.Format ( format, args ) );
 		}
 
-		/**
-		 * Outputs a {@link LogLevel#ERROR} level message.
-		 * @param tag The tag associated with the message.
-		 * @param message The message to output.
-		 */
+		/// <summary>
+		/// Outputs a Warn level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="exception">The exception to warn</param>
+		public static void w ( String tag, Exception exception ) {
+			if ( exception != null ) {
+				w ( tag, exception.ToString ( ) );
+			}
+		}
+
+		/// <summary>
+		/// Outputs a Warn level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="message">The message to output.</param>
+		/// <param name="exception">The exception to warn</param>
+		public static void w ( String tag, String message, Exception exception ) {
+			w ( tag, "{0}\n{1}", message, exception );
+		}
+
+		/// <summary>
+		/// Outputs a Error level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="message">The message to output.</param>
 		public static void e ( String tag, String message ) {
 			WriteLine ( LogLevel.Error, tag, message );
 		}
 
-		/**
-		 * Outputs a log message and attempts to display it in a dialog.
-		 * @param tag The tag associated with the message.
-		 * @param message The message to output.
-		 */
+		/// <summary>
+		/// Outputs a Error level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="format">The message to output format string.</param>
+		/// <param name="args">The values for the format message</param>
+		public static void e ( String tag, String format, params object[] args ) {
+			WriteLine ( LogLevel.Error, tag, String.Format ( format, args ) );
+		}
+
+		/// <summary>
+		/// Outputs a Error level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="exception">The exception to warn</param>
+		public static void e ( String tag, Exception exception ) {
+			if ( exception != null ) {
+				e ( tag, exception.ToString ( ) );
+			}
+		}
+
+		/// <summary>
+		/// Outputs a Error level message.
+		/// </summary>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="message">The message to output.</param>
+		/// <param name="exception">The exception to warn</param>
+		public static void e ( String tag, String message, Exception exception ) {
+			e ( tag, "{0}\n{1}", message, exception );
+		}
+
+
+		/// <summary>
+		/// Outputs a log message and attempts to display it in a dialog.
+		/// </summary>
+		/// <param name="logLevel">The log level</param>
+		/// <param name="tag">The tag associated with the message.</param>
+		/// <param name="message">The message to output.</param>
 		public static void LogAndDisplay ( LogLevel.LogLevelInfo logLevel, String tag, String message ) {
-			if ( sLogOutput != null ) {
-				sLogOutput.WriteAndPromptLog ( logLevel, tag, message );
+			if ( LogOutput != null ) {
+				LogOutput.WriteAndPromptLog ( logLevel, tag, message );
 			} else {
 				WriteLine ( logLevel, tag, message );
 			}
 		}
 
-		/**
-		 * Outputs a {@link LogLevel#ERROR} level {@link Throwable} information.
-		 * @param tag The tag associated with the message.
-		 * @param throwable The {@link Throwable} to output.
-		 */
-		public static void e ( String tag, Exception exception ) {
-			if ( exception != null ) {
-				WriteLine ( LogLevel.Error, tag, exception.Message + '\n' + exception.StackTrace );
-			}
-		}
 
-		public static void SetLevel ( LogLevel.LogLevelInfo logLevel ) {
-			mLevel = logLevel;
-		}
-
-		/**
-		 * Sets the {@link ILogOutput} to use to print the logs. If not set, {@link System#out}
-		 * will be used.
-		 * @param logOutput The {@link ILogOutput} to use to print the log.
-		 */
-		public static void SetLogOutput ( ILogOutput logOutput ) {
-			sLogOutput = logOutput;
-		}
-
-		/**
-		 * Show hex dump.
-		 * <p/>
-		 * Local addition.  Output looks like:
-		 * 1230- 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff  0123456789abcdef
-		 * <p/>
-		 * Uses no string concatenation; creates one String object per line.
-		 */
+		/// <summary>
+		/// Dump the entire contents of a byte array with DEBUG priority.
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <param name="level"></param>
+		/// <param name="data"></param>
+		/// <param name="offset"></param>
+		/// <param name="length"></param>
+		/// <remarks>
+		/// Local addition.  Output looks like:
+		/// 1230- 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff  0123456789abcdef
+		/// Uses no string concatenation; creates one String object per line.
+		/// </remarks>
 		internal static void HexDump ( String tag, LogLevel.LogLevelInfo level, byte[] data, int offset, int length ) {
 
 			int kHexOffset = 6;
 			int kAscOffset = 55;
-			char[] line = new char[mSpaceLine.Length];
+			char[] line = new char[SpaceLine.Length];
 			int addr, baseAddr, count;
 			int i, ch;
 			bool needErase = true;
@@ -158,8 +239,7 @@ namespace Managed.Adb {
 				}
 
 				if ( needErase ) {
-					//System.arraycopy(mSpaceLine, 0, line, 0, mSpaceLine.Length);
-					mSpaceLine.CopyTo ( line, 0 );
+					Array.Copy ( SpaceLine, 0, line, 0, SpaceLine.Length );
 					needErase = false;
 				}
 
@@ -168,7 +248,7 @@ namespace Managed.Adb {
 				addr &= 0xffff;
 				ch = 3;
 				while ( addr != 0 ) {
-					line[ch] = mHexDigit[addr & 0x0f];
+					line[ch] = HEXDIGIT[addr & 0x0f];
 					ch--;
 					addr >>= 4;
 				}
@@ -178,8 +258,8 @@ namespace Managed.Adb {
 				for ( i = 0; i < count; i++ ) {
 					byte val = data[offset + i];
 
-					line[ch++] = mHexDigit[( val >> 4 ) & 0x0f];
-					line[ch++] = mHexDigit[val & 0x0f];
+					line[ch++] = HEXDIGIT[( val >> 4 ) & 0x0f];
+					line[ch++] = HEXDIGIT[val & 0x0f];
 					ch++;
 
 					if ( val >= 0x20 && val < 0x7f )
@@ -198,44 +278,50 @@ namespace Managed.Adb {
 
 		}
 
-		/**
-		 * Dump the entire contents of a byte array with DEBUG priority.
-		 */
+
+		/// <summary>
+		/// Dump the entire contents of a byte array with DEBUG priority.
+		/// </summary>
+		/// <param name="data"></param>
 		internal static void HexDump ( byte[] data ) {
 			HexDump ( "ddms", LogLevel.Debug, data, 0, data.Length );
 		}
 
-		/* currently prints to stdout; could write to a log window */
+		/// <summary>
+		/// prints to stdout; could write to a log window
+		/// </summary>
+		/// <param name="logLevel"></param>
+		/// <param name="tag"></param>
+		/// <param name="message"></param>
 		private static void WriteLine ( LogLevel.LogLevelInfo logLevel, String tag, String message ) {
-			if ( logLevel.Priority >= mLevel.Priority ) {
-				if ( sLogOutput != null ) {
-					sLogOutput.Write ( logLevel, tag, message );
+			if ( logLevel.Priority >= Level.Priority ) {
+				if ( LogOutput != null ) {
+					LogOutput.Write ( logLevel, tag, message );
 				} else {
 					Write ( logLevel, tag, message );
 				}
 			}
 		}
 
-		/**
-		 * Prints a log message.
-		 * @param logLevel
-		 * @param tag
-		 * @param message
-		 */
+		/// <summary>
+		/// Prints a log message.
+		/// </summary>
+		/// <param name="logLevel"></param>
+		/// <param name="tag"></param>
+		/// <param name="message"></param>
 		public static void Write ( LogLevel.LogLevelInfo logLevel, String tag, String message ) {
 			Console.Write ( GetLogFormatString ( logLevel, tag, message ) );
 		}
 
-		/**
-		 * Formats a log message.
-		 * @param logLevel
-		 * @param tag
-		 * @param message
-		 */
+		/// <summary>
+		/// Formats a log message.
+		/// </summary>
+		/// <param name="logLevel"></param>
+		/// <param name="tag"></param>
+		/// <param name="message"></param>
+		/// <returns></returns>
 		public static String GetLogFormatString ( LogLevel.LogLevelInfo logLevel, String tag, String message ) {
-			long msec;
-
-			msec = DateTime.Now.ToUnixEpoch ( );
+			long msec = DateTime.Now.ToUnixEpoch ( );
 			return String.Format ( "{0:00}:{1:00} {2}/{3}: {4}\n", ( msec / 60000 ) % 60, ( msec / 1000 ) % 60,
 							logLevel.Letter, tag, message );
 		}

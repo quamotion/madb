@@ -22,6 +22,7 @@ namespace Managed.Adb {
 		}
 
 		public void AddOutput ( byte[] data, int offset, int length ) {
+
 		}
 
 		public void Flush ( ) {

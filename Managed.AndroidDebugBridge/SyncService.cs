@@ -61,10 +61,10 @@ namespace Managed.Adb {
 
 		#region static members
 		static SyncService ( ) {
-			NullSyncMonitor = new NullSyncProgressMonitor ( );
+			NullProgressMonitor = new NullSyncProgressMonitor ( );
 		}
 
-		public static NullSyncProgressMonitor NullSyncMonitor { get; private set; }
+		public static NullSyncProgressMonitor NullProgressMonitor { get; private set; }
 		private static byte[] DataBuffer { get; set; }
 
 		/// <summary>
@@ -213,8 +213,17 @@ namespace Managed.Adb {
 		public IPEndPoint Address { get; private set; }
 		public Device Device { get; private set; }
 		private Socket Channel { get; set; }
+		public bool IsOpen {
+			get {
+				return Channel != null && Channel.Connected;
+			}
+		}
 
 		public bool Open ( ) {
+			if ( IsOpen ) {
+				return true;
+			}
+
 			try {
 				Channel = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 				Channel.Connect ( this.Address );
@@ -229,24 +238,14 @@ namespace Managed.Adb {
 				AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( Channel, false /* readDiagString */);
 
 				if ( !resp.IOSuccess || !resp.Okay ) {
-					Log.w ( "ddms:syncservice",
-									"Got timeout or unhappy response from ADB sync req: "
-									+ resp.Message );
+					Log.w ( "ddms:syncservice", "Got timeout or unhappy response from ADB sync req: {0}", resp.Message );
 					Channel.Close ( );
 					Channel = null;
 					return false;
 				}
-			} catch ( IOException e ) {
-				if ( Channel != null ) {
-					try {
-						Channel.Close ( );
-					} catch ( IOException ) {
-						// we want to throw the original exception, so we ignore this one.
-					}
-					Channel = null;
-				}
-
-				throw e;
+			} catch ( IOException ) {
+				Close ( );
+				throw;
 			}
 
 			return true;
@@ -260,7 +259,7 @@ namespace Managed.Adb {
 				try {
 					Channel.Close ( );
 				} catch ( IOException ) {
-					// nothing to be done really...
+					
 				}
 				Channel = null;
 			}
@@ -744,7 +743,6 @@ namespace Managed.Adb {
 			}
 
 			foreach ( FileEntry e in entries ) {
-				Console.WriteLine ( "DoPull({0})", e.FullPath );
 				// check if we're cancelled
 				if ( monitor.IsCanceled ) {
 					return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
@@ -758,7 +756,6 @@ namespace Managed.Adb {
 				// get type (we only pull directory and files for now)
 				FileListingService.FileTypes type = e.Type;
 				if ( type == FileListingService.FileTypes.Directory ) {
-					Console.WriteLine ( "pulling dir: {0}", e.FullPath );
 					monitor.StartSubTask ( e.FullPath );
 					// then recursively call the content. Since we did a ls command
 					// to get the number of files, we can use the cache
@@ -769,21 +766,19 @@ namespace Managed.Adb {
 					}
 					monitor.Advance ( 1 );
 				} else if ( type == FileListingService.FileTypes.File ) {
-					Console.WriteLine ( "pulling file: {0}", e.FullPath );
 					monitor.StartSubTask ( e.FullPath );
 					SyncResult result = DoPullFile ( e.FullPath, dest, monitor );
 					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
 						return result;
 					}
 				} else if ( type == FileListingService.FileTypes.Link ) {
-					Console.WriteLine ( "pulling file: {0}", e.FullPath );
 					monitor.StartSubTask ( e.FullPath );
 					SyncResult result = DoPullFile ( e.FullResolvedPath, dest, monitor );
 					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
 						return result;
 					}
 				} else {
-					Console.WriteLine ( "unknown type to transfer: {0}", type );
+					Log.d ( "ddms-sync", String.Format ( "unknown type to transfer: {0}", type ) );
 				}
 			}
 

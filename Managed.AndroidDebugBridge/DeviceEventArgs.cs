@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 
 namespace Managed.Adb {
+	[Flags]
 	public enum DeviceChangeMask {
-		ChangeBuildInfo,
-		ChangeState,
-		ChangeClientList
+		State = 0x0001,
+		ClientList = 0x0002,
+		BuildInfo = 0x0004
+
 	}
 
 	public class DeviceEventArgs : EventArgs {

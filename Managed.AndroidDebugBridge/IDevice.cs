@@ -5,7 +5,9 @@ using System.Text;
 using System.Drawing;
 
 namespace Managed.Adb {
+
 	public interface IDevice {
+
 		/**
      * Returns the serial number of the device.
      */
@@ -18,7 +20,9 @@ namespace Managed.Adb {
      * tree build), this method will return "<code>&lt;build&gt;</code>".
      * @return the name of the AVD or <code>null</code> if there isn't any.
      */
-		String AvdName { get; }
+		String AvdName { get; set; }
+
+		Dictionary<String, MountPoint> MountPoints { get; }
 
     /**
      * Returns the state of the device.
@@ -82,18 +86,20 @@ namespace Managed.Adb {
      */
     //Client GetClient(String applicationName);
 
-    /**
-     * Returns a {@link SyncService} object to push / pull files to and from the device.
-     * @return <code>null</code> if the SyncService couldn't be created. This can happen if adb
-     * refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
-     * @throws IOException if the connection with adb failed.
-     */
-		//SyncService SyncService { get; }
+		/// <summary>
+		/// Returns a <see cref="SyncService"/> object to push / pull files to and from the device.
+		/// </summary>
+		/// <remarks>
+		/// <code>null</code> if the SyncService couldn't be created. This can happen if adb
+		/// refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
+		/// </remarks>
+		/// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
+		SyncService SyncService { get; }
 
-    /**
-     * Returns a {@link FileListingService} for this device.
-     */
-		//FileListingService FileListingService { get; }
+    /// <summary>
+		/// Returns a <see cref="FileListingService"/> for this device.
+    /// </summary>
+		FileListingService FileListingService { get; }
 
     /**
      * Takes a screen shot of the device and returns it as a {@link RawImage}.
@@ -157,7 +163,7 @@ namespace Managed.Adb {
      * @return a {@link String} with an error code, or <code>null</code> if success.
      * @throws IOException
      */
-    //String InstallPackage(String packageFilePath, bool reinstall) ;
+    void InstallPackage(String packageFilePath, bool reinstall) ;
 
     /**
      * Pushes a file to device
@@ -165,7 +171,7 @@ namespace Managed.Adb {
      * @return {@link String} destination path on device for file
      * @throws IOException if fatal error occurred when pushing file
      */
-		//String SyncPackageToDevice ( String localFilePath );
+		String SyncPackageToDevice ( String localFilePath );
 
     /**
      * Installs the application package that was pushed to a temporary location on the device.
@@ -173,14 +179,14 @@ namespace Managed.Adb {
      * @param reinstall set to <code>true</code> if re-install of app should be performed
      * @throws InstallException if installation failed
      */
-    //String InstallRemotePackage(String remoteFilePath, bool reinstall);
+    void InstallRemotePackage(String remoteFilePath, bool reinstall);
 
     /**
      * Remove a file from device
      * @param remoteFilePath path on device of file to remove
      * @throws IOException if file removal failed
      */
-    //void RemoveRemotePackage(String remoteFilePath);
+    void RemoveRemotePackage(String remoteFilePath);
 
     /**
      * Uninstall an package from the device.
@@ -188,6 +194,6 @@ namespace Managed.Adb {
      * @return a {@link String} with an error code, or <code>null</code> if success.
      * @throws IOException
      */
-    //String UninstallPackage(String packageName) ;
+    void UninstallPackage(String packageName) ;
 	}
 }

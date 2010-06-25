@@ -86,7 +86,7 @@ namespace Managed.Adb {
 
 		public virtual bool IsCancelled { get; protected set; }
 
-		public abstract void ProcessNewLines ( String[] lines );
+		protected abstract void ProcessNewLines ( String[] lines );
 	}
 
 }

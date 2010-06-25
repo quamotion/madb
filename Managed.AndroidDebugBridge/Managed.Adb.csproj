@@ -73,12 +73,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\VersionAssemblyInfo.cs">
+      <Link>Properties\VersionAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AdbHelper.cs" />
     <Compile Include="AdbResponse.cs" />
     <Compile Include="AllocationInfo.cs" />
     <Compile Include="AndroidDebugBridge.cs" />
     <Compile Include="AndroidDebugBridgeEventArgs.cs" />
+    <Compile Include="ClientData.cs" />
     <Compile Include="DdmPreferences.cs" />
+    <Compile Include="Exceptions\PackageInstallationException.cs" />
     <Compile Include="Extensions\ArrayHelper.cs" />
     <Compile Include="BadPacketException.cs" />
     <Compile Include="ChunkHandler.cs">
@@ -90,7 +98,6 @@
     <Compile Include="Device.cs" />
     <Compile Include="DeviceEventArgs.cs" />
     <Compile Include="ErrorCodeHelper.cs" />
-    <Compile Include="Exceptions\UnsupportedEncodingException.cs" />
     <Compile Include="Extensions\FileInfoHelper.cs" />
     <Compile Include="Extensions\StringHelper.cs" />
     <Compile Include="FileEntry.cs" />
@@ -98,6 +105,8 @@
     <Compile Include="IClient.cs" />
     <Compile Include="IDevice.cs" />
     <Compile Include="IListingReceiver.cs" />
+    <Compile Include="ILogOutput.cs" />
+    <Compile Include="InstallReceiver.cs" />
     <Compile Include="IO\LinuxPath.cs" />
     <Compile Include="IPacketConsumer.cs" />
     <Compile Include="IShellOutputReceiver.cs" />
@@ -106,6 +115,8 @@
     <Compile Include="Log.cs" />
     <Compile Include="LogLevel.cs" />
     <Compile Include="MonitorThread.cs" />
+    <Compile Include="MountPoint.cs" />
+    <Compile Include="MountPointReceiver.cs" />
     <Compile Include="MultilineReceiver.cs" />
     <Compile Include="NullOutputReceiver.cs" />
     <Compile Include="NullSyncProgressMonitor.cs" />
