@@ -359,8 +359,8 @@ namespace Managed.Adb {
 			RawImage imageParams = new RawImage ( );
 			byte[] request = FormAdbRequest ( "framebuffer:" ); //$NON-NLS-1$
 			byte[] nudge = {
-            0
-        };
+						0
+				};
 			byte[] reply;
 
 			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
@@ -490,7 +490,7 @@ namespace Managed.Adb {
 						Log.w ( TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count );
 						throw new EndOfStreamException ( );
 					} else if ( count == 0 ) {
-						Console.WriteLine ( "No More Data" );
+						// do nothing
 					} else {
 
 						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries );

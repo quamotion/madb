@@ -89,6 +89,7 @@ namespace Managed.Adb {
 				}
 
 				String info = null;
+				String linkName = null;
 
 				// and the type
 				FileListingService.FileTypes objectType = FileListingService.FileTypes.Other;
@@ -119,13 +120,12 @@ namespace Managed.Adb {
 
 				// now check what we may be linking to
 				if ( objectType == FileListingService.FileTypes.Link ) {
-					String[] segments = name.Split ( new string[] { "\\s->\\s" }, StringSplitOptions.RemoveEmptyEntries ); //$NON-NLS-1$
-
+					String[] segments = name.Split ( new string[] { " -> " }, StringSplitOptions.RemoveEmptyEntries );
 					// we should have 2 segments
 					if ( segments.Length == 2 ) {
 						// update the entry name to not contain the link
 						name = segments[0];
-
+						Console.WriteLine ( "Link Name:{0}", name );
 						// and the link name
 						info = segments[1];
 
@@ -134,7 +134,7 @@ namespace Managed.Adb {
 						if ( pathSegments.Length == 1 ) {
 							// the link is to something in the same directory,
 							// unless the link is ..
-							if ( String.Compare ( "..", pathSegments[0], false ) == 0 ) { //$NON-NLS-1$
+							if ( String.Compare ( "..", pathSegments[0], false ) == 0 ) {
 								// set the type and we're done.
 								objectType = FileListingService.FileTypes.DirectoryLink;
 							} else {
@@ -142,8 +142,11 @@ namespace Managed.Adb {
 								// or we'll find it later.
 							}
 						}
+					} else {
+						
 					}
 
+					linkName = info;
 					// add an arrow in front to specify it's a link.
 					info = String.Format ( LINK_FORMAT, info );
 				}
@@ -160,6 +163,7 @@ namespace Managed.Adb {
 				entry.Date = date;
 				entry.Owner = owner;
 				entry.Group = group;
+				entry.LinkName = linkName;
 				if ( objectType == FileListingService.FileTypes.Link ) {
 					entry.Info = info;
 				}

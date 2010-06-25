@@ -79,7 +79,7 @@ namespace Managed.Adb.Tests {
 			using ( SyncService sync = new SyncService ( AndroidDebugBridge.SocketAddress, GetFirstDevice ( ) ) ) {
 				FileListingService fls = new FileListingService ( GetFirstDevice ( ), false );
 				String rfile = "/sdcard/bootanimations/bootanimation-cm.zip";
-				FileEntry rentry = fls.FindEntry ( rfile );
+				FileEntry rentry = fls.FindFileEntry ( rfile );
 
 				String lpath = Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory );
 				String lfile = Path.Combine ( lpath, LinuxPath.GetFileName ( rfile ) );
@@ -112,7 +112,7 @@ namespace Managed.Adb.Tests {
 				Assert.True ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
 				FileEntry remoteEntry = null;
 				Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-					remoteEntry = fls.FindEntry ( remoteFile );
+					remoteEntry = fls.FindFileEntry ( remoteFile );
 				} ) );
 
 				// check the size
@@ -125,20 +125,23 @@ namespace Managed.Adb.Tests {
 
 		[Fact]
 		public void SyncServicePullFilesTest ( ) {
-			Assert.True ( false );
-			// doesnt work yet...
+			// doesn't work yet...
 			using ( SyncService sync = new SyncService ( AndroidDebugBridge.SocketAddress, GetFirstDevice ( ) ) ) {
 				FileListingService fls = new FileListingService ( GetFirstDevice ( ), false );
-				String lpath = Path.Combine(Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ),"bin");
-				String rpath = "/system/bin";
+				String lpath = Path.Combine(Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ),"data");
+				String rpath = "/data/app";
 				DirectoryInfo ldir = new DirectoryInfo(lpath);
-				
-				FileEntry fentry = fls.FindEntry(rpath);
+				if ( !ldir.Exists ) {
+					ldir.Create ( );
+				}
+				FileEntry fentry = fls.FindFileEntry(rpath);
 				Assert.True(fentry.IsDirectory);
 
-				FileEntry[] entries = fls.GetChildren ( fentry, true, new FileListingServiceReceiver() );
-				//Console.WriteLine ( "Count: {0}", entries.Length );
-				sync.Pull ( entries, ldir.FullName, new FileSyncProgressMonitor ( ) );
+				FileEntry[] entries = fls.GetChildren ( fentry, false, null );
+				Console.WriteLine ( "entry children: {0}", entries.Length );
+				SyncResult result = sync.Pull ( entries, ldir.FullName, new FileSyncProgressMonitor ( ) );
+
+				Assert.True ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
 
 			}
 		}

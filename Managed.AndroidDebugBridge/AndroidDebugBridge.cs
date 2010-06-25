@@ -9,12 +9,30 @@ using System.Diagnostics;
 using System.Threading;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public sealed class AndroidDebugBridge {
 
+		/// <summary>
+		/// Occurs when [bridge changed].
+		/// </summary>
 		public event EventHandler<AndroidDebugBridgeEventArgs> BridgeChanged;
+		/// <summary>
+		/// Occurs when [device changed].
+		/// </summary>
 		public event EventHandler<DeviceEventArgs> DeviceChanged;
+		/// <summary>
+		/// Occurs when [device connected].
+		/// </summary>
 		public event EventHandler<DeviceEventArgs> DeviceConnected;
+		/// <summary>
+		/// Occurs when [device disconnected].
+		/// </summary>
 		public event EventHandler<DeviceEventArgs> DeviceDisconnected;
+		/// <summary>
+		/// Occurs when [client changed].
+		/// </summary>
 		public event EventHandler<ClientEventArgs> ClientChanged;
 
 		/*
@@ -26,27 +44,46 @@ namespace Managed.Adb {
 		private const int ADB_VERSION_MICRO_MAX = -1;
 
 
-		private const String ADB_VERSION_PATTERN = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$"; //$NON-NLS-1$
+		private const String ADB_VERSION_PATTERN = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$"; 
 
-		private const String ADB = "adb"; //$NON-NLS-1$
-		private const String DDMS = "ddms"; //$NON-NLS-1$
+		private const String ADB = "adb"; 
+		private const String DDMS = "ddms";
 
 		// Where to find the ADB bridge.
-		public const String ADB_HOST = "127.0.0.1"; //$NON-NLS-1$
+		/// <summary>
+		/// 
+		/// </summary>
 		public const int ADB_PORT = 5037;
 
 
 		#region statics
+		/// <summary>
+		/// 
+		/// </summary>
 		private static AndroidDebugBridge _instance;
+		/// <summary>
+		/// 
+		/// </summary>
 		private static bool _clientSupport;
 
+		/// <summary>
+		/// Gets or sets the socket address.
+		/// </summary>
+		/// <value>The socket address.</value>
 		public static IPEndPoint SocketAddress { get; private set; }
+		/// <summary>
+		/// Gets or sets the host address.
+		/// </summary>
+		/// <value>The host address.</value>
 		public static IPAddress HostAddress { get; private set; }
 
+		/// <summary>
+		/// Initializes the <see cref="AndroidDebugBridge"/> class.
+		/// </summary>
 		static AndroidDebugBridge ( ) {
 			// built-in local address/port for ADB.
 			try {
-				HostAddress = IPAddress.Parse ( ADB_HOST );
+				HostAddress = IPAddress.Loopback;
 
 				SocketAddress = new IPEndPoint ( HostAddress, ADB_PORT );
 			} catch ( ArgumentOutOfRangeException e ) {
@@ -54,31 +91,36 @@ namespace Managed.Adb {
 			}
 		}
 
-		/**
-     * Initializes the <code>ddm</code> library.
-     * <p/>This must be called once <b>before</b> any call to
-     * {@link #createBridge(String, boolean)}.
-     * <p>The library can be initialized in 2 ways:
-     * <ul>
-     * <li>Mode 1: <var>clientSupport</var> == <code>true</code>.<br>The library monitors the
-     * devices and the applications running on them. It will connect to each application, as a
-     * debugger of sort, to be able to interact with them through JDWP packets.</li>
-     * <li>Mode 2: <var>clientSupport</var> == <code>false</code>.<br>The library only monitors
-     * devices. The applications are left untouched, letting other tools built on
-     * <code>ddmlib</code> to connect a debugger to them.</li>
-     * </ul>
-     * <p/><b>Only one tool can run in mode 1 at the same time.</b>
-     * <p/>Note that mode 1 does not prevent debugging of applications running on devices. Mode 1
-     * lets debuggers connect to <code>ddmlib</code> which acts as a proxy between the debuggers and
-     * the applications to debug. See {@link Client#getDebuggerListenPort()}.
-     * <p/>The preferences of <code>ddmlib</code> should also be initialized with whatever default
-     * values were changed from the default values.
-     * <p/>When the application quits, {@link #terminate()} should be called.
-     * @param clientSupport Indicates whether the library should enable the monitoring and
-     * interaction with applications running on the devices.
-     * @see AndroidDebugBridge#createBridge(String, boolean)
-     * @see DdmPreferences
-     */
+		/*
+		 * Initializes the <code>ddm</code> library.
+		 * <p/>This must be called once <b>before</b> any call to
+		 * {@link #createBridge(String, boolean)}.
+		 * <p>The library can be initialized in 2 ways:
+		 * <ul>
+		 * <li>Mode 1: <var>clientSupport</var> == <code>true</code>.<br>The library monitors the
+		 * devices and the applications running on them. It will connect to each application, as a
+		 * debugger of sort, to be able to interact with them through JDWP packets.</li>
+		 * <li>Mode 2: <var>clientSupport</var> == <code>false</code>.<br>The library only monitors
+		 * devices. The applications are left untouched, letting other tools built on
+		 * <code>ddmlib</code> to connect a debugger to them.</li>
+		 * </ul>
+		 * <p/><b>Only one tool can run in mode 1 at the same time.</b>
+		 * <p/>Note that mode 1 does not prevent debugging of applications running on devices. Mode 1
+		 * lets debuggers connect to <code>ddmlib</code> which acts as a proxy between the debuggers and
+		 * the applications to debug. See {@link Client#getDebuggerListenPort()}.
+		 * <p/>The preferences of <code>ddmlib</code> should also be initialized with whatever default
+		 * values were changed from the default values.
+		 * <p/>When the application quits, {@link #terminate()} should be called.
+		 * @param clientSupport Indicates whether the library should enable the monitoring and
+		 * interaction with applications running on the devices.
+		 * @see AndroidDebugBridge#createBridge(String, boolean)
+		 * @see DdmPreferences
+		 */
+		/// <summary>
+		/// Initializes the <code>ddm</code> library.
+		/// <para>This must be called once <b>before</b> any call to CreateBridge.</para>
+		/// </summary>
+		/// <param name="clientSupport">if set to <c>true</c> [client support].</param>
 		public static void Initialize ( bool clientSupport ) {
 			ClientSupport = clientSupport;
 
@@ -131,13 +173,13 @@ namespace Managed.Adb {
 		public static bool ClientSupport { get; private set; }
 
 		/**
-     * Creates a {@link AndroidDebugBridge} that is not linked to any particular executable.
-     * <p/>This bridge will expect adb to be running. It will not be able to start/stop/restart
-     * adb.
-     * <p/>If a bridge has already been started, it is directly returned with no changes (similar
-     * to calling {@link #getBridge()}).
-     * @return a connected bridge.
-     */
+		 * Creates a {@link AndroidDebugBridge} that is not linked to any particular executable.
+		 * <p/>This bridge will expect adb to be running. It will not be able to start/stop/restart
+		 * adb.
+		 * <p/>If a bridge has already been started, it is directly returned with no changes (similar
+		 * to calling {@link #getBridge()}).
+		 * @return a connected bridge.
+		 */
 		public static AndroidDebugBridge CreateBridge ( ) {
 			if ( _instance != null ) {
 				return _instance;
@@ -156,15 +198,15 @@ namespace Managed.Adb {
 		}
 
 		/**
-     * Creates a new debug bridge from the location of the command line tool.
-     * <p/>
-     * Any existing server will be disconnected, unless the location is the same and
-     * <code>forceNewBridge</code> is set to false.
-     * @param osLocation the location of the command line tool 'adb'
-     * @param forceNewBridge force creation of a new bridge even if one with the same location
-     * already exists.
-     * @return a connected bridge.
-     */
+		 * Creates a new debug bridge from the location of the command line tool.
+		 * <p/>
+		 * Any existing server will be disconnected, unless the location is the same and
+		 * <code>forceNewBridge</code> is set to false.
+		 * @param osLocation the location of the command line tool 'adb'
+		 * @param forceNewBridge force creation of a new bridge even if one with the same location
+		 * already exists.
+		 * @return a connected bridge.
+		 */
 		public static AndroidDebugBridge CreateBridge ( String osLocation, bool forceNewBridge ) {
 
 			if ( _instance != null ) {
@@ -189,12 +231,12 @@ namespace Managed.Adb {
 		}
 
 		/**
-     * Disconnects the current debug bridge, and destroy the object.
-     * <p/>This also stops the current adb host server.
-     * <p/>
-     * A new object will have to be created with {@link #createBridge(String, boolean)}.
-     */
-		public static void disconnectBridge ( ) {
+		 * Disconnects the current debug bridge, and destroy the object.
+		 * <p/>This also stops the current adb host server.
+		 * <p/>
+		 * A new object will have to be created with {@link #createBridge(String, boolean)}.
+		 */
+		public static void DisconnectBridge ( ) {
 			if ( _instance != null ) {
 				_instance.Stop ( );
 
@@ -208,10 +250,10 @@ namespace Managed.Adb {
 
 		#region constructors
 		/**
-     * Creates a new bridge.
-     * @param osLocation the location of the command line tool
-     * @throws InvalidParameterException
-     */
+		 * Creates a new bridge.
+		 * @param osLocation the location of the command line tool
+		 * @throws InvalidParameterException
+		 */
 		private AndroidDebugBridge ( String osLocation ) {
 			if ( string.IsNullOrEmpty ( osLocation ) ) {
 				throw new ArgumentException ( );
@@ -283,9 +325,9 @@ namespace Managed.Adb {
 
 		#region public methods
 		/**
-     * Starts the debug bridge.
-     * @return true if success.
-     */
+		 * Starts the debug bridge.
+		 * @return true if success.
+		 */
 		public bool Start ( ) {
 			/*if ( AdbOsLocation != null && ( VersionCheck == false || StartAdb ( ) == false ) ) {
 				return false;
@@ -301,9 +343,9 @@ namespace Managed.Adb {
 		}
 
 		/**
-     * Kills the debug bridge, and the adb host server.
-     * @return true if success
-     */
+		 * Kills the debug bridge, and the adb host server.
+		 * @return true if success
+		 */
 		public bool Stop ( ) {
 			// if we haven't started we return false;
 			/*if ( Started == false ) {
@@ -398,9 +440,9 @@ namespace Managed.Adb {
 		}
 
 		/**
-     * Sets the client to accept debugger connection on the custom "Selected debug port".
-     * @param selectedClient the client. Can be null.
-     */
+		 * Sets the client to accept debugger connection on the custom "Selected debug port".
+		 * @param selectedClient the client. Can be null.
+		 */
 		public IClient SelectedClient {
 			get {
 				/*MonitorThread monitorThread = MonitorThread.Instance;
@@ -466,9 +508,9 @@ namespace Managed.Adb {
 		#region private methods
 
 		/**
-     * Queries adb for its version number and checks it against {@link #MIN_VERSION_NUMBER} and
-     * {@link #MAX_VERSION_NUMBER}
-     */
+		 * Queries adb for its version number and checks it against {@link #MIN_VERSION_NUMBER} and
+		 * {@link #MAX_VERSION_NUMBER}
+		 */
 		private void CheckAdbVersion ( ) {
 			// default is bad check
 			VersionCheck = false;
@@ -530,17 +572,17 @@ namespace Managed.Adb {
 
 
 		/**
-     * Scans a line resulting from 'adb version' for a potential version number.
-     * <p/>
-     * If a version number is found, it checks the version number against what is expected
-     * by this version of ddms.
-     * <p/>
-     * Returns true when a version number has been found so that we can stop scanning,
-     * whether the version number is in the acceptable range or not.
-     *
-     * @param line The line to scan.
-     * @return True if a version number was found (whether it is acceptable or not).
-     */
+		 * Scans a line resulting from 'adb version' for a potential version number.
+		 * <p/>
+		 * If a version number is found, it checks the version number against what is expected
+		 * by this version of ddms.
+		 * <p/>
+		 * Returns true when a version number has been found so that we can stop scanning,
+		 * whether the version number is in the acceptable range or not.
+		 *
+		 * @param line The line to scan.
+		 * @return True if a version number was found (whether it is acceptable or not).
+		 */
 		private bool ScanVersionLine ( String line ) {
 			if ( !string.IsNullOrEmpty ( line ) ) {
 
@@ -615,9 +657,9 @@ namespace Managed.Adb {
 		}
 
 		/**
-     * Stops the adb host side server.
-     * @return true if success
-     */
+		 * Stops the adb host side server.
+		 * @return true if success
+		 */
 		private bool StopAdb ( ) {
 			if ( string.IsNullOrEmpty ( AdbOsLocation ) ) {
 				Log.e ( ADB, "Cannot stop adb when AndroidDebugBridge is created without the location of adb." ); //$NON-NLS-1$

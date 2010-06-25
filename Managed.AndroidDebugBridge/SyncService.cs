@@ -253,8 +253,8 @@ namespace Managed.Adb {
 		}
 
 		/**
-     * Closes the connection.
-     */
+		 * Closes the connection.
+		 */
 		public void Close ( ) {
 			if ( Channel != null ) {
 				try {
@@ -279,16 +279,14 @@ namespace Managed.Adb {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
-
-			FileAttributes attributes = File.GetAttributes ( localPath );
-			bool isDirectory = ( attributes & FileAttributes.Directory ) == FileAttributes.Directory;
-
+			
 			// first we check the destination is a directory and exists
-			FileInfo f = new FileInfo ( localPath );
-			if ( !f.Exists ) {
+			DirectoryInfo d = new DirectoryInfo ( localPath );
+			if ( !d.Exists ) {
 				return new SyncResult ( ErrorCodeHelper.RESULT_NO_DIR_TARGET );
 			}
-			if ( !isDirectory ) {
+
+			if ( !d.IsDirectory() ) {
 				return new SyncResult ( ErrorCodeHelper.RESULT_TARGET_IS_FILE );
 			}
 
@@ -297,6 +295,7 @@ namespace Managed.Adb {
 
 			// compute the number of file to move
 			long total = GetTotalRemoteFileSize ( entries, fls );
+			Console.WriteLine ( "total transfer: {0}", total );
 
 			// start the monitor
 			monitor.Start ( total );
@@ -346,11 +345,10 @@ namespace Managed.Adb {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
 
-			//TODO: use the FileListingService to get the file size.
 			long totalWork = 0;
 			try {
 				FileListingService fls = new FileListingService ( this.Device );
-				FileEntry remoteFileEntry = fls.FindEntry ( remoteFilepath );
+				FileEntry remoteFileEntry = fls.FindFileEntry ( remoteFilepath );
 				totalWork = remoteFileEntry.Size;
 			} catch ( FileNotFoundException ffe ) {
 				Console.WriteLine ( ffe.ToString ( ) );
@@ -735,6 +733,7 @@ namespace Managed.Adb {
 
 			// check if we're cancelled
 			if ( monitor.IsCanceled ) {
+
 				return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
 			}
 
@@ -745,17 +744,21 @@ namespace Managed.Adb {
 			}
 
 			foreach ( FileEntry e in entries ) {
+				Console.WriteLine ( "DoPull({0})", e.FullPath );
 				// check if we're cancelled
 				if ( monitor.IsCanceled ) {
 					return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
 				}
 
 				// the destination item (folder or file)
+
+
 				String dest = Path.Combine ( localPath, e.Name );
 
 				// get type (we only pull directory and files for now)
 				FileListingService.FileTypes type = e.Type;
 				if ( type == FileListingService.FileTypes.Directory ) {
+					Console.WriteLine ( "pulling dir: {0}", e.FullPath );
 					monitor.StartSubTask ( e.FullPath );
 					// then recursively call the content. Since we did a ls command
 					// to get the number of files, we can use the cache
@@ -766,11 +769,21 @@ namespace Managed.Adb {
 					}
 					monitor.Advance ( 1 );
 				} else if ( type == FileListingService.FileTypes.File ) {
+					Console.WriteLine ( "pulling file: {0}", e.FullPath );
 					monitor.StartSubTask ( e.FullPath );
 					SyncResult result = DoPullFile ( e.FullPath, dest, monitor );
 					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
 						return result;
 					}
+				} else if ( type == FileListingService.FileTypes.Link ) {
+					Console.WriteLine ( "pulling file: {0}", e.FullPath );
+					monitor.StartSubTask ( e.FullPath );
+					SyncResult result = DoPullFile ( e.FullResolvedPath, dest, monitor );
+					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
+						return result;
+					}
+				} else {
+					Console.WriteLine ( "unknown type to transfer: {0}", type );
 				}
 			}
 

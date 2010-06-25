@@ -31,6 +31,7 @@ namespace Managed.Adb {
 
 		public FileEntry Parent { get; private set; }
 		public String Name { get; private set; }
+		public String LinkName { get; set; }
 		public String Info { get; set; }
 		public String Permissions { get; set; }
 		public long Size { get; set; }
@@ -119,6 +120,19 @@ namespace Managed.Adb {
 			}
 		}
 
+		public String FullResolvedPath {
+			get {
+				if ( IsRoot ) {
+					return FileListingService.FILE_ROOT;
+				}
+
+				StringBuilder pathBuilder = new StringBuilder ( );
+				FillPathBuilder ( pathBuilder, false,true );
+
+				return pathBuilder.ToString ( );
+			}
+		}
+
 		/// <summary>
 		/// Gets the fully escaped path of the entry. This path is safe to use in a shell command line.
 		/// </summary>
@@ -188,21 +202,41 @@ namespace Managed.Adb {
 		/// Recursively fills the pathBuilder with the full path
 		/// </summary>
 		/// <param name="pathBuilder">a StringBuilder used to create the path.</param>
-		/// <param name="escapePath"> Whether the path need to be escaped for consumption by a shell command line.</param>
-		protected void FillPathBuilder ( StringBuilder pathBuilder, bool escapePath ) {
+		/// <param name="escapePath">Whether the path need to be escaped for consumption by a shell command line.</param>
+		/// <param name="resolveLinks">if set to <c>true</c> [resolve links].</param>
+		protected void FillPathBuilder ( StringBuilder pathBuilder, bool escapePath, bool resolveLinks ) {
 			if ( IsRoot ) {
 				return;
 			}
 
 			if ( Parent != null ) {
-				Parent.FillPathBuilder ( pathBuilder, escapePath );
+				Parent.FillPathBuilder ( pathBuilder, escapePath, resolveLinks );
 			}
 			pathBuilder.Append ( FileListingService.FILE_SEPARATOR );
-			pathBuilder.Append ( escapePath ? Escape ( Name ) : Name );
+			String n = resolveLinks && !String.IsNullOrEmpty ( LinkName ) ? LinkName : Name;
+			pathBuilder.Append ( escapePath ? Escape ( n ) : n );
 		}
 
+		/// <summary>
+		/// Fills the path builder.
+		/// </summary>
+		/// <param name="pathBuilder">The path builder.</param>
+		/// <param name="escapePath">if set to <c>true</c> [escape path].</param>
+		protected void FillPathBuilder ( StringBuilder pathBuilder, bool escapePath ) {
+			FillPathBuilder ( pathBuilder, escapePath, false );
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public class FileEntryComparer : Comparer<FileEntry> {
 
+			/// <summary>
+			/// Compares the specified x.
+			/// </summary>
+			/// <param name="x">The x.</param>
+			/// <param name="y">The y.</param>
+			/// <returns></returns>
 			public override int Compare ( FileEntry x, FileEntry y ) {
 				return x.Name.CompareTo ( y.Name );
 			}

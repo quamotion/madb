@@ -138,7 +138,6 @@ namespace Managed.Adb {
 			// if there's no receiver, then this is a synchronous call, and we
 			// return the result of ls
 			if ( receiver == null ) {
-				Console.WriteLine ( "No receiver" );
 				DoLS ( entry );
 				return entry.Children.ToArray ( );
 			}
@@ -238,8 +237,6 @@ namespace Managed.Adb {
 			// sort the children and set them as the new children
 			entryList.Sort ( new FileEntry.FileEntryComparer ( ) );
 			entry.Children = entryList;
-
-
 		}
 
 		private class ThreadState {
@@ -254,7 +251,7 @@ namespace Managed.Adb {
 		/// <param name="path">The file path of</param>
 		/// <returns>The FileEntry</returns>
 		/// <exception cref="FileNotFoundException">Throws if unable to locate the file or directory</exception>
-		public FileEntry FindEntry ( String path ) {
+		public FileEntry FindFileEntry ( String path ) {
 			String[] entriesString = path.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
 			FileEntry current = this.Root;
 			foreach ( var pathItem in entriesString ) {
