@@ -276,7 +276,7 @@ namespace Managed.Adb {
 		/// Raises the <see cref="E:BridgeChanged"/> event.
 		/// </summary>
 		/// <param name="e">The <see cref="Managed.Adb.AndroidDebugBridgeEventArgs"/> instance containing the event data.</param>
-		protected void OnBridgeChanged ( AndroidDebugBridgeEventArgs e ) {
+		internal void OnBridgeChanged ( AndroidDebugBridgeEventArgs e ) {
 			if ( this.BridgeChanged != null ) {
 				this.BridgeChanged ( this, e );
 			}
@@ -286,7 +286,7 @@ namespace Managed.Adb {
 		/// Raises the <see cref="E:ClientChanged"/> event.
 		/// </summary>
 		/// <param name="e">The <see cref="Managed.Adb.ClientEventArgs"/> instance containing the event data.</param>
-		protected void OnClientChanged ( ClientEventArgs e ) {
+		internal void OnClientChanged ( ClientEventArgs e ) {
 			if ( this.ClientChanged != null ) {
 				this.ClientChanged ( this, e );
 			}
@@ -296,7 +296,7 @@ namespace Managed.Adb {
 		/// Raises the <see cref="E:DeviceChanged"/> event.
 		/// </summary>
 		/// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
-		protected void OnDeviceChanged ( DeviceEventArgs e ) {
+		internal void OnDeviceChanged ( DeviceEventArgs e ) {
 			if ( this.DeviceChanged != null ) {
 				this.DeviceChanged ( this, e );
 			}
@@ -306,7 +306,7 @@ namespace Managed.Adb {
 		/// Raises the <see cref="E:DeviceConnected"/> event.
 		/// </summary>
 		/// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
-		protected void OnDeviceConnected ( DeviceEventArgs e ) {
+		internal void OnDeviceConnected ( DeviceEventArgs e ) {
 			if ( this.DeviceConnected != null ) {
 				this.DeviceConnected ( this, e );
 			}
@@ -316,7 +316,7 @@ namespace Managed.Adb {
 		/// Raises the <see cref="E:DeviceDisconnected"/> event.
 		/// </summary>
 		/// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
-		protected void OnDeviceDisconnected ( DeviceEventArgs e ) {
+		internal void OnDeviceDisconnected ( DeviceEventArgs e ) {
 			if ( this.DeviceDisconnected != null ) {
 				this.DeviceDisconnected ( this, e );
 			}

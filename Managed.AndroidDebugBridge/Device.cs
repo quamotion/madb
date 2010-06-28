@@ -18,7 +18,18 @@ namespace Managed.Adb {
 		Unknown
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public sealed class Device : IDevice {
+		public const String MNT_EXTERNAL_STORAGE = "EXTERNAL_STORAGE";
+		public const String MNT_DATA = "ANDROID_DATA";
+		public const String MNT_ROOT = "ANDROID_ROOT";
+
+		public event EventHandler<EventArgs> StateChanged;
+		public event EventHandler<EventArgs> BuildInfoChanged;
+
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -63,11 +74,6 @@ namespace Managed.Adb {
 		private const String LOG_TAG = "Device";
 
 
-		public const String MNT_EXTERNAL_STORAGE = "EXTERNAL_STORAGE";
-		public const String MNT_ROOT = "ANDROID_ROOT";
-		public const String MNT_DATA = "ANDROID_DATA";
-
-
 		/// <summary>
 		/// 
 		/// </summary>
@@ -83,6 +89,8 @@ namespace Managed.Adb {
 			this.SerialNumber = serial;
 			this.State = state;
 			MountPoints = new Dictionary<String, MountPoint> ( );
+			Properties = new Dictionary<string, string> ( );
+			EnvironmentVariables = new Dictionary<string, string> ( );
 			RefreshMountPoints ( );
 		}
 
@@ -148,66 +156,94 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets the device state
 		/// </summary>
-		public DeviceState State { get; private set; }
+		public DeviceState State { get; internal set; }
 
 		/// <summary>
 		/// Gets the device mount points.
 		/// </summary>
 		public Dictionary<String, MountPoint> MountPoints { get; set; }
 
-		/*
-		 * (non-Javadoc)
-		 * @see com.android.ddmlib.IDevice#getProperties()
-		 */
+
+		/// <summary>
+		/// Returns the device properties. It contains the whole output of 'getprop'
+		/// </summary>
+		/// <value>The properties.</value>
 		public Dictionary<String, String> Properties { get; private set; }
 
-		/*
-		 * (non-Javadoc)
-		 * @see com.android.ddmlib.IDevice#getPropertyCount()
-		 */
-		public int PropertyCount {
-			get {
-				return Properties.Count;
-			}
-		}
+		/// <summary>
+		/// Gets the environment variables.
+		/// </summary>
+		/// <value>The environment variables.</value>
+		public Dictionary<String, String> EnvironmentVariables { get; private set; }
 
+		/// <summary>
+		/// Gets the property.
+		/// </summary>
+		/// <param name="name">The name of the value to return.</param>
+		/// <returns>
+		/// the value or <code>null</code> if the property does not exist.
+		/// </returns>
 		public String GetProperty ( String name ) {
 			return Properties[name];
 		}
 
-
-		public override String ToString ( ) {
-			return SerialNumber;
-		}
-
+		/// <summary>
+		/// Gets a value indicating whether the device is online.
+		/// </summary>
+		/// <value><c>true</c> if the device is online; otherwise, <c>false</c>.</value>
 		public bool IsOnline {
 			get {
 				return State == DeviceState.Online;
 			}
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this device is emulator.
+		/// </summary>
+		/// <value><c>true</c> if this device is emulator; otherwise, <c>false</c>.</value>
 		public bool IsEmulator {
 			get {
 				return Regex.Match ( SerialNumber, RE_EMULATOR_SN ).Success;
 			}
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this device is offline.
+		/// </summary>
+		/// <value><c>true</c> if this device is offline; otherwise, <c>false</c>.</value>
 		public bool IsOffline {
 			get {
 				return State == DeviceState.Offline;
 			}
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this device is in boot loader mode.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this device is in boot loader mode; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsBootLoader {
 			get {
 				return State == DeviceState.BootLoader;
 			}
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this instance is recovery.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is recovery; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsRecovery {
 			get { return State == DeviceState.Recovery; }
 		}
 
+		/// <summary>
+		/// Remounts the mount point.
+		/// </summary>
+		/// <param name="mnt">The MNT.</param>
+		/// <param name="readOnly">if set to <c>true</c> [read only].</param>
 		public void RemountMountPoint ( MountPoint mnt, bool readOnly ) {
 			if ( mnt.IsReadOnly == readOnly ) {
 				throw new ArgumentException ( String.Format ( "Mount point is already set as {0}", readOnly ? "ro" : "rw" ) );
@@ -219,6 +255,9 @@ namespace Managed.Adb {
 			RefreshMountPoints ( );
 		}
 
+		/// <summary>
+		/// Refreshes the mount points.
+		/// </summary>
 		public void RefreshMountPoints ( ) {
 			if ( !IsOffline ) {
 				var receiver = new MountPointReceiver ( );
@@ -261,6 +300,15 @@ public Client GetClient ( String applicationName ) {
 	return null;
 }*/
 
+		/// <summary>
+		/// Returns a <see cref="SyncService"/> object to push / pull files to and from the device.
+		/// </summary>
+		/// <value></value>
+		/// <remarks>
+		/// 	<code>null</code> if the SyncService couldn't be created. This can happen if adb
+		/// refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
+		/// </remarks>
+		/// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
 		public SyncService SyncService {
 			get {
 				SyncService syncService = new SyncService ( AndroidDebugBridge.SocketAddress, this );
@@ -272,22 +320,41 @@ public Client GetClient ( String applicationName ) {
 			}
 		}
 
+		/// <summary>
+		/// Returns a <see cref="FileListingService"/> for this device.
+		/// </summary>
+		/// <value></value>
 		public FileListingService FileListingService {
 			get {
 				return new FileListingService ( this );
 			}
 		}
 
+		/// <summary>
+		/// Takes a screen shot of the device and returns it as a <see cref="RawImage"/>
+		/// </summary>
+		/// <value>The screenshot.</value>
 		public RawImage Screenshot {
 			get {
 				return AdbHelper.Instance.GetFrameBuffer ( AndroidDebugBridge.SocketAddress, this );
 			}
 		}
 
+		/// <summary>
+		/// Executes a shell command on the device, and sends the result to a receiver.
+		/// </summary>
+		/// <param name="command">The command to execute</param>
+		/// <param name="receiver">The receiver object getting the result from the command.</param>
 		public void ExecuteShellCommand ( String command, IShellOutputReceiver receiver ) {
 			ExecuteShellCommand ( command, receiver, new object[] { } );
 		}
 
+		/// <summary>
+		/// Executes a shell command on the device, and sends the result to a receiver.
+		/// </summary>
+		/// <param name="command">The command.</param>
+		/// <param name="receiver">The receiver.</param>
+		/// <param name="commandArgs">The command args.</param>
 		public void ExecuteShellCommand ( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
 			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, string.Format ( command, commandArgs ), this, receiver );
 		}
@@ -301,6 +368,12 @@ public Client GetClient ( String applicationName ) {
 			AdbHelper.RunLogService ( AndroidDebugBridge.sSocketAddress, this, logname, receiver );
 		}
 		*/
+		/// <summary>
+		/// Creates a port forwarding between a local and a remote port.
+		/// </summary>
+		/// <param name="localPort">the local port to forward</param>
+		/// <param name="remotePort">the remote port.</param>
+		/// <returns><code>true</code> if success.</returns>
 		public bool CreateForward ( int localPort, int remotePort ) {
 			try {
 				return AdbHelper.Instance.CreateForward ( AndroidDebugBridge.SocketAddress, this, localPort, remotePort );
@@ -310,6 +383,12 @@ public Client GetClient ( String applicationName ) {
 			}
 		}
 
+		/// <summary>
+		/// Removes a port forwarding between a local and a remote port.
+		/// </summary>
+		/// <param name="localPort">the local port to forward</param>
+		/// <param name="remotePort">the remote port.</param>
+		/// <returns><code>true</code> if success.</returns>
 		public bool RemoveForward ( int localPort, int remotePort ) {
 			try {
 				return AdbHelper.Instance.RemoveForward ( AndroidDebugBridge.SocketAddress, this, localPort, remotePort );
@@ -379,17 +458,27 @@ public Client GetClient ( String applicationName ) {
 		void Update ( Client client, int changeMask ) {
 			Monitor.Server.ClientChanged ( client, changeMask );
 		}
-		*/
-		void AddProperty ( String label, String value ) {
-			Properties.Add ( label, value );
-		}
+*/
 
+		/// <summary>
+		/// Installs an Android application on device.
+		/// This is a helper method that combines the syncPackageToDevice, installRemotePackage,
+		/// and removePackage steps
+		/// </summary>
+		/// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
+		/// <param name="reinstall">set to <code>true</code>if re-install of app should be performed</param>
 		public void InstallPackage ( String packageFilePath, bool reinstall ) {
 			String remoteFilePath = SyncPackageToDevice ( packageFilePath );
 			InstallRemotePackage ( remoteFilePath, reinstall );
 			RemoveRemotePackage ( remoteFilePath );
 		}
 
+		/// <summary>
+		/// Pushes a file to device
+		/// </summary>
+		/// <param name="localFilePath">the absolute path to file on local host</param>
+		/// <returns>destination path on device for file</returns>
+		/// <exception cref="IOException">if fatal error occurred when pushing file</exception>
 		public String SyncPackageToDevice ( String localFilePath ) {
 			try {
 				String packageFileName = Path.GetFileName ( localFilePath );
@@ -417,6 +506,11 @@ public Client GetClient ( String applicationName ) {
 			}
 		}
 
+		/// <summary>
+		/// Installs the application package that was pushed to a temporary location on the device.
+		/// </summary>
+		/// <param name="remoteFilePath">absolute file path to package file on device</param>
+		/// <param name="reinstall">set to <code>true</code> if re-install of app should be performed</param>
 		public void InstallRemotePackage ( String remoteFilePath, bool reinstall ) {
 			InstallReceiver receiver = new InstallReceiver ( );
 			String cmd = String.Format ( reinstall ? "pm install -r \"{0}\"" : "pm install \"{0}\"", remoteFilePath );
@@ -428,6 +522,11 @@ public Client GetClient ( String applicationName ) {
 		}
 
 
+		/// <summary>
+		/// Remove a file from device
+		/// </summary>
+		/// <param name="remoteFilePath">path on device of file to remove</param>
+		/// <exception cref="IOException">if file removal failed</exception>
 		public void RemoveRemotePackage ( String remoteFilePath ) {
 			// now we delete the app we sync'ed
 			try {
@@ -438,6 +537,12 @@ public Client GetClient ( String applicationName ) {
 			}
 		}
 
+		/// <summary>
+		/// Uninstall an package from the device.
+		/// </summary>
+		/// <param name="packageName">Name of the package.</param>
+		/// <exception cref="IOException"></exception>
+		/// <exception cref="PackageInstallException"></exception>
 		public void UninstallPackage ( String packageName ) {
 			InstallReceiver receiver = new InstallReceiver ( );
 			ExecuteShellCommand ( String.Format ( "pm uninstall {0}", packageName ), receiver );
@@ -446,6 +551,24 @@ public Client GetClient ( String applicationName ) {
 			}
 		}
 
+		/// <summary>
+		/// Raises the <see cref="E:StateChanged"/> event.
+		/// </summary>
+		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+		internal void OnStateChanged ( EventArgs e ) {
+			if ( this.StateChanged != null ) {
+				this.StateChanged ( this, e );
+			}
+		}
 
+		/// <summary>
+		/// Raises the <see cref="E:BuildInfoChanged"/> event.
+		/// </summary>
+		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+		internal void OnBuildInfoChanged ( EventArgs e ) {
+			if ( this.BuildInfoChanged != null ) {
+				this.BuildInfoChanged ( this, e );
+			}
+		}
 	}
 }

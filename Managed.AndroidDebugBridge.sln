@@ -10,6 +10,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xunit", "xunit", "{E9A9E417-965C-461D-ABCA-3A32E5BF15B2}"
 	ProjectSection(SolutionItems) = preProject
 		3rdParty\xunit\xunit.dll = 3rdParty\xunit\xunit.dll
+		3rdParty\xunit\xunit.xml = 3rdParty\xunit\xunit.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{49EA5373-6CDB-45BE-A763-80F421B8A22E}"
+  
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{9AA331B1-1F41-41B7-B04A-95E8656E560A}"
+	ProjectSection(SolutionItems) = preProject
+		Shared\SharedAssemblyInfo.cs = Shared\SharedAssemblyInfo.cs
+		Shared\VersionAssemblyInfo.cs = Shared\VersionAssemblyInfo.cs
 	EndProjectSection
 EndProject
 Global

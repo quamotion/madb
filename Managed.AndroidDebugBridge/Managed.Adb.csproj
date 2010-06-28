@@ -86,6 +86,8 @@
     <Compile Include="AndroidDebugBridgeEventArgs.cs" />
     <Compile Include="ClientData.cs" />
     <Compile Include="DdmPreferences.cs" />
+    <Compile Include="DeviceMonitor.cs" />
+    <Compile Include="EnvironmentVariablesReceiver.cs" />
     <Compile Include="Exceptions\PackageInstallationException.cs" />
     <Compile Include="Extensions\ArrayHelper.cs" />
     <Compile Include="BadPacketException.cs" />
@@ -102,6 +104,7 @@
     <Compile Include="Extensions\StringHelper.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileListingService.cs" />
+    <Compile Include="GetPropReceiver.cs" />
     <Compile Include="IClient.cs" />
     <Compile Include="IDevice.cs" />
     <Compile Include="IListingReceiver.cs" />

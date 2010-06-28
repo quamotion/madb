@@ -13,11 +13,20 @@ namespace Managed.Adb {
 	/// Provides Device side file listing service.
 	/// </summary>
 	public class FileListingService {
+		/// <summary>
+		/// 
+		/// </summary>
 		public const string APK_FILE_PATTERN = ".*\\.apk";
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public const String PM_FULL_LISTING = "pm list packages -f";
 
 		// mine is better, it supports both toolbox ls and busybox ls
+		/// <summary>
+		/// 
+		/// </summary>
 		[Obsolete("Use LS_PATTERN_EX, it supports busybox, plus standard ls",true)]
 		public const String LS_PATTERN = "^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\\s+(\\S+)\\s+(\\S+)\\s+([\\d\\s,]*)\\s+(\\d{4}-\\d\\d-\\d\\d)\\s+(\\d\\d:\\d\\d)\\s+(.*)$";
 
@@ -65,15 +74,36 @@ namespace Managed.Adb {
 		public const String DIRECTORY_APP = "app";
 
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public const long REFRESH_RATE = 5000L;
+		/// <summary>
+		/// 
+		/// </summary>
 		public const long REFRESH_TEST = (long)( REFRESH_RATE * .8 );
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public const String FILE_SEPARATOR = "/";
+		/// <summary>
+		/// 
+		/// </summary>
 		public const String FILE_ROOT = "/";
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public const String BUSYBOX_LS = "busybox ls -lF --color=never {0}";
+		/// <summary>
+		/// 
+		/// </summary>
 		public const String TOOLBOX_LS = "ls -l {0}";
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public static readonly String[] RootLevelApprovedItems = {
 				DIRECTORY_DATA,
 				DIRECTORY_SDCARD,
@@ -84,32 +114,82 @@ namespace Managed.Adb {
 				DIRECTORY_APP
 		};
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public enum FileTypes {
+			/// <summary>
+			/// 
+			/// </summary>
 			File = 0,
+			/// <summary>
+			/// 
+			/// </summary>
 			Directory = 1,
+			/// <summary>
+			/// 
+			/// </summary>
 			DirectoryLink = 2,
+			/// <summary>
+			/// 
+			/// </summary>
 			Block = 3,
+			/// <summary>
+			/// 
+			/// </summary>
 			Character = 4,
+			/// <summary>
+			/// 
+			/// </summary>
 			Link = 5,
+			/// <summary>
+			/// 
+			/// </summary>
 			Socket = 6,
+			/// <summary>
+			/// 
+			/// </summary>
 			FIFO = 7,
+			/// <summary>
+			/// 
+			/// </summary>
 			Other = 8
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private FileEntry _root = null;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FileListingService"/> class.
+		/// </summary>
+		/// <param name="device">The device.</param>
+		/// <param name="forceBusyBox">if set to <c>true</c> [force busy box].</param>
 		public FileListingService ( Device device, bool forceBusyBox ) {
 			this.Device = device;
 			this.Threads = new List<Thread> ( );
 			this.ForceBusyBox = forceBusyBox;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FileListingService"/> class.
+		/// </summary>
+		/// <param name="device">The device.</param>
 		public FileListingService ( Device device )
 			: this ( device, false ) {
 
 		}
 
+		/// <summary>
+		/// Gets or sets the device.
+		/// </summary>
+		/// <value>The device.</value>
 		public Device Device { get; private set; }
+		/// <summary>
+		/// Gets or sets the root.
+		/// </summary>
+		/// <value>The root.</value>
 		public FileEntry Root {
 			get {
 				if ( Device != null ) {
@@ -125,9 +205,20 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether [force busy box].
+		/// </summary>
+		/// <value><c>true</c> if [force busy box]; otherwise, <c>false</c>.</value>
 		public bool ForceBusyBox { get; set; }
 
 
+		/// <summary>
+		/// Gets the children.
+		/// </summary>
+		/// <param name="entry">The entry.</param>
+		/// <param name="useCache">if set to <c>true</c> [use cache].</param>
+		/// <param name="receiver">The receiver.</param>
+		/// <returns></returns>
 		public FileEntry[] GetChildren ( FileEntry entry, bool useCache, IListingReceiver receiver ) {
 			// first thing we do is check the cache, and if we already have a recent
 			// enough children list, we just return that.
@@ -204,8 +295,16 @@ namespace Managed.Adb {
 			return null;
 		}
 
+		/// <summary>
+		/// Gets or sets the threads.
+		/// </summary>
+		/// <value>The threads.</value>
 		private List<Thread> Threads { get; set; }
 
+		/// <summary>
+		/// Does the LS.
+		/// </summary>
+		/// <param name="entry">The entry.</param>
 		private void DoLS ( FileEntry entry ) {
 			// create a list that will receive the list of the entries
 			List<FileEntry> entryList = new List<FileEntry> ( );
@@ -239,8 +338,17 @@ namespace Managed.Adb {
 			entry.Children = entryList;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private class ThreadState {
+			/// <summary>
+			/// 
+			/// </summary>
 			public Thread Thread;
+			/// <summary>
+			/// 
+			/// </summary>
 			public FileEntry Entry;
 
 		}
@@ -271,6 +379,9 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		internal class PackageManagerReceiver : MultiLineReceiver {
 			/// <summary>
 			/// Pattern to parse the output of the 'pm -lf' command.
@@ -280,14 +391,31 @@ namespace Managed.Adb {
 			private const String PM_PATTERN = "^package:(.+?)=(.+)$";
 
 
+			/// <summary>
+			/// Initializes a new instance of the <see cref="PackageManagerReceiver"/> class.
+			/// </summary>
+			/// <param name="entryMap">The entry map.</param>
+			/// <param name="receiver">The receiver.</param>
 			public PackageManagerReceiver ( Dictionary<String, FileEntry> entryMap, IListingReceiver receiver ) {
 				this.Map = entryMap;
 				this.Receiver = receiver;
 			}
 
+			/// <summary>
+			/// Gets or sets the map.
+			/// </summary>
+			/// <value>The map.</value>
 			public Dictionary<String, FileEntry> Map { get; set; }
+			/// <summary>
+			/// Gets or sets the receiver.
+			/// </summary>
+			/// <value>The receiver.</value>
 			public IListingReceiver Receiver { get; set; }
 
+			/// <summary>
+			/// Processes the new lines.
+			/// </summary>
+			/// <param name="lines">The lines.</param>
 			protected override void ProcessNewLines ( string[] lines ) {
 				foreach ( String line in lines ) {
 					if ( line.Length > 0 ) {

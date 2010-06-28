@@ -7,7 +7,13 @@ using Managed.Adb.Extensions;
 using System.Globalization;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class ListingServiceReceiver : MultiLineReceiver {
+		/// <summary>
+		/// 
+		/// </summary>
 		private const String LINK_FORMAT = "-> {0}";
 		/// <summary>
 		/// Create an ls receiver/parser.
@@ -24,11 +30,31 @@ namespace Managed.Adb {
 			CurrentChildren = Parent.Children.ToArray ( );
 		}
 
+		/// <summary>
+		/// Gets or sets the entries.
+		/// </summary>
+		/// <value>The entries.</value>
 		public List<FileEntry> Entries { get; private set; }
+		/// <summary>
+		/// Gets or sets the links.
+		/// </summary>
+		/// <value>The links.</value>
 		public List<String> Links { get; private set; }
+		/// <summary>
+		/// Gets or sets the current children.
+		/// </summary>
+		/// <value>The current children.</value>
 		public FileEntry[] CurrentChildren { get; private set; }
+		/// <summary>
+		/// Gets or sets the parent.
+		/// </summary>
+		/// <value>The parent.</value>
 		public FileEntry Parent { get; private set; }
 
+		/// <summary>
+		/// Processes the new lines.
+		/// </summary>
+		/// <param name="lines">The lines.</param>
 		protected override void ProcessNewLines ( string[] lines ) {
 			foreach ( String line in lines ) {
 				// no need to handle empty lines.
@@ -173,6 +199,12 @@ namespace Managed.Adb {
 		}
 
 
+		/// <summary>
+		/// Gets a value indicating whether this instance is cancelled.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is cancelled; otherwise, <c>false</c>.
+		/// </value>
 		public override bool IsCancelled {
 			get {
 				return false;
@@ -205,6 +237,9 @@ namespace Managed.Adb {
 		}
 
 
+		/// <summary>
+		/// Finishes the links.
+		/// </summary>
 		public void FinishLinks ( ) {
 			// this isnt done in the DDMS lib either... 
 			// TODO: Handle links in the listing service

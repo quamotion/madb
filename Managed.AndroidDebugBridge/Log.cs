@@ -5,7 +5,14 @@ using System.Text;
 using Managed.Adb.Extensions;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public sealed class Log {
+		/// <summary>
+		/// Gets or sets the level.
+		/// </summary>
+		/// <value>The level.</value>
 		public static LogLevel.LogLevelInfo Level { get; set; }
 
 		/// <summary>
@@ -13,7 +20,13 @@ namespace Managed.Adb {
 		/// </summary>
 		public static ILogOutput LogOutput { get; set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private static char[] SpaceLine = new char[72];
+		/// <summary>
+		/// 
+		/// </summary>
 		private static readonly char[] HEXDIGIT = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
 		/// <summary>

@@ -4,19 +4,49 @@ using System.Linq;
 using System.Text;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public abstract class MultiLineReceiver : IShellOutputReceiver {
 
+		/// <summary>
+		/// 
+		/// </summary>
 		protected const String NEWLINE = "\r\n";
+		/// <summary>
+		/// 
+		/// </summary>
 		protected const String ENCODING = "ISO-8859-1";
 
+		/// <summary>
+		/// Gets or sets a value indicating whether [trim lines].
+		/// </summary>
+		/// <value><c>true</c> if [trim lines]; otherwise, <c>false</c>.</value>
 		public bool TrimLines { get; set; }
+		/// <summary>
+		/// Gets or sets the unfinished line.
+		/// </summary>
+		/// <value>The unfinished line.</value>
 		protected String UnfinishedLine { get; set; }
+		/// <summary>
+		/// Gets or sets the lines.
+		/// </summary>
+		/// <value>The lines.</value>
 		protected List<String> Lines { get; set; }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
+		/// </summary>
 		public MultiLineReceiver ( ) {
 			Lines = new List<string> ( );
 		}
 
+		/// <summary>
+		/// Adds the output.
+		/// </summary>
+		/// <param name="data">The data.</param>
+		/// <param name="offset">The offset.</param>
+		/// <param name="length">The length.</param>
 		public void AddOutput ( byte[] data, int offset, int length ) {
 			if ( !IsCancelled ) {
 				String s = null;
@@ -72,6 +102,9 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Flushes the output.
+		/// </summary>
 		public void Flush ( ) {
 			if ( !String.IsNullOrEmpty ( UnfinishedLine ) ) {
 				ProcessNewLines ( new String[] { UnfinishedLine } );
@@ -80,12 +113,25 @@ namespace Managed.Adb {
 			Done ( );
 		}
 
+		/// <summary>
+		/// Finishes the receiver
+		/// </summary>
 		protected virtual void Done ( ) {
 			// Do nothing
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this instance is cancelled.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is cancelled; otherwise, <c>false</c>.
+		/// </value>
 		public virtual bool IsCancelled { get; protected set; }
 
+		/// <summary>
+		/// Processes the new lines.
+		/// </summary>
+		/// <param name="lines">The lines.</param>
 		protected abstract void ProcessNewLines ( String[] lines );
 	}
 
