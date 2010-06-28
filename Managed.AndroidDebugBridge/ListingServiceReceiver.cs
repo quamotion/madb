@@ -151,7 +151,6 @@ namespace Managed.Adb {
 					if ( segments.Length == 2 ) {
 						// update the entry name to not contain the link
 						name = segments[0];
-						Console.WriteLine ( "Link Name:{0}", name );
 						// and the link name
 						info = segments[1];
 

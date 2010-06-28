@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using Managed.Adb.Extensions;
 
 namespace Managed.Adb {
 	/// <summary>
@@ -48,13 +49,33 @@ namespace Managed.Adb {
 			}
 		}
 
-
+		/// <summary>
+		/// Starts the monitoring
+		/// </summary>
 		public void Start ( ) {
-
+			Thread t = new Thread ( new ThreadStart ( DeviceMonitorLoop ) );
+			t.Name = "Device List Monitor";
+			t.Start ( );
 		}
 
+		/// <summary>
+		/// Stops the monitoring
+		/// </summary>
 		public void Stop ( ) {
+			IsRunning = false;
 
+			// wakeup the main loop thread by closing the main connection to adb.
+			try {
+				if ( MainAdbConnection != null ) {
+					MainAdbConnection.Close ( );
+				}
+			} catch ( IOException ) {
+			}
+
+			// wake up the secondary loop by closing the selector.
+			/*if ( Selector != null ) {
+				Selector.WakeUp ( );
+			}*/
 		}
 
 		/// <summary>
@@ -115,7 +136,7 @@ namespace Managed.Adb {
 				}
 			} while ( IsRunning );
 		}
-
+		
 		/// <summary>
 		/// Waits before continuing.
 		/// </summary>
@@ -153,21 +174,11 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
-		/// Reads the length.
-		/// </summary>
-		/// <param name="MainAdbConnection">The main adb connection.</param>
-		/// <param name="LengthBuffer">The length buffer.</param>
-		/// <returns></returns>
-		private int ReadLength ( Socket MainAdbConnection, byte[] LengthBuffer ) {
-			throw new NotImplementedException ( );
-		}
-
-		/// <summary>
 		/// Processes the incoming device data.
 		/// </summary>
 		/// <param name="length">The length.</param>
 		private void ProcessIncomingDeviceData ( int length ) {
-			List<IDevice> list = new List<IDevice> ( );
+			List<Device> list = new List<Device> ( );
 
 			if ( length > 0 ) {
 				byte[] buffer = new byte[length];
@@ -248,7 +259,7 @@ namespace Managed.Adb {
 							// the device is gone, we need to remove it, and keep current index
 							// to process the next one.
 							RemoveDevice ( device );
-							Server.OnDeviceDisconnected ( new DeviceEventArgs ( newDevice ) );
+							Server.OnDeviceDisconnected ( new DeviceEventArgs ( device ) );
 						} else {
 							// process the next one
 							d++;
@@ -301,7 +312,6 @@ namespace Managed.Adb {
 			// TODO: do this in a separate thread.
 			try {
 				// first get the list of properties.
-				device.ExecuteShellCommand ( GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver ( device ) );
 
 				// get environment variables
 				QueryNewDeviceForEnvironmentVariables ( device );
@@ -322,7 +332,11 @@ namespace Managed.Adb {
 		}
 
 		private void QueryNewDeviceForEnvironmentVariables ( Device device ) {
-			device.ExecuteShellCommand ( EnvironmentVariablesReceiver.ENV_COMMAND, new EnvironmentVariablesReceiver ( device ) );
+			try {
+				device.RefreshEnvironmentVariables ( );
+			} catch ( IOException ) {
+				// if we can't get the build info, it doesn't matter too much
+			}
 		}
 
 		private void QueryNewDeviceForMountingPoint ( Device device ) {
@@ -341,9 +355,9 @@ namespace Managed.Adb {
 					bool result = SendDeviceMonitoringRequest ( socket, device );
 					if ( result ) {
 
-						if ( Selector == null ) {
+						/*if ( Selector == null ) {
 							StartDeviceMonitorThread ( );
-						}
+						}*/
 
 						device.ClientMonitoringSocket = socket;
 
@@ -351,7 +365,7 @@ namespace Managed.Adb {
 							// always wakeup before doing the register. The synchronized block
 							// ensure that the selector won't select() before the end of this block.
 							// @see deviceClientMonitorLoop
-							Selector.wakeup ( );
+							//Selector.wakeup ( );
 
 							socket.Blocking = true;
 							//socket.register(mSelector, SelectionKey.OP_READ, device);
@@ -373,9 +387,279 @@ namespace Managed.Adb {
 			return false;
 		}
 
-		private void StartDeviceMonitorThread() {
-        Selector = Selector.Open();
-				new Thread ( new ThreadStart ( DeviceClientMonitorLoop ) ).Start ( );
+		private void StartDeviceMonitorThread ( ) {
+      //Selector = Selector.Open();
+			Thread t = new Thread ( new ThreadStart ( DeviceClientMonitorLoop ) );
+			t.Name = "Device Client Monitor";
+			t.Start ( );
+    }
+
+		private void DeviceClientMonitorLoop ( ) {
+			do {
+				try {
+					// This synchronized block stops us from doing the select() if a new
+					// Device is being added.
+					// @see startMonitoringDevice()
+					lock ( Devices ) {
+					}
+
+					//int count = Selector.Select ( );
+					int count = 0;
+
+					if ( !IsRunning ) {
+						return;
+					}
+
+					lock ( ClientsToReopen ) {
+						if ( ClientsToReopen.Count > 0 ) {
+							Dictionary<IClient, int>.KeyCollection clients = ClientsToReopen.Keys;
+							MonitorThread monitorThread = MonitorThread.Instance;
+
+							foreach ( IClient client in clients ) {
+								Device device = client.DeviceImplementation;
+								int pid = client.ClientData.Pid;
+
+								monitorThread.DropClient ( client, false /* notify */);
+
+								// This is kinda bad, but if we don't wait a bit, the client
+								// will never answer the second handshake!
+								WaitBeforeContinue ( );
+
+								int port = ClientsToReopen[client];
+
+								if ( port == DebugPortManager.NO_STATIC_PORT ) {
+									port = GetNextDebuggerPort ( );
+								}
+								Log.d ( "DeviceMonitor", "Reopening " + client );
+								OpenClient ( device, pid, port, monitorThread );
+								device.OnClientListChanged ( EventArgs.Empty );
+							}
+
+							ClientsToReopen.Clear ( );
+						}
+					}
+
+					if ( count == 0 ) {
+						continue;
+					}
+
+					/*List<SelectionKey> keys = Selector.selectedKeys();
+					List<SelectionKey>.Enumerator iter = keys.GetEnumerator();
+
+					while (iter.MoveNext()) {
+							SelectionKey key = iter.next();
+							iter.remove();
+
+							if (key.isValid() && key.isReadable()) {
+									Object attachment = key.attachment();
+
+									if (attachment instanceof Device) {
+											Device device = (Device)attachment;
+
+											SocketChannel socket = device.getClientMonitoringSocket();
+
+											if (socket != null) {
+													try {
+															int length = readLength(socket, mLengthBuffer2);
+
+															processIncomingJdwpData(device, socket, length);
+													} catch (IOException ioe) {
+															Log.d("DeviceMonitor",
+																			"Error reading jdwp list: " + ioe.getMessage());
+															socket.close();
+
+															// restart the monitoring of that device
+															synchronized (mDevices) {
+																	if (mDevices.contains(device)) {
+																			Log.d("DeviceMonitor",
+																							"Restarting monitoring service for " + device);
+																			startMonitoringDevice(device);
+																	}
+															}
+													}
+											}
+									}
+							}
+					}*/
+				} catch ( IOException e ) {
+					if ( !IsRunning ) {
+
+					}
+				}
+
+			} while ( !IsRunning );
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="socket"></param>
+		/// <param name="device"></param>
+		/// <returns></returns>
+		private bool SendDeviceMonitoringRequest ( Socket socket, Device device ) {
+        AdbHelper.Instance.SetDevice(socket, device);
+        byte[] request = AdbHelper.Instance.FormAdbRequest("track-jdwp");
+        if (!AdbHelper.Instance.Write(socket, request)) {
+            Log.e(TAG, "Sending jdwp tracking request failed!");
+            socket.Close();
+            throw new IOException();
+        }
+				AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( socket, false /* readDiagString */);
+        if (resp.IOSuccess == false) {
+            Log.e(TAG, "Failed to read the adb response!");
+            socket.Close();
+            throw new IOException();
+        }
+
+        if (resp.Okay == false) {
+            // request was refused by adb!
+            Log.e(TAG, "adb refused request: " + resp.Message);
+        }
+
+        return resp.Okay;
+    }
+
+		private void OpenClient ( Device device, int pid, int port, MonitorThread monitorThread ) {
+
+			Socket clientSocket;
+			try {
+				clientSocket = AdbHelper.Instance.CreatePassThroughConnection ( AndroidDebugBridge.SocketAddress, device, pid );
+
+				clientSocket.Blocking = true;
+			} catch ( IOException ioe ) {
+				Log.w ( TAG, "Failed to connect to client {0}: {1}'", pid, ioe.Message );
+				return;
+			}
+
+			CreateClient ( device, pid, clientSocket, port, monitorThread );
+		}
+
+		private void CreateClient ( Device device, int pid, Socket socket, int debuggerPort, MonitorThread monitorThread ) {
+
+			/*
+			 * Successfully connected to something. Create a Client object, add
+			 * it to the list, and initiate the JDWP handshake.
+			 */
+
+			Client client = new Client ( device, socket, pid );
+
+			if ( client.SendHandshake ( ) ) {
+				try {
+					if ( AndroidDebugBridge.ClientSupport ) {
+						client.ListenForDebugger ( debuggerPort );
+					}
+				} catch ( IOException ) {
+					client.ClientData.DebuggerConnectionStatus = Managed.Adb.ClientData.DebuggerStatus.ERROR;
+					Log.e ( "ddms", "Can't bind to local {0} for debugger", debuggerPort );
+					// oh well
+				}
+
+				client.RequestAllocationStatus ( );
+			} else {
+				Log.e ( "ddms", "Handshake with {0} failed!", client );
+				/*
+				 * The handshake send failed. We could remove it now, but if the
+				 * failure is "permanent" we'll just keep banging on it and
+				 * getting the same result. Keep it in the list with its "error"
+				 * state so we don't try to reopen it.
+				 */
+			}
+
+			if ( client.IsValid ) {
+				device.Clients.Add ( client );
+				monitorThread.Clients.Add ( client );
+			} else {
+				client = null;
+			}
+		}
+
+		private int GetNextDebuggerPort ( ) {
+			// get the first port and remove it
+			lock ( DebuggerPorts ) {
+				if ( DebuggerPorts.Count > 0 ) {
+					int port = DebuggerPorts[0];
+
+					// remove it.
+					DebuggerPorts.RemoveAt ( 0 );
+
+					// if there's nothing left, add the next port to the list
+					if ( DebuggerPorts.Count == 0 ) {
+						DebuggerPorts.Add ( port + 1 );
+					}
+
+					return port;
+				}
+			}
+
+			return -1;
+		}
+
+		public void AddPortToAvailableList ( int port ) {
+			if ( port > 0 ) {
+				lock ( DebuggerPorts ) {
+					// because there could be case where clients are closed twice, we have to make
+					// sure the port number is not already in the list.
+					if ( DebuggerPorts.IndexOf ( port ) == -1 ) {
+						// add the port to the list while keeping it sorted. It's not like there's
+						// going to be tons of objects so we do it linearly.
+						int count = DebuggerPorts.Count;
+						for ( int i = 0; i < count; i++ ) {
+							if ( port < DebuggerPorts[i] ) {
+								DebuggerPorts.Insert ( i, port );
+								break;
+							}
+						}
+						// TODO: check if we can compact the end of the list.
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Reads the length of the next message from a socket.
+		/// </summary>
+		/// <param name="socket">The Socket to read from.</param>
+		/// <param name="buffer"></param>
+		/// <returns>the length, or 0 (zero) if no data is available from the socket.</returns>
+		private int ReadLength ( Socket socket, byte[] buffer ) {
+			String msg = Read ( socket, buffer );
+			if ( msg != null ) {
+				try {
+					int len = int.Parse ( msg, System.Globalization.NumberStyles.HexNumber );
+					return len;
+				} catch ( FormatException nfe ) {
+					// we'll throw an exception below.
+				}
+			}
+			// we receive something we can't read. It's better to reset the connection at this point.
+			throw new IOException ( "Unable to read length" );
+		}
+
+		private String Read(Socket socket, byte[] data) {
+			int count = -1;
+			int totalRead = 0;
+
+			while ( count != 0 && totalRead < data.Length ) {
+				try {
+					int left = data.Length - totalRead;
+					int buflen = left < socket.ReceiveBufferSize ? left : socket.ReceiveBufferSize;
+
+					byte[] buffer = new byte[buflen];
+					socket.ReceiveBufferSize = buffer.Length;
+					count = socket.Receive ( buffer, buflen, SocketFlags.None );
+					if ( count < 0 ) {
+						throw new IOException ( "EOF" );
+					} else if ( count == 0 ) {
+					} else {
+						Array.Copy ( buffer, 0, data, totalRead, count );
+						totalRead += count;
+					}
+				} catch ( SocketException sex ) {
+					throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
+				}
+			}
+
+			return data.GetString ( AdbHelper.DEFAULT_ENCODING );
     }
 
 		/// <summary>

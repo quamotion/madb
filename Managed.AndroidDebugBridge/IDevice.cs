@@ -13,6 +13,11 @@ namespace Managed.Adb {
 
 		event EventHandler<EventArgs> StateChanged;
 		event EventHandler<EventArgs> BuildInfoChanged;
+		event EventHandler<EventArgs> ClientListChanged;
+
+		FileSystem FileSystem { get; }
+
+		BusyBox BusyBox { get; }
 
 		/// <summary>
 		/// Gets the serial number of the device.
@@ -95,10 +100,10 @@ namespace Managed.Adb {
 		 */
 		//bool HasClients { get; }
 
-		/**
-		 * Returns the array of clients.
-		 */
-		//Client[] Clients { get; }
+		/// <summary>
+		/// Gets the list of clients
+		/// </summary>
+		List<IClient> Clients { get; }
 
 		/**
 		 * Returns a {@link Client} by its application name.
@@ -218,5 +223,11 @@ namespace Managed.Adb {
 		/// <exception cref="IOException"></exception>
 		/// <exception cref="PackageInstallException"></exception>
 		void UninstallPackage(String packageName) ;
+
+		void RefreshEnvironmentVariables ( );
+
+		void RefreshMountPoints ( );
+
+		void RefreshProperties ( );
 	}
 }

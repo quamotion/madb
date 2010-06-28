@@ -22,7 +22,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Sends the handshake.
 		/// </summary>
-		void SendHandshake ( );
+		bool SendHandshake ( );
 		/// <summary>
 		/// Sends the and consume.
 		/// </summary>

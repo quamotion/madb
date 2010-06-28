@@ -46,8 +46,7 @@ namespace Managed.Adb {
 		bool IsDdmAware { get; }
 		bool IsDebuggerAttached { get; }
 		Debugger Debugger { get; }
-		// TODO: ClientData
-		/*ClientData*/ Object ClientData { get; }
+		ClientData ClientData { get; }
 		bool IsThreadUpdateEnabled { get; set; }
 		bool IsHeapUpdateEnabled { get; set; }
 		bool IsSelectedClient { get; set; }

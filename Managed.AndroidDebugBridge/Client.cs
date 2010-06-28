@@ -68,7 +68,7 @@ namespace Managed.Adb {
 
 		public Debugger Debugger { get; private set; }
 
-		public object ClientData { get; private set; }
+		public ClientData ClientData { get; private set; }
 
 		public bool IsThreadUpdateEnabled { get; set; }
 
@@ -79,15 +79,19 @@ namespace Managed.Adb {
 		public bool IsValid { get; private set; }
 
 		public void ExecuteGarbageCollector ( ) {
-			try {
+			throw new NotImplementedException ( );
+
+			/*try {
 				HandleHeap.SendHPGC ( this );
 			} catch ( IOException ioe ) {
 				Log.w ( "ddms", "Send of HPGC message failed" );
-			}
+			}*/
 		}
 
 		public void DumpHprof ( ) {
-			bool canStream = ClientData.HasFeature ( ClientData.FEATURE_HPROF_STREAMING );
+			throw new NotImplementedException ( );
+
+			/*bool canStream = ClientData.HasFeature ( ClientData.FEATURE_HPROF_STREAMING );
 			try {
 				if ( canStream ) {
 					HandleHeap.SendHPDS ( this );
@@ -97,7 +101,7 @@ namespace Managed.Adb {
 				}
 			} catch ( IOException e ) {
 				Log.w ( "ddms", "Send of HPDU message failed" );
-			}
+			}*/
 		}
 
 		public void ToggleMethodProfiling ( ) {
@@ -188,7 +192,7 @@ namespace Managed.Adb {
 			throw new NotImplementedException ( );
 		}
 
-		public void SendHandshake ( ) {
+		public bool SendHandshake ( ) {
 			throw new NotImplementedException ( );
 		}
 

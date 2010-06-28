@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.CompilerServices;
+using Managed.Adb.Extensions;
+
 
 namespace Managed.Adb.IO {
 	public static class LinuxPath {
@@ -49,12 +51,13 @@ namespace Managed.Adb.IO {
 					break;
 				}
 			}
-			if ( ( extension == null ) || ( path.Length == 0 ) ) {
+			if ( String.IsNullOrEmpty ( extension ) || path.Length == 0 ) {
 				return str;
 			}
-			if ( ( extension.Length == 0 ) || ( extension[0] != '.' ) ) {
+			if ( extension.Length > 0 && extension[0] != '.' ) {
 				str = str + ".";
 			}
+
 			return ( str + extension );
 		}
 
@@ -110,22 +113,25 @@ namespace Managed.Adb.IO {
 			if ( ( path1 == null ) || ( path2 == null ) ) {
 				throw new ArgumentNullException ( ( path1 == null ) ? "path1" : "path2" );
 			}
+
 			CheckInvalidPathChars ( path1 );
 			CheckInvalidPathChars ( path2 );
 			if ( path2.Length == 0 ) {
-				return path1;
+				return FixupPath ( path1 );
 			}
 			if ( path1.Length == 0 ) {
-				return path2;
+				return FixupPath ( path2 );
 			}
+
 			if ( IsPathRooted ( path2 ) ) {
-				return path2;
+				return FixupPath ( path2 );
 			}
+
 			char ch = path1[path1.Length - 1];
 			if ( ( ( ch != DirectorySeparatorChar ) && ( ch != AltDirectorySeparatorChar ) ) ) {
-				return ( path1 + DirectorySeparatorChar + path2 );
+				return FixupPath ( path1 + DirectorySeparatorChar ) + path2;
 			}
-			return ( path1 + path2 );
+			return FixupPath ( path1 ) + path2;
 		}
 
 		/// <summary>Returns the directory information for the specified path string.</summary>
@@ -134,19 +140,22 @@ namespace Managed.Adb.IO {
 		/// <exception cref="T:System.ArgumentException">The path parameter contains invalid characters, is empty, or contains only white spaces, or contains a wildcard character. </exception>
 		/// <exception cref="T:System.IO.PathTooLongException">The path parameter is longer than the system-defined maximum length.</exception>
 		/// <filterpriority>1</filterpriority>
-		public static string GetDirectoryName ( string path ) {
+		public static string GetDirectoryName ( String path ) {
 			if ( path != null ) {
 				CheckInvalidPathChars ( path );
-				path = FixupPath ( path );
-				
-				string tpath = path;
+				//path = FixupPath ( path );
+
+				String tpath = path;
 				if ( tpath.Length > 1 ) {
 					if ( tpath.EndsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) ) {
-						tpath = tpath.Substring ( 0, tpath.Length - 1 );
+						return tpath.Substring ( 0, tpath.Length );
 					}
 
-					tpath = tpath.Substring ( tpath.LastIndexOf ( DirectorySeparatorChar ) + 1 );
-					return tpath;
+					tpath = tpath.Substring ( 0, tpath.LastIndexOf ( DirectorySeparatorChar ) + 1 );
+
+					return FixupPath ( tpath );
+				} else if ( tpath.Length == 1 ) {
+					return new String ( new char[] { DirectorySeparatorChar } );
 				}
 			}
 			return null;
@@ -166,6 +175,8 @@ namespace Managed.Adb.IO {
 		private static string FixupPath ( string path ) {
 			string sb = path;
 			sb = sb.Replace ( System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar );
+
+
 			if ( !sb.StartsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) ) {
 				sb = string.Format ( ".{0}{1}", DirectorySeparatorChar, sb );
 			}
@@ -173,6 +184,8 @@ namespace Managed.Adb.IO {
 			if ( !sb.EndsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) ) {
 				sb = string.Format ( "{0}{1}", sb, DirectorySeparatorChar );
 			}
+
+			sb = sb.Replace ( "//", new byte[] { (byte)DirectorySeparatorChar }.GetString ( ) );
 
 			return sb;
 		}
@@ -299,6 +312,10 @@ namespace Managed.Adb.IO {
 		public static bool HasExtension ( string path ) {
 			if ( path != null ) {
 				CheckInvalidPathChars ( path );
+				if ( path.EndsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) || path.EndsWith ( new String ( new char[] { AltDirectorySeparatorChar } ) ) ) {
+					return false;
+				} 
+				
 				int length = path.Length;
 				while ( --length >= 0 ) {
 					char ch = path[length];
@@ -352,7 +369,8 @@ namespace Managed.Adb.IO {
 			if ( path != null ) {
 				CheckInvalidPathChars ( path );
 				int length = path.Length;
-				if ( ( ( length >= 1 ) && ( ( path[0] == DirectorySeparatorChar ) || ( path[0] == AltDirectorySeparatorChar ) ) ) || ( ( length >= 2 ) ) ) {
+				if ( ( length >= 1 && ( path[0] == DirectorySeparatorChar || path[0] == AltDirectorySeparatorChar ) ) ||
+					( length == 1 ) ) {
 					return true;
 				}
 			}

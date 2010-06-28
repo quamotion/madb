@@ -90,7 +90,6 @@ namespace Managed.Adb {
 					return -1;
 				}
 
-				//String sReply = Encoding.Default.GetString ( reply );
 				String sReply = reply.GetString ( AdbHelper.DEFAULT_ENCODING );
 				return int.Parse ( sReply, System.Globalization.NumberStyles.HexNumber );
 
@@ -98,6 +97,42 @@ namespace Managed.Adb {
 				Console.WriteLine ( ex );
 				throw;
 			}
+		}
+
+		/// <summary>
+		/// Creates and connects a new pass-through socket, from the host to a port on the device.
+		/// </summary>
+		/// <param name="endpoint"></param>
+		/// <param name="device">the device to connect to. Can be null in which case the connection will be 
+		/// to the first available device.</param>
+		/// <param name="pid">the process pid to connect to.</param>
+		/// <returns>The Socket</returns>
+		public Socket CreatePassThroughConnection ( IPEndPoint endpoint, Device device, int pid ) {
+			Socket socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+			try {
+				socket.Connect ( endpoint );
+				socket.NoDelay = true;
+
+				// if the device is not -1, then we first tell adb we're looking to
+				// talk to a specific device
+				SetDevice ( socket, device );
+
+				byte[] req = CreateJdwpForwardRequest ( pid );
+				// Log.hexDump(req);
+
+				if ( !Write ( socket, req ) )
+					throw new IOException ( "failed submitting request to ADB" ); //$NON-NLS-1$
+
+				AdbResponse resp = ReadAdbResponse ( socket, false /* readDiagString */);
+				if ( !resp.Okay )
+					throw new IOException ( "connection request rejected: " + resp.Message ); //$NON-NLS-1$
+
+			} catch ( IOException ioe ) {
+				socket.Close ( );
+				throw ioe;
+			}
+
+			return socket;
 		}
 
 		public byte[] CreateAdbForwardRequest ( String address, int port ) {
@@ -196,23 +231,20 @@ namespace Managed.Adb {
 				try {
 					len = int.Parse ( lenStr, System.Globalization.NumberStyles.HexNumber );
 
-				} catch ( FormatException nfe ) {
-					Log.e ( TAG, "Expected digits, got '" + lenStr + "': "
-										+ lenBuf[0] + " " + lenBuf[1] + " " + lenBuf[2] + " "
-										+ lenBuf[3] );
-					Log.e ( TAG, "reply was " + ReplyToString ( reply ) );
+				} catch ( FormatException ) {
+					Log.e ( TAG, "Expected digits, got '{0}' : {1} {2} {3} {4}", lenBuf[0], lenBuf[1], lenBuf[2], lenBuf[3] );
+					Log.e ( TAG, "reply was {0}", ReplyToString ( reply ) );
 					break;
 				}
 
 				byte[] msg = new byte[len];
 				if ( !Read ( socket, msg ) ) {
-					Log.e ( TAG, "Failed reading diagnostic string, len=" + len );
+					Log.e ( TAG, "Failed reading diagnostic string, len={0}", len );
 					break;
 				}
 
 				resp.Message = ReplyToString ( msg );
-				Log.e ( TAG, "Got reply '" + ReplyToString ( reply ) + "', diag='"
-								+ resp.Message + "'" );
+				Log.e ( TAG, "Got reply '{0}', diag='{1}'", ReplyToString ( reply ), resp.Message );
 
 				break;
 			}
@@ -224,7 +256,7 @@ namespace Managed.Adb {
 			try {
 				Read ( socket, data, -1, DdmPreferences.Timeout );
 			} catch ( IOException e ) {
-				Log.e ( TAG, "readAll: IOException: " + e.Message );
+				Log.e ( TAG, "readAll: IOException: {0}", e.Message );
 				return false;
 			}
 
@@ -299,7 +331,7 @@ namespace Managed.Adb {
 				adbChan.Connect ( adbSockAddr );
 				adbChan.Blocking = true;
 
-				byte[] request = FormAdbRequest ( String.Format ("host-serial:{0}:killforward:tcp:{1};tcp:{2}",
+				byte[] request = FormAdbRequest ( String.Format ( "host-serial:{0}:killforward:tcp:{1};tcp:{2}",
 								device.SerialNumber, localPort, remotePort ) );
 
 				if ( !Write ( adbChan, request ) ) {
@@ -520,7 +552,7 @@ namespace Managed.Adb {
 						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries );
 						string sdata = data.GetString ( 0, count, AdbHelper.DEFAULT_ENCODING );
 						if ( string.Compare ( sdata.Trim ( ), string.Format ( "{0}: not found", cmd[0] ), false ) == 0 ) {
-							Log.w("AdbHelper", "The remote execution returned: '{0}: not found'", cmd[0] );
+							Log.w ( "AdbHelper", "The remote execution returned: '{0}: not found'", cmd[0] );
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}: not found'", cmd[0] ) );
 						}
 

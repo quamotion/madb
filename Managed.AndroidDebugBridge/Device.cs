@@ -8,6 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.ComponentModel;
 using Managed.Adb.Exceptions;
+using Managed.Adb.IO;
 
 namespace Managed.Adb {
 	public enum DeviceState {
@@ -28,7 +29,7 @@ namespace Managed.Adb {
 
 		public event EventHandler<EventArgs> StateChanged;
 		public event EventHandler<EventArgs> BuildInfoChanged;
-
+		public event EventHandler<EventArgs> ClientListChanged;
 
 		/// <summary>
 		/// 
@@ -86,12 +87,23 @@ namespace Managed.Adb {
 		/// <param name="serial"></param>
 		/// <param name="state"></param>
 		public Device ( String serial, DeviceState state ) {
+
 			this.SerialNumber = serial;
 			this.State = state;
 			MountPoints = new Dictionary<String, MountPoint> ( );
 			Properties = new Dictionary<string, string> ( );
 			EnvironmentVariables = new Dictionary<string, string> ( );
+			Clients = new List<IClient> ( );
+			FileSystem = new FileSystem ( this );
+			BusyBox = new BusyBox ( this );
+
+			RetrieveDeviceInfo ( );
+		}
+
+		public void RetrieveDeviceInfo ( ) {
 			RefreshMountPoints ( );
+			RefreshEnvironmentVariables ( );
+			RefreshProperties ( );
 		}
 
 		/*public Device ( DeviceMonitor monitor, String serialNumber, DeviceState deviceState ) {
@@ -107,15 +119,22 @@ namespace Managed.Adb {
 		/// <param name="state">The device state string</param>
 		/// <returns></returns>
 		public static DeviceState GetStateFromString ( String state ) {
-			if ( Enum.IsDefined ( typeof ( DeviceState ), state ) ) {
-				return (DeviceState)Enum.Parse ( typeof ( DeviceState ), state, true );
+			String tstate = state;
+
+			if ( String.Compare ( state, "device", false ) == 0 ) {
+				tstate = "online";
+			}
+
+			if ( Enum.IsDefined ( typeof ( DeviceState ), tstate ) ) {
+				return (DeviceState)Enum.Parse ( typeof ( DeviceState ), tstate, true );
 			} else {
 				foreach ( var fi in typeof ( DeviceState ).GetFields ( ) ) {
-					if ( string.Compare ( fi.Name, state, true ) == 0 ) {
+					if ( string.Compare ( fi.Name, tstate, true ) == 0 ) {
 						return (DeviceState)fi.GetValue ( null );
 					}
 				}
 			}
+
 			return DeviceState.Unknown;
 		}
 
@@ -134,6 +153,8 @@ namespace Managed.Adb {
 				throw new ArgumentException ( "Invalid device list data" );
 			}
 		}
+
+		public Socket ClientMonitoringSocket { get; set; }
 
 		/// <summary>
 		/// Gets the device serial number
@@ -186,6 +207,10 @@ namespace Managed.Adb {
 		public String GetProperty ( String name ) {
 			return Properties[name];
 		}
+
+		public FileSystem FileSystem { get; private set; }
+
+		public BusyBox BusyBox { get; private set; }
 
 		/// <summary>
 		/// Gets a value indicating whether the device is online.
@@ -242,63 +267,74 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Remounts the mount point.
 		/// </summary>
-		/// <param name="mnt">The MNT.</param>
-		/// <param name="readOnly">if set to <c>true</c> [read only].</param>
+		/// <param name="mnt">The mount point.</param>
+		/// <param name="readOnly">if set to <c>true</c> the mount poine will be set to read-only.</param>
 		public void RemountMountPoint ( MountPoint mnt, bool readOnly ) {
-			if ( mnt.IsReadOnly == readOnly ) {
-				throw new ArgumentException ( String.Format ( "Mount point is already set as {0}", readOnly ? "ro" : "rw" ) );
-			}
-
 			String command = String.Format ( "mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name );
 			this.ExecuteShellCommand ( command, NullOutputReceiver.Instance );
-
 			RefreshMountPoints ( );
 		}
+
+		/// <summary>
+		/// Remounts the mount point.
+		/// </summary>
+		/// <param name="mountPoint">the mount point</param>
+		/// <param name="readOnly">if set to <c>true</c> the mount poine will be set to read-only.</param>
+		/// <exception cref="IOException">Throws if the mount point does not exist.</exception>
+		public void RemountMountPoint ( String mountPoint, bool readOnly ) {
+			if ( MountPoints.ContainsKey ( mountPoint ) ) {
+				MountPoint mnt = MountPoints[mountPoint];
+				RemountMountPoint ( mnt, readOnly );
+			} else {
+				throw new IOException ( "Invalid mount point" );
+			}
+		}
+
 
 		/// <summary>
 		/// Refreshes the mount points.
 		/// </summary>
 		public void RefreshMountPoints ( ) {
 			if ( !IsOffline ) {
-				var receiver = new MountPointReceiver ( );
-				this.ExecuteShellCommand ( "mount", receiver );
-				foreach ( var item in receiver.MountPoints.Keys ) {
-					if ( this.MountPoints.ContainsKey ( item ) ) {
-						this.MountPoints.Remove ( item );
-					}
-					this.MountPoints.Add ( item, receiver.MountPoints[item].Clone ( ) );
-				}
+				this.ExecuteShellCommand ( MountPointReceiver.MOUNT_COMMAND, new MountPointReceiver ( this ) );
+			}
+		}
+
+		public void RefreshEnvironmentVariables ( ) {
+			if ( !IsOffline ) {
+				this.ExecuteShellCommand ( EnvironmentVariablesReceiver.ENV_COMMAND, new EnvironmentVariablesReceiver ( this ) );
+			}
+		}
+
+		public void RefreshProperties ( ) {
+			if ( !IsOffline ) {
+				this.ExecuteShellCommand ( GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver ( this ) );
+			}
+		}
+
+		/// <summary>
+		/// Reboots the device in to the specified state
+		/// </summary>
+		/// <param name="into">The reboot state</param>
+		public void Reboot ( String into ) {
+			AdbHelper.Instance.Reboot ( into, AndroidDebugBridge.SocketAddress, this );
+		}
+
+		/// <summary>
+		/// Reboots the device in to the specified state
+		/// </summary>
+		public void Reboot ( ) {
+			Reboot ( String.Empty );
+		}
+
+		public bool HasClients {
+			get {
+				return Clients.Count > 0;
 			}
 		}
 
 
-		/*public bool HasClients {
-	get {
-		return Clients.Length > 0;
-	}
-}
-
-
-public Client[] Clients {
-	get {
-		lock ( this.ClientList ) {
-			return this.ClientList.ToArray ( );
-		}
-	}
-}
-
-public Client GetClient ( String applicationName ) {
-	lock ( ClientList ) {
-		foreach ( Client c in ClientList ) {
-			if ( string.Compare ( applicationName, c.ClientData ( ).ClientDescription ( ), false ) ) {
-				return c;
-			}
-		}
-
-	}
-
-	return null;
-}*/
+		public List<IClient> Clients { get; private set; }
 
 		/// <summary>
 		/// Returns a <see cref="SyncService"/> object to push / pull files to and from the device.
@@ -484,6 +520,7 @@ public Client GetClient ( String applicationName ) {
 				String packageFileName = Path.GetFileName ( localFilePath );
 				String remoteFilePath = String.Format ( "/data/local/tmp/{0}", packageFileName );
 
+				Console.WriteLine ( String.Format ( "Uploading {0} onto device '{1}'", packageFileName, SerialNumber ) );
 				Log.d ( packageFileName, String.Format ( "Uploading {0} onto device '{1}'", packageFileName, SerialNumber ) );
 
 				SyncService sync = SyncService;
@@ -500,9 +537,8 @@ public Client GetClient ( String applicationName ) {
 				}
 				return remoteFilePath;
 			} catch ( IOException e ) {
-				Log.e ( LOG_TAG, String.Format ( "Unable to open sync connection! reason: {0}",
-								e.Message ) );
-				throw e;
+				Log.e ( LOG_TAG, String.Format ( "Unable to open sync connection! reason: {0}", e.Message ) );
+				throw;
 			}
 		}
 
@@ -513,7 +549,8 @@ public Client GetClient ( String applicationName ) {
 		/// <param name="reinstall">set to <code>true</code> if re-install of app should be performed</param>
 		public void InstallRemotePackage ( String remoteFilePath, bool reinstall ) {
 			InstallReceiver receiver = new InstallReceiver ( );
-			String cmd = String.Format ( reinstall ? "pm install -r \"{0}\"" : "pm install \"{0}\"", remoteFilePath );
+			FileEntry entry = FileListingService.FindFileEntry ( remoteFilePath );
+			String cmd = String.Format ( "pm install {1}{0}", entry.FullEscapedPath, reinstall ? "-r " : String.Empty );
 			ExecuteShellCommand ( cmd, receiver );
 
 			if ( !String.IsNullOrEmpty ( receiver.ErrorMessage ) ) {
@@ -568,6 +605,16 @@ public Client GetClient ( String applicationName ) {
 		internal void OnBuildInfoChanged ( EventArgs e ) {
 			if ( this.BuildInfoChanged != null ) {
 				this.BuildInfoChanged ( this, e );
+			}
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:ClientListChanged"/> event.
+		/// </summary>
+		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+		internal void OnClientListChanged ( EventArgs e ) {
+			if ( this.ClientListChanged != null ) {
+				this.ClientListChanged ( this, e );
 			}
 		}
 	}

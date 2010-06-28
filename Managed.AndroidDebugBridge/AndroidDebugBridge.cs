@@ -86,7 +86,7 @@ namespace Managed.Adb {
 				HostAddress = IPAddress.Loopback;
 
 				SocketAddress = new IPEndPoint ( HostAddress, ADB_PORT );
-			} catch ( ArgumentOutOfRangeException e ) {
+			} catch ( ArgumentOutOfRangeException ) {
 
 			}
 		}
@@ -245,6 +245,9 @@ namespace Managed.Adb {
 			}
 		}
 
+		public static object GetLock ( ) {
+			return Instance;
+		}
 
 		#endregion
 
@@ -394,8 +397,6 @@ namespace Managed.Adb {
 
 			return false;
 		}
-
-
 		#endregion
 
 		#region public properties

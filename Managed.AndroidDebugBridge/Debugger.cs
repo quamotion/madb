@@ -116,7 +116,7 @@ namespace Managed.Adb {
 			Client.SendAndConsume ( packet );
 		}
 
-		public void SendHandshake ( ) {
+		public bool SendHandshake ( ) {
 			throw new NotImplementedException ( );
 			/*ByteBuffer tempBuffer = ByteBuffer.allocate ( JdwpPacket.HANDSHAKE_LEN );
 			JdwpPacket.PutHandshake ( tempBuffer );

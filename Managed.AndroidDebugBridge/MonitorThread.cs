@@ -70,5 +70,9 @@ namespace Managed.Adb {
 		internal void SetDebugSelectedPort ( int value ) {
 			//throw new NotImplementedException ( );
 		}
+
+		public void DropClient ( IClient client, bool notify ) {
+
+		}
 	}
 }

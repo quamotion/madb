@@ -8,12 +8,14 @@ using Managed.Adb.IO;
 
 namespace Managed.Adb.Tests {
 	public class AdbHelperTests {
+
+
 		[Fact]
 		public void GetDevicesTest ( ) {
 			List<Device> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
 			Assert.True ( devices.Count >= 1 );
 			foreach ( var item in devices ) {
-				Console.WriteLine ( item.SerialNumber );
+				Console.WriteLine ( "{0}\t{1}{2}", item.SerialNumber, item.State, item.IsEmulator ? " - Emulator" : String.Empty );
 			}
 		}
 
@@ -39,15 +41,15 @@ namespace Managed.Adb.Tests {
 			} ) );
 
 			Assert.Equal<bool> ( !isReadOnly, device.MountPoints["/system"].IsReadOnly );
-			Console.WriteLine ( "Successfully mounted /system as {0}", !isReadOnly ? "rw" : "ro" );
+			Console.WriteLine ( "Successfully mounted /system as {0}", !isReadOnly ? "ro" : "rw" );
 
 			// revert it back...
 			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
 				device.RemountMountPoint ( device.MountPoints["/system"], isReadOnly );
 			} ) );
 			Assert.Equal<bool> ( isReadOnly, device.MountPoints["/system"].IsReadOnly );
-			Console.WriteLine ( "Successfully mounted /system as {0}", isReadOnly ? "rw" : "ro" );
-
+			Console.WriteLine ( "Successfully mounted /system as {0}", isReadOnly ? "ro" : "rw" );
+			
 		}
 
 		[Fact]
@@ -180,6 +182,7 @@ namespace Managed.Adb.Tests {
 			}
 		}
 
+		[Fact]
 		public void DeviceInstallPackageTest ( ) {
 			Device device = GetFirstDevice ( );
 			String package = Path.Combine ( Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ), "HttpDump.apk" );
@@ -188,6 +191,42 @@ namespace Managed.Adb.Tests {
 			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
 				device.InstallPackage ( package, false );
 			} ) );
+		}
+
+		[Fact]
+		public void DeviceEnvironmentVariablesTest ( ) {
+			Device device = GetFirstDevice ( );
+			foreach ( var key in device.EnvironmentVariables.Keys ) {
+				Console.WriteLine ( "{0}={1}", key, device.EnvironmentVariables[key] );
+			}
+
+			Assert.True ( device.EnvironmentVariables.Count > 0 );
+			Assert.True ( device.EnvironmentVariables.ContainsKey ( "ANDROID_ROOT" ) );
+		}
+
+		[Fact]
+		public void DevicePropertiesTest ( ) {
+			Device device = GetFirstDevice ( );
+			foreach ( var key in device.Properties.Keys ) {
+				Console.WriteLine ( "[{0}]: {1}", key, device.Properties[key] );
+			}
+
+			Assert.True ( device.Properties.Count > 0 );
+			Assert.True ( device.Properties.ContainsKey ( "ro.product.device" ) );
+		}
+
+		[Fact]
+		public void BusyBoxInstallTest ( ) {
+			Device device = GetFirstDevice ( );
+			bool avail = device.BusyBox.Available;
+			if ( !avail ) {
+				Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
+					bool result = device.BusyBox.Install ( "/sdcard/busybox" );
+					Assert.True(result,"BusyBox Install returned false");
+				} ) );
+			}
+
+			Assert.True ( device.BusyBox.Available, "BusyBox is not installed" ); 
 		}
 
 		private String CreateTestFile ( ) {
