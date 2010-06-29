@@ -13,8 +13,10 @@ namespace Managed.Adb {
 		/// <summary>
 		/// 
 		/// </summary>
-		private const String FAILURE_PATTERN = @"Failure\s+\[(.*)\]";
+		private const String FAILURE_PATTERN = @"Failure(?:\s+\[(.*)\])?";
 
+
+		private const String UNKNOWN_ERROR = "An unknown error occured.";
 		/// <summary>
 		/// Processes the new lines.
 		/// </summary>
@@ -28,7 +30,8 @@ namespace Managed.Adb {
 					} else {
 						Match m = Regex.Match ( line, FAILURE_PATTERN );
 						if ( m.Success ) {
-							ErrorMessage = m.Groups[1].Value;
+							string msg = m.Groups[1].Value;
+							ErrorMessage = String.IsNullOrEmpty ( msg ) ? UNKNOWN_ERROR : msg;
 						}
 					}
 				}

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Managed.Adb.Extensions;
+using System.IO;
+using Managed.Adb.IO;
 
 namespace Managed.Adb {
 	public class FileEntry {
@@ -11,6 +13,62 @@ namespace Managed.Adb {
 		/// Pattern to escape filenames for shell command consumption.
 		/// </summary>
 		private const String ESCAPEPATTERN = "([\\\\()*+?\"'#/\\s])";
+
+		/// <summary>
+		/// Gets if the specified path exists on the device.
+		/// </summary>
+		/// <param name="device">The device to check</param>
+		/// <param name="path">the path to check</param>
+		/// <returns><c>true</c>, if the path exists; otherwise, <c>false</c></returns>
+		/// <exception cref="IOException">If the device is not connected.</exception>
+		/// <exception cref="ArgumentNullException">If the device or path is null.</exception>
+		public static bool Exists ( Device device, String path ) {
+			if ( device == null ) {
+				throw new ArgumentNullException ( "device", "Device cannot be null." );
+			}
+
+			if ( String.IsNullOrEmpty ( path ) ) {
+				throw new ArgumentNullException ( "path", "Path cannot be null or empty." );
+			}
+
+			if ( !device.IsOffline ) {
+				try {
+					FileEntry fe = device.FileListingService.FindFileEntry ( path );
+					return fe != null;
+				} catch ( FileNotFoundException ) {
+					return false;
+				}
+			} else {
+				throw new IOException ( "Device is not online" );
+			}
+		}
+
+		/// <summary>
+		/// Gets a file entry from the specified path on the device.
+		/// </summary>
+		/// <param name="device">The device to check</param>
+		/// <param name="path">the path to check</param>
+		/// <exception cref="IOException">If the device is not connected.</exception>
+		/// <exception cref="ArgumentNullException">If the device or path is null.</exception>
+		/// <exception cref="FileNotFoundException">If the entrty is not found.</exception>
+		/// <returns></returns>
+		public static FileEntry Find ( Device device, String path ) {
+			if ( device == null ) {
+				throw new ArgumentNullException ( "device", "Device cannot be null." );
+			}
+
+			if ( String.IsNullOrEmpty ( path ) ) {
+				throw new ArgumentNullException ( "path", "Path cannot be null or empty." );
+			}
+
+			if ( !device.IsOffline ) {
+				return device.FileListingService.FindFileEntry ( path );
+			} else {
+				throw new IOException ( "Device is not online" );
+			}
+		}
+
+
 
 		/// <summary>
 		///  Creates a new file entry.
@@ -57,7 +115,7 @@ namespace Managed.Adb {
 					return true;
 				}
 
-				long current = DateTime.Now.CurrentTimeMillis();
+				long current = DateTime.Now.CurrentTimeMillis ( );
 				if ( current - FetchTime > FileListingService.REFRESH_TEST ) {
 					return true;
 				}
@@ -115,6 +173,10 @@ namespace Managed.Adb {
 
 				StringBuilder pathBuilder = new StringBuilder ( );
 				FillPathBuilder ( pathBuilder, false );
+				
+				if ( IsDirectory && pathBuilder[pathBuilder.Length -1] != LinuxPath.DirectorySeparatorChar ) {
+					pathBuilder.Append ( LinuxPath.DirectorySeparatorChar );
+				}
 
 				return pathBuilder.ToString ( );
 			}
@@ -127,7 +189,7 @@ namespace Managed.Adb {
 				}
 
 				StringBuilder pathBuilder = new StringBuilder ( );
-				FillPathBuilder ( pathBuilder, false,true );
+				FillPathBuilder ( pathBuilder, false, true );
 
 				return pathBuilder.ToString ( );
 			}
@@ -170,7 +232,8 @@ namespace Managed.Adb {
 
 		/// <summary>
 		/// Sets the internal app package status flag. This checks whether the entry is in an app
-		/// directory like /data/app or /system/app
+		/// directory like /data/app or /system/app or /sd/app or /sd-ext/app. The last two are common for
+		/// apps2sd on rooted phones
 		/// </summary>
 		private void CheckAppPackageStatus ( ) {
 			IsApplicationPackage = false;
@@ -178,7 +241,10 @@ namespace Managed.Adb {
 			String[] segments = PathSegments;
 			if ( this.Type == FileListingService.FileTypes.File && segments.Length == 3 && IsApplicationFileName ) {
 				IsApplicationPackage = String.Compare ( FileListingService.DIRECTORY_APP, segments[1], false ) == 0 &&
-						( String.Compare ( FileListingService.DIRECTORY_SYSTEM, segments[0], false ) == 0 || String.Compare ( FileListingService.DIRECTORY_DATA, segments[0], false ) == 0 );
+						( String.Compare ( FileListingService.DIRECTORY_SYSTEM, segments[0], false ) == 0 ||
+						String.Compare ( FileListingService.DIRECTORY_DATA, segments[0], false ) == 0 ||
+						String.Compare ( FileListingService.DIRECTORY_SD, segments[0], false ) == 0 ||
+						String.Compare ( FileListingService.DIRECTORY_SDEXT, segments[0], false ) == 0 );
 			}
 		}
 
@@ -212,7 +278,8 @@ namespace Managed.Adb {
 			if ( Parent != null ) {
 				Parent.FillPathBuilder ( pathBuilder, escapePath, resolveLinks );
 			}
-			pathBuilder.Append ( FileListingService.FILE_SEPARATOR );
+
+			pathBuilder.Append ( LinuxPath.DirectorySeparatorChar );
 			String n = resolveLinks && !String.IsNullOrEmpty ( LinkName ) ? LinkName : Name;
 			pathBuilder.Append ( escapePath ? Escape ( n ) : n );
 		}

@@ -49,13 +49,13 @@ namespace Managed.Adb.Tests {
 			} ) );
 			Assert.Equal<bool> ( isReadOnly, device.MountPoints["/system"].IsReadOnly );
 			Console.WriteLine ( "Successfully mounted /system as {0}", isReadOnly ? "ro" : "rw" );
-			
+
 		}
 
 		[Fact]
 		public void ExecuteRemoteCommandTest ( ) {
 			Device device = GetFirstDevice ( );
-			ConsoleReceiver creciever = new ConsoleReceiver ( );
+			ConsoleOutputReceiver creciever = new ConsoleOutputReceiver ( );
 
 			Console.WriteLine ( "Executing 'ls':" );
 			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
@@ -158,7 +158,7 @@ namespace Managed.Adb.Tests {
 				Assert.Equal<long> ( localFile.Length, remoteEntry.Size );
 
 				// clean up temp file on sdcard
-				device.ExecuteShellCommand ( String.Format ( "rm {0}", remoteEntry.FullEscapedPath ), new ConsoleReceiver ( ) );
+				device.ExecuteShellCommand ( String.Format ( "rm {0}", remoteEntry.FullEscapedPath ), new ConsoleOutputReceiver ( ) );
 			}
 		}
 
@@ -185,11 +185,19 @@ namespace Managed.Adb.Tests {
 		[Fact]
 		public void DeviceInstallPackageTest ( ) {
 			Device device = GetFirstDevice ( );
-			String package = Path.Combine ( Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ), "HttpDump.apk" );
+			String package = Path.Combine ( Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ), "com.camalotdesigns.httpdump.apk" );
 			Assert.True ( File.Exists ( package ) );
 
 			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
 				device.InstallPackage ( package, false );
+			} ) );
+		}
+
+		[Fact]
+		public void DeviceUninstallPackageTest ( ) {
+			Device device = GetFirstDevice ( );
+			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
+				device.UninstallPackage ( "com.camalotdesigns.httpdump" );
 			} ) );
 		}
 
@@ -222,11 +230,25 @@ namespace Managed.Adb.Tests {
 			if ( !avail ) {
 				Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
 					bool result = device.BusyBox.Install ( "/sdcard/busybox" );
-					Assert.True(result,"BusyBox Install returned false");
+					Assert.True ( result, "BusyBox Install returned false" );
 				} ) );
 			}
 
-			Assert.True ( device.BusyBox.Available, "BusyBox is not installed" ); 
+			device.ExecuteShellCommand ( "printenv", new ConsoleOutputReceiver ( ) );
+
+			Assert.True ( device.BusyBox.Available, "BusyBox is not installed" );
+		}
+
+		[Fact]
+		public void BusyBoxGetCommandsTest ( ) {
+			Device device = GetFirstDevice ( );
+			bool avail = device.BusyBox.Available;
+
+			foreach ( var item in device.BusyBox.Commands ) {
+				Console.Write ( "{0},", item );
+			}
+
+			Assert.True ( device.BusyBox.Commands.Count > 0 );
 		}
 
 		private String CreateTestFile ( ) {
@@ -288,15 +310,6 @@ namespace Managed.Adb.Tests {
 			public long TotalWork { get; set; }
 			public long Remaining { get; set; }
 			public long Transfered { get; set; }
-		}
-
-		public class ConsoleReceiver : MultiLineReceiver {
-
-			protected override void ProcessNewLines ( string[] lines ) {
-				foreach ( var line in lines ) {
-					Console.WriteLine ( line );
-				}
-			}
 		}
 	}
 }

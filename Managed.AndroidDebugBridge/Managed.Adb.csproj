@@ -88,6 +88,7 @@
     <Compile Include="Client.cs" />
     <Compile Include="ClientData.cs" />
     <Compile Include="CommandErrorReceiver.cs" />
+    <Compile Include="ConsoleOutputReceiver.cs" />
     <Compile Include="DdmPreferences.cs" />
     <Compile Include="DebugPortManager.cs" />
     <Compile Include="DeviceMonitor.cs" />
@@ -129,6 +130,8 @@
     <Compile Include="MultilineReceiver.cs" />
     <Compile Include="NullOutputReceiver.cs" />
     <Compile Include="NullSyncProgressMonitor.cs" />
+    <Compile Include="PackageManager.cs" />
+    <Compile Include="PackageManagerReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawImage.cs" />
     <Compile Include="Reflection\ReflectionHelper.cs" />

@@ -59,7 +59,6 @@ namespace Managed.Adb {
 			foreach ( String line in lines ) {
 				// no need to handle empty lines.
 				if ( line.Length == 0 ) {
-					Console.WriteLine ( "Empty" );
 					continue;
 				}
 
@@ -67,10 +66,10 @@ namespace Managed.Adb {
 				Regex regex = new Regex ( FileListingService.LS_PATTERN_EX, RegexOptions.Compiled );
 				Match m = regex.Match ( line.Trim() );
 
+
 				if ( !m.Success ) {
 					continue;
 				}
-
 				// get the name
 				String name = m.Groups[9].Value;
 				// if the parent is root, we only accept selected items
@@ -109,9 +108,9 @@ namespace Managed.Adb {
 				if ( date1.Length == 3 ) {
 					// check if we don't have a year and use current if we don't
 					String tyear = String.IsNullOrEmpty ( date3 ) ? DateTime.Now.Year.ToString ( ) : date3;
-					date = DateTime.ParseExact ( String.Format ( "{0}-{1}-{2} {3}", date1, date2, tyear, time ), "MMM-dd-yyyy HH:mm", CultureInfo.CurrentCulture );
+					date = DateTime.ParseExact ( String.Format ( "{0}-{1}-{2} {3}", date1, date2.PadLeft(2,'0'), tyear, time ), "MMM-dd-yyyy HH:mm", CultureInfo.CurrentCulture );
 				} else if ( date1.Length == 4 ) {
-					date = DateTime.ParseExact ( String.Format ( "{0}-{1}-{2} {3}", date1, date2, date3, time ), "yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture );
+					date = DateTime.ParseExact ( String.Format ( "{0}-{1}-{2} {3}", date1, date2.PadLeft ( 2, '0' ), date3, time ), "yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture );
 				}
 
 				String info = null;

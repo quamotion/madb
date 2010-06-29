@@ -408,7 +408,6 @@ namespace Managed.Adb {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
 
-
 			FileInfo f = new FileInfo ( local );
 			if ( !f.Exists ) {
 				return new SyncResult ( ErrorCodeHelper.RESULT_NO_LOCAL_FILE );
@@ -554,6 +553,9 @@ namespace Managed.Adb {
 			} catch ( IOException e ) {
 				return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
 			}
+
+			// files pushed have no permissions...
+			this.Device.FileSystem.Chmod ( remotePath, "0666" );
 
 			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
 		}

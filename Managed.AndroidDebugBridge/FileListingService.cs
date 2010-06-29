@@ -27,7 +27,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// 
 		/// </summary>
-		[Obsolete("Use LS_PATTERN_EX, it supports busybox, plus standard ls",true)]
+		[Obsolete ( "Use LS_PATTERN_EX, it supports busybox, plus standard ls", true )]
 		public const String LS_PATTERN = "^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\\s+(\\S+)\\s+(\\S+)\\s+([\\d\\s,]*)\\s+(\\d{4}-\\d\\d-\\d\\d)\\s+(\\d\\d:\\d\\d)\\s+(.*)$";
 
 		/// <summary>
@@ -46,7 +46,7 @@ namespace Managed.Adb {
 		///		<li>File types (or empty in toolbox ls)</li>
 		/// </ol>
 		/// </summary>
-		public const String LS_PATTERN_EX = @"^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\s+(?:\d{0,})?\s*(\S+)\s+(\S+)\s+(\d{1,}|\s)\s+(\w{3}|\d{4})[\s-](\d{2})[\s-]\s?(?:(\d{2}|\d{4}|\s)\s*)?(\d{2}:\d{2}|\s)\s*(.*?)([/@=*\|]?)$";
+		public const String LS_PATTERN_EX = @"^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\s+(?:\d{0,})?\s*(\S+)\s+(\S+)\s+(\d{1,}|\s)\s+(\w{3}|\d{4})[\s-](?:\s?(\d{1,2})\s?)[\s-]\s?(?:(\d{2}|\d{4}|\s)\s*)?(\d{2}:\d{2}|\s)\s*(.*?)([/@=*\|]?)$";
 
 		/// <summary>
 		///  Top level data folder.
@@ -72,6 +72,10 @@ namespace Managed.Adb {
 		/// Application folder. 
 		/// </summary>
 		public const String DIRECTORY_APP = "app";
+
+		public const String DIRECTORY_SD = "sd";
+
+		public const String DIRECTORY_SDEXT = "sd-ext";
 
 
 		/// <summary>
@@ -255,7 +259,7 @@ namespace Managed.Adb {
 					// call pm.
 					String command = PM_FULL_LISTING;
 					try {
-						this.Device.ExecuteShellCommand ( command, new PackageManagerReceiver ( map, receiver ) );
+						this.Device.ExecuteShellCommand ( command, new PackageManagerListingReceiver ( map, receiver ) );
 					} catch ( IOException e ) {
 						// adb failed somehow, we do nothing.
 						Log.e ( "FileListingService", e );
@@ -360,78 +364,26 @@ namespace Managed.Adb {
 		/// <returns>The FileEntry</returns>
 		/// <exception cref="FileNotFoundException">Throws if unable to locate the file or directory</exception>
 		public FileEntry FindFileEntry ( String path ) {
+			return FindFileEntry ( this.Root, path );
+		}
+
+		public FileEntry FindFileEntry ( FileEntry parent, String path ) {
 			String[] entriesString = path.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
-			FileEntry current = this.Root;
+			FileEntry current = parent;
 			foreach ( var pathItem in entriesString ) {
 				FileEntry[] entries = GetChildren ( current, true, null );
 				foreach ( var e in entries ) {
 					if ( String.Compare ( e.Name, pathItem, false ) == 0 ) {
 						current = e;
-						continue;
+						break;
 					}
 				}
 			}
+
 			if ( String.Compare ( current.FullPath, path, false ) == 0 ) {
-				Console.WriteLine ( "returning: {0}", current.FullPath );
 				return current;
 			} else {
 				throw new FileNotFoundException ( String.Format ( "Unable to locate {0}", path ) );
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		internal class PackageManagerReceiver : MultiLineReceiver {
-			/// <summary>
-			/// Pattern to parse the output of the 'pm -lf' command.
-			/// The output format looks like:
-			/// /data/app/myapp.apk=com.mypackage.myapp
-			/// </summary>
-			private const String PM_PATTERN = "^package:(.+?)=(.+)$";
-
-
-			/// <summary>
-			/// Initializes a new instance of the <see cref="PackageManagerReceiver"/> class.
-			/// </summary>
-			/// <param name="entryMap">The entry map.</param>
-			/// <param name="receiver">The receiver.</param>
-			public PackageManagerReceiver ( Dictionary<String, FileEntry> entryMap, IListingReceiver receiver ) {
-				this.Map = entryMap;
-				this.Receiver = receiver;
-			}
-
-			/// <summary>
-			/// Gets or sets the map.
-			/// </summary>
-			/// <value>The map.</value>
-			public Dictionary<String, FileEntry> Map { get; set; }
-			/// <summary>
-			/// Gets or sets the receiver.
-			/// </summary>
-			/// <value>The receiver.</value>
-			public IListingReceiver Receiver { get; set; }
-
-			/// <summary>
-			/// Processes the new lines.
-			/// </summary>
-			/// <param name="lines">The lines.</param>
-			protected override void ProcessNewLines ( string[] lines ) {
-				foreach ( String line in lines ) {
-					if ( line.Length > 0 ) {
-						// get the filepath and package from the line
-						Match m = new Regex ( PM_PATTERN, RegexOptions.Compiled ).Match ( line );
-						if ( m.Success ) {
-							// get the children with that path
-							FileEntry entry = Map[m.Groups[1].Value];
-							if ( entry != null ) {
-								entry.Info = m.Groups[2].Value;
-								Receiver.RefreshEntry ( entry );
-							}
-						}
-					}
-				}
-
 			}
 		}
 	}

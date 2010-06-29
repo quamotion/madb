@@ -55,7 +55,9 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AdbHelperTests.cs" />
+    <Compile Include="FileEntryTests.cs" />
     <Compile Include="LinuxPathTests.cs" />
+    <Compile Include="PackageManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

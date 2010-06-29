@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using Managed.Adb.IO;
 
 namespace Managed.Adb {
 	public class FileSystem {
@@ -15,7 +16,27 @@ namespace Managed.Adb {
 
 		public void MakeDirectory ( String path ) {
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
-			Device.ExecuteShellCommand ( "mkdir {0}", cer, path );
+			try {
+				string[] segs = path.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
+				FileEntry current = Device.FileListingService.Root;
+				foreach ( var pathItem in segs ) {
+					FileEntry[] entries = Device.FileListingService.GetChildren ( current, true, null );
+					bool found = false;
+					foreach ( var e in entries ) {
+						if ( String.Compare ( e.Name, pathItem, false ) == 0 ) {
+							current = e;
+							found = true;
+							break;
+						}
+					}
+
+					if ( !found ) {
+						Device.ExecuteShellCommand ( "mkdir {0}", cer, LinuxPath.Combine ( current.FullPath, pathItem ) );
+					}
+				}
+			} catch {
+
+			}
 			if ( !String.IsNullOrEmpty ( cer.ErrorMessage ) ) {
 				throw new IOException ( cer.ErrorMessage );
 			}
@@ -32,7 +53,7 @@ namespace Managed.Adb {
 		}
 
 		public void Chmod ( String path, String permissions ) {
-			FileEntry entry = Device.FileListingService.FindFileEntry(path);
+			FileEntry entry = Device.FileListingService.FindFileEntry ( path );
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			Device.ExecuteShellCommand ( "chmod {0} {1}", cer, permissions, entry.FullEscapedPath );
 		}
@@ -44,7 +65,7 @@ namespace Managed.Adb {
 		/// <returns><code>true</code>, if read-only; otherwise, <code>false</code></returns>
 		/// <exception cref="IOException">If mount point doesnt exist</exception>
 		public bool IsMountPointReadOnly ( String mount ) {
-			if ( !Device.MountPoints.ContainsKey(mount)) {
+			if ( !Device.MountPoints.ContainsKey ( mount ) ) {
 				throw new IOException ( "Invalid mount point" );
 			}
 

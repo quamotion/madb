@@ -4,57 +4,65 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Managed.Adb.IO;
+using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
 	public class BusyBox {
-		private const String BUSYBOX_XBIN = "/system/xbin";
+		private const String BUSYBOX_BIN = "/data/local/bin/";
 		private const String BUSYBOX_COMMAND = "busybox";
 
 		public BusyBox ( Device device ) {
 			this.Device = device;
+			Version = new System.Version ( "0.0.0.0" );
+			Commands = new List<String> ( );
 			CheckForBusyBox ( );
+
 		}
 
 		public bool Install ( String busybox ) {
 			FileEntry bb = null;
 
 			try {
-				bb = Device.FileListingService.FindFileEntry ( LinuxPath.Combine ( BUSYBOX_XBIN, BUSYBOX_COMMAND ) );
-				if ( bb != null && !bb.IsDirectory ) {
-					return true;
-				}
+				Device.ExecuteShellCommand ( BUSYBOX_COMMAND, NullOutputReceiver.Instance );
+				return true;
 			} catch {
 				// we are just checking if it is already installed so we really expect it to wind up here.
 			}
 
 			try {
-				MountPoint mp = Device.MountPoints["/system"];
+				MountPoint mp = Device.MountPoints["/data"];
 				bool isRO = mp.IsReadOnly;
-				Device.RemountMountPoint ( Device.MountPoints["/system"], false );
+				Device.RemountMountPoint ( Device.MountPoints["/data"], false );
 
 				FileEntry path = null;
 				try {
-					path = Device.FileListingService.FindFileEntry ( BUSYBOX_XBIN );
+					path = Device.FileListingService.FindFileEntry ( BUSYBOX_BIN );
 				} catch ( FileNotFoundException ) {
 					// path doesn't exist, so we make it.
-					Device.FileSystem.MakeDirectory ( BUSYBOX_XBIN );
+					Device.FileSystem.MakeDirectory ( BUSYBOX_BIN );
 					// attempt to get the FileEntry after the directory has been made
-					path = Device.FileListingService.FindFileEntry ( BUSYBOX_XBIN );
+					path = Device.FileListingService.FindFileEntry ( BUSYBOX_BIN );
 				}
 
-				String bbPath = LinuxPath.Combine ( path.FullPath, BUSYBOX_COMMAND );
-				Device.FileSystem.Copy ( busybox, bbPath );
-				bb = Device.FileListingService.FindFileEntry ( bbPath );
-				Device.FileSystem.Chmod ( bb.FullEscapedPath, "0755" );
+				Device.FileSystem.Chmod ( path.FullPath, "0755" );
 
-				Device.ExecuteShellCommand ( "{0}/busybox --install {0}", NullOutputReceiver.Instance, BUSYBOX_XBIN );
+				String bbPath = LinuxPath.Combine ( path.FullPath, BUSYBOX_COMMAND );
+
+				Device.FileSystem.Copy ( busybox, bbPath );
+
+
+				bb = Device.FileListingService.FindFileEntry ( bbPath );
+				Device.FileSystem.Chmod ( bb.FullPath, "0755" );
+
+				Device.ExecuteShellCommand ( "{0}/busybox --install {0}", new ConsoleOutputReceiver ( ), path.FullPath );
 
 				// check if this path exists in the path already
 				if ( Device.EnvironmentVariables.ContainsKey ( "PATH" ) ) {
 					String[] paths = Device.EnvironmentVariables["PATH"].Split ( ':' );
 					bool found = false;
 					foreach ( var tpath in paths ) {
-						if ( String.Compare ( tpath, BUSYBOX_XBIN, false ) == 0 ) {
+						if ( String.Compare ( tpath, BUSYBOX_BIN, false ) == 0 ) {
+							Console.WriteLine ( "Already in PATH" );
 							found = true;
 							break;
 						}
@@ -62,7 +70,8 @@ namespace Managed.Adb {
 
 					// we didnt find it, so add it.
 					if ( !found ) {
-						Device.ExecuteShellCommand ( "export PATH={0}:$PATH", NullOutputReceiver.Instance, BUSYBOX_XBIN );
+						// this doesn't seem to actually work
+						Device.ExecuteShellCommand ( "export PATH={0}:$PATH", NullOutputReceiver.Instance, BUSYBOX_BIN );
 					}
 				}
 
@@ -84,7 +93,8 @@ namespace Managed.Adb {
 		private void CheckForBusyBox ( ) {
 			if ( this.Device.IsOnline ) {
 				try {
-					Device.ExecuteShellCommand ( BUSYBOX_COMMAND, NullOutputReceiver.Instance );
+					Commands.Clear ( );
+					Device.ExecuteShellCommand ( BUSYBOX_COMMAND, new BusyBoxCommandsReceiver(this) );
 					Available = true;
 				} catch ( FileNotFoundException ) {
 					Available = false;
@@ -98,6 +108,42 @@ namespace Managed.Adb {
 		private Device Device { get; set; }
 
 		public bool Available { get; private set; }
+		public Version Version { get; private set; }
+		public List<String> Commands { get; private set; }
+
+		private class BusyBoxCommandsReceiver : MultiLineReceiver {
+			private const String BB_VERSION_PATTERN = @"^BusyBox\sv(\d{1,}\.\d{1,}\.\d{1,})";
+			private const String BB_FUNCTIONS_PATTERN = @"(?:([\[a-z0-9]+)(?:,\s|$))";
+
+			public BusyBoxCommandsReceiver ( BusyBox bb ) : base() {
+				TrimLines = true;
+				BusyBox = bb;
+			}
+
+			private BusyBox BusyBox { get; set; }
+
+			protected override void ProcessNewLines ( string[] lines ) {
+				BusyBox.Commands.Clear ( );
+				foreach ( var line in lines ) {
+					if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) ) {
+						continue;
+					}
+
+					Match m = Regex.Match ( line, BB_VERSION_PATTERN, RegexOptions.Compiled );
+					if ( m.Success ) {
+						BusyBox.Version = new Version ( m.Groups[1].Value );
+						continue;
+					}
+
+					m = Regex.Match ( line, BB_FUNCTIONS_PATTERN, RegexOptions.Compiled );
+					while ( m.Success ) {
+						BusyBox.Commands.Add ( m.Groups[1].Value );
+						m = m.NextMatch ( );
+					}
+
+				}
+			}
+		}
 
 	}
 }
