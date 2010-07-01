@@ -20,12 +20,17 @@ namespace Managed.Adb {
 		public const String MOUNT_COMMAND = "cat /proc/mounts";
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="MountPointReceiver"/> class.
 		/// </summary>
+		/// <param name="device">The device.</param>
 		public MountPointReceiver ( Device device ) {
 			Device = device;
 		}
 
+		/// <summary>
+		/// Processes the new lines.
+		/// </summary>
+		/// <param name="lines">The lines.</param>
 		protected override void ProcessNewLines ( string[] lines ) {
 			Device.MountPoints.Clear ( );
 			foreach ( var line in lines ) {
@@ -42,6 +47,9 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Finishes the receiver
+		/// </summary>
 		protected override void Done ( ) {
 			this.Device.OnBuildInfoChanged ( EventArgs.Empty );
 			base.Done ( );

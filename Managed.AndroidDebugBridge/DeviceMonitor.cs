@@ -388,11 +388,11 @@ namespace Managed.Adb {
 		}
 
 		private void StartDeviceMonitorThread ( ) {
-      //Selector = Selector.Open();
+			//Selector = Selector.Open();
 			Thread t = new Thread ( new ThreadStart ( DeviceClientMonitorLoop ) );
 			t.Name = "Device Client Monitor";
 			t.Start ( );
-    }
+		}
 
 		private void DeviceClientMonitorLoop ( ) {
 			do {
@@ -497,27 +497,27 @@ namespace Managed.Adb {
 		/// <param name="device"></param>
 		/// <returns></returns>
 		private bool SendDeviceMonitoringRequest ( Socket socket, Device device ) {
-        AdbHelper.Instance.SetDevice(socket, device);
-        byte[] request = AdbHelper.Instance.FormAdbRequest("track-jdwp");
-        if (!AdbHelper.Instance.Write(socket, request)) {
-            Log.e(TAG, "Sending jdwp tracking request failed!");
-            socket.Close();
-            throw new IOException();
-        }
+				AdbHelper.Instance.SetDevice(socket, device);
+				byte[] request = AdbHelper.Instance.FormAdbRequest("track-jdwp");
+				if (!AdbHelper.Instance.Write(socket, request)) {
+						Log.e(TAG, "Sending jdwp tracking request failed!");
+						socket.Close();
+						throw new IOException();
+				}
 				AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( socket, false /* readDiagString */);
-        if (resp.IOSuccess == false) {
-            Log.e(TAG, "Failed to read the adb response!");
-            socket.Close();
-            throw new IOException();
-        }
+				if (resp.IOSuccess == false) {
+						Log.e(TAG, "Failed to read the adb response!");
+						socket.Close();
+						throw new IOException();
+				}
 
-        if (resp.Okay == false) {
-            // request was refused by adb!
-            Log.e(TAG, "adb refused request: " + resp.Message);
-        }
+				if (resp.Okay == false) {
+						// request was refused by adb!
+						Log.e(TAG, "adb refused request: " + resp.Message);
+				}
 
-        return resp.Okay;
-    }
+				return resp.Okay;
+		}
 
 		private void OpenClient ( Device device, int pid, int port, MonitorThread monitorThread ) {
 
@@ -660,7 +660,7 @@ namespace Managed.Adb {
 			}
 
 			return data.GetString ( AdbHelper.DEFAULT_ENCODING );
-    }
+		}
 
 		/// <summary>
 		/// Attempts to connect to the debug bridge server.
