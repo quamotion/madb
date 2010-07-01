@@ -12,22 +12,14 @@ namespace Managed.Adb.Tests {
 		public void CreateBridgeTest ( ) {
 			try {
 				AndroidDebugBridge adb = CreateBridge ( @"S:\Android\sdk\tools\adb.exe" );
-				adb.DeviceChanged += delegate ( object sender, DeviceEventArgs e ) {
-					Console.WriteLine ( "{0} changed", e.Device.SerialNumber );
-				};
-				adb.DeviceConnected += delegate ( object sender, DeviceEventArgs e ) {
-					Console.WriteLine ( "{0} connected", e.Device.SerialNumber );
-				};
-				adb.DeviceDisconnected += delegate ( object sender, DeviceEventArgs e ) {
-					Console.WriteLine ( "{0} disconnected", e.Device.SerialNumber );
-				};
-
 				bool result = adb.Start ( );
 				Assert.True ( result, "Failed to start ADB" );
 
-				Assert.Throws<FileNotFoundException> ( new Assert.ThrowsDelegate ( delegate ( ) {
-					AndroidDebugBridge adb2 = CreateBridge ( @"C:\Bad\Path\Doesnt\Exist\adb.exe" );
-				} ) );
+				foreach ( var device in adb.Devices ) {
+					Console.WriteLine ( "{0}\t{1}", device.SerialNumber, device.State );
+				}
+
+				adb.Stop ( );
 			} catch ( Exception ex ) {
 				Console.WriteLine ( ex.ToString ( ) );
 			}

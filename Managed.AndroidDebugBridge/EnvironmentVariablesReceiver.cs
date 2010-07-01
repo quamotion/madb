@@ -41,7 +41,11 @@ namespace Managed.Adb {
 					String value = m.Groups[2].Value.Trim ( );
 
 					if ( label.Length > 0 ) {
-						Device.EnvironmentVariables.Add ( label, value );
+						if ( Device.EnvironmentVariables.ContainsKey ( label ) ) {
+							Device.EnvironmentVariables[label] = value;
+						} else {
+							Device.EnvironmentVariables.Add ( label, value );
+						}
 					}
 				}
 

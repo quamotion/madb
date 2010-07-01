@@ -346,7 +346,7 @@ namespace Managed.Adb {
 
 			// now that the bridge is connected, we start the underlying services.
 			DeviceMonitor = new DeviceMonitor ( this );
-			//DeviceMonitor.Start ( );
+			DeviceMonitor.Start ( );
 
 			return true;
 		}
@@ -413,12 +413,12 @@ namespace Managed.Adb {
 		/// Gets the devices.
 		/// </summary>
 		/// <value>The devices.</value>
-		public List<IDevice> Devices {
+		public List<Device> Devices {
 			get {
-				/*if ( DeviceMonitor != null ) {
+				if ( DeviceMonitor != null ) {
 					return DeviceMonitor.Devices;
-				}*/
-				return new List<IDevice> ( );
+				}
+				return new List<Device> ( );
 			}
 		}
 
@@ -503,11 +503,21 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Gets the device monitor
+		/// </summary>
 		public DeviceMonitor DeviceMonitor { get; private set; }
+
+		/// <summary>
+		/// Gets if the adb host has started
+		/// </summary>
 		private bool Started { get; set; }
+		/// <summary>
+		/// Gets the result of the version check
+		/// </summary>
+		private bool VersionCheck { get; set; }
 		#endregion
 
-		private bool VersionCheck { get; set; }
 		#region private methods
 
 		/// <summary>
@@ -574,19 +584,13 @@ namespace Managed.Adb {
 			} 
 		}
 
-
-		/**
-		 * Scans a line resulting from 'adb version' for a potential version number.
-		 * <p/>
-		 * If a version number is found, it checks the version number against what is expected
-		 * by this version of ddms.
-		 * <p/>
-		 * Returns true when a version number has been found so that we can stop scanning,
-		 * whether the version number is in the acceptable range or not.
-		 *
-		 * @param line The line to scan.
-		 * @return True if a version number was found (whether it is acceptable or not).
-		 */
+		/// <summary>
+		/// Scans a line resulting from 'adb version' for a potential version number.
+		/// </summary>
+		/// <param name="line">The line to scan.</param>
+		/// <returns><c>true</c> if a version number was found (whether it is acceptable or not).</returns>
+		/// <remarks>If a version number is found, it checks the version number against what is expected
+		/// by this version of ddms.</remarks>
 		private bool ScanVersionLine ( String line ) {
 			if ( !string.IsNullOrEmpty ( line ) ) {
 				Match matcher = Regex.Match ( line, ADB_VERSION_PATTERN );
@@ -613,6 +617,10 @@ namespace Managed.Adb {
 			return false;
 		}
 
+		/// <summary>
+		/// Starts the adb host side server.
+		/// </summary>
+		/// <returns>true if success</returns>
 		private bool StartAdb ( ) {
 			if ( string.IsNullOrEmpty ( AdbOsLocation ) ) {
 				Log.e ( ADB, "Cannot start adb when AndroidDebugBridge is created without the location of adb." ); 
@@ -653,10 +661,10 @@ namespace Managed.Adb {
 			return true;
 		}
 
-		/**
-		 * Stops the adb host side server.
-		 * @return true if success
-		 */
+		/// <summary>
+		/// Stops the adb host side server.
+		/// </summary>
+		/// <returns>true if success</returns>
 		private bool StopAdb ( ) {
 			if ( string.IsNullOrEmpty ( AdbOsLocation ) ) {
 				Log.e ( ADB, "Cannot stop adb when AndroidDebugBridge is created without the location of adb." );
@@ -692,18 +700,15 @@ namespace Managed.Adb {
 			return true;
 		}
 
-
-		/**
-		 * Get the stderr/stdout outputs of a process and return when the process is done.
-		 * Both <b>must</b> be read or the process will block on windows.
-		 * @param process The process to get the ouput from
-		 * @param errorOutput The array to store the stderr output. cannot be null.
-		 * @param stdOutput The array to store the stdout output. cannot be null.
-		 * @param displayStdOut If true this will display stdout as well
-		 * @param waitforReaders if true, this will wait for the reader threads.
-		 * @return the process return code.
-		 * @throws InterruptedException
-		 */
+		/// <summary>
+		/// Get the stderr/stdout outputs of a process and return when the process is done.
+		/// Both <b>must</b> be read or the process will block on windows.
+		/// </summary>
+		/// <param name="process">The process to get the ouput from</param>
+		/// <param name="errorOutput">The array to store the stderr output. cannot be null.</param>
+		/// <param name="stdOutput">The array to store the stdout output. cannot be null.</param>
+		/// <param name="waitforReaders">if true, this will wait for the reader threads.</param>
+		/// <returns>the process return code.</returns>
 		private int GrabProcessOutput ( Process process, List<String> errorOutput, List<String> stdOutput, bool waitforReaders ) {
 			if ( errorOutput == null ) {
 				throw new ArgumentNullException ( "errorOutput" );

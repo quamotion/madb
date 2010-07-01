@@ -20,13 +20,13 @@ namespace Managed.Adb {
 
 
 		public DeviceMonitor ( AndroidDebugBridge bridge ) {
+			Server = bridge;
 			Devices = new List<Device> ( );
 			DebuggerPorts = new List<int> ( );
 			ClientsToReopen = new Dictionary<IClient, int> ( );
 			DebuggerPorts.Add ( DdmPreferences.DebugPortBase );
 			LengthBuffer = new byte[4];
 			LengthBuffer2 = new byte[4];
-
 		}
 
 		public List<Device> Devices { get; private set; }
@@ -82,17 +82,22 @@ namespace Managed.Adb {
 		/// Monitors the devices. This connects to the Debug Bridge
 		/// </summary>
 		private void DeviceMonitorLoop ( ) {
+			IsRunning = true;
 			do {
 				try {
 					if ( MainAdbConnection == null ) {
 						Log.d ( TAG, "Opening adb connection" );
 						MainAdbConnection = OpenAdbConnection ( );
+
 						if ( MainAdbConnection == null ) {
 							ConnectionAttemptCount++;
-							Log.e ( TAG, "Connection attempts: " + ConnectionAttemptCount );
+							Console.WriteLine ( "Connection attempts: {0}", ConnectionAttemptCount );
+							Log.e ( TAG, "Connection attempts: {0}", ConnectionAttemptCount );
+
 							if ( ConnectionAttemptCount > 10 ) {
 								if ( Server.Start ( ) == false ) {
 									RestartAttemptCount++;
+									Console.WriteLine ( "adb restart attempts: {0}", RestartAttemptCount );
 									Log.e ( TAG, "adb restart attempts: {0}", RestartAttemptCount );
 								} else {
 									RestartAttemptCount = 0;
@@ -103,11 +108,12 @@ namespace Managed.Adb {
 							Log.d ( TAG, "Connected to adb for device monitoring" );
 							ConnectionAttemptCount = 0;
 						}
-					}
-
+					} 
+					//break;
 					if ( MainAdbConnection != null && !IsMonitoring ) {
 						IsMonitoring = SendDeviceListMonitoringRequest ( );
 					}
+
 					if ( IsMonitoring ) {
 						// read the length of the incoming message
 						int length = ReadLength ( MainAdbConnection, LengthBuffer );
@@ -121,6 +127,7 @@ namespace Managed.Adb {
 						}
 					}
 				} catch ( IOException ioe ) {
+					Console.WriteLine ( ioe );
 					if ( !IsRunning ) {
 						Log.e ( TAG, "Adb connection Error: ", ioe );
 						IsMonitoring = false;
@@ -133,10 +140,12 @@ namespace Managed.Adb {
 							MainAdbConnection = null;
 						}
 					}
+				} catch ( Exception ex ) {
+					Console.WriteLine ( ex );
 				}
 			} while ( IsRunning );
 		}
-		
+
 		/// <summary>
 		/// Waits before continuing.
 		/// </summary>
@@ -271,10 +280,12 @@ namespace Managed.Adb {
 					foreach ( Device newDevice in list ) {
 						// add them to the list
 						Devices.Add ( newDevice );
-						Server.OnDeviceConnected ( new DeviceEventArgs ( newDevice ) );
+						if ( Server != null ) {
+							Server.OnDeviceConnected ( new DeviceEventArgs ( newDevice ) );
+						}
 
 						// start monitoring them.
-						if ( AndroidDebugBridge.ClientSupport == true ) {
+						if ( AndroidDebugBridge.ClientSupport ) {
 							if ( newDevice.IsOnline ) {
 								StartMonitoringDevice ( newDevice );
 							}
@@ -302,7 +313,7 @@ namespace Managed.Adb {
 			if ( channel != null ) {
 				try {
 					channel.Close ( );
-				} catch ( IOException e ) {
+				} catch ( IOException ) {
 					// doesn't really matter if the close fails.
 				}
 			}
@@ -497,26 +508,26 @@ namespace Managed.Adb {
 		/// <param name="device"></param>
 		/// <returns></returns>
 		private bool SendDeviceMonitoringRequest ( Socket socket, Device device ) {
-				AdbHelper.Instance.SetDevice(socket, device);
-				byte[] request = AdbHelper.Instance.FormAdbRequest("track-jdwp");
-				if (!AdbHelper.Instance.Write(socket, request)) {
-						Log.e(TAG, "Sending jdwp tracking request failed!");
-						socket.Close();
-						throw new IOException();
-				}
-				AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( socket, false /* readDiagString */);
-				if (resp.IOSuccess == false) {
-						Log.e(TAG, "Failed to read the adb response!");
-						socket.Close();
-						throw new IOException();
-				}
+			AdbHelper.Instance.SetDevice ( socket, device );
+			byte[] request = AdbHelper.Instance.FormAdbRequest ( "track-jdwp" );
+			if ( !AdbHelper.Instance.Write ( socket, request ) ) {
+				Log.e ( TAG, "Sending jdwp tracking request failed!" );
+				socket.Close ( );
+				throw new IOException ( );
+			}
+			AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( socket, false /* readDiagString */);
+			if ( resp.IOSuccess == false ) {
+				Log.e ( TAG, "Failed to read the adb response!" );
+				socket.Close ( );
+				throw new IOException ( );
+			}
 
-				if (resp.Okay == false) {
-						// request was refused by adb!
-						Log.e(TAG, "adb refused request: " + resp.Message);
-				}
+			if ( resp.Okay == false ) {
+				// request was refused by adb!
+				Log.e ( TAG, "adb refused request: " + resp.Message );
+			}
 
-				return resp.Okay;
+			return resp.Okay;
 		}
 
 		private void OpenClient ( Device device, int pid, int port, MonitorThread monitorThread ) {
@@ -635,7 +646,7 @@ namespace Managed.Adb {
 			throw new IOException ( "Unable to read length" );
 		}
 
-		private String Read(Socket socket, byte[] data) {
+		private String Read ( Socket socket, byte[] data ) {
 			int count = -1;
 			int totalRead = 0;
 
