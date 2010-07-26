@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Net;
 using System.IO;
 using System.Threading;
-using Managed.Adb.Extensions;
 namespace Managed.Adb {
 	public class AdbHelper {
 		private const string TAG = "AdbHelper";

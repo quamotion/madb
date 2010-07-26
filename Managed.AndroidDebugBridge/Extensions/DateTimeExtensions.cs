@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Globalization;
 
-namespace Managed.Adb.Extensions {
+namespace System {
 	public static class DateTimeExtensions {
 		public static readonly DateTime Epoch = new DateTime ( 1970, 1, 1 );
 

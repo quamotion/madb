@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Managed.Adb.Extensions;
 using System.IO;
 using Managed.Adb.IO;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb.Extensions {
+namespace System {
 	public static class StringHelper {
 		public static byte[] GetBytes ( this String str ) {
 			return GetBytes ( str, Encoding.Default );

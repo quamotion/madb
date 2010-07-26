@@ -19,6 +19,11 @@ namespace Managed.Adb {
 
 		}
 
+		/// <summary>
+		/// Attempts to install on the device
+		/// </summary>
+		/// <param name="busybox">The path to the busybox binary to install.</param>
+		/// <returns><c>true</c>, if successfull; otherwise, <c>false</c></returns>
 		public bool Install ( String busybox ) {
 			FileEntry bb = null;
 
@@ -71,7 +76,8 @@ namespace Managed.Adb {
 					// we didnt find it, so add it.
 					if ( !found ) {
 						// this doesn't seem to actually work
-						Device.ExecuteShellCommand ( "export PATH={0}:$PATH", NullOutputReceiver.Instance, BUSYBOX_BIN );
+						Device.ExecuteShellCommand ( @"echo \ Mad Bee buxybox >> /init.rc", NullOutputReceiver.Instance );
+						Device.ExecuteShellCommand ( @"echo export PATH={0}:\$PATH >> /init.rc", NullOutputReceiver.Instance, BUSYBOX_BIN );
 					}
 				}
 
@@ -94,7 +100,7 @@ namespace Managed.Adb {
 			if ( this.Device.IsOnline ) {
 				try {
 					Commands.Clear ( );
-					Device.ExecuteShellCommand ( BUSYBOX_COMMAND, new BusyBoxCommandsReceiver(this) );
+					Device.ExecuteShellCommand ( BUSYBOX_COMMAND, new BusyBoxCommandsReceiver ( this ) );
 					Available = true;
 				} catch ( FileNotFoundException ) {
 					Available = false;
@@ -106,16 +112,38 @@ namespace Managed.Adb {
 
 
 		private Device Device { get; set; }
-
+		/// <summary>
+		/// Gets if busybox is available on this device.
+		/// </summary>
 		public bool Available { get; private set; }
+		/// <summary>
+		/// Gets the version of busybox
+		/// </summary>
 		public Version Version { get; private set; }
+		/// <summary>
+		/// Gets a collection of the supported commands
+		/// </summary>
 		public List<String> Commands { get; private set; }
+
+		/// <summary>
+		/// Gets if the specified command name is supported by this version of busybox
+		/// </summary>
+		/// <param name="command">The command name to check</param>
+		/// <returns><c>true</c>, if supported; otherwise, <c>false</c>.</returns>
+		public bool Supports ( String command ) {
+			if ( String.IsNullOrEmpty ( command ) || String.IsNullOrEmpty ( command.Trim ( ) ) ) {
+				throw new ArgumentException ( "Command must not be empty", "command" );
+			}
+
+			return Commands.Contains ( command );
+		}
 
 		private class BusyBoxCommandsReceiver : MultiLineReceiver {
 			private const String BB_VERSION_PATTERN = @"^BusyBox\sv(\d{1,}\.\d{1,}\.\d{1,})";
 			private const String BB_FUNCTIONS_PATTERN = @"(?:([\[a-z0-9]+)(?:,\s|$))";
 
-			public BusyBoxCommandsReceiver ( BusyBox bb ) : base() {
+			public BusyBoxCommandsReceiver ( BusyBox bb )
+				: base ( ) {
 				TrimLines = true;
 				BusyBox = bb;
 			}

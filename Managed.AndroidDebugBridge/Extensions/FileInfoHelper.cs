@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Managed.Adb.Extensions {
+namespace System.IO {
 	public static class FileInfoHelper {
 
 		public static bool IsDirectory ( String path ) {

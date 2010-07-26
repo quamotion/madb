@@ -24,6 +24,12 @@ namespace Managed.Adb.Tests {
 
 			result = LinuxPath.Combine ( "/system//xbin", "busybox" );
 			Assert.Equal<String> ( "/system/xbin/busybox", result );
+
+			result = LinuxPath.Combine ( "/system","xbin", "busybox" );
+			Assert.Equal<String> ( "/system/xbin/busybox", result );
+
+			result = LinuxPath.Combine ( "/system", "xbin", "really", "long", "path" ,"to", "nothing" );
+			Assert.Equal<String> ( "/system/xbin/really/long/path/to/nothing", result );
 		}
 
 		[Fact]

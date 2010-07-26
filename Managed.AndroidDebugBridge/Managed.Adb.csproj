@@ -106,6 +106,7 @@
     <Compile Include="DeviceEventArgs.cs" />
     <Compile Include="ErrorCodeHelper.cs" />
     <Compile Include="Extensions\FileInfoHelper.cs" />
+    <Compile Include="Extensions\PathHelper.cs" />
     <Compile Include="Extensions\StringHelper.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileListingService.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="ILogOutput.cs" />
     <Compile Include="InstallReceiver.cs" />
     <Compile Include="IO\LinuxPath.cs" />
+    <Compile Include="IO\Rgb565.cs" />
     <Compile Include="IPacketConsumer.cs" />
     <Compile Include="IShellOutputReceiver.cs" />
     <Compile Include="ISyncProgressMonitor.cs" />

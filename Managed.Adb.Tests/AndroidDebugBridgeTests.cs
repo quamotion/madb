@@ -22,6 +22,7 @@ namespace Managed.Adb.Tests {
 				adb.Stop ( );
 			} catch ( Exception ex ) {
 				Console.WriteLine ( ex.ToString ( ) );
+				throw;
 			}
 		}
 

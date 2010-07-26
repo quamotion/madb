@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.CompilerServices;
-using Managed.Adb.Extensions;
 
 
 namespace Managed.Adb.IO {
@@ -102,14 +101,7 @@ namespace Managed.Adb.IO {
 			}
 		}
 
-		/// <summary>Combines two path strings.</summary>
-		/// <returns>A string containing the combined paths. If one of the specified paths is a zero-length string, this method returns the other path. If path2 contains an absolute path, this method returns path2.</returns>
-		/// <param name="path2">The second path. </param>
-		/// <param name="path1">The first path. </param>
-		/// <exception cref="T:System.ArgumentNullException">path1 or path2 is null. </exception>
-		/// <exception cref="T:System.ArgumentException">path1 or path2 contain one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
-		/// <filterpriority>1</filterpriority>
-		public static string Combine ( string path1, string path2 ) {
+		/*public static string Combine ( string path1, string path2 ) {
 			if ( ( path1 == null ) || ( path2 == null ) ) {
 				throw new ArgumentNullException ( ( path1 == null ) ? "path1" : "path2" );
 			}
@@ -132,7 +124,113 @@ namespace Managed.Adb.IO {
 				return FixupPath ( path1 + DirectorySeparatorChar ) + path2;
 			}
 			return FixupPath ( path1 ) + path2;
+		}*/
+
+		/// <summary>Combines two path strings.</summary>
+		/// <returns>A string containing the combined paths. If one of the specified paths is a zero-length string, this method returns the other path. If path2 contains an absolute path, this method returns path2.</returns>
+		/// <param name="path2">The second path. </param>
+		/// <param name="path1">The first path. </param>
+		/// <exception cref="T:System.ArgumentNullException">path1 or path2 is null. </exception>
+		/// <exception cref="T:System.ArgumentException">path1 or path2 contain one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
+		public static string Combine ( string path1, string path2 ) {
+			if ( ( path1 == null ) || ( path2 == null ) ) {
+				throw new ArgumentNullException ( ( path1 == null ) ? "path1" : "path2" );
+			}
+			CheckInvalidPathChars ( path1 );
+			CheckInvalidPathChars ( path2 );
+			return CombineNoChecks ( path1, path2 );
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="path1"></param>
+		/// <param name="path2"></param>
+		/// <param name="path3"></param>
+		/// <returns></returns>
+		public static string Combine ( string path1, string path2, string path3 ) {
+			if ( ( ( path1 == null ) || ( path2 == null ) ) || ( path3 == null ) ) {
+				throw new ArgumentNullException ( ( path1 == null ) ? "path1" : ( ( path2 == null ) ? "path2" : "path3" ) );
+			}
+			CheckInvalidPathChars ( path1 );
+			CheckInvalidPathChars ( path2 );
+			CheckInvalidPathChars ( path3 );
+			return CombineNoChecks ( CombineNoChecks ( path1, path2 ), path3 );
+		}
+
+		public static string Combine ( string path1, string path2, string path3, string path4 ) {
+			if ( ( ( path1 == null ) || ( path2 == null ) ) || ( ( path3 == null ) || ( path4 == null ) ) ) {
+				throw new ArgumentNullException ( ( path1 == null ) ? "path1" : ( ( path2 == null ) ? "path2" : ( ( path3 == null ) ? "path3" : "path4" ) ) );
+			}
+			CheckInvalidPathChars ( path1 );
+			CheckInvalidPathChars ( path2 );
+			CheckInvalidPathChars ( path3 );
+			CheckInvalidPathChars ( path4 );
+			return CombineNoChecks ( CombineNoChecks ( CombineNoChecks ( path1, path2 ), path3 ), path4 );
+		}
+
+		public static String Combine ( params String[] paths ) {
+			if ( paths == null ) {
+				throw new ArgumentNullException ( "paths" );
+			}
+			int capacity = 0;
+			int num2 = 0;
+			for ( int i = 0; i < paths.Length; i++ ) {
+				if ( paths[i] == null ) {
+					throw new ArgumentNullException ( "paths" );
+				}
+				if ( paths[i].Length != 0 ) {
+					CheckInvalidPathChars ( paths[i] );
+					if ( IsPathRooted ( paths[i] ) ) {
+						num2 = i;
+						capacity = paths[i].Length;
+					} else {
+						capacity += paths[i].Length;
+					}
+					char ch = paths[i][paths[i].Length - 1];
+					if ( ( ( ch != DirectorySeparatorChar ) && ( ch != AltDirectorySeparatorChar ) ) ) {
+						capacity++;
+					}
+				}
+			}
+			StringBuilder builder = new StringBuilder ( capacity );
+			for ( int j = num2; j < paths.Length; j++ ) {
+				if ( paths[j].Length != 0 ) {
+					if ( builder.Length == 0 ) {
+						builder.Append ( FixupPath ( paths[j] ) );
+					} else {
+						char ch2 = builder[builder.Length - 1];
+						if ( ( ( ch2 != DirectorySeparatorChar ) && ( ch2 != AltDirectorySeparatorChar ) ) ) {
+							builder.Append ( DirectorySeparatorChar );
+						}
+							builder.Append ( paths[j] );
+					}
+				}
+			}
+			return builder.ToString ( );
+
+		}
+
+		private static string CombineNoChecks ( string path1, string path2 ) {
+			if ( path2.Length == 0 ) {
+				return FixupPath ( path1 );
+			}
+			if ( path1.Length == 0 ) {
+				return FixupPath ( path2 );
+			}
+			if ( IsPathRooted ( path2 ) ) {
+				return FixupPath ( path2 );
+			}
+			char ch = path1[path1.Length - 1];
+			char ch2 = path2[0];
+			if ( ch != DirectorySeparatorChar && ch != AltDirectorySeparatorChar &&
+				ch2 != DirectorySeparatorChar && ch2 != AltDirectorySeparatorChar ) {
+				return ( FixupPath ( path1 ) + path2 );
+			}
+			return ( FixupPath ( path1 ) + path2 );
+		}
+
+
 
 		/// <summary>Returns the directory information for the specified path string.</summary>
 		/// <returns>A <see cref="T:System.String"></see> containing directory information for path, or null if path denotes a root directory, is the empty string (""), or is null. Returns <see cref="F:System.String.Empty"></see> if path does not contain directory information.</returns>
@@ -314,8 +412,8 @@ namespace Managed.Adb.IO {
 				CheckInvalidPathChars ( path );
 				if ( path.EndsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) || path.EndsWith ( new String ( new char[] { AltDirectorySeparatorChar } ) ) ) {
 					return false;
-				} 
-				
+				}
+
 				int length = path.Length;
 				while ( --length >= 0 ) {
 					char ch = path[length];
