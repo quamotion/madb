@@ -151,21 +151,25 @@ namespace Managed.Adb {
 			private BusyBox BusyBox { get; set; }
 
 			protected override void ProcessNewLines ( string[] lines ) {
-				BusyBox.Commands.Clear ( );
 				foreach ( var line in lines ) {
 					if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) ) {
 						continue;
 					}
 
-					Match m = Regex.Match ( line, BB_VERSION_PATTERN, RegexOptions.Compiled );
+					Match m = Regex.Match ( line, BB_VERSION_PATTERN, RegexOptions.Compiled |  RegexOptions.IgnoreCase );
 					if ( m.Success ) {
 						BusyBox.Version = new Version ( m.Groups[1].Value );
+						BusyBox.Commands.Clear ( );
 						continue;
 					}
 
-					m = Regex.Match ( line, BB_FUNCTIONS_PATTERN, RegexOptions.Compiled );
+					if ( line.Contains ( "defined functions" ) ) {
+						BusyBox.Commands.Clear ( );
+					}
+
+					m = Regex.Match ( line, BB_FUNCTIONS_PATTERN, RegexOptions.Compiled  );
 					while ( m.Success ) {
-						BusyBox.Commands.Add ( m.Groups[1].Value );
+						BusyBox.Commands.Add ( m.Groups[1].Value.Trim() );
 						m = m.NextMatch ( );
 					}
 
