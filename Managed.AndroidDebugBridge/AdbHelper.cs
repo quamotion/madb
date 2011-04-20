@@ -550,7 +550,7 @@ namespace Managed.Adb {
 
 						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries );
 						string sdata = data.GetString ( 0, count, AdbHelper.DEFAULT_ENCODING );
-						if ( string.Compare ( sdata.Trim ( ), string.Format ( "{0}: not found", cmd[0] ), false ) == 0 ) {
+						if ( sdata.Trim ( ).EndsWith(String.Format ( "{0}: not found", cmd[0] ) ) ) {
 							Log.w ( "AdbHelper", "The remote execution returned: '{0}: not found'", cmd[0] );
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}: not found'", cmd[0] ) );
 						}

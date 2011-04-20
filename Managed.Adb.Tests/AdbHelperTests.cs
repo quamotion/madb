@@ -87,7 +87,7 @@ namespace Managed.Adb.Tests {
 
 			Console.WriteLine ( "Executing 'ls /system/foo'" );
 			Assert.Throws<FileNotFoundException> ( new Assert.ThrowsDelegate ( delegate ( ) {
-				device.ExecuteShellCommand ( "ls /system/foo", creciever );
+				device.ExecuteShellCommand ("ls /system/foo", creciever );
 			} ) );
 
 		}
@@ -99,9 +99,9 @@ namespace Managed.Adb.Tests {
 			RawImage rawImage = device.Screenshot;
 
 			Assert.NotNull ( rawImage );
-			Assert.Equal<int> ( 16, rawImage.Bpp );
-			Assert.Equal<int> ( 320, rawImage.Width );
-			Assert.Equal<int> ( 480, rawImage.Height );
+			Assert.Equal<int> ( 32, rawImage.Bpp );
+			Assert.Equal<int> ( 480, rawImage.Width );
+			Assert.Equal<int> ( 800, rawImage.Height );
 
 		}
 
@@ -167,7 +167,7 @@ namespace Managed.Adb.Tests {
 			Device device = GetFirstDevice ( );
 			using ( SyncService sync = device.SyncService ) {
 				String lpath = Path.Combine ( Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ), "apps" );
-				String rpath = "/system/app";
+				String rpath = "/system/app/";
 				DirectoryInfo ldir = new DirectoryInfo ( lpath );
 				if ( !ldir.Exists ) {
 					ldir.Create ( );

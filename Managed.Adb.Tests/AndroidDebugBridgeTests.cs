@@ -11,7 +11,7 @@ namespace Managed.Adb.Tests {
 		[Fact]
 		public void CreateBridgeTest ( ) {
 			try {
-				AndroidDebugBridge adb = CreateBridge ( @"S:\Android\sdk\tools\adb.exe" );
+				AndroidDebugBridge adb = CreateBridge ( @"C:\tools\android-sdk\platform-tools\adb.exe" );
 				bool result = adb.Start ( );
 				Assert.True ( result, "Failed to start ADB" );
 
