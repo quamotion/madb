@@ -93,6 +93,8 @@
     <Compile Include="DebugPortManager.cs" />
     <Compile Include="DeviceMonitor.cs" />
     <Compile Include="EnvironmentVariablesReceiver.cs" />
+    <Compile Include="Exceptions\AdbException.cs" />
+    <Compile Include="Exceptions\DeviceNotFoundException.cs" />
     <Compile Include="Exceptions\PackageInstallationException.cs" />
     <Compile Include="Extensions\ArrayHelper.cs" />
     <Compile Include="BadPacketException.cs" />

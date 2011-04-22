@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.IO;
 using System.Threading;
+using Managed.Adb.Exceptions;
 namespace Managed.Adb {
 	public class AdbHelper {
 		private const string TAG = "AdbHelper";
@@ -38,14 +39,14 @@ namespace Managed.Adb {
 
 				byte[] req = CreateAdbForwardRequest ( null, port );
 				if ( !Write ( s, req ) ) {
-					throw new IOException ( "failed submitting request to ADB" );
+					throw new AdbException ( "failed submitting request to ADB" );
 				}
 				AdbResponse resp = ReadAdbResponse ( s, false );
 				if ( !resp.Okay ) {
-					throw new IOException ( "connection request rejected" );
+					throw new AdbException ( "connection request rejected" );
 				}
 				s.Blocking = true;
-			} catch ( IOException ) {
+			} catch ( AdbException ) {
 				s.Close ( );
 				throw;
 			}
@@ -120,13 +121,13 @@ namespace Managed.Adb {
 				// Log.hexDump(req);
 
 				if ( !Write ( socket, req ) )
-					throw new IOException ( "failed submitting request to ADB" ); //$NON-NLS-1$
+					throw new AdbException ( "failed submitting request to ADB" ); //$NON-NLS-1$
 
 				AdbResponse resp = ReadAdbResponse ( socket, false /* readDiagString */);
 				if ( !resp.Okay )
-					throw new IOException ( "connection request rejected: " + resp.Message ); //$NON-NLS-1$
+					throw new AdbException ( "connection request rejected: " + resp.Message ); //$NON-NLS-1$
 
-			} catch ( IOException ioe ) {
+			} catch ( AdbException ioe ) {
 				socket.Close ( );
 				throw ioe;
 			}
@@ -178,11 +179,11 @@ namespace Managed.Adb {
 			try {
 				count = socket.Send ( data, 0, length != -1 ? length : data.Length, SocketFlags.None );
 				if ( count < 0 ) {
-					throw new IOException ( "channel EOF" );
+					throw new AdbException ( "channel EOF" );
 				} else if ( count == 0 ) {
 					// TODO: need more accurate timeout?
 					if ( timeout != 0 && numWaits * WAIT_TIME > timeout ) {
-						throw new IOException ( "timeout" );
+						throw new AdbException ( "timeout" );
 					}
 					// non-blocking spin
 					Thread.Sleep ( WAIT_TIME );
@@ -254,7 +255,7 @@ namespace Managed.Adb {
 		public bool Read ( Socket socket, byte[] data ) {
 			try {
 				Read ( socket, data, -1, DdmPreferences.Timeout );
-			} catch ( IOException e ) {
+			} catch ( AdbException e ) {
 				Log.e ( TAG, "readAll: IOException: {0}", e.Message );
 				return false;
 			}
@@ -277,7 +278,7 @@ namespace Managed.Adb {
 					count = socket.Receive ( buffer, buflen, SocketFlags.None );
 					if ( count < 0 ) {
 						Log.e ( TAG, "read: channel EOF" );
-						throw new IOException ( "EOF" );
+						throw new AdbException ( "EOF" );
 					} else if ( count == 0 ) {
 						Console.WriteLine ( "DONE with Read" );
 					} else {
@@ -285,7 +286,7 @@ namespace Managed.Adb {
 						totalRead += count;
 					}
 				} catch ( SocketException sex ) {
-					throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
+					throw new AdbException ( String.Format ( "No Data to read: {0}", sex.Message ) );
 				}
 			}
 
@@ -307,12 +308,12 @@ namespace Managed.Adb {
 								device.SerialNumber, localPort, remotePort ) );
 
 				if ( !Write ( adbChan, request ) ) {
-					throw new IOException ( "failed to submit the forward command." );
+					throw new AdbException ( "failed to submit the forward command." );
 				}
 
 				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
-					throw new IOException ( "Device rejected command: " + resp.Message );
+					throw new AdbException ( "Device rejected command: " + resp.Message );
 				}
 			} finally {
 				if ( adbChan != null ) {
@@ -334,12 +335,12 @@ namespace Managed.Adb {
 								device.SerialNumber, localPort, remotePort ) );
 
 				if ( !Write ( adbChan, request ) ) {
-					throw new IOException ( "failed to submit the remove forward command." );
+					throw new AdbException ( "failed to submit the remove forward command." );
 				}
 
 				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
-					throw new IOException ( "Device rejected command: " + resp.Message );
+					throw new AdbException ( "Device rejected command: " + resp.Message );
 				}
 			} finally {
 				if ( adbChan != null ) {
@@ -375,7 +376,7 @@ namespace Managed.Adb {
 				socket.Connect ( address );
 				socket.Blocking = true;
 				if ( !Write ( socket, request ) ) {
-					throw new IOException ( "failed asking for devices" );
+					throw new AdbException ( "failed asking for devices" );
 				}
 
 				AdbResponse resp = ReadAdbResponse ( socket, false /* readDiagString */);
@@ -430,7 +431,7 @@ namespace Managed.Adb {
 				// to a specific device
 				SetDevice ( adbChan, device );
 				if ( !Write ( adbChan, request ) )
-					throw new IOException ( "failed asking for frame buffer" );
+					throw new AdbException ( "failed asking for frame buffer" );
 
 				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
@@ -480,7 +481,7 @@ namespace Managed.Adb {
 								+ ", height=" + imageParams.Height );
 
 				if ( !Write ( adbChan, nudge ) )
-					throw new IOException ( "failed nudging" );
+					throw new AdbException ( "failed nudging" );
 
 				reply = new byte[imageParams.Size];
 				if ( !Read ( adbChan, reply ) ) {
@@ -521,12 +522,12 @@ namespace Managed.Adb {
 
 				byte[] request = FormAdbRequest ( "shell:" + command ); //$NON-NLS-1$
 				if ( !Write ( socket, request ) ) {
-					throw new IOException ( "failed submitting shell command" );
+					throw new AdbException ( "failed submitting shell command" );
 				}
 
 				AdbResponse resp = ReadAdbResponse ( socket, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
-					throw new IOException ( "sad result from adb: " + resp.Message );
+					throw new AdbException ( "sad result from adb: " + resp.Message );
 				}
 
 				byte[] data = new byte[16384];
@@ -581,12 +582,16 @@ namespace Managed.Adb {
 				byte[] device_query = FormAdbRequest ( msg );
 
 				if ( !Write ( adbChan, device_query ) ) {
-					throw new IOException ( "failed submitting device (" + device + ") request to ADB" );
+					throw new AdbException ( "failed submitting device (" + device + ") request to ADB" );
 				}
 
 				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
 				if ( !resp.Okay ) {
-					throw new IOException ( "device (" + device + ") request rejected: " + resp.Message );
+					if ( String.Compare ( "device not found", resp.Message, true ) == 0 ) {
+						throw new DeviceNotFoundException ( device.SerialNumber );
+					} else {
+						throw new AdbException ( "device (" + device + ") request rejected: " + resp.Message );
+					}
 				}
 			}
 
@@ -610,7 +615,7 @@ namespace Managed.Adb {
 				SetDevice ( adbChan, device );
 
 				if ( !Write ( adbChan, request ) ) {
-					throw new IOException ( "failed asking for reboot" );
+					throw new AdbException ( "failed asking for reboot" );
 				}
 			} finally {
 				if ( adbChan != null ) {
