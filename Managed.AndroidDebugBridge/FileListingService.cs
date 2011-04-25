@@ -172,7 +172,7 @@ namespace Managed.Adb {
 		public FileListingService ( Device device, bool forceBusyBox ) {
 			this.Device = device;
 			this.Threads = new List<Thread> ( );
-			this.ForceBusyBox = forceBusyBox;
+			this.ForceBusyBox = forceBusyBox && device.BusyBox.Available;
 		}
 
 		/// <summary>
@@ -180,7 +180,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="device">The device.</param>
 		public FileListingService ( Device device )
-			: this ( device, false ) {
+			: this ( device, device.BusyBox.Available ) {
 
 		}
 
@@ -318,7 +318,6 @@ namespace Managed.Adb {
 			try {
 				// create the command
 				String command = String.Format ( ForceBusyBox ? BUSYBOX_LS : TOOLBOX_LS, entry.FullPath );
-
 				// create the receiver object that will parse the result from ls
 				ListingServiceReceiver receiver = new ListingServiceReceiver ( entry, entryList, linkList );
 

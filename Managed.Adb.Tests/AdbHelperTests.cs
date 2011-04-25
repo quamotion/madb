@@ -108,6 +108,7 @@ namespace Managed.Adb.Tests {
 		[Fact]
 		public void FileListingServiceTest ( ) {
 			Device device = GetFirstDevice ( );
+			device.FileListingService.ForceBusyBox = true;
 			FileEntry[] entries = device.FileListingService.GetChildren ( device.FileListingService.Root, false, null );
 			foreach ( var item in entries ) {
 				Console.WriteLine ( item.FullPath );

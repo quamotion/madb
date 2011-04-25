@@ -112,6 +112,7 @@
     <Compile Include="Extensions\StringHelper.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileListingService.cs" />
+    <Compile Include="FilePermission.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="GetPropReceiver.cs" />
     <Compile Include="IClient.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawImage.cs" />
     <Compile Include="Reflection\ReflectionHelper.cs" />
+    <Compile Include="ShellCommand.cs" />
     <Compile Include="SyncResult.cs" />
     <Compile Include="SyncService.cs" />
   </ItemGroup>

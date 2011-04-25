@@ -84,5 +84,48 @@ namespace Managed.Adb {
 			}
 		}
 
+		public void Mount ( MountPoint mp, String options ) {
+			CommandErrorReceiver cer = new CommandErrorReceiver ( );
+			if ( Device.BusyBox.Available ) {
+				Device.ExecuteShellCommand ( "busybox mount {0} {4} -t {1} {2} {3}", cer, mp.IsReadOnly ? "-r" : "-w", mp.FileSystem, mp.Block, mp.Name, !String.IsNullOrEmpty(options) ? String.Format("-o {0}",options) : String.Empty);
+			} else {
+				Device.ExecuteShellCommand ( "mount {0} {4} -t {1} {2} {3}", cer, mp.IsReadOnly ? "-r" : "-w", mp.FileSystem, mp.Block, mp.Name, !String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty );
+			}
+		}
+
+		public void Mount ( MountPoint mp ) {
+			Mount ( mp, String.Empty );
+		}
+
+		public void Mount ( String directory, String device, String fileSytemType, bool isReadOnly, String options ) {
+			Mount ( new MountPoint ( device, directory, fileSytemType, isReadOnly ), options );
+		}
+
+		public void Mount ( String directory, String device, String fileSytemType, bool isReadOnly ) {
+			Mount ( new MountPoint ( device, directory, fileSytemType, isReadOnly ), String.Empty );
+		}
+
+		public void Unmount ( MountPoint mp ) {
+			Unmount ( mp, String.Empty );
+		}
+
+
+		public void Unmount ( MountPoint mp, String options ) {
+			Unmount ( mp.Name, options );
+		}
+
+		public void Unmount ( String mountPoint ) {
+			Unmount ( mountPoint, String.Empty );
+		}
+
+		public void Unmount ( String mountPoint, String options ) {
+			CommandErrorReceiver cer = new CommandErrorReceiver ( );
+			if ( Device.BusyBox.Available ) {
+				Device.ExecuteShellCommand ( "busybox umount {1} {0}", cer, !String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty, mountPoint );
+			} else {
+				Device.ExecuteShellCommand ( "umount {1} {0}", cer, !String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty, mountPoint );
+			}
+		}
+
 	}
 }

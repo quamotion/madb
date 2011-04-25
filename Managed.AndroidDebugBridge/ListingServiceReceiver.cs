@@ -92,6 +92,7 @@ namespace Managed.Adb {
 				String permissions = m.Groups[1].Value;
 				String owner = m.Groups[2].Value;
 				String group = m.Groups[3].Value;
+				bool isExec = String.Compare ( m.Groups[10].Value, "*", true ) == 0;
 				long size = 0;
 				String sizeData = m.Groups[4].Value.Trim ( );
 				long.TryParse ( String.IsNullOrEmpty ( sizeData ) ? "0" : sizeData, out size );
@@ -181,11 +182,12 @@ namespace Managed.Adb {
 				}
 
 				// add some misc info
-				entry.Permissions = permissions;
+				entry.Permissions = new FilePermissions ( permissions );
 				entry.Size = size;
 				entry.Date = date;
 				entry.Owner = owner;
-				entry.Group = group;
+				entry.Group =  group;
+				entry.IsExecutable = isExec;
 				entry.LinkName = linkName;
 				if ( objectType == FileListingService.FileTypes.Link ) {
 					entry.Info = info;

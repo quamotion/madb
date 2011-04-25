@@ -90,15 +90,16 @@ namespace Managed.Adb {
 		public String Name { get; private set; }
 		public String LinkName { get; set; }
 		public String Info { get; set; }
-		public String Permissions { get; set; }
+		public FilePermissions Permissions { get; set; }
 		public long Size { get; set; }
 		public DateTime Date { get; set; }
 		public String Owner { get; set; }
 		public String Group { get; set; }
+		public FilePermission Other { get; set; }
 		public FileListingService.FileTypes Type { get; private set; }
 		public bool IsApplicationPackage { get; private set; }
 		public bool IsRoot { get; private set; }
-
+		public bool IsExecutable { get; set; }
 		public List<FileEntry> Children { get; set; }
 
 
