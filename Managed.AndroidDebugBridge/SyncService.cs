@@ -273,7 +273,7 @@ namespace Managed.Adb {
 		/// <param name="monitor">The progress monitor. Cannot be null.</param>
 		/// <returns>a SyncResult object with a code and an optional message.</returns>
 		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
-		public SyncResult Pull ( FileEntry[] entries, String localPath, ISyncProgressMonitor monitor ) {
+		public SyncResult Pull ( IEnumerable<FileEntry> entries, String localPath, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
@@ -368,7 +368,7 @@ namespace Managed.Adb {
 		/// <param name="monitor">The progress monitor. Cannot be null.</param>
 		/// <returns>a SyncResult object with a code and an optional message.</returns>
 		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
-		public SyncResult Push ( String[] local, FileEntry remote, ISyncProgressMonitor monitor ) {
+		public SyncResult Push ( IEnumerable<String> local, FileEntry remote, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
@@ -384,11 +384,10 @@ namespace Managed.Adb {
 			}
 
 			// get the total count of the bytes to transfer
-			FileSystemInfo[] fileArray = files.ToArray ( );
-			long total = GetTotalLocalFileSize ( fileArray );
+			long total = GetTotalLocalFileSize ( files );
 
 			monitor.Start ( total );
-			SyncResult result = DoPush ( fileArray, remote.FullPath, monitor );
+			SyncResult result = DoPush ( files, remote.FullPath, monitor );
 			monitor.Stop ( );
 
 			return result;
@@ -559,7 +558,7 @@ namespace Managed.Adb {
 			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
 		}
 
-		private SyncResult DoPush ( FileSystemInfo[] fileArray, string remotePath, ISyncProgressMonitor monitor ) {
+		private SyncResult DoPush ( IEnumerable<FileSystemInfo> files, string remotePath, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
@@ -569,7 +568,7 @@ namespace Managed.Adb {
 				return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
 			}
 
-			foreach ( FileSystemInfo f in fileArray ) {
+			foreach ( FileSystemInfo f in files ) {
 				// check if we're canceled
 				if ( monitor.IsCanceled ) {
 					return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
@@ -726,7 +725,7 @@ namespace Managed.Adb {
 		/// <returns></returns>
 		/// <exception cref="System.IO.IOException">Throws if unable to create a file or folder</exception>
 		/// <exception cref="System.ArgumentNullException">Throws if the ISyncProgressMonitor is null</exception>
-		private SyncResult DoPull ( FileEntry[] entries, string localPath, FileListingService fileListingService, ISyncProgressMonitor monitor ) {
+		private SyncResult DoPull ( IEnumerable<FileEntry> entries, string localPath, FileListingService fileListingService, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
@@ -792,13 +791,13 @@ namespace Managed.Adb {
 		/// <param name="entries">The remote files</param>
 		/// <param name="fls">The FileListingService</param>
 		/// <returns>The total number of bytes of the specified remote files</returns>
-		private long GetTotalRemoteFileSize ( FileEntry[] entries, FileListingService fls ) {
+		private long GetTotalRemoteFileSize ( IEnumerable<FileEntry> entries, FileListingService fls ) {
 			long count = 0;
 			foreach ( FileEntry e in entries ) {
 				FileListingService.FileTypes type = e.Type;
 				if ( type == FileListingService.FileTypes.Directory ) {
 					// get the children
-					FileEntry[] children = fls.GetChildren ( e, false, null );
+					IEnumerable<FileEntry> children = fls.GetChildren ( e, false, null );
 					count += GetTotalRemoteFileSize ( children, fls ) + 1;
 				} else if ( type == FileListingService.FileTypes.File ) {
 					count += e.Size;
@@ -814,7 +813,7 @@ namespace Managed.Adb {
 		/// <param name="files">The local files / folders</param>
 		/// <returns>The total number of bytes</returns>
 		/// <remarks>This does not check for circular links.</remarks>
-		private long GetTotalLocalFileSize ( FileSystemInfo[] fsis ) {
+		private long GetTotalLocalFileSize ( IEnumerable<FileSystemInfo> fsis ) {
 			long count = 0;
 
 			foreach ( FileSystemInfo fsi in fsis ) {
