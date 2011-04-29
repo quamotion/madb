@@ -500,6 +500,10 @@ namespace Managed.Adb {
 			return imageParams;
 		}
 
+		public void ExecuteRemoteRootCommand( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr ) {
+			ExecuteRemoteCommand ( endPoint, String.Format ( "su -c \"{0}\"", command), device, rcvr );
+		}
+
 
 		/// <summary>
 		/// Executes a shell command on the remote device
