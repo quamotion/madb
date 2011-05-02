@@ -16,6 +16,7 @@ namespace Managed.Adb {
 		BootLoader,
 		Offline,
 		Online,
+		Download,
 		Unknown
 	}
 
@@ -68,7 +69,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Device list info regex
 		/// </summary>
-		private const String RE_DEVICELIST_INFO = @"^([^\s]+)\s+(device|offline|unknown|bootloader|recovery)$";
+		private const String RE_DEVICELIST_INFO = @"^([^\s]+)\s+(device|offline|unknown|bootloader|recovery|download)$";
 		/// <summary>
 		/// Tag
 		/// </summary>
@@ -79,7 +80,7 @@ namespace Managed.Adb {
 		/// 
 		/// </summary>
 		private string avdName;
-
+		private bool _canSU = false;
 
 		/// <summary>
 		/// 
@@ -138,6 +139,7 @@ namespace Managed.Adb {
 			return DeviceState.Unknown;
 		}
 
+
 		/// <summary>
 		/// Create a device from Adb Device list data
 		/// </summary>
@@ -152,6 +154,28 @@ namespace Managed.Adb {
 			} else {
 				throw new ArgumentException ( "Invalid device list data" );
 			}
+		}
+
+
+		/// <summary>
+		/// Determines whether this instance can use the SU shell.
+		/// </summary>
+		/// <returns>
+		///   <c>true</c> if this instance can use the SU shell; otherwise, <c>false</c>.
+		/// </returns>
+		public bool CanSU( ) {
+			if ( _canSU ) {
+				return _canSU;
+			}
+
+			try {
+				this.ExecuteRootShellCommand ( "echo \\\"I can haz root\\\"", NullOutputReceiver.Instance );
+				_canSU = true;
+			} catch ( FileNotFoundException ) {
+				_canSU = false;
+			}
+
+			return _canSU;
 		}
 
 		public Socket ClientMonitoringSocket { get; set; }
@@ -208,8 +232,14 @@ namespace Managed.Adb {
 			return Properties[name];
 		}
 
+		/// <summary>
+		/// Gets the file system for this device.
+		/// </summary>
 		public FileSystem FileSystem { get; private set; }
 
+		/// <summary>
+		/// Gets the busy box object for this device.
+		/// </summary>
 		public BusyBox BusyBox { get; private set; }
 
 		/// <summary>
@@ -393,6 +423,25 @@ namespace Managed.Adb {
 		/// <param name="commandArgs">The command args.</param>
 		public void ExecuteShellCommand ( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
 			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, string.Format ( command, commandArgs ), this, receiver );
+		}
+
+		/// <summary>
+		/// Executes the root shell command.
+		/// </summary>
+		/// <param name="command">The command.</param>
+		/// <param name="receiver">The receiver.</param>
+		public void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver ) {
+			ExecuteRootShellCommand ( command, receiver, new object[] { } );
+		}
+
+		/// <summary>
+		/// Executes a root shell command on the device, and sends the result to a receiver.
+		/// </summary>
+		/// <param name="command">The command.</param>
+		/// <param name="receiver">The receiver.</param>
+		/// <param name="commandArgs">The command args.</param>
+		public void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
+			AdbHelper.Instance.ExecuteRemoteRootCommand ( AndroidDebugBridge.SocketAddress, string.Format ( command, commandArgs ), this, receiver );
 		}
 
 		/*

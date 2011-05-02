@@ -93,6 +93,22 @@ namespace Managed.Adb.Tests {
 		}
 
 		[Fact]
+		public void ExecuteRemoteRootCommandTest( ) {
+			Device device = GetFirstDevice ( );
+			ConsoleOutputReceiver creciever = new ConsoleOutputReceiver ( );
+
+			Console.WriteLine ( "Executing 'ls':" );
+			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
+				try {
+					device.ExecuteRootShellCommand ( "ls -lF --color=never", creciever );
+				} catch ( FileNotFoundException ) {
+					device.ExecuteRootShellCommand ( "ls -l", creciever );
+				}
+			} ) );
+
+		}
+
+		[Fact]
 		public void GetRawImageTest ( ) {
 			Device device = GetFirstDevice ( );
 
