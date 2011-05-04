@@ -13,26 +13,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xunit", "xunit", "{E9A9E417
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{49EA5373-6CDB-45BE-A763-80F421B8A22E}"
+	ProjectSection(SolutionItems) = preProject
+		Build\BuildAll.msbuild = Build\BuildAll.msbuild
+		madbee.nuspec = madbee.nuspec
+		Build\SharedProperties.msbuild = Build\SharedProperties.msbuild
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{9AA331B1-1F41-41B7-B04A-95E8656E560A}"
 	ProjectSection(SolutionItems) = preProject
 		Shared\SharedAssemblyInfo.cs = Shared\SharedAssemblyInfo.cs
-		Shared\VersionAssemblyInfo.cs = Shared\VersionAssemblyInfo.cs
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs02.codeplex.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Managed.AndroidDebugBridge\\Managed.Adb.csproj
-		SccProjectName1 = Managed.AndroidDebugBridge
-		SccLocalPath1 = Managed.AndroidDebugBridge
-		SccProjectUniqueName2 = Managed.Adb.Tests\\Managed.Adb.Tests.csproj
-		SccProjectName2 = Managed.Adb.Tests
-		SccLocalPath2 = Managed.Adb.Tests
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

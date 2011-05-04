@@ -78,9 +78,6 @@
     <Compile Include="..\Shared\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Shared\VersionAssemblyInfo.cs">
-      <Link>Properties\VersionAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="AdbHelper.cs" />
     <Compile Include="AdbResponse.cs" />
     <Compile Include="AllocationInfo.cs" />

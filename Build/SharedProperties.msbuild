@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Build">
+	<PropertyGroup>
+		<SharedProperties>SharedProperties</SharedProperties>
+		<CCNetLabel Condition="'$(CCNetLabel)' == ''">1.0.0.0</CCNetLabel>
+		
+		<Configuration Condition="'$(CCNetBuildCondition)' == 'ForceBuild'">Release</Configuration>
+		<Configuration Condition="'$(CCNetBuildCondition)' != 'ForceBuild'">Debug</Configuration>
+		<ReleasePlatform>$(Platform)</ReleasePlatform>
+		<ReleasePlatform Condition=" '$(ReleasePlatform)' == '' OR '$(ReleasePlatform)' == 'Any CPU' ">x86</ReleasePlatform>
+		<Platform Condition="'$(Platform)' == 'AnyCPU' OR '$(Platform)' == ''">x86</Platform>
+
+		<PlatformConstant Condition=" '$(Platform)' == 'x86' ">PLATFORMX86</PlatformConstant>
+		<PlatformConstant Condition=" '$(Platform)' == 'x64' ">PLATFORMX64</PlatformConstant>
+		<PlatformConstant Condition=" '$(Platform)' == 'ia64' ">PLATFORMIA64</PlatformConstant>
+		<PlatformConstant Condition=" '$(PlatformConstant)' == '' ">PLATFORMX86</PlatformConstant>
+		<OSPlatform Condition=" '$(OSPlatform)' == '' ">PLATFORM_WINDOWS</OSPlatform>
+
+		<SignAssemblies Condition="'$(SignAssemblies)' == ''">false</SignAssemblies>
+		<CCNetArtifactDirectory Condition="'$(CCNetArtifactDirectory)' == ''">$(MSBuildProjectDirectory)\..\bin\</CCNetArtifactDirectory>
+		<CCNetWorkingDirectory Condition="'$(CCNetWorkingDirectory)' == ''">$(MSBuildProjectDirectory)\..\</CCNetWorkingDirectory>
+		<CCNetProject Condition="'$(CCNetProject)' == ''">Managed.Adb</CCNetProject>
+		<CleanBuildOutput>True</CleanBuildOutput>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<BuildAllDependsOn>AssemblyInfo;CleanBuild;PluginBuild;ReleaseCleanup</BuildAllDependsOn>
+		<CompileDependsOn>$(CompileDependsOn)</CompileDependsOn>
+		<ReleaseMode Condition=" '$(ReleaseMode)' != 'Standalone' ">Setup</ReleaseMode>
+		<OutputPath>$(CCNetArtifactDirectory)$(Configuration)\$(CCNetLabel)\$(ReleaseMode)\$(ReleasePlatform)\</OutputPath>
+		<MSBuildProperties>ReleasePlatform=$(ReleasePlatform);ReleaseMode=$(ReleaseMode);SignAssemblies=$(SignAssemblies);Configuration=$(Configuration);OutputPath=$(OutputPath);CCNetLabel=$(CCNetLabel);CCNetIntegrationStatus=$(CCNetIntegrationStatus);CCNetBuildCondition=$(CCNetBuildCondition);CCNetProject=$(CCNetProject);CCNetBuildDate=$(CCNetBuildDate);CCNetLastIntegrationStatus=$(CCNetLastIntegrationStatus);CCNetBuildTime=$(CCNetBuildTime);CCNetArtifactDirectory=$(CCNetArtifactDirectory);CCNetWorkingDirectory=$(CCNetWorkingDirectory);CCNetRequestSource=$(CCNetRequestSource)</MSBuildProperties>
+		<PublishMode Condition=" '$(PublishMode)' == '' ">None</PublishMode>
+	</PropertyGroup>
+</Project>
