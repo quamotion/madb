@@ -4,61 +4,23 @@
 
 	<Import Project="$(MSBuildProjectDirectory)\Publish.msbuild" Condition="Exists('$(MSBuildProjectDirectory)\Publish.msbuild') AND '$(PublishTarget)' != 'PublishTarget' " />
 
-	<PropertyGroup>
-		<PluginMsBuildProperties>SignAssemblies=$(SignAssemblies);Configuration=$(Configuration);OutputPath=$(OutputPath)Plugins\;CCNetLabel=$(CCNetLabel);CCNetIntegrationStatus=$(CCNetIntegrationStatus);CCNetBuildCondition=$(CCNetBuildCondition);CCNetProject=$(CCNetProject);CCNetBuildDate=$(CCNetBuildDate);CCNetLastIntegrationStatus=$(CCNetLastIntegrationStatus);CCNetBuildTime=$(CCNetBuildTime);CCNetArtifactDirectory=$(CCNetArtifactDirectory);CCNetWorkingDirectory=$(CCNetWorkingDirectory);CCNetRequestSource=$(CCNetRequestSource)</PluginMsBuildProperties>
-	</PropertyGroup>
-
 	<Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" Condition="'$(MSBuildCommunityTasksPath)' == ''"/>
 
 	<ItemGroup>
-		<ProjectsToBuild Include="$(CCNetWorkingDirectory)**\*.csproj" />
+		<ProjectsToBuild Include="$(CCNetWorkingDirectory)**\*.csproj" Exclude="$(CCNetWorkingDirectory)**\*Tests*.csproj"/>
 	</ItemGroup>
 
-	<Target Name="CleanBuild">
-		<RemoveDir Directories="$(OutputPath)" Condition="Exists('$(OutputPath)')" ContinueOnError="true" />
-		<MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')" />
-	</Target>
 
-	<Target Name="CoreBuild">
+	<Target Name="CoreBuild" DependsOnTargets="AssemblyInfo;">
 		<MSBuild Projects ="@(ProjectsToBuild)" ContinueOnError="false"
 						 Properties="$(MSBuildProperties)">
 			<Output ItemName="OutputFiles" TaskParameter="TargetOutputs"/>
 		</MSBuild>
 	</Target>
 
-	<Target Name="ZipRelease" Condition=" '$(ReleaseMode)' == 'Binary' ">
-		<CreateItem Include="$(OutputPath)**\*.*" Exclude="$(OutputPath)*.zip;$(OutputPath)*.vshost.*;$(OutputPath)*.msi;$(OutputPath)*.wixpdb">
-			<Output ItemName="ZipFiles" TaskParameter="Include" />
-		</CreateItem>
-
-		<Zip Comment="$(CCNetBuildDate) $(CCNetBuildTime) $(CCNetProject) version $(CCNetLabel)" Files="@(ZipFiles);@(AndroidTools)"
-				 WorkingDirectory="$(OutputPath)"
-				 ZipFileName="$(OutputPath)$(CCNetProject).$(CCNetLabel).$(Platform).zip" ZipLevel="9" Flatten="False" />
+	
+	<Target Name="Build" DependsOnTargets="CleanBuild;CoreBuild;ReleaseCleanup;BuildPublish">
 	</Target>
 
-	<Target Name="ReleaseCleanup" DependsOnTargets="ZipRelease">
-		<CreateItem Include="$(OutputPath)*.*" Exclude="$(OutputPath)*.msi;$(OutputPath)*.zip;$(OutputPath)*.vshost.*">
-			<Output ItemName="Files" TaskParameter="Include"/>
-		</CreateItem>
-		<Delete Files="@(Files)" ContinueOnError="true" />
-	</Target>
-
-	<Target Name="Build" DependsOnTargets="AssemblyInfo;CleanBuild;PluginBuild;BuildInstall;ReleaseCleanup;BuildBootStrapper;BuildPublish">
-	</Target>
-
-	<Target Name="BuildPublish" Condition=" '$(PublishTarget)' == 'PublishTarget' AND  '$(ReleaseMode)' != 'Binary'">
-		<Message Text="Publishing Build" Importance="high" />
-		<CallTarget Targets="Publish" />
-	</Target>
-
-	<Target Name="AssemblyInfo"
-					Outputs="$(MSBuildProjectDirectory)\..\Shared\AssemblyVersionInfo.cs"
-					Condition=" '$(CCNetLabel)' != '' ">
-
-		<AssemblyInfo CodeLanguage="CS"
-									AssemblyFileVersion="$(CCNetLabel)"
-									AssemblyVersion="$(CCNetLabel)"
-									OutputFile="$(MSBuildProjectDirectory)\..\Shared\VersionAssemblyInfo.cs"
-									/>
-	</Target>
+	
 </Project>

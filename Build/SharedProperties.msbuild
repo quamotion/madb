@@ -1,14 +1,26 @@
 <?xml version="1.0"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Build">
 	<PropertyGroup>
+		<Major>1</Major>
+		<Minor>0</Minor>
+		<Build>0</Build>
+		<Revision>0</Revision>
+	</PropertyGroup>
+	<PropertyGroup>
+		<CCNetProject Condition="'$(CCNetProject)' == ''">Managed.Adb</CCNetProject>
+
+		<!-- SVN_HOME environment variable should be set to the "home directory" of SVN -->
+		<!-- if not, you can set this below. -->
+		<SVN_HOME Condition=" '$(SVN_HOME)' == '' ">$(ProgramFiles32)\subversion\</SVN_HOME>
+	</PropertyGroup>
+	<PropertyGroup>
 		<SharedProperties>SharedProperties</SharedProperties>
-		<CCNetLabel Condition="'$(CCNetLabel)' == ''">1.0.0.0</CCNetLabel>
 		
 		<Configuration Condition="'$(CCNetBuildCondition)' == 'ForceBuild'">Release</Configuration>
 		<Configuration Condition="'$(CCNetBuildCondition)' != 'ForceBuild'">Debug</Configuration>
 		<ReleasePlatform>$(Platform)</ReleasePlatform>
-		<ReleasePlatform Condition=" '$(ReleasePlatform)' == '' OR '$(ReleasePlatform)' == 'Any CPU' ">x86</ReleasePlatform>
-		<Platform Condition="'$(Platform)' == 'AnyCPU' OR '$(Platform)' == ''">x86</Platform>
+		<ReleasePlatform Condition=" '$(ReleasePlatform)' == '' OR '$(ReleasePlatform)' == 'Any CPU' OR '$(ReleasePlatform)' == 'BPC' ">x86</ReleasePlatform>
+		<Platform Condition="'$(Platform)' != 'AnyCPU' AND '$(Platform)' != 'x64'">x86</Platform>
 
 		<PlatformConstant Condition=" '$(Platform)' == 'x86' ">PLATFORMX86</PlatformConstant>
 		<PlatformConstant Condition=" '$(Platform)' == 'x64' ">PLATFORMX64</PlatformConstant>
@@ -19,14 +31,68 @@
 		<SignAssemblies Condition="'$(SignAssemblies)' == ''">false</SignAssemblies>
 		<CCNetArtifactDirectory Condition="'$(CCNetArtifactDirectory)' == ''">$(MSBuildProjectDirectory)\..\bin\</CCNetArtifactDirectory>
 		<CCNetWorkingDirectory Condition="'$(CCNetWorkingDirectory)' == ''">$(MSBuildProjectDirectory)\..\</CCNetWorkingDirectory>
-		<CCNetProject Condition="'$(CCNetProject)' == ''">Managed.Adb</CCNetProject>
+
 		<CleanBuildOutput>True</CleanBuildOutput>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<BuildAllDependsOn>AssemblyInfo;CleanBuild;PluginBuild;ReleaseCleanup</BuildAllDependsOn>
+		<BuildAllDependsOn>AssemblyInfo;CleanBuild;ReleaseCleanup</BuildAllDependsOn>
 		<CompileDependsOn>$(CompileDependsOn)</CompileDependsOn>
-		<ReleaseMode Condition=" '$(ReleaseMode)' != 'Standalone' ">Setup</ReleaseMode>
-		<OutputPath>$(CCNetArtifactDirectory)$(Configuration)\$(CCNetLabel)\$(ReleaseMode)\$(ReleasePlatform)\</OutputPath>
-		<MSBuildProperties>ReleasePlatform=$(ReleasePlatform);ReleaseMode=$(ReleaseMode);SignAssemblies=$(SignAssemblies);Configuration=$(Configuration);OutputPath=$(OutputPath);CCNetLabel=$(CCNetLabel);CCNetIntegrationStatus=$(CCNetIntegrationStatus);CCNetBuildCondition=$(CCNetBuildCondition);CCNetProject=$(CCNetProject);CCNetBuildDate=$(CCNetBuildDate);CCNetLastIntegrationStatus=$(CCNetLastIntegrationStatus);CCNetBuildTime=$(CCNetBuildTime);CCNetArtifactDirectory=$(CCNetArtifactDirectory);CCNetWorkingDirectory=$(CCNetWorkingDirectory);CCNetRequestSource=$(CCNetRequestSource)</MSBuildProperties>
+		<!--OutputPath>$(CCNetArtifactDirectory)$(Configuration)\$(CCNetLabel)\$(ReleasePlatform)\</OutputPath-->
 		<PublishMode Condition=" '$(PublishMode)' == '' ">None</PublishMode>
 	</PropertyGroup>
+
+	<Target Name="BuildPublish" Condition=" '$(PublishTarget)' == 'PublishTarget'">
+		<CallTarget Targets="Publish" />
+	</Target>
+
+	<Target Name="AssemblyInfo"
+					Outputs="$(MSBuildProjectDirectory)\..\Shared\AssemblyVersionInfo.cs">
+
+		<SvnVersion LocalPath="$(MSBuildProjectDirectory)" ToolPath="$(SVN_HOME)\bin">
+			<Output TaskParameter="Revision" PropertyName="Revision" />
+		</SvnVersion>
+
+		<CreateProperty Condition=" '$(CCNetLabel)' == '' " Value="$(Major).$(Minor).$(Build).$(Revision)">
+			<Output PropertyName="CCNetLabel" TaskParameter="Value" />
+		</CreateProperty>
+
+		<CreateProperty Value="$(CCNetArtifactDirectory)$(Configuration)\$(CCNetLabel)\$(ReleasePlatform)\">
+			<Output PropertyName="OutputPath" TaskParameter="Value" />
+		</CreateProperty>
+
+		<CreateProperty Value="OSPlatform=$(OSPlatform);ReleasePlatform=$(ReleasePlatform);SignAssemblies=$(SignAssemblies);Configuration=$(Configuration);OutputPath=$(OutputPath);CCNetLabel=$(CCNetLabel);CCNetIntegrationStatus=$(CCNetIntegrationStatus);CCNetBuildCondition=$(CCNetBuildCondition);CCNetProject=$(CCNetProject);CCNetBuildDate=$(CCNetBuildDate);CCNetLastIntegrationStatus=$(CCNetLastIntegrationStatus);CCNetBuildTime=$(CCNetBuildTime);CCNetArtifactDirectory=$(CCNetArtifactDirectory);CCNetWorkingDirectory=$(CCNetWorkingDirectory);CCNetRequestSource=$(CCNetRequestSource)">
+			<Output PropertyName="MSBuildProperties" TaskParameter="Value" />
+		</CreateProperty>
+		
+		<AssemblyInfo CodeLanguage="CS"
+									AssemblyFileVersion="$(CCNetLabel)"
+									AssemblyVersion="$(CCNetLabel)"
+									OutputFile="$(MSBuildProjectDirectory)\..\Shared\VersionAssemblyInfo.cs"
+									/>
+	</Target>
+
+
+	<Target Name="ReleaseCleanup" DependsOnTargets="ZipRelease">
+		<!--CreateItem Include="$(OutputPath)*.*" Exclude="$(OutputPath)*.msi;$(OutputPath)*.zip;$(OutputPath)*.vshost.*">
+			<Output ItemName="Files" TaskParameter="Include"/>
+		</CreateItem>
+		<Delete Files="@(Files)" ContinueOnError="true" /-->
+	</Target>
+
+
+	<Target Name="CleanBuild">
+		<RemoveDir Directories="$(OutputPath)" Condition="Exists('$(OutputPath)')" ContinueOnError="true" />
+		<MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')" />
+	</Target>
+
+	<Target Name="ZipRelease" Condition=" '$(ReleaseMode)' == 'Binary' ">
+		<CreateItem Include="$(OutputPath)**\*.*" Exclude="$(OutputPath)*.zip;$(OutputPath)*.vshost.*;$(OutputPath)*.msi;$(OutputPath)*.wixpdb">
+			<Output ItemName="ZipFiles" TaskParameter="Include" />
+		</CreateItem>
+
+		<Zip Comment="$(CCNetBuildDate) $(CCNetBuildTime) $(CCNetProject) version $(CCNetLabel)" Files="@(ZipFiles);@(AndroidTools)"
+				 WorkingDirectory="$(OutputPath)"
+				 ZipFileName="$(OutputPath)$(CCNetProject).$(CCNetLabel).$(Platform).zip" ZipLevel="9" Flatten="False" />
+	</Target>
+
+
 </Project>

@@ -1,14 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
-	<metadata>
-		<id>Managed.Adb</id>
-		<version>1.0.0</version>
-		<authors>Ryan Conrad</authors>
-		<owners>Ryan Conrad</owners>
-		<desscription>A managed library for communicating with the Android Debug Bridge.</desscription>
-		<projectUrl>http://madb.codeplex.com</projectUrl>
-		<licenseUrl>http://madb.codeplex.com/license</licenseUrl>
-		<tags>.net20 .net35 .net40 android adb</tags>
-		<language>en-US</language>
-	</metadata>
+  <metadata>
+    <id>Managed.AndroidDebugBridge</id>
+    <version>1.0.0.0</version>
+    <authors>Ryan Conrad</authors>
+    <owners>Ryan Conrad</owners>
+		<title>Managed Android Debug Bridge (MadBee)</title>
+    <description>A managed library for communicating with the Android Debug Bridge.</description>
+    <projectUrl>http://madb.codeplex.com</projectUrl>
+    <licenseUrl>http://madb.codeplex.com/license</licenseUrl>
+    <iconUrl>http://download.codeplex.com/Project/Download/FileDownload.aspx?ProjectName=madb&amp;DownloadId=235792</iconUrl>
+    <tags>.net20 .net35 .net40 android adb</tags>
+    <language>en-US</language>
+  </metadata>
 </package>
