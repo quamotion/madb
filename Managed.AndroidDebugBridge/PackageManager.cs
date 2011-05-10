@@ -6,15 +6,31 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class PackageManager {
 		private const String PM_LIST_FULL = "pm list packages -f";
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PackageManager"/> class.
+		/// </summary>
+		/// <param name="device">The device.</param>
 		public PackageManager ( Device device ) {
 			Device = device;
 			Packages = new Dictionary<string, FileEntry> ( );
 		}
 
+		/// <summary>
+		/// Gets or sets the packages.
+		/// </summary>
+		/// <value>
+		/// The packages.
+		/// </value>
 		public Dictionary<String,FileEntry> Packages { get; set; }
 
+		/// <summary>
+		/// Refreshes the packages.
+		/// </summary>
 		public void RefreshPackages ( ) {
 			if ( this.Device.IsOffline ) {
 				throw new IOException ( "Device is offline" );
@@ -25,6 +41,11 @@ namespace Managed.Adb {
 
 		}
 
+		/// <summary>
+		/// Existses the specified package.
+		/// </summary>
+		/// <param name="package">The package.</param>
+		/// <returns></returns>
 		public bool Exists ( String package ) {
 			try {
 				return GetApkFileEntry ( package ) != null;
@@ -33,10 +54,20 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Gets the apk file entry.
+		/// </summary>
+		/// <param name="package">The package.</param>
+		/// <returns></returns>
 		public FileEntry GetApkFileEntry ( String package ) {
 			return FileEntry.Find ( this.Device, GetApkPath ( package ) );
 		}
 
+		/// <summary>
+		/// Gets the apk path.
+		/// </summary>
+		/// <param name="package">The package.</param>
+		/// <returns></returns>
 		public String GetApkPath ( String package ) {
 
 			if ( this.Device.IsOffline ) {
@@ -53,8 +84,17 @@ namespace Managed.Adb {
 
 		}
 
+		/// <summary>
+		/// Gets or sets the device.
+		/// </summary>
+		/// <value>
+		/// The device.
+		/// </value>
 		private Device Device { get; set; }
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private class PackageManagerPathReceiver : MultiLineReceiver {
 			/// <summary>
 			/// Pattern to parse the output of the 'pm path &lt;package&gt;' command.
@@ -63,12 +103,25 @@ namespace Managed.Adb {
 			/// </summary>
 			public const String PM_PATH_PATTERN = "^package:(.+?)$";
 
+			/// <summary>
+			/// Initializes a new instance of the <see cref="PackageManagerPathReceiver"/> class.
+			/// </summary>
 			public PackageManagerPathReceiver ( ) {
 				Path = null;
 			}
 
+			/// <summary>
+			/// Gets or sets the path.
+			/// </summary>
+			/// <value>
+			/// The path.
+			/// </value>
 			public String Path { get; private set; }
 
+			/// <summary>
+			/// Processes the new lines.
+			/// </summary>
+			/// <param name="lines">The lines.</param>
 			protected override void ProcessNewLines ( string[] lines ) {
 				foreach ( String line in lines ) {
 					if ( !String.IsNullOrEmpty ( line ) && !line.StartsWith ( "#" ) ) {

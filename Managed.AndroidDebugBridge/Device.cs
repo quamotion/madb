@@ -387,6 +387,15 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
+		/// Returns a <see cref="PackageManager"/> for this device.
+		/// </summary>
+		public PackageManager PackageManager {
+			get {
+				return new PackageManager ( this );
+			}
+		}
+
+		/// <summary>
 		/// Returns a <see cref="FileListingService"/> for this device.
 		/// </summary>
 		/// <value></value>
