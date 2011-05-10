@@ -99,9 +99,13 @@ namespace Managed.Adb {
 		public FileListingService.FileTypes Type { get; private set; }
 		public bool IsApplicationPackage { get; private set; }
 		public bool IsRoot { get; private set; }
-		public bool IsExecutable { get; set; }
+		public bool IsExecutable { get; internal set; }
 		public List<FileEntry> Children { get; set; }
-
+		public bool IsLink {
+			get {
+				return Type == FileListingService.FileTypes.Link;
+			}
+		}
 
 
 		/// <summary>
