@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Build">
+	<PropertyGroup>
+		<SharedProperties>SharedProperties</SharedProperties>
+		<PublishTarget Condition=" '$(PublishMode)' == 'NuGet' ">PublishTarget</PublishTarget>
+	</PropertyGroup>
+	
+	<Target Name="Publish" DependsOnTargets="NuGetPackage" Condition=" '$(PublishMode)' == 'NuGet' ">
+		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push $(CCNetProject).$(CCNetLabel).nupkg $(NuGetKey) –source http://packages.nuget.org/v1/" />
+	</Target>
+
+	<Target Name="NuGetPackage">
+    <Error Condition=" '$(NuGetKey)' == '' " Code="500" Text="'NuGetKey' property was not set."></Error>
+    <Error Condition=" '$(NuSpecFile)' == '' " Code="500" Text="'NuSpecFile' property was not set."></Error>
+    
+		<Copy SourceFiles="$(NuSpecFile)" DestinationFolder="$(OutputPath)" />
+		<XmlUpdate
+			XPath="/package/metadata/version"
+			XmlFileName="$(OutputPath)\$(CCNetProject).nuspec"
+			Value="$(CCNetLabel)"/>
+		<XmlUpdate
+			XPath="/package/metadata/id"
+			XmlFileName="$(OutputPath)\$(CCNetProject).nuspec"
+			Value="$(CCNetProject)"/>
+
+		<Exec WorkingDirectory="$(OutputPath)" Command="nuget pack $(CCNetProject).nuspec" />
+	</Target>
+</Project>
