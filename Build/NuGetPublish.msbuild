@@ -6,8 +6,8 @@
 	</PropertyGroup>
 	
 	<Target Name="Publish" DependsOnTargets="NuGetPackage" Condition=" '$(PublishMode)' == 'NuGet' ">
-    <Exec WorkingDirectory="$(OutputPath" Command="nuget setapikey $(NuGetKey) –source http://packages.nuget.org/v1/" />
-		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push $(CCNetProject).$(CCNetLabel).nupkg" />
+    <!--Exec WorkingDirectory="$(OutputPath" Command="nuget setapikey $(NuGetKey) –source http://packages.nuget.org/v1/" /-->
+		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push $(CCNetProject).$(CCNetLabel).nupkg $(NuGetKey) –source http://packages.nuget.org/v1/" />
 	</Target>
 
 	<Target Name="NuGetPackage">
