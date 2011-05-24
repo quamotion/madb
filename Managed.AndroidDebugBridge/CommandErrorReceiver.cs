@@ -12,7 +12,7 @@ namespace Managed.Adb {
 		protected override void ProcessNewLines ( string[] lines ) {
 			StringBuilder message = new StringBuilder ( );
 			foreach ( var line in lines ) {
-				if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) ) {
+				if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) || line.StartsWith("$") ) {
 					continue;
 				}
 

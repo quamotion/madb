@@ -11,20 +11,14 @@ namespace Managed.Adb {
 	/// 
 	/// </summary>
 	public class FileEntry {
-		/// <summary>
-		/// Pattern to escape filenames for shell command consumption.
-		/// </summary>
-		private const String ESCAPEPATTERN = "([\\\\()*+?\"'#/\\s])";
 
 		/// <summary>
-		/// Gets if the specified path exists on the device.
+		/// Finds the file entry, or creates an empty FileEntry if it does not exist.
 		/// </summary>
-		/// <param name="device">The device to check</param>
-		/// <param name="path">the path to check</param>
-		/// <returns><c>true</c>, if the path exists; otherwise, <c>false</c></returns>
-		/// <exception cref="IOException">If the device is not connected.</exception>
-		/// <exception cref="ArgumentNullException">If the device or path is null.</exception>
-		public static bool Exists ( Device device, String path ) {
+		/// <param name="device">The device.</param>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
+		public static FileEntry FindOrCreate( Device device, String path ) {
 			if ( device == null ) {
 				throw new ArgumentNullException ( "device", "Device cannot be null." );
 			}
@@ -35,10 +29,9 @@ namespace Managed.Adb {
 
 			if ( !device.IsOffline ) {
 				try {
-					FileEntry fe = device.FileListingService.FindFileEntry ( path );
-					return fe != null;
+					return device.FileListingService.FindFileEntry ( path );
 				} catch ( FileNotFoundException ) {
-					return false;
+					return new FileEntry ( path );
 				}
 			} else {
 				throw new IOException ( "Device is not online" );
@@ -87,6 +80,19 @@ namespace Managed.Adb {
 			this.IsRoot = isRoot;
 			Children = new List<FileEntry> ( );
 			CheckAppPackageStatus ( );
+			this.Exists = true;
+		}
+
+		internal FileEntry( String path ) {
+			this.FetchTime = 0;
+			this.Parent = null;
+			bool isDir = path.EndsWith ( new String ( LinuxPath.DirectorySeparatorChar, 1 ) );
+			this.Name = isDir  ? LinuxPath.GetDirectoryName ( path ) : LinuxPath.GetFileName ( path );
+			this.IsRoot = path.Length == 1 && path[0] == LinuxPath.DirectorySeparatorChar;
+			this.Type = isDir ? FileListingService.FileTypes.Directory : FileListingService.FileTypes.File;
+			this.Size = 0;
+			this.Children = new List<FileEntry> ( );
+			this.Exists = false;
 		}
 
 		/// <summary>
@@ -197,6 +203,8 @@ namespace Managed.Adb {
 				return Type == FileListingService.FileTypes.Link;
 			}
 		}
+
+		public bool Exists { get; private set; }
 
 
 		/// <summary>
@@ -329,17 +337,7 @@ namespace Managed.Adb {
 			}
 		}
 
-		/// <summary>
-		/// Returns an escaped version of the entry name.
-		/// </summary>
-		/// <param name="entryName"></param>
-		/// <returns></returns>
-		private String Escape ( String entryName ) {
-			return new Regex ( ESCAPEPATTERN ).Replace ( entryName, new MatchEvaluator ( delegate ( Match m ) {
-				return m.Result ( "\\\\$1" );
-			} ) );
-		}
-
+		
 		/// <summary>
 		/// Sets the internal app package status flag. This checks whether the entry is in an app
 		/// directory like /data/app or /system/app or /sd/app or /sd-ext/app. The last two are common for
@@ -391,7 +389,7 @@ namespace Managed.Adb {
 
 			pathBuilder.Append ( LinuxPath.DirectorySeparatorChar );
 			String n = resolveLinks && !String.IsNullOrEmpty ( LinkName ) ? LinkName : Name;
-			pathBuilder.Append ( escapePath ? Escape ( n ) : n );
+			pathBuilder.Append ( escapePath ? LinuxPath.Escape ( n ) : n );
 		}
 
 		/// <summary>

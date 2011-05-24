@@ -3,26 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 
 namespace Managed.Adb.IO {
 	public static class LinuxPath {
+
+		/// <summary>
+		/// Pattern to escape filenames for shell command consumption.
+		/// </summary>
+		private const String ESCAPEPATTERN = "([\\\\()*+?\"'#/\\s])";
+
 		public static readonly char DirectorySeparatorChar = '/';
 		public static readonly char AltDirectorySeparatorChar = '/';
 		private static readonly char[] InvalidFileNameChars = new char[] { 
-            '"', '<', '>', '|', '\0', '\x0001', '\x0002', '\x0003', '\x0004', '\x0005', '\x0006', '\a', '\b', '\t', '\n', '\v', 
-            '\f', '\r', '\x000e', '\x000f', '\x0010', '\x0011', '\x0012', '\x0013', '\x0014', '\x0015', '\x0016', '\x0017', '\x0018', '\x0019', '\x001a', '\x001b', 
-            '\x001c', '\x001d', '\x001e', '\x001f', '*', '?', '\\', '/'
-         };
+						'"', '<', '>', '|', '\0', '\x0001', '\x0002', '\x0003', '\x0004', '\x0005', '\x0006', '\a', '\b', '\t', '\n', '\v', 
+						'\f', '\r', '\x000e', '\x000f', '\x0010', '\x0011', '\x0012', '\x0013', '\x0014', '\x0015', '\x0016', '\x0017', '\x0018', '\x0019', '\x001a', '\x001b', 
+						'\x001c', '\x001d', '\x001e', '\x001f', '*', '?', '\\', '/'
+				 };
 		internal const int MAX_DIRECTORY_PATH = 0xf8;
 		internal const int MAX_PATH = 260;
 		internal static readonly int MaxPath = 260;
 		public static readonly char PathSeparator = ';';
 		private static readonly char[] RealInvalidPathChars = new char[] { 
-            '"', '<', '>', '|', '\0', '\x0001', '\x0002', '\x0003', '\x0004', '\x0005', '\x0006', '\a', '\b', '\t', '\n', '\v', 
-            '\f', '\r', '\x000e', '\x000f', '\x0010', '\x0011', '\x0012', '\x0013', '\x0014', '\x0015', '\x0016', '\x0017', '\x0018', '\x0019', '\x001a', '\x001b', 
-            '\x001c', '\x001d', '\x001e', '\x001f'
-         };
+						'"', '<', '>', '|', '\0', '\x0001', '\x0002', '\x0003', '\x0004', '\x0005', '\x0006', '\a', '\b', '\t', '\n', '\v', 
+						'\f', '\r', '\x000e', '\x000f', '\x0010', '\x0011', '\x0012', '\x0013', '\x0014', '\x0015', '\x0016', '\x0017', '\x0018', '\x0019', '\x001a', '\x001b', 
+						'\x001c', '\x001d', '\x001e', '\x001f'
+				 };
 
 		[MethodImpl ( MethodImplOptions.InternalCall )]
 		private static extern bool CanPathCircumventSecurityNative ( string partOfPath );
@@ -92,7 +99,7 @@ namespace Managed.Adb.IO {
 			return true;
 		}
 
-		internal static void CheckInvalidPathChars ( string path ) {
+		internal static void CheckInvalidPathChars( string path ) {
 			for ( int i = 0; i < path.Length; i++ ) {
 				int num2 = path[i];
 				if ( ( ( num2 == 0x22 ) || ( num2 == 60 ) ) || ( ( ( num2 == 0x3e ) || ( num2 == 0x7c ) ) || ( num2 < 0x20 ) ) ) {
@@ -100,31 +107,6 @@ namespace Managed.Adb.IO {
 				}
 			}
 		}
-
-		/*public static string Combine ( string path1, string path2 ) {
-			if ( ( path1 == null ) || ( path2 == null ) ) {
-				throw new ArgumentNullException ( ( path1 == null ) ? "path1" : "path2" );
-			}
-
-			CheckInvalidPathChars ( path1 );
-			CheckInvalidPathChars ( path2 );
-			if ( path2.Length == 0 ) {
-				return FixupPath ( path1 );
-			}
-			if ( path1.Length == 0 ) {
-				return FixupPath ( path2 );
-			}
-
-			if ( IsPathRooted ( path2 ) ) {
-				return FixupPath ( path2 );
-			}
-
-			char ch = path1[path1.Length - 1];
-			if ( ( ( ch != DirectorySeparatorChar ) && ( ch != AltDirectorySeparatorChar ) ) ) {
-				return FixupPath ( path1 + DirectorySeparatorChar ) + path2;
-			}
-			return FixupPath ( path1 ) + path2;
-		}*/
 
 		/// <summary>Combines two path strings.</summary>
 		/// <returns>A string containing the combined paths. If one of the specified paths is a zero-length string, this method returns the other path. If path2 contains an absolute path, this method returns path2.</returns>
@@ -474,6 +456,18 @@ namespace Managed.Adb.IO {
 			}
 			return false;
 		}
+
+		/// <summary>
+		/// Returns an escaped version of the entry name.
+		/// </summary>
+		/// <param name="entryName"></param>
+		/// <returns></returns>
+		public static String Escape( String path ) {
+			return new Regex ( ESCAPEPATTERN ).Replace ( path, new MatchEvaluator ( delegate ( Match m ) {
+				return m.Result ( "\\\\$1" );
+			} ) );
+		}
+
 
 
 	}
