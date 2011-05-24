@@ -6,14 +6,15 @@
 	</PropertyGroup>
 	
 	<Target Name="Publish" DependsOnTargets="NuGetPackage" Condition=" '$(PublishMode)' == 'NuGet' ">
-		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push $(CCNetProject).$(CCNetLabel).nupkg $(NuGetKey) –source http://packages.nuget.org/v1/" />
+    <Exec WorkingDirectory="$(OutputPath" Command="nuget setapikey $(NuGetKey) –source http://packages.nuget.org/v1/" />
+		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push $(CCNetProject).$(CCNetLabel).nupkg" />
 	</Target>
 
 	<Target Name="NuGetPackage">
-    <Error Condition=" '$(NuGetKey)' == '' " Code="500" Text="'NuGetKey' property was not set."></Error>
-    <Error Condition=" '$(NuSpecFile)' == '' " Code="500" Text="'NuSpecFile' property was not set."></Error>
-    
-		<Copy SourceFiles="$(NuSpecFile)" DestinationFolder="$(OutputPath)" />
+		<Error Condition=" '$(NuGetKey)' == '' " Code="500" Text="'NuGetKey' property was not set."></Error>
+		<Error Condition=" '$(NuSpecFile)' == '' " Code="500" Text="'NuSpecFile' property was not set."></Error>
+		
+		<Copy SourceFiles="$(NuSpecFile)" DestinationFiles="$(OutputPath)\$(CCNetProject).nuspec" />
 		<XmlUpdate
 			XPath="/package/metadata/version"
 			XmlFileName="$(OutputPath)\$(CCNetProject).nuspec"

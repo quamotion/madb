@@ -7,6 +7,9 @@ using System.IO;
 using Managed.Adb.IO;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class FileEntry {
 		/// <summary>
 		/// Pattern to escape filenames for shell command consumption.
@@ -86,21 +89,109 @@ namespace Managed.Adb {
 			CheckAppPackageStatus ( );
 		}
 
+		/// <summary>
+		/// Gets the parent.
+		/// </summary>
 		public FileEntry Parent { get; private set; }
+		/// <summary>
+		/// Gets the name.
+		/// </summary>
 		public String Name { get; private set; }
+		/// <summary>
+		/// Gets or sets the name of the link.
+		/// </summary>
+		/// <value>
+		/// The name of the link.
+		/// </value>
 		public String LinkName { get; set; }
+		/// <summary>
+		/// Gets or sets the info.
+		/// </summary>
+		/// <value>
+		/// The info.
+		/// </value>
 		public String Info { get; set; }
+		/// <summary>
+		/// Gets or sets the permissions.
+		/// </summary>
+		/// <value>
+		/// The permissions.
+		/// </value>
 		public FilePermissions Permissions { get; set; }
+		/// <summary>
+		/// Gets or sets the size.
+		/// </summary>
+		/// <value>
+		/// The size.
+		/// </value>
 		public long Size { get; set; }
+		/// <summary>
+		/// Gets or sets the date.
+		/// </summary>
+		/// <value>
+		/// The date.
+		/// </value>
 		public DateTime Date { get; set; }
+		/// <summary>
+		/// Gets or sets the owner.
+		/// </summary>
+		/// <value>
+		/// The owner.
+		/// </value>
 		public String Owner { get; set; }
+		/// <summary>
+		/// Gets or sets the group.
+		/// </summary>
+		/// <value>
+		/// The group.
+		/// </value>
 		public String Group { get; set; }
+		/// <summary>
+		/// Gets or sets the other.
+		/// </summary>
+		/// <value>
+		/// The other.
+		/// </value>
 		public FilePermission Other { get; set; }
+		/// <summary>
+		/// Gets the type.
+		/// </summary>
 		public FileListingService.FileTypes Type { get; private set; }
+		/// <summary>
+		/// Gets a value indicating whether this instance is application package.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is application package; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsApplicationPackage { get; private set; }
+		/// <summary>
+		/// Gets a value indicating whether this instance is root.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance is root; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsRoot { get; private set; }
+		/// <summary>
+		/// Gets a value indicating whether this instance is executable.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is executable; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsExecutable { get; internal set; }
+		/// <summary>
+		/// Gets or sets the children.
+		/// </summary>
+		/// <remarks>Note that this is not populated by default. Use the FileListingService.GetChildren to populate it.</remarks>
+		/// <value>
+		/// The children.
+		/// </value>
 		public List<FileEntry> Children { get; set; }
+		/// <summary>
+		/// Gets a value indicating whether this instance is link.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance is link; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsLink {
 			get {
 				return Type == FileListingService.FileTypes.Link;
@@ -138,7 +229,7 @@ namespace Managed.Adb {
 
 
 		/// <summary>
-		/// Returns the child {@link FileEntry} matching the name.
+		/// Returns the child FileEntry matching the name.
 		/// This uses the cached children list.
 		/// </summary>
 		/// <param name="name">the name of the child to return.</param>
@@ -153,12 +244,24 @@ namespace Managed.Adb {
 		}
 
 
+		/// <summary>
+		/// Gets a value indicating whether this instance is directory.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is directory; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsDirectory {
 			get {
 				return this.Type == FileListingService.FileTypes.Directory || Type == FileListingService.FileTypes.DirectoryLink;
 			}
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this instance is application file name.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is application file name; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsApplicationFileName {
 			get {
 				Regex regex = new Regex ( FileListingService.APK_FILE_PATTERN, RegexOptions.Compiled );
@@ -186,6 +289,9 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Gets the full resolved path.
+		/// </summary>
 		public String FullResolvedPath {
 			get {
 				if ( IsRoot ) {

@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5" DefaultTargets="Build">
 	<Import Project="$(MSBuildProjectDirectory)\SharedProperties.msbuild" Condition="Exists('$(MSBuildProjectDirectory)\SharedProperties.msbuild') AND '$(SharedProperties)' != 'SharedProperties' " />
 
-	<Import Project="$(MSBuildProjectDirectory)\Publish.msbuild" Condition="Exists('$(MSBuildProjectDirectory)\Publish.msbuild') AND '$(PublishTarget)' != 'PublishTarget' " />
+	<Import Project="$(MSBuildProjectDirectory)\NuGetPublish.msbuild" Condition="Exists('$(MSBuildProjectDirectory)\NuGetPublish.msbuild') AND '$(PublishTarget)' != 'PublishTarget' " />
 
 	<Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" Condition="'$(MSBuildCommunityTasksPath)' == ''"/>
 

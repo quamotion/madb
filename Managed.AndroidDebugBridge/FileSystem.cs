@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Managed.Adb.IO;
+using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
 	public class FileSystem {
@@ -139,6 +140,26 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
+		/// Gets the dev blocks for the device.
+		/// </summary>
+		/// <exception cref="System.IO.FileNotFoundException">Throws if unable to locate /dev/block </exception>
+		public List<String> DeviceBlocks {
+			get {
+				List<String> result = new List<String> ( );
+				FileEntry blocks = FileEntry.Find ( Device, "/dev/block/" );
+				blocks.Children = new List<FileEntry> ( Device.FileListingService.GetChildren ( blocks, true, null ) );
+
+				foreach ( var block in blocks.Children ) {
+					Console.WriteLine ( "b: {0}", block.Name );
+					if ( block.Type == FileListingService.FileTypes.Block ) {
+						result.Add ( block.Name );
+					}
+				}
+				return result;
+			}
+		}
+
+		/// <summary>
 		/// Mounts the specified device.
 		/// </summary>
 		/// <param name="mp">The mp.</param>
@@ -153,11 +174,25 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
-		/// Mounts the specified device.
+		/// Attempts to mount the mount point to the associated device without knowing the device or the type.
+		/// Some devices may not support this method.
 		/// </summary>
-		/// <param name="mp">The mp.</param>
-		public void Mount ( MountPoint mp ) {
-			Mount ( mp, String.Empty );
+		/// <param name="mountPoint"></param>
+		public void Mount( String mountPoint ) {
+			CommandErrorReceiver cer = new CommandErrorReceiver ( );
+			if ( Device.BusyBox.Available ) {
+				Device.ExecuteShellCommand ( "busybox mount {0}", cer, mountPoint );
+			} else {
+				Device.ExecuteShellCommand ( "mount {0}", cer, mountPoint );
+			}
+		}
+
+		/// <summary>
+		/// Mounts the specified mount point.
+		/// </summary>
+		/// <param name="mountPoint">The mountPoint.</param>
+		public void Mount( MountPoint mountPoint ) {
+			Mount ( mountPoint, String.Empty );
 		}
 
 		/// <summary>
@@ -166,7 +201,7 @@ namespace Managed.Adb {
 		/// <param name="directory">The directory.</param>
 		/// <param name="device">The device.</param>
 		/// <param name="fileSytemType">Type of the file sytem.</param>
-		/// <param name="isReadOnly">if set to <c>true</c> [is read only].</param>
+		/// <param name="isReadOnly">if set to <c>true</c> is read only.</param>
 		/// <param name="options">The options.</param>
 		public void Mount ( String directory, String device, String fileSytemType, bool isReadOnly, String options ) {
 			Mount ( new MountPoint ( device, directory, fileSytemType, isReadOnly ), options );
@@ -178,7 +213,7 @@ namespace Managed.Adb {
 		/// <param name="directory">The directory.</param>
 		/// <param name="device">The device.</param>
 		/// <param name="fileSytemType">Type of the file sytem.</param>
-		/// <param name="isReadOnly">if set to <c>true</c> [is read only].</param>
+		/// <param name="isReadOnly">if set to <c>true</c> is read only.</param>
 		public void Mount ( String directory, String device, String fileSytemType, bool isReadOnly ) {
 			Mount ( new MountPoint ( device, directory, fileSytemType, isReadOnly ), String.Empty );
 		}
@@ -186,19 +221,19 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Unmounts the specified mount point.
 		/// </summary>
-		/// <param name="mp">The mp.</param>
-		public void Unmount ( MountPoint mp ) {
-			Unmount ( mp, String.Empty );
+		/// <param name="mountPoint">The mountPoint.</param>
+		public void Unmount( MountPoint mountPoint ) {
+			Unmount ( mountPoint, String.Empty );
 		}
 
 
 		/// <summary>
 		/// Unmounts the specified mount point.
 		/// </summary>
-		/// <param name="mp">The mp.</param>
+		/// <param name="mp">The mountPoint.</param>
 		/// <param name="options">The options.</param>
-		public void Unmount ( MountPoint mp, String options ) {
-			Unmount ( mp.Name, options );
+		public void Unmount( MountPoint mountPoint, String options ) {
+			Unmount ( mountPoint.Name, options );
 		}
 
 		/// <summary>
@@ -222,6 +257,6 @@ namespace Managed.Adb {
 				Device.ExecuteShellCommand ( "umount {1} {0}", cer, !String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty, mountPoint );
 			}
 		}
-
+		
 	}
 }

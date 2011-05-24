@@ -60,13 +60,13 @@ namespace Managed.Adb {
 				if ( line.Length == 0 ) {
 					continue;
 				}
-
 				// run the line through the regexp
 				Regex regex = new Regex ( FileListingService.LS_PATTERN_EX, RegexOptions.Compiled );
 				Match m = regex.Match ( line.Trim() );
 
 
 				if ( !m.Success ) {
+					Console.WriteLine ( "not match: {0}", line );
 					continue;
 				}
 				// get the name

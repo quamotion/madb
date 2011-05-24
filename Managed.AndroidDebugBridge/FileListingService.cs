@@ -44,8 +44,12 @@ namespace Managed.Adb {
 		///		<li>Name</li>
 		///		<li>File types (or empty in toolbox ls)</li>
 		/// </ol>
+		/// 
 		/// </summary>
-		public const String LS_PATTERN_EX = @"^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\s+(?:\d{0,})?\s*(\S+)\s+(\S+)\s+(\d{1,}|\s)\s+(\w{3}|\d{4})[\s-](?:\s?(\d{1,2})\s?)[\s-]\s?(?:(\d{2}|\d{4}|\s)\s*)?(\d{2}:\d{2}|\s)\s*(.*?)([/@=*\|]?)$";
+		/// <remarks>
+		/// added non-capture "(?:\d{1,},\s+)?" for "blocks"
+		/// </remarks>
+		public const String LS_PATTERN_EX = @"^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\s+(?:\d{0,})?\s*(\S+)\s+(\S+)\s+(?:\d{1,},\s+)?(\d{1,}|\s)\s+(\w{3}|\d{4})[\s-](?:\s?(\d{1,2})\s?)[\s-]\s?(?:(\d{2}|\d{4}|\s)\s*)?(\d{2}:\d{2}|\s)\s*(.*?)([/@=*\|]?)$";
 
 		/// <summary>
 		///  Top level data folder.
@@ -72,8 +76,14 @@ namespace Managed.Adb {
 		/// </summary>
 		public const String DIRECTORY_APP = "app";
 
-		public const String DIRECTORY_SD = "sd";
+		/// <summary>
+		/// 
+		/// </summary>
+		public const String DIRECTORY_SD = "sdcard";
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public const String DIRECTORY_SDEXT = "sd-ext";
 
 
@@ -365,6 +375,12 @@ namespace Managed.Adb {
 			return FindFileEntry ( this.Root, path );
 		}
 
+		/// <summary>
+		/// Finds the file entry.
+		/// </summary>
+		/// <param name="parent">The parent.</param>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
 		public FileEntry FindFileEntry ( FileEntry parent, String path ) {
 			String[] entriesString = path.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
 			FileEntry current = parent;
@@ -377,7 +393,6 @@ namespace Managed.Adb {
 					}
 				}
 			}
-
 			if ( String.Compare ( current.FullPath, path, false ) == 0 ) {
 				return current;
 			} else {

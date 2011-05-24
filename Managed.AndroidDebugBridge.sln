@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{49EA5373
 	ProjectSection(SolutionItems) = preProject
 		Build\BuildAll.msbuild = Build\BuildAll.msbuild
 		Build\madbee.nuspec = Build\madbee.nuspec
+		Build\NuGetPublish.msbuild = Build\NuGetPublish.msbuild
 		Build\SharedProperties.msbuild = Build\SharedProperties.msbuild
 	EndProjectSection
 EndProject
