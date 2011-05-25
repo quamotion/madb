@@ -47,7 +47,7 @@ namespace Managed.Adb {
 		/// <exception cref="ArgumentNullException">If the device or path is null.</exception>
 		/// <exception cref="FileNotFoundException">If the entrty is not found.</exception>
 		/// <returns></returns>
-		public static FileEntry Find ( Device device, String path ) {
+		public static FileEntry Find( Device device, String path ) {
 			if ( device == null ) {
 				throw new ArgumentNullException ( "device", "Device cannot be null." );
 			}
@@ -72,7 +72,7 @@ namespace Managed.Adb {
 		/// <param name="name">name of the entry.</param>
 		/// <param name="type">entry type.</param>
 		/// <param name="isRoot"></param>
-		internal FileEntry ( FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
+		internal FileEntry( FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
 			this.FetchTime = 0;
 			this.Parent = parent;
 			this.Name = name;
@@ -87,7 +87,7 @@ namespace Managed.Adb {
 			this.FetchTime = 0;
 			this.Parent = null;
 			bool isDir = path.EndsWith ( new String ( LinuxPath.DirectorySeparatorChar, 1 ) );
-			this.Name = isDir  ? LinuxPath.GetDirectoryName ( path ) : LinuxPath.GetFileName ( path );
+			this.Name = isDir ? LinuxPath.GetDirectoryName ( path ) : LinuxPath.GetFileName ( path );
 			this.IsRoot = path.Length == 1 && path[0] == LinuxPath.DirectorySeparatorChar;
 			this.Type = isDir ? FileListingService.FileTypes.Directory : FileListingService.FileTypes.File;
 			this.Size = 0;
@@ -231,7 +231,7 @@ namespace Managed.Adb {
 		/// Adds a child file entry
 		/// </summary>
 		/// <param name="child">The child file entry</param>
-		public void AddChild ( FileEntry child ) {
+		public void AddChild( FileEntry child ) {
 			Children.Add ( child );
 		}
 
@@ -242,7 +242,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="name">the name of the child to return.</param>
 		/// <return>the FileEntry matching the name or null.</return>
-		public FileEntry FindChild ( String name ) {
+		public FileEntry FindChild( String name ) {
 			foreach ( FileEntry entry in Children ) {
 				if ( String.Compare ( entry.Name, name, false ) == 0 ) {
 					return entry;
@@ -288,8 +288,8 @@ namespace Managed.Adb {
 
 				StringBuilder pathBuilder = new StringBuilder ( );
 				FillPathBuilder ( pathBuilder, false );
-				
-				if ( IsDirectory && pathBuilder[pathBuilder.Length -1] != LinuxPath.DirectorySeparatorChar ) {
+
+				if ( IsDirectory && pathBuilder[pathBuilder.Length - 1] != LinuxPath.DirectorySeparatorChar ) {
 					pathBuilder.Append ( LinuxPath.DirectorySeparatorChar );
 				}
 
@@ -337,13 +337,13 @@ namespace Managed.Adb {
 			}
 		}
 
-		
+
 		/// <summary>
 		/// Sets the internal app package status flag. This checks whether the entry is in an app
 		/// directory like /data/app or /system/app or /sd/app or /sd-ext/app. The last two are common for
 		/// apps2sd on rooted phones
 		/// </summary>
-		private void CheckAppPackageStatus ( ) {
+		private void CheckAppPackageStatus( ) {
 			IsApplicationPackage = false;
 
 			String[] segments = PathSegments;
@@ -360,7 +360,7 @@ namespace Managed.Adb {
 		/// Recursively fills the segment list with the full path.
 		/// </summary>
 		/// <param name="list">The list of segments to fill.</param>
-		protected void FillPathSegments ( List<String> list ) {
+		protected void FillPathSegments( List<String> list ) {
 			if ( IsRoot ) {
 				return;
 			}
@@ -378,7 +378,7 @@ namespace Managed.Adb {
 		/// <param name="pathBuilder">a StringBuilder used to create the path.</param>
 		/// <param name="escapePath">Whether the path need to be escaped for consumption by a shell command line.</param>
 		/// <param name="resolveLinks">if set to <c>true</c> [resolve links].</param>
-		protected void FillPathBuilder ( StringBuilder pathBuilder, bool escapePath, bool resolveLinks ) {
+		protected void FillPathBuilder( StringBuilder pathBuilder, bool escapePath, bool resolveLinks ) {
 			if ( IsRoot ) {
 				return;
 			}
@@ -387,8 +387,12 @@ namespace Managed.Adb {
 				Parent.FillPathBuilder ( pathBuilder, escapePath, resolveLinks );
 			}
 
-			pathBuilder.Append ( LinuxPath.DirectorySeparatorChar );
 			String n = resolveLinks && !String.IsNullOrEmpty ( LinkName ) ? LinkName : Name;
+			
+			if ( n[0] != LinuxPath.DirectorySeparatorChar ) {
+				pathBuilder.Append ( LinuxPath.DirectorySeparatorChar );
+			}
+
 			pathBuilder.Append ( escapePath ? LinuxPath.Escape ( n ) : n );
 		}
 
@@ -397,7 +401,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="pathBuilder">The path builder.</param>
 		/// <param name="escapePath">if set to <c>true</c> [escape path].</param>
-		protected void FillPathBuilder ( StringBuilder pathBuilder, bool escapePath ) {
+		protected void FillPathBuilder( StringBuilder pathBuilder, bool escapePath ) {
 			FillPathBuilder ( pathBuilder, escapePath, false );
 		}
 
@@ -412,7 +416,7 @@ namespace Managed.Adb {
 			/// <param name="x">The x.</param>
 			/// <param name="y">The y.</param>
 			/// <returns></returns>
-			public override int Compare ( FileEntry x, FileEntry y ) {
+			public override int Compare( FileEntry x, FileEntry y ) {
 				return x.Name.CompareTo ( y.Name );
 			}
 		}

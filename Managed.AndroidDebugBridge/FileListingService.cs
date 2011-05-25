@@ -393,7 +393,9 @@ namespace Managed.Adb {
 					}
 				}
 			}
-			if ( String.Compare ( current.FullPath, path, false ) == 0 ) {
+			// better checking if the file is the "same" based on the link or the reference
+			if ( String.Compare ( current.FullPath, path, false ) == 0 || String.Compare ( current.FullResolvedPath, path, false ) == 0 ||
+				( String.Compare(current.LinkName,path,false) == 0 && current.IsLink ) ) {
 				return current;
 			} else {
 				throw new FileNotFoundException ( String.Format ( "Unable to locate {0}", path ) );
