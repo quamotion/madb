@@ -207,7 +207,7 @@ namespace Managed.Adb {
 			get {
 				if ( Device != null ) {
 					if ( _root == null ) {
-						_root = new FileEntry ( null /* parent */, string.Empty /* name */, FileTypes.Directory, true /* isRoot */ );
+						_root = new FileEntry (this.Device,  null /* parent */, string.Empty /* name */, FileTypes.Directory, true /* isRoot */ );
 					}
 					return _root;
 				}

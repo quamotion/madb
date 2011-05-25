@@ -31,7 +31,7 @@ namespace Managed.Adb {
 				try {
 					return device.FileListingService.FindFileEntry ( path );
 				} catch ( FileNotFoundException ) {
-					return new FileEntry ( path );
+					return new FileEntry ( device, path );
 				}
 			} else {
 				throw new IOException ( "Device is not online" );
@@ -72,7 +72,7 @@ namespace Managed.Adb {
 		/// <param name="name">name of the entry.</param>
 		/// <param name="type">entry type.</param>
 		/// <param name="isRoot"></param>
-		internal FileEntry( FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
+		internal FileEntry( Device device, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
 			this.FetchTime = 0;
 			this.Parent = parent;
 			this.Name = name;
@@ -83,7 +83,7 @@ namespace Managed.Adb {
 			this.Exists = true;
 		}
 
-		internal FileEntry( String path ) {
+		internal FileEntry( Device device, String path ) {
 			this.FetchTime = 0;
 			this.Parent = null;
 			bool isDir = path.EndsWith ( new String ( LinuxPath.DirectorySeparatorChar, 1 ) );
@@ -95,6 +95,10 @@ namespace Managed.Adb {
 			this.Exists = false;
 		}
 
+		/// <summary>
+		/// Gets the device associated with this file entry.
+		/// </summary>
+		public Device Device { get; private set; }
 		/// <summary>
 		/// Gets the parent.
 		/// </summary>

@@ -178,7 +178,7 @@ namespace Managed.Adb {
 				// get the entry, either from an existing one, or a new one
 				FileEntry entry = GetExistingEntry ( name );
 				if ( entry == null ) {
-					entry = new FileEntry ( Parent, name, objectType, false /* isRoot */);
+					entry = new FileEntry ( Parent.Device, Parent, name, objectType, false /* isRoot */);
 				}
 
 				// add some misc info
