@@ -314,8 +314,8 @@ namespace Managed.Adb.Tests {
 
 			public bool IsCanceled { get; private set; }
 
-			public void StartSubTask ( string name ) {
-				Console.WriteLine ( "Syncing {0}", name );
+			public void StartSubTask ( String source, String destination ) {
+				Console.WriteLine ( "Syncing {0} -> {1}", source, destination );
 			}
 
 			public void Advance ( long work ) {

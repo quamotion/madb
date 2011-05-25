@@ -28,8 +28,8 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Sent when a sub task is started.
 		/// </summary>
-		/// <param name="name">the name of the sub task.</param>
-		void StartSubTask ( String name );
+		/// <param name="destination">the destination.</param>
+		void StartSubTask ( String source, String destination );
 
 		/// <summary>
 		/// Sent when some progress have been made.

@@ -578,7 +578,7 @@ namespace Managed.Adb {
 				if ( f.Exists ) {
 					if ( f.IsDirectory ( ) ) {
 						DirectoryInfo fsiDir = f as DirectoryInfo;
-						monitor.StartSubTask ( dest );
+						monitor.StartSubTask ( f.FullName, dest );
 						SyncResult result = DoPush ( fsiDir.GetFileSystemInfos ( ), dest, monitor );
 
 						if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
@@ -587,7 +587,7 @@ namespace Managed.Adb {
 
 						monitor.Advance ( 1 );
 					} else if ( f.IsFile ( ) ) {
-						monitor.StartSubTask ( dest );
+						monitor.StartSubTask ( f.FullName, dest );
 						SyncResult result = DoPushFile ( f.FullName, dest, monitor );
 						if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
 							return result;
@@ -756,7 +756,7 @@ namespace Managed.Adb {
 				// get type (we only pull directory and files for now)
 				FileListingService.FileTypes type = e.Type;
 				if ( type == FileListingService.FileTypes.Directory ) {
-					monitor.StartSubTask ( e.FullPath );
+					monitor.StartSubTask ( e.FullPath, dest );
 					// then recursively call the content. Since we did a ls command
 					// to get the number of files, we can use the cache
 					FileEntry[] children = fileListingService.GetChildren ( e, true, null );
@@ -766,13 +766,13 @@ namespace Managed.Adb {
 					}
 					monitor.Advance ( 1 );
 				} else if ( type == FileListingService.FileTypes.File ) {
-					monitor.StartSubTask ( e.FullPath );
+					monitor.StartSubTask ( e.FullPath, dest );
 					SyncResult result = DoPullFile ( e.FullPath, dest, monitor );
 					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
 						return result;
 					}
 				} else if ( type == FileListingService.FileTypes.Link ) {
-					monitor.StartSubTask ( e.FullPath );
+					monitor.StartSubTask ( e.FullPath, dest );
 					SyncResult result = DoPullFile ( e.FullResolvedPath, dest, monitor );
 					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
 						return result;

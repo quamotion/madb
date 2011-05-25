@@ -21,7 +21,7 @@ namespace Managed.Adb {
 			}
 		}
 
-		public void StartSubTask ( string name ) {
+		public void StartSubTask ( String source, String destination ) {
 		}
 
 		public void Advance ( long work ) {
