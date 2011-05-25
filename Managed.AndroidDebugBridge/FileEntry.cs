@@ -81,6 +81,7 @@ namespace Managed.Adb {
 			Children = new List<FileEntry> ( );
 			CheckAppPackageStatus ( );
 			this.Exists = true;
+			this.Device = device;
 		}
 
 		internal FileEntry( Device device, String path ) {
@@ -93,7 +94,9 @@ namespace Managed.Adb {
 			this.Size = 0;
 			this.Children = new List<FileEntry> ( );
 			this.Exists = false;
+			this.Device = device;
 		}
+
 
 		/// <summary>
 		/// Gets the device associated with this file entry.
