@@ -6,24 +6,35 @@
 	</PropertyGroup>
 	
 	<Target Name="Publish" DependsOnTargets="NuGetPackage" Condition=" '$(PublishMode)' == 'NuGet' ">
-    <!--Exec WorkingDirectory="$(OutputPath" Command="nuget setapikey $(NuGetKey) –source http://packages.nuget.org/v1/" /-->
 		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push $(CCNetProject).$(CCNetLabel).nupkg $(NuGetKey) –source http://packages.nuget.org/v1/" />
 	</Target>
 
 	<Target Name="NuGetPackage">
 		<Error Condition=" '$(NuGetKey)' == '' " Code="500" Text="'NuGetKey' property was not set."></Error>
 		<Error Condition=" '$(NuSpecFile)' == '' " Code="500" Text="'NuSpecFile' property was not set."></Error>
+
+		<CreateProperty Value="$(OutputPath)\$(CCNetProject).$(CCNetLabel)">
+			<Output TaskParameter="Value" PropertyName="PackagePath" />
+		</CreateProperty>
 		
-		<Copy SourceFiles="$(NuSpecFile)" DestinationFiles="$(OutputPath)\$(CCNetProject).nuspec" />
+		
+		<MakeDir Directories="$(PackagePath)\lib" Condition="!Exists('$(PackagePath)\lib')" />
+		<Copy SourceFiles="$(NuSpecFile)" DestinationFiles="$(PackagePath)\$(CCNetProject).nuspec" />
+		
+		<CreateItem Include="$(OutputPath)*.*" Exclude="$(OutputPath)*.msi;$(OutputPath)*.zip;$(OutputPath)*.vshost.*">
+			<Output ItemName="CopyFiles" TaskParameter="Include"/>
+		</CreateItem>
+		<Copy SourceFiles="@(CopyFiles)" DestinationFolder="$(PackagePath)\lib" />
 		<XmlUpdate
 			XPath="/package/metadata/version"
-			XmlFileName="$(OutputPath)\$(CCNetProject).nuspec"
+			XmlFileName="$(PackagePath)\$(CCNetProject).nuspec"
 			Value="$(CCNetLabel)"/>
 		<XmlUpdate
 			XPath="/package/metadata/id"
-			XmlFileName="$(OutputPath)\$(CCNetProject).nuspec"
+			XmlFileName="$(PackagePath)\$(CCNetProject).nuspec"
 			Value="$(CCNetProject)"/>
 
-		<Exec WorkingDirectory="$(OutputPath)" Command="nuget pack $(CCNetProject).nuspec" />
+		<Exec WorkingDirectory="$(OutputPath)" Command="nuget pack &quot;$(PackagePath)\$(CCNetProject).nuspec&quot;" />
+		<RemoveDir Directories="$(PackagePath)" Condition="Exists('$(PackagePath)')" ContinueOnError="true" />
 	</Target>
 </Project>
