@@ -21,7 +21,7 @@
 		<MakeDir Directories="$(PackagePath)\lib" Condition="!Exists('$(PackagePath)\lib')" />
 		<Copy SourceFiles="$(NuSpecFile)" DestinationFiles="$(PackagePath)\$(CCNetProject).nuspec" />
 		
-		<CreateItem Include="$(OutputPath)*.*" Exclude="$(OutputPath)*.msi;$(OutputPath)*.zip;$(OutputPath)*.vshost.*">
+		<CreateItem Include="$(OutputPath)*.*" Exclude="$(OutputPath)*.msi;$(OutputPath)*.zip;$(OutputPath)*.vshost.*;$(OutputPath)madb.*">
 			<Output ItemName="CopyFiles" TaskParameter="Include"/>
 		</CreateItem>
 		<Copy SourceFiles="@(CopyFiles)" DestinationFolder="$(PackagePath)\lib" />
