@@ -28,17 +28,64 @@ namespace Managed.Adb {
 			LengthBuffer2 = new byte[4];
 		}
 
+		/// <summary>
+		/// Gets the devices.
+		/// </summary>
 		public List<Device> Devices { get; private set; }
+		/// <summary>
+		/// Gets the debugger ports.
+		/// </summary>
 		public List<int> DebuggerPorts { get; private set; }
+		/// <summary>
+		/// Gets the clients to reopen.
+		/// </summary>
 		public Dictionary<IClient, int> ClientsToReopen { get; private set; }
+		/// <summary>
+		/// Gets the server.
+		/// </summary>
 		public AndroidDebugBridge Server { get; private set; }
+		/// <summary>
+		/// Gets a value indicating whether this instance is monitoring.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is monitoring; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsMonitoring { get; private set; }
+		/// <summary>
+		/// Gets a value indicating whether this instance is running.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is running; otherwise, <c>false</c>.
+		/// </value>
 		public bool IsRunning { get; private set; }
+		/// <summary>
+		/// Gets the connection attempt count.
+		/// </summary>
 		public int ConnectionAttemptCount { get; private set; }
+		/// <summary>
+		/// Gets the restart attempt count.
+		/// </summary>
 		public int RestartAttemptCount { get; private set; }
+		/// <summary>
+		/// Gets a value indicating whether this instance has initial device list.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance has initial device list; otherwise, <c>false</c>.
+		/// </value>
 		public bool HasInitialDeviceList { get; private set; }
+		/// <summary>
+		/// Gets or sets the main adb connection.
+		/// </summary>
+		/// <value>
+		/// The main adb connection.
+		/// </value>
 		private Socket MainAdbConnection { get; set; }
 
+		/// <summary>
+		/// Adds the client to drop and reopen.
+		/// </summary>
+		/// <param name="client">The client.</param>
+		/// <param name="port">The port.</param>
 		public void AddClientToDropAndReopen ( IClient client, int port ) {
 			lock ( ClientsToReopen ) {
 				Log.d ( TAG, "Adding {0} to list of client to reopen ({1})", client, port );
@@ -81,8 +128,8 @@ namespace Managed.Adb {
 		/// Monitors the devices. This connects to the Debug Bridge
 		/// </summary>
 		private void DeviceMonitorLoop ( ) {
-			IsRunning = true;
-			do {
+			while ( !IsRunning ) {
+				IsRunning = true;
 				try {
 					if ( MainAdbConnection == null ) {
 						Log.d ( TAG, "Opening adb connection" );
@@ -108,7 +155,7 @@ namespace Managed.Adb {
 							ConnectionAttemptCount = 0;
 						}
 					} 
-					//break;
+
 					if ( MainAdbConnection != null && !IsMonitoring ) {
 						IsMonitoring = SendDeviceListMonitoringRequest ( );
 					}
@@ -117,7 +164,7 @@ namespace Managed.Adb {
 						// read the length of the incoming message
 						int length = ReadLength ( MainAdbConnection, LengthBuffer );
 
-						if ( length >= 0 ) {
+						if ( length >= 0 && !HasInitialDeviceList) {
 							// read the incoming message
 							ProcessIncomingDeviceData ( length );
 
@@ -142,7 +189,7 @@ namespace Managed.Adb {
 				} catch ( Exception ex ) {
 					Console.WriteLine ( ex );
 				}
-			} while ( IsRunning );
+			};
 		}
 
 		/// <summary>
@@ -157,28 +204,32 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <returns></returns>
 		private bool SendDeviceListMonitoringRequest ( ) {
-			byte[] request = AdbHelper.Instance.FormAdbRequest ( "host:track-devices" );
+			try {
+				byte[] request = AdbHelper.Instance.FormAdbRequest ( "host:track-devices" );
 
-			if ( AdbHelper.Instance.Write ( MainAdbConnection, request ) == false ) {
-				Log.e ( TAG, "Sending Tracking request failed!" );
-				MainAdbConnection.Close ( );
-				throw new IOException ( "Sending Tracking request failed!" );
+				if ( AdbHelper.Instance.Write ( MainAdbConnection, request ) == false ) {
+					Log.e ( TAG, "Sending Tracking request failed!" );
+					MainAdbConnection.Close ( );
+					throw new IOException ( "Sending Tracking request failed!" );
+				}
+
+				AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( MainAdbConnection, false /* readDiagString */);
+
+				if ( !resp.IOSuccess ) {
+					Log.e ( TAG, "Failed to read the adb response!" );
+					MainAdbConnection.Close ( );
+					throw new IOException ( "Failed to read the adb response!" );
+				}
+
+				if ( !resp.Okay ) {
+					// request was refused by adb!
+					Log.e ( TAG, "adb refused request: {0}", resp.Message );
+				}
+
+				return resp.Okay;
+			} catch ( SocketException ) {
+				return false;
 			}
-
-			AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( MainAdbConnection, false /* readDiagString */);
-
-			if ( !resp.IOSuccess ) {
-				Log.e ( TAG, "Failed to read the adb response!" );
-				MainAdbConnection.Close ( );
-				throw new IOException ( "Failed to read the adb response!" );
-			}
-
-			if ( !resp.Okay ) {
-				// request was refused by adb!
-				Log.e ( TAG, "adb refused request: {0}", resp.Message );
-			}
-
-			return resp.Okay;
 		}
 
 		/// <summary>
@@ -408,6 +459,9 @@ namespace Managed.Adb {
 			t.Start ( );
 		}
 
+		/// <summary>
+		/// Devices the client monitor loop.
+		/// </summary>
 		private void DeviceClientMonitorLoop ( ) {
 			do {
 				try {
@@ -505,10 +559,10 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
-		/// 
+		/// Sends the device monitoring request.
 		/// </summary>
-		/// <param name="socket"></param>
-		/// <param name="device"></param>
+		/// <param name="socket">The socket.</param>
+		/// <param name="device">The device.</param>
 		/// <returns></returns>
 		private bool SendDeviceMonitoringRequest ( Socket socket, Device device ) {
 			AdbHelper.Instance.SetDevice ( socket, device );
@@ -533,6 +587,13 @@ namespace Managed.Adb {
 			return resp.Okay;
 		}
 
+		/// <summary>
+		/// Opens the client.
+		/// </summary>
+		/// <param name="device">The device.</param>
+		/// <param name="pid">The pid.</param>
+		/// <param name="port">The port.</param>
+		/// <param name="monitorThread">The monitor thread.</param>
 		private void OpenClient ( Device device, int pid, int port, MonitorThread monitorThread ) {
 
 			Socket clientSocket;
@@ -548,6 +609,14 @@ namespace Managed.Adb {
 			CreateClient ( device, pid, clientSocket, port, monitorThread );
 		}
 
+		/// <summary>
+		/// Creates the client.
+		/// </summary>
+		/// <param name="device">The device.</param>
+		/// <param name="pid">The pid.</param>
+		/// <param name="socket">The socket.</param>
+		/// <param name="debuggerPort">The debugger port.</param>
+		/// <param name="monitorThread">The monitor thread.</param>
 		private void CreateClient ( Device device, int pid, Socket socket, int debuggerPort, MonitorThread monitorThread ) {
 
 			/*
@@ -587,6 +656,10 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Gets the next debugger port.
+		/// </summary>
+		/// <returns></returns>
 		private int GetNextDebuggerPort ( ) {
 			// get the first port and remove it
 			lock ( DebuggerPorts ) {
@@ -608,6 +681,10 @@ namespace Managed.Adb {
 			return -1;
 		}
 
+		/// <summary>
+		/// Adds the port to available list.
+		/// </summary>
+		/// <param name="port">The port.</param>
 		public void AddPortToAvailableList ( int port ) {
 			if ( port > 0 ) {
 				lock ( DebuggerPorts ) {
@@ -646,7 +723,7 @@ namespace Managed.Adb {
 				}
 			}
 			// we receive something we can't read. It's better to reset the connection at this point.
-			return 0;
+			throw new IOException ( "unable to retrieve read length" );
 		}
 
 		private String Read ( Socket socket, byte[] data ) {
@@ -669,12 +746,7 @@ namespace Managed.Adb {
 						totalRead += count;
 					}
 				} catch ( SocketException sex ) {
-					if ( sex.Message.Contains ( "connection was aborted" ) ) {
-						// ignore this?
-						return String.Empty;
-					} else {
 						throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
-					}
 				}
 			}
 

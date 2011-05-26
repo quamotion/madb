@@ -234,7 +234,7 @@ namespace Managed.Adb {
 		public static AndroidDebugBridge CreateBridge ( String osLocation, bool forceNewBridge ) {
 
 			if ( _instance != null ) {
-				if ( !String.IsNullOrEmpty ( _instance.AdbOsLocation ) && string.Compare ( _instance.AdbOsLocation, osLocation, true ) == 0 && !forceNewBridge ) {
+				if ( !String.IsNullOrEmpty ( AdbOsLocation ) && string.Compare ( AdbOsLocation, osLocation, true ) == 0 && !forceNewBridge ) {
 					return _instance;
 				} else {
 					// stop the current server
@@ -292,6 +292,7 @@ namespace Managed.Adb {
 			}
 
 			if ( !File.Exists ( osLocation ) ) {
+				Console.WriteLine ( osLocation );
 				throw new FileNotFoundException ( "unable to locate adb in the specified location" );
 			}
 
@@ -393,9 +394,9 @@ namespace Managed.Adb {
 			DeviceMonitor.Stop ( );
 			DeviceMonitor = null;
 
-			if ( StopAdb ( ) == false ) {
+			/*if ( !StopAdb ( ) ) {
 				return false;
-			}
+			}*/
 
 			Started = false;
 			return true;
@@ -433,10 +434,10 @@ namespace Managed.Adb {
 		#region public properties
 
 		/// <summary>
-		/// Gets the adb location on the OS.
+		/// Gets or Sets the adb location on the OS.
 		/// </summary>
 		/// <value>The adb location on the OS.</value>
-		public string AdbOsLocation { get; internal set; }
+		public static string AdbOsLocation { get; set; }
 		/// <summary>
 		/// Gets the devices.
 		/// </summary>
