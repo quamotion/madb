@@ -12,12 +12,25 @@ namespace Managed.Adb {
 	/// debuggable process information from it.
 	/// </summary>
 	public class DeviceMonitor {
+		/// <summary>
+		/// 
+		/// </summary>
 		private const String TAG = "DeviceMonitor";
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private byte[] LengthBuffer = null;
+		/// <summary>
+		/// 
+		/// </summary>
 		private byte[] LengthBuffer2 = null;
 
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
+		/// </summary>
+		/// <param name="bridge">The bridge.</param>
 		public DeviceMonitor ( AndroidDebugBridge bridge ) {
 			Server = bridge;
 			Devices = new List<Device> ( );
@@ -128,8 +141,8 @@ namespace Managed.Adb {
 		/// Monitors the devices. This connects to the Debug Bridge
 		/// </summary>
 		private void DeviceMonitorLoop ( ) {
-			while ( !IsRunning ) {
-				IsRunning = true;
+			IsRunning = true;
+			do {
 				try {
 					if ( MainAdbConnection == null ) {
 						Log.d ( TAG, "Opening adb connection" );
@@ -155,7 +168,7 @@ namespace Managed.Adb {
 							ConnectionAttemptCount = 0;
 						}
 					} 
-
+					//break;
 					if ( MainAdbConnection != null && !IsMonitoring ) {
 						IsMonitoring = SendDeviceListMonitoringRequest ( );
 					}
@@ -164,7 +177,7 @@ namespace Managed.Adb {
 						// read the length of the incoming message
 						int length = ReadLength ( MainAdbConnection, LengthBuffer );
 
-						if ( length >= 0 && !HasInitialDeviceList) {
+						if ( length >= 0 ) {
 							// read the incoming message
 							ProcessIncomingDeviceData ( length );
 
@@ -189,7 +202,7 @@ namespace Managed.Adb {
 				} catch ( Exception ex ) {
 					Console.WriteLine ( ex );
 				}
-			};
+			} while ( IsRunning );
 		}
 
 		/// <summary>
@@ -204,32 +217,28 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <returns></returns>
 		private bool SendDeviceListMonitoringRequest ( ) {
-			try {
-				byte[] request = AdbHelper.Instance.FormAdbRequest ( "host:track-devices" );
+			byte[] request = AdbHelper.Instance.FormAdbRequest ( "host:track-devices" );
 
-				if ( AdbHelper.Instance.Write ( MainAdbConnection, request ) == false ) {
-					Log.e ( TAG, "Sending Tracking request failed!" );
-					MainAdbConnection.Close ( );
-					throw new IOException ( "Sending Tracking request failed!" );
-				}
-
-				AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( MainAdbConnection, false /* readDiagString */);
-
-				if ( !resp.IOSuccess ) {
-					Log.e ( TAG, "Failed to read the adb response!" );
-					MainAdbConnection.Close ( );
-					throw new IOException ( "Failed to read the adb response!" );
-				}
-
-				if ( !resp.Okay ) {
-					// request was refused by adb!
-					Log.e ( TAG, "adb refused request: {0}", resp.Message );
-				}
-
-				return resp.Okay;
-			} catch ( SocketException ) {
-				return false;
+			if ( AdbHelper.Instance.Write ( MainAdbConnection, request ) == false ) {
+				Log.e ( TAG, "Sending Tracking request failed!" );
+				MainAdbConnection.Close ( );
+				throw new IOException ( "Sending Tracking request failed!" );
 			}
+
+			AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( MainAdbConnection, false /* readDiagString */);
+
+			if ( !resp.IOSuccess ) {
+				Log.e ( TAG, "Failed to read the adb response!" );
+				MainAdbConnection.Close ( );
+				throw new IOException ( "Failed to read the adb response!" );
+			}
+
+			if ( !resp.Okay ) {
+				// request was refused by adb!
+				Log.e ( TAG, "adb refused request: {0}", resp.Message );
+			}
+
+			return resp.Okay;
 		}
 
 		/// <summary>
@@ -459,9 +468,6 @@ namespace Managed.Adb {
 			t.Start ( );
 		}
 
-		/// <summary>
-		/// Devices the client monitor loop.
-		/// </summary>
 		private void DeviceClientMonitorLoop ( ) {
 			do {
 				try {
@@ -723,9 +729,15 @@ namespace Managed.Adb {
 				}
 			}
 			// we receive something we can't read. It's better to reset the connection at this point.
-			throw new IOException ( "unable to retrieve read length" );
+			return 0;
 		}
 
+		/// <summary>
+		/// Reads the specified socket.
+		/// </summary>
+		/// <param name="socket">The socket.</param>
+		/// <param name="data">The data.</param>
+		/// <returns></returns>
 		private String Read ( Socket socket, byte[] data ) {
 			int count = -1;
 			int totalRead = 0;
@@ -746,7 +758,12 @@ namespace Managed.Adb {
 						totalRead += count;
 					}
 				} catch ( SocketException sex ) {
+					if ( sex.Message.Contains ( "connection was aborted" ) ) {
+						// ignore this?
+						return String.Empty;
+					} else {
 						throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
+					}
 				}
 			}
 
