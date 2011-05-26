@@ -5,28 +5,52 @@ using System.Text;
 using System.IO;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public abstract class ChunkHandler {
+		/// <summary>
+		/// 
+		/// </summary>
 		public enum ByteOrder {
+			/// <summary>
+			/// 
+			/// </summary>
 			LittleEndian,
+			/// <summary>
+			/// 
+			/// </summary>
 			BigEndian
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public const int CHUNK_HEADER_LEN = 8;   // 4-byte type, 4-byte len
+		/// <summary>
+		/// 
+		/// </summary>
 		public const ByteOrder CHUNK_ORDER = ByteOrder.BigEndian;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public const int CHUNK_FAIL = -1;
 
+		/// <summary>
+		/// Prevents a default instance of the <see cref="ChunkHandler"/> class from being created.
+		/// </summary>
 		ChunkHandler ( ) { }
 
 		/**
-     * Client is ready.  The monitor thread calls this method on all
-     * handlers when the client is determined to be DDM-aware (usually
-     * after receiving a HELO response.)
-     *
-     * The handler can use this opportunity to initialize client-side
-     * activity.  Because there's a fair chance we'll want to send a
-     * message to the client, this method can throw an IOException.
-     */
+		 * Client is ready.  The monitor thread calls this method on all
+		 * handlers when the client is determined to be DDM-aware (usually
+		 * after receiving a HELO response.)
+		 *
+		 * The handler can use this opportunity to initialize client-side
+		 * activity.  Because there's a fair chance we'll want to send a
+		 * message to the client, this method can throw an IOException.
+		 */
 		public abstract void ClientReady ( IClient client );
 
 		/**

@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class AndroidDebugBridgeEventArgs : EventArgs {
 
 		/// <summary>

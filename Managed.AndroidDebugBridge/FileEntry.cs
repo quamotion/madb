@@ -8,7 +8,7 @@ using Managed.Adb.IO;
 
 namespace Managed.Adb {
 	/// <summary>
-	/// 
+	/// Represents a file entry on a device
 	/// </summary>
 	public class FileEntry {
 
@@ -66,12 +66,13 @@ namespace Managed.Adb {
 
 
 		/// <summary>
-		///  Creates a new file entry.
+		/// Creates a new file entry.
 		/// </summary>
+		/// <param name="device">The device.</param>
 		/// <param name="parent">parent entry or null if entry is root</param>
 		/// <param name="name">name of the entry.</param>
 		/// <param name="type">entry type.</param>
-		/// <param name="isRoot"></param>
+		/// <param name="isRoot">if set to <c>true</c> [is root].</param>
 		internal FileEntry( Device device, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
 			this.FetchTime = 0;
 			this.Parent = parent;
@@ -84,6 +85,11 @@ namespace Managed.Adb {
 			this.Device = device;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FileEntry"/> class.
+		/// </summary>
+		/// <param name="device">The device.</param>
+		/// <param name="path">The path.</param>
 		internal FileEntry( Device device, String path ) {
 			this.FetchTime = 0;
 			this.Parent = null;
@@ -211,6 +217,12 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this <see cref="FileEntry"/> is exists.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if exists; otherwise, <c>false</c>.
+		/// </value>
 		public bool Exists { get; private set; }
 
 

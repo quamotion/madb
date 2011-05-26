@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace Managed.Adb {
 	/// <summary>
-	/// 
+	/// The android debug bridge
 	/// </summary>
 	public sealed class AndroidDebugBridge {
 
@@ -40,18 +40,33 @@ namespace Managed.Adb {
 		 * ADB_SERVER_VERSION found in //device/tools/adb/adb.h
 		 */
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private const int ADB_VERSION_MICRO_MIN = 20;
+		/// <summary>
+		/// 
+		/// </summary>
 		private const int ADB_VERSION_MICRO_MAX = -1;
 
 
+		/// <summary>
+		/// The regex pattern for getting the adb version
+		/// </summary>
 		private const String ADB_VERSION_PATTERN = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
+		/// <summary>
+		/// The ADB executive
+		/// </summary>
 		private const String ADB = "adb";
+		/// <summary>
+		/// The DDMS executive
+		/// </summary>
 		private const String DDMS = "ddms";
 
 		// Where to find the ADB bridge.
 		/// <summary>
-		/// 
+		/// The default ADB bridge port
 		/// </summary>
 		public const int ADB_PORT = 5037;
 
@@ -136,9 +151,9 @@ namespace Managed.Adb {
 			HandleProfiling.register ( monitorThread );*/
 		}
 
-		/**
-		* Terminates the ddm library. This must be called upon application termination.
-		*/
+		/// <summary>
+		/// Terminates the ddm library. This must be called upon application termination.
+		/// </summary>
 		public static void Terminate ( ) {
 			// kill the monitoring services
 			if ( Instance != null && Instance.DeviceMonitor != null ) {
@@ -154,7 +169,7 @@ namespace Managed.Adb {
 
 
 		/// <summary>
-		/// Gets the instance.
+		/// Gets an instance of <see cref="AndroidDebugBridge"/>.
 		/// </summary>
 		/// <value>The instance.</value>
 		public static AndroidDebugBridge Instance {
@@ -166,20 +181,29 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Gets an instance of <see cref="AndroidDebugBridge"/>.
+		/// </summary>
 		public static AndroidDebugBridge Bridge {
 			get { return Instance; }
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether there is client support.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if there is client support; otherwise, <c>false</c>.
+		/// </value>
 		public static bool ClientSupport { get; private set; }
 
-		/**
-		 * Creates a {@link AndroidDebugBridge} that is not linked to any particular executable.
-		 * <p/>This bridge will expect adb to be running. It will not be able to start/stop/restart
-		 * adb.
-		 * <p/>If a bridge has already been started, it is directly returned with no changes (similar
-		 * to calling {@link #getBridge()}).
-		 * @return a connected bridge.
-		 */
+
+
+		/// <summary>
+		/// Creates a {@link AndroidDebugBridge} that is not linked to any particular executable.
+		/// This bridge will expect adb to be running. It will not be able to start/stop/restart</summary>
+		/// adb.
+		/// If a bridge has already been started, it is directly returned with no changes
+		/// <returns></returns>
 		public static AndroidDebugBridge CreateBridge ( ) {
 			if ( _instance != null ) {
 				return _instance;
@@ -244,6 +268,10 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Gets the lock.
+		/// </summary>
+		/// <returns></returns>
 		public static object GetLock ( ) {
 			return Instance;
 		}

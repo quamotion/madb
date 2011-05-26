@@ -38,8 +38,8 @@ namespace System {
 
 		/// <summary>
 		/// Reads an unsigned 16 bit integer from an array coming from a device,
-    /// and returns it as an 'int'
-  	/// </summary>
+		/// and returns it as an 'int'
+		/// </summary>
 		/// <param name="value">the array containing the 16 bit int (2 byte).</param>
 		/// <param name="offset">the offset in the array at which the int starts</param>
 		/// <remarks>Array length must be at least offset + 2</remarks>

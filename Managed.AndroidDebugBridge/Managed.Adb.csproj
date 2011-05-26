@@ -6,45 +6,47 @@
 		<Platform Condition=" '$(Platform)' == '' ">x86</Platform>
 		<PlatformTarget>$(Platform)</PlatformTarget>
 		<ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{65473257-E70F-410B-9269-D0C0F771EA87}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Managed.Adb</RootNamespace>
-    <AssemblyName>Managed.AndroidDebugBridge</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <SignAssembly Condition="Exists('..\shared\madb.pfx')">true</SignAssembly>
-    <AssemblyOriginatorKeyFile Condition="Exists('..\shared\madb.pfx')">..\shared\madb.pfx</AssemblyOriginatorKeyFile>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-  </PropertyGroup>
+		<SchemaVersion>2.0</SchemaVersion>
+		<ProjectGuid>{65473257-E70F-410B-9269-D0C0F771EA87}</ProjectGuid>
+		<OutputType>Library</OutputType>
+		<AppDesignerFolder>Properties</AppDesignerFolder>
+		<RootNamespace>Managed.Adb</RootNamespace>
+		<AssemblyName>Managed.AndroidDebugBridge</AssemblyName>
+		<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+		<FileAlignment>512</FileAlignment>
+		<FileUpgradeFlags>
+		</FileUpgradeFlags>
+		<SignAssembly Condition="Exists('..\shared\madb.pfx')">true</SignAssembly>
+		<AssemblyOriginatorKeyFile Condition="Exists('..\shared\madb.pfx')">..\shared\madb.pfx</AssemblyOriginatorKeyFile>
+		<OldToolsVersion>3.5</OldToolsVersion>
+		<UpgradeBackupLocation />
+		<PublishUrl>publish\</PublishUrl>
+		<Install>true</Install>
+		<InstallFrom>Disk</InstallFrom>
+		<UpdateEnabled>false</UpdateEnabled>
+		<UpdateMode>Foreground</UpdateMode>
+		<UpdateInterval>7</UpdateInterval>
+		<UpdateIntervalUnits>Days</UpdateIntervalUnits>
+		<UpdatePeriodically>false</UpdatePeriodically>
+		<UpdateRequired>false</UpdateRequired>
+		<MapFileExtensions>true</MapFileExtensions>
+		<ApplicationRevision>0</ApplicationRevision>
+		<ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+		<IsWebBootstrapper>false</IsWebBootstrapper>
+		<UseApplicationTrust>false</UseApplicationTrust>
+		<BootstrapperEnabled>true</BootstrapperEnabled>
+		<SccProjectName>SAK</SccProjectName>
+		<SccLocalPath>SAK</SccLocalPath>
+		<SccAuxPath>SAK</SccAuxPath>
+		<SccProvider>SAK</SccProvider>
+	</PropertyGroup>
 	<PropertyGroup Condition=" '$(CCNetLabel)' == '' ">
 		<DefineConstants>TRACE;DEBUG</DefineConstants>
 		<CCNetLabel Condition=" '$(CCNetLabel)' == '' ">0.5.0.1</CCNetLabel>
 		<OutputPath Condition=" '$(OutputPath)' == '' ">..\bin\$(Configuration)\$(CCNetLabel)\$(Platform)\</OutputPath>
-		<DocumentationFile>$(OutputPath)$(AssemblyName).XML</DocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup>
+		<DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
 		<DebugSymbols>true</DebugSymbols>
@@ -86,116 +88,116 @@
 		<ErrorReport>prompt</ErrorReport>
 		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
 	</PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\Shared\SharedAssemblyInfo.cs">
-      <Link>Properties\SharedAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\Shared\AssemblyVersionInfo.cs" Condition="Exists('..\Shared\AssemblyVersionInfo.cs')">
-      <Link>Properties\AssemblyVersionInfo.cs</Link>
-    </Compile>
-    <Compile Include="AdbHelper.cs" />
-    <Compile Include="AdbResponse.cs" />
-    <Compile Include="AllocationInfo.cs" />
-    <Compile Include="AndroidDebugBridge.cs" />
-    <Compile Include="AndroidDebugBridgeEventArgs.cs" />
-    <Compile Include="BusyBox.cs" />
-    <Compile Include="Client.cs" />
-    <Compile Include="ClientData.cs" />
-    <Compile Include="CommandErrorReceiver.cs" />
-    <Compile Include="ConsoleOutputReceiver.cs" />
-    <Compile Include="DdmPreferences.cs" />
-    <Compile Include="DebugPortManager.cs" />
-    <Compile Include="DeviceMonitor.cs" />
-    <Compile Include="EnvironmentVariablesReceiver.cs" />
-    <Compile Include="Exceptions\AdbException.cs" />
-    <Compile Include="Exceptions\DeviceNotFoundException.cs" />
-    <Compile Include="Exceptions\PackageInstallationException.cs" />
-    <Compile Include="Extensions\ArrayHelper.cs" />
-    <Compile Include="BadPacketException.cs" />
-    <Compile Include="ChunkHandler.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ClientEventArgs.cs" />
-    <Compile Include="Extensions\DateTimeExtensions.cs" />
-    <Compile Include="Debugger.cs" />
-    <Compile Include="Device.cs" />
-    <Compile Include="DeviceEventArgs.cs" />
-    <Compile Include="ErrorCodeHelper.cs" />
-    <Compile Include="Extensions\FileInfoHelper.cs" />
-    <Compile Include="Extensions\PathHelper.cs" />
-    <Compile Include="Extensions\StringHelper.cs" />
-    <Compile Include="FileEntry.cs" />
-    <Compile Include="FileListingService.cs" />
-    <Compile Include="FilePermission.cs" />
-    <Compile Include="FileSystem.cs" />
-    <Compile Include="GetPropReceiver.cs" />
-    <Compile Include="IClient.cs" />
-    <Compile Include="IDebugPortProvider.cs" />
-    <Compile Include="IDevice.cs" />
-    <Compile Include="IListingReceiver.cs" />
-    <Compile Include="ILogOutput.cs" />
-    <Compile Include="InstallReceiver.cs" />
-    <Compile Include="IO\LinuxPath.cs" />
-    <Compile Include="IO\Rgb565.cs" />
-    <Compile Include="IPacketConsumer.cs" />
-    <Compile Include="IShellOutputReceiver.cs" />
-    <Compile Include="ISyncProgressMonitor.cs" />
-    <Compile Include="ListingServiceReceiver.cs" />
-    <Compile Include="Log.cs" />
-    <Compile Include="LogLevel.cs" />
-    <Compile Include="MonitorThread.cs" />
-    <Compile Include="MountPoint.cs" />
-    <Compile Include="MountPointReceiver.cs" />
-    <Compile Include="MultilineReceiver.cs" />
-    <Compile Include="NullOutputReceiver.cs" />
-    <Compile Include="NullSyncProgressMonitor.cs" />
-    <Compile Include="PackageManager.cs" />
-    <Compile Include="PackageManagerReceiver.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RawImage.cs" />
-    <Compile Include="Reflection\ReflectionHelper.cs" />
-    <Compile Include="SyncResult.cs" />
-    <Compile Include="SyncService.cs" />
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+	<ItemGroup>
+		<Reference Include="System" />
+		<Reference Include="System.Core">
+			<RequiredTargetFramework>3.5</RequiredTargetFramework>
+		</Reference>
+		<Reference Include="System.Drawing" />
+		<Reference Include="System.Xml.Linq">
+			<RequiredTargetFramework>3.5</RequiredTargetFramework>
+		</Reference>
+		<Reference Include="System.Data.DataSetExtensions">
+			<RequiredTargetFramework>3.5</RequiredTargetFramework>
+		</Reference>
+		<Reference Include="System.Data" />
+		<Reference Include="System.Xml" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\Shared\SharedAssemblyInfo.cs">
+			<Link>Properties\SharedAssemblyInfo.cs</Link>
+		</Compile>
+		<Compile Include="..\Shared\AssemblyVersionInfo.cs" Condition="Exists('..\Shared\AssemblyVersionInfo.cs')">
+			<Link>Properties\AssemblyVersionInfo.cs</Link>
+		</Compile>
+		<Compile Include="AdbHelper.cs" />
+		<Compile Include="AdbResponse.cs" />
+		<Compile Include="AllocationInfo.cs" />
+		<Compile Include="AndroidDebugBridge.cs" />
+		<Compile Include="AndroidDebugBridgeEventArgs.cs" />
+		<Compile Include="BusyBox.cs" />
+		<Compile Include="Client.cs" />
+		<Compile Include="ClientData.cs" />
+		<Compile Include="CommandErrorReceiver.cs" />
+		<Compile Include="ConsoleOutputReceiver.cs" />
+		<Compile Include="DdmPreferences.cs" />
+		<Compile Include="DebugPortManager.cs" />
+		<Compile Include="DeviceMonitor.cs" />
+		<Compile Include="EnvironmentVariablesReceiver.cs" />
+		<Compile Include="Exceptions\AdbException.cs" />
+		<Compile Include="Exceptions\DeviceNotFoundException.cs" />
+		<Compile Include="Exceptions\PackageInstallationException.cs" />
+		<Compile Include="Extensions\ArrayHelper.cs" />
+		<Compile Include="Exceptions\BadPacketException.cs" />
+		<Compile Include="ChunkHandler.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Include="ClientEventArgs.cs" />
+		<Compile Include="Extensions\DateTimeHelper.cs" />
+		<Compile Include="Debugger.cs" />
+		<Compile Include="Device.cs" />
+		<Compile Include="DeviceEventArgs.cs" />
+		<Compile Include="ErrorCodeHelper.cs" />
+		<Compile Include="Extensions\FileInfoHelper.cs" />
+		<Compile Include="Extensions\PathHelper.cs" />
+		<Compile Include="Extensions\StringHelper.cs" />
+		<Compile Include="FileEntry.cs" />
+		<Compile Include="FileListingService.cs" />
+		<Compile Include="FilePermission.cs" />
+		<Compile Include="FileSystem.cs" />
+		<Compile Include="GetPropReceiver.cs" />
+		<Compile Include="IClient.cs" />
+		<Compile Include="IDebugPortProvider.cs" />
+		<Compile Include="IDevice.cs" />
+		<Compile Include="IListingReceiver.cs" />
+		<Compile Include="ILogOutput.cs" />
+		<Compile Include="InstallReceiver.cs" />
+		<Compile Include="IO\LinuxPath.cs" />
+		<Compile Include="IO\Rgb565.cs" />
+		<Compile Include="IPacketConsumer.cs" />
+		<Compile Include="IShellOutputReceiver.cs" />
+		<Compile Include="ISyncProgressMonitor.cs" />
+		<Compile Include="ListingServiceReceiver.cs" />
+		<Compile Include="Log.cs" />
+		<Compile Include="LogLevel.cs" />
+		<Compile Include="MonitorThread.cs" />
+		<Compile Include="MountPoint.cs" />
+		<Compile Include="MountPointReceiver.cs" />
+		<Compile Include="MultilineReceiver.cs" />
+		<Compile Include="NullOutputReceiver.cs" />
+		<Compile Include="NullSyncProgressMonitor.cs" />
+		<Compile Include="PackageManager.cs" />
+		<Compile Include="PackageManagerReceiver.cs" />
+		<Compile Include="Properties\AssemblyInfo.cs" />
+		<Compile Include="RawImage.cs" />
+		<Compile Include="Reflection\ReflectionHelper.cs" />
+		<Compile Include="SyncResult.cs" />
+		<Compile Include="SyncService.cs" />
+	</ItemGroup>
+	<ItemGroup />
+	<ItemGroup>
+		<BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+			<Visible>False</Visible>
+			<ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+			<Install>false</Install>
+		</BootstrapperPackage>
+		<BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+			<Visible>False</Visible>
+			<ProductName>.NET Framework 3.5 SP1</ProductName>
+			<Install>true</Install>
+		</BootstrapperPackage>
+		<BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+			<Visible>False</Visible>
+			<ProductName>Windows Installer 3.1</ProductName>
+			<Install>true</Install>
+		</BootstrapperPackage>
+	</ItemGroup>
+	<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+	<!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+			 Other similar extension points exist, see Microsoft.Common.targets.
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
 </Project>

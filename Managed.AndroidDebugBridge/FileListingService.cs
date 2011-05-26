@@ -24,7 +24,7 @@ namespace Managed.Adb {
 
 		// mine is better, it supports both toolbox ls and busybox ls
 		/// <summary>
-		/// 
+		/// DO NOT USE
 		/// </summary>
 		[Obsolete ( "Use LS_PATTERN_EX, it supports busybox, plus standard ls", true )]
 		public const String LS_PATTERN = "^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\\s+(\\S+)\\s+(\\S+)\\s+([\\d\\s,]*)\\s+(\\d{4}-\\d\\d-\\d\\d)\\s+(\\d\\d:\\d\\d)\\s+(.*)$";

@@ -7,6 +7,9 @@ using System.Text.RegularExpressions;
 
 
 namespace Managed.Adb.IO {
+	/// <summary>
+	/// Just like System.IO.Path, except it is geared for Linux
+	/// </summary>
 	public static class LinuxPath {
 
 		/// <summary>
@@ -14,23 +17,54 @@ namespace Managed.Adb.IO {
 		/// </summary>
 		private const String ESCAPEPATTERN = "([\\\\()*+?\"'#/\\s])";
 
+		/// <summary>
+		/// The directory separator character
+		/// </summary>
 		public static readonly char DirectorySeparatorChar = '/';
+		/// <summary>
+		/// The directory separator alternate character
+		/// </summary>
 		public static readonly char AltDirectorySeparatorChar = '/';
+		/// <summary>
+		/// Invalid characters for a file name
+		/// </summary>
 		private static readonly char[] InvalidFileNameChars = new char[] { 
 						'"', '<', '>', '|', '\0', '\x0001', '\x0002', '\x0003', '\x0004', '\x0005', '\x0006', '\a', '\b', '\t', '\n', '\v', 
 						'\f', '\r', '\x000e', '\x000f', '\x0010', '\x0011', '\x0012', '\x0013', '\x0014', '\x0015', '\x0016', '\x0017', '\x0018', '\x0019', '\x001a', '\x001b', 
 						'\x001c', '\x001d', '\x001e', '\x001f', '*', '?', '\\', '/'
 				 };
+		/// <summary>
+		/// The max length of a directory path
+		/// </summary>
 		internal const int MAX_DIRECTORY_PATH = 0xf8;
+		/// <summary>
+		/// the max length of a file path
+		/// </summary>
 		internal const int MAX_PATH = 260;
+		/// <summary>
+		/// the max length of a file path
+		/// </summary>
 		internal static readonly int MaxPath = 260;
+		/// <summary>
+		/// The character used to separate multiple paths
+		/// </summary>
 		public static readonly char PathSeparator = ';';
+		/// <summary>
+		/// Invalid characters for a file/directory path
+		/// </summary>
 		private static readonly char[] RealInvalidPathChars = new char[] { 
 						'"', '<', '>', '|', '\0', '\x0001', '\x0002', '\x0003', '\x0004', '\x0005', '\x0006', '\a', '\b', '\t', '\n', '\v', 
 						'\f', '\r', '\x000e', '\x000f', '\x0010', '\x0011', '\x0012', '\x0013', '\x0014', '\x0015', '\x0016', '\x0017', '\x0018', '\x0019', '\x001a', '\x001b', 
 						'\x001c', '\x001d', '\x001e', '\x001f'
 				 };
 
+		/// <summary>
+		/// Determines whether this instance [can path circumvent security native] the specified part of path.
+		/// </summary>
+		/// <param name="partOfPath">The part of path.</param>
+		/// <returns>
+		///   <c>true</c> if this instance [can path circumvent security native] the specified part of path; otherwise, <c>false</c>.
+		/// </returns>
 		[MethodImpl ( MethodImplOptions.InternalCall )]
 		private static extern bool CanPathCircumventSecurityNative ( string partOfPath );
 
@@ -67,6 +101,14 @@ namespace Managed.Adb.IO {
 			return ( str + extension );
 		}
 
+		/// <summary>
+		/// Checks if the char array starts with ordinal
+		/// </summary>
+		/// <param name="array">The array.</param>
+		/// <param name="numChars">The num chars.</param>
+		/// <param name="compareTo">The compare to.</param>
+		/// <param name="ignoreCase">if set to <c>true</c> [ignore case].</param>
+		/// <returns></returns>
 		private static unsafe bool CharArrayStartsWithOrdinal ( char* array, int numChars, string compareTo, bool ignoreCase ) {
 			if ( numChars < compareTo.Length ) {
 				return false;
@@ -83,6 +125,14 @@ namespace Managed.Adb.IO {
 			return true;
 		}
 
+		/// <summary>
+		/// Checks if the char array starts with ordinal
+		/// </summary>
+		/// <param name="array">The array.</param>
+		/// <param name="numChars">The num chars.</param>
+		/// <param name="compareTo">The compare to.</param>
+		/// <param name="ignoreCase">if set to <c>true</c> [ignore case].</param>
+		/// <returns></returns>
 		private static bool CharArrayStartsWithOrdinal ( char[] array, int numChars, string compareTo, bool ignoreCase ) {
 			if ( numChars < compareTo.Length ) {
 				return false;
@@ -99,6 +149,10 @@ namespace Managed.Adb.IO {
 			return true;
 		}
 
+		/// <summary>
+		/// Checks the invalid path chars.
+		/// </summary>
+		/// <param name="path">The path.</param>
 		internal static void CheckInvalidPathChars( string path ) {
 			for ( int i = 0; i < path.Length; i++ ) {
 				int num2 = path[i];
@@ -124,11 +178,11 @@ namespace Managed.Adb.IO {
 		}
 
 		/// <summary>
-		/// 
+		/// Combine the specified paths to form one path
 		/// </summary>
-		/// <param name="path1"></param>
-		/// <param name="path2"></param>
-		/// <param name="path3"></param>
+		/// <param name="path1">The path1.</param>
+		/// <param name="path2">The path2.</param>
+		/// <param name="path3">The path3.</param>
 		/// <returns></returns>
 		public static string Combine ( string path1, string path2, string path3 ) {
 			if ( ( ( path1 == null ) || ( path2 == null ) ) || ( path3 == null ) ) {
@@ -140,6 +194,14 @@ namespace Managed.Adb.IO {
 			return CombineNoChecks ( CombineNoChecks ( path1, path2 ), path3 );
 		}
 
+		/// <summary>
+		/// Combine the specified paths to form one path
+		/// </summary>
+		/// <param name="path1">The path1.</param>
+		/// <param name="path2">The path2.</param>
+		/// <param name="path3">The path3.</param>
+		/// <param name="path4">The path4.</param>
+		/// <returns></returns>
 		public static string Combine ( string path1, string path2, string path3, string path4 ) {
 			if ( ( ( path1 == null ) || ( path2 == null ) ) || ( ( path3 == null ) || ( path4 == null ) ) ) {
 				throw new ArgumentNullException ( ( path1 == null ) ? "path1" : ( ( path2 == null ) ? "path2" : ( ( path3 == null ) ? "path3" : "path4" ) ) );
@@ -151,6 +213,11 @@ namespace Managed.Adb.IO {
 			return CombineNoChecks ( CombineNoChecks ( CombineNoChecks ( path1, path2 ), path3 ), path4 );
 		}
 
+		/// <summary>
+		/// Combine the specified paths to form one path
+		/// </summary>
+		/// <param name="paths">The paths.</param>
+		/// <returns></returns>
 		public static String Combine ( params String[] paths ) {
 			if ( paths == null ) {
 				throw new ArgumentNullException ( "paths" );
@@ -193,6 +260,12 @@ namespace Managed.Adb.IO {
 
 		}
 
+		/// <summary>
+		/// Combines the path with no checks.
+		/// </summary>
+		/// <param name="path1">The path1.</param>
+		/// <param name="path2">The path2.</param>
+		/// <returns></returns>
 		private static string CombineNoChecks ( string path1, string path2 ) {
 			if ( path2.Length == 0 ) {
 				return FixupPath ( path1 );
@@ -241,6 +314,11 @@ namespace Managed.Adb.IO {
 			return null;
 		}
 
+		/// <summary>
+		/// Gets the path without file name.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
 		public static string GetPathWithoutFile ( string path ) {
 			if ( path != null ) {
 				CheckInvalidPathChars ( path );
@@ -252,6 +330,11 @@ namespace Managed.Adb.IO {
 			return null;
 		}
 
+		/// <summary>
+		/// Fixups the path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
 		private static string FixupPath ( string path ) {
 			string sb = path;
 			sb = sb.Replace ( System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar );
@@ -360,6 +443,11 @@ namespace Managed.Adb.IO {
 			return path.Substring ( 0, GetRootLength ( path ) );
 		}
 
+		/// <summary>
+		/// Gets the length of the root.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
 		internal static int GetRootLength ( string path ) {
 			CheckInvalidPathChars ( path );
 			int num = 0;
@@ -410,6 +498,12 @@ namespace Managed.Adb.IO {
 			return false;
 		}
 
+		/// <summary>
+		/// Combine the specified paths to form one path
+		/// </summary>
+		/// <param name="path1">The path1.</param>
+		/// <param name="path2">The path2.</param>
+		/// <returns></returns>
 		internal static string InternalCombine ( string path1, string path2 ) {
 			if ( ( path1 == null ) || ( path2 == null ) ) {
 				throw new ArgumentNullException ( ( path1 == null ) ? "path1" : "path2" );

@@ -7,10 +7,23 @@ using Managed.Adb.IO;
 using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// A class to help with working with BusyBox
+	/// </summary>
 	public class BusyBox {
+		/// <summary>
+		/// 
+		/// </summary>
 		private const String BUSYBOX_BIN = "/data/local/bin/";
+		/// <summary>
+		/// 
+		/// </summary>
 		private const String BUSYBOX_COMMAND = "busybox";
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="BusyBox"/> class.
+		/// </summary>
+		/// <param name="device">The device.</param>
 		public BusyBox ( Device device ) {
 			this.Device = device;
 			Version = new System.Version ( "0.0.0.0" );
@@ -23,7 +36,7 @@ namespace Managed.Adb {
 		/// Attempts to install on the device
 		/// </summary>
 		/// <param name="busybox">The path to the busybox binary to install.</param>
-		/// <returns><c>true</c>, if successfull; otherwise, <c>false</c></returns>
+		/// <returns><c>true</c>, if successful; otherwise, <c>false</c></returns>
 		public bool Install ( String busybox ) {
 			FileEntry bb = null;
 
@@ -96,6 +109,9 @@ namespace Managed.Adb {
 			return true;
 		}
 
+		/// <summary>
+		/// Checks for busy box.
+		/// </summary>
 		private void CheckForBusyBox ( ) {
 			if ( this.Device.IsOnline ) {
 				try {
@@ -111,7 +127,13 @@ namespace Managed.Adb {
 		}
 
 
-		private Device Device { get; set; }
+		/// <summary>
+		/// Gets or sets the device.
+		/// </summary>
+		/// <value>
+		/// The device.
+		/// </value>
+		public Device Device { get; set; }
 		/// <summary>
 		/// Gets if busybox is available on this device.
 		/// </summary>
@@ -138,8 +160,17 @@ namespace Managed.Adb {
 			return Commands.Contains ( command );
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private class BusyBoxCommandsReceiver : MultiLineReceiver {
+			/// <summary>
+			/// The busybox version regex pattern
+			/// </summary>
 			private const String BB_VERSION_PATTERN = @"^BusyBox\sv(\d{1,}\.\d{1,}\.\d{1,})";
+			/// <summary>
+			/// the busybox commands list regex pattern
+			/// </summary>
 			private const String BB_FUNCTIONS_PATTERN = @"(?:([\[a-z0-9]+)(?:,\s|$))";
 
 			public BusyBoxCommandsReceiver ( BusyBox bb )
@@ -148,8 +179,18 @@ namespace Managed.Adb {
 				BusyBox = bb;
 			}
 
+			/// <summary>
+			/// Gets or sets the busy box.
+			/// </summary>
+			/// <value>
+			/// The busy box.
+			/// </value>
 			private BusyBox BusyBox { get; set; }
 
+			/// <summary>
+			/// Processes the new lines.
+			/// </summary>
+			/// <param name="lines">The lines.</param>
 			protected override void ProcessNewLines ( string[] lines ) {
 				foreach ( var line in lines ) {
 					if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) ) {

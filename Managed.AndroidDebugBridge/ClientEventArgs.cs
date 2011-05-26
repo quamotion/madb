@@ -4,16 +4,43 @@ using System.Linq;
 using System.Text;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum ClientChangeMask {
+		/// <summary>
+		/// 
+		/// </summary>
 		ChangeInfo,
+		/// <summary>
+		/// 
+		/// </summary>
 		ChangeDebuggerStatus,
+		/// <summary>
+		/// 
+		/// </summary>
 		ChangeThreadMode,
+		/// <summary>
+		/// 
+		/// </summary>
 		ChangeThreadData,
+		/// <summary>
+		/// 
+		/// </summary>
 		ChangeHeapMode,
+		/// <summary>
+		/// 
+		/// </summary>
 		ChangeHeapData,
+		/// <summary>
+		/// 
+		/// </summary>
 		ChangeNatvieHeapData
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public class ClientEventArgs : EventArgs {
 
 		/// <summary>

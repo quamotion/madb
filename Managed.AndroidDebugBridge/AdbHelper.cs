@@ -8,16 +8,37 @@ using System.IO;
 using System.Threading;
 using Managed.Adb.Exceptions;
 namespace Managed.Adb {
+	/// <summary>
+	/// The ADB Helper class
+	/// </summary>
 	public class AdbHelper {
+		/// <summary>
+		/// Logging tag
+		/// </summary>
 		private const string TAG = "AdbHelper";
+		/// <summary>
+		/// The time to wait
+		/// </summary>
 		private const int WAIT_TIME = 5;
+		/// <summary>
+		/// The default encoding
+		/// </summary>
 		public static String DEFAULT_ENCODING = "ISO-8859-1";
 
+		/// <summary>
+		/// Prevents a default instance of the <see cref="AdbHelper"/> class from being created.
+		/// </summary>
 		private AdbHelper ( ) {
 
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private static AdbHelper _instance = null;
+		/// <summary>
+		/// Gets an instance of the <see cref="AdbHelper"/> class
+		/// </summary>
 		public static AdbHelper Instance {
 			get {
 				if ( _instance == null ) {
@@ -28,6 +49,13 @@ namespace Managed.Adb {
 		}
 
 
+		/// <summary>
+		/// Opens the specified address on the device on the specified port.
+		/// </summary>
+		/// <param name="address">The address.</param>
+		/// <param name="device">The device.</param>
+		/// <param name="port">The port.</param>
+		/// <returns></returns>
 		public Socket Open ( IPAddress address, IDevice device, int port ) {
 			Socket s = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
@@ -53,6 +81,11 @@ namespace Managed.Adb {
 			return s;
 		}
 
+		/// <summary>
+		/// Gets the adb version.
+		/// </summary>
+		/// <param name="address">The address.</param>
+		/// <returns></returns>
 		public int GetAdbVersion ( IPEndPoint address ) {
 			byte[] request = FormAdbRequest ( "host:version" );
 			byte[] reply;
@@ -135,6 +168,12 @@ namespace Managed.Adb {
 			return socket;
 		}
 
+		/// <summary>
+		/// Creates the adb forward request.
+		/// </summary>
+		/// <param name="address">The address.</param>
+		/// <param name="port">The port.</param>
+		/// <returns></returns>
 		public byte[] CreateAdbForwardRequest ( String address, int port ) {
 			String request;
 
@@ -145,6 +184,11 @@ namespace Managed.Adb {
 			return FormAdbRequest ( request );
 		}
 
+		/// <summary>
+		/// Forms the adb request.
+		/// </summary>
+		/// <param name="req">The req.</param>
+		/// <returns></returns>
 		public byte[] FormAdbRequest ( String req ) {
 			String resultStr = String.Format ( "{0}{1}\n", req.Length.ToString ( "X4" ), req ); //$NON-NLS-1$
 			byte[] result;
@@ -159,6 +203,12 @@ namespace Managed.Adb {
 			return result;
 		}
 
+		/// <summary>
+		/// Writes the specified data to the specified socket.
+		/// </summary>
+		/// <param name="socket">The socket.</param>
+		/// <param name="data">The data.</param>
+		/// <returns></returns>
 		public bool Write ( Socket socket, byte[] data ) {
 			try {
 				Write ( socket, data, -1, DdmPreferences.Timeout );
@@ -170,6 +220,13 @@ namespace Managed.Adb {
 			return true;
 		}
 
+		/// <summary>
+		/// Writes the specified data to the specified socket.
+		/// </summary>
+		/// <param name="socket">The socket.</param>
+		/// <param name="data">The data.</param>
+		/// <param name="length">The length.</param>
+		/// <param name="timeout">The timeout.</param>
 		public void Write ( Socket socket, byte[] data, int length, int timeout ) {
 			//using ( var buf = new MemoryStream ( data, 0, length != -1 ? length : data.Length ) ) {
 			int numWaits = 0;
@@ -199,6 +256,12 @@ namespace Managed.Adb {
 			//}
 		}
 
+		/// <summary>
+		/// Reads the adb response.
+		/// </summary>
+		/// <param name="socket">The socket.</param>
+		/// <param name="readDiagString">if set to <c>true</c> [read diag string].</param>
+		/// <returns></returns>
 		public AdbResponse ReadAdbResponse ( Socket socket, bool readDiagString ) {
 
 			AdbResponse resp = new AdbResponse ( );
@@ -252,6 +315,12 @@ namespace Managed.Adb {
 			return resp;
 		}
 
+		/// <summary>
+		/// Reads the data from specified socket.
+		/// </summary>
+		/// <param name="socket">The socket.</param>
+		/// <param name="data">The data.</param>
+		/// <returns></returns>
 		public bool Read ( Socket socket, byte[] data ) {
 			try {
 				Read ( socket, data, -1, DdmPreferences.Timeout );
@@ -263,6 +332,13 @@ namespace Managed.Adb {
 			return true;
 		}
 
+		/// <summary>
+		/// Reads the data from specified socket.
+		/// </summary>
+		/// <param name="socket">The socket.</param>
+		/// <param name="data">The data.</param>
+		/// <param name="length">The length.</param>
+		/// <param name="timeout">The timeout.</param>
 		public void Read ( Socket socket, byte[] data, int length, int timeout ) {
 			int expLen = length != -1 ? length : data.Length;
 			int count = -1;
@@ -292,11 +368,24 @@ namespace Managed.Adb {
 
 		}
 
+		/// <summary>
+		/// Creates the JDWP forward request.
+		/// </summary>
+		/// <param name="pid">The pid.</param>
+		/// <returns></returns>
 		private byte[] CreateJdwpForwardRequest ( int pid ) {
 			String req = String.Format ( "jdwp:{0}", pid );
 			return FormAdbRequest ( req );
 		}
 
+		/// <summary>
+		/// Creates the forward.
+		/// </summary>
+		/// <param name="adbSockAddr">The adb sock addr.</param>
+		/// <param name="device">The device.</param>
+		/// <param name="localPort">The local port.</param>
+		/// <param name="remotePort">The remote port.</param>
+		/// <returns></returns>
 		public bool CreateForward ( IPEndPoint adbSockAddr, Device device, int localPort, int remotePort ) {
 
 			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
@@ -324,6 +413,14 @@ namespace Managed.Adb {
 			return true;
 		}
 
+		/// <summary>
+		/// Removes the forward.
+		/// </summary>
+		/// <param name="adbSockAddr">The adb sock addr.</param>
+		/// <param name="device">The device.</param>
+		/// <param name="localPort">The local port.</param>
+		/// <param name="remotePort">The remote port.</param>
+		/// <returns></returns>
 		public bool RemoveForward ( IPEndPoint adbSockAddr, Device device, int localPort, int remotePort ) {
 
 			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
@@ -351,6 +448,13 @@ namespace Managed.Adb {
 			return true;
 		}
 
+		/// <summary>
+		/// Determines whether the specified reply is okay.
+		/// </summary>
+		/// <param name="reply">The reply.</param>
+		/// <returns>
+		///   <c>true</c> if the specified reply is okay; otherwise, <c>false</c>.
+		/// </returns>
 		public bool IsOkay ( byte[] reply ) {
 			return reply[0] == (byte)'O' && reply[1] == (byte)'K'
 								&& reply[2] == (byte)'A' && reply[3] == (byte)'Y';
@@ -367,6 +471,11 @@ namespace Managed.Adb {
 			return result;
 		}
 
+		/// <summary>
+		/// Gets the devices that are available for communication.
+		/// </summary>
+		/// <param name="address">The address.</param>
+		/// <returns></returns>
 		public List<Device> GetDevices ( IPEndPoint address ) {
 			byte[] request = FormAdbRequest ( "host:devices" ); //$NON-NLS-1$
 			byte[] reply;
@@ -413,6 +522,12 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Gets the frame buffer from the specified end point.
+		/// </summary>
+		/// <param name="adbSockAddr">The adb sock addr.</param>
+		/// <param name="device">The device.</param>
+		/// <returns></returns>
 		public RawImage GetFrameBuffer ( IPEndPoint adbSockAddr, IDevice device ) {
 
 			RawImage imageParams = new RawImage ( );
@@ -585,6 +700,11 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Sets the device.
+		/// </summary>
+		/// <param name="adbChan">The adb chan.</param>
+		/// <param name="device">The device.</param>
 		public void SetDevice ( Socket adbChan, IDevice device ) {
 			// if the device is not -1, then we first tell adb we're looking to talk
 			// to a specific device
@@ -608,6 +728,21 @@ namespace Managed.Adb {
 
 		}
 
+		/// <summary>
+		/// Reboots the specified adb socket address.
+		/// </summary>
+		/// <param name="adbSocketAddress">The adb socket address.</param>
+		/// <param name="device">The device.</param>
+		public void Reboot( IPEndPoint adbSocketAddress, Device device ) {
+			Reboot ( "", adbSocketAddress, device );
+		}
+
+		/// <summary>
+		/// Reboots the specified device in to the specified mode.
+		/// </summary>
+		/// <param name="into">The into.</param>
+		/// <param name="adbSockAddr">The adb sock addr.</param>
+		/// <param name="device">The device.</param>
 		public void Reboot ( String into, IPEndPoint adbSockAddr, Device device ) {
 			byte[] request;
 			if ( into == null ) {

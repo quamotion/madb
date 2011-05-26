@@ -267,6 +267,8 @@ namespace Managed.Adb {
 							// the device is gone, we need to remove it, and keep current index
 							// to process the next one.
 							RemoveDevice ( device );
+							device.State = DeviceState.Offline;
+							device.OnStateChanged ( EventArgs.Empty );
 							Server.OnDeviceDisconnected ( new DeviceEventArgs ( device ) );
 						} else {
 							// process the next one
@@ -280,6 +282,8 @@ namespace Managed.Adb {
 						// add them to the list
 						Devices.Add ( newDevice );
 						if ( Server != null ) {
+							newDevice.State = DeviceState.Online;
+							newDevice.OnStateChanged ( EventArgs.Empty );
 							Server.OnDeviceConnected ( new DeviceEventArgs ( newDevice ) );
 						}
 
@@ -642,7 +646,7 @@ namespace Managed.Adb {
 				}
 			}
 			// we receive something we can't read. It's better to reset the connection at this point.
-			throw new IOException ( "Unable to read length" );
+			return 0;
 		}
 
 		private String Read ( Socket socket, byte[] data ) {
@@ -665,7 +669,12 @@ namespace Managed.Adb {
 						totalRead += count;
 					}
 				} catch ( SocketException sex ) {
-					throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
+					if ( sex.Message.Contains ( "connection was aborted" ) ) {
+						// ignore this?
+						return String.Empty;
+					} else {
+						throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
+					}
 				}
 			}
 

@@ -5,6 +5,9 @@ using System.Text;
 using System.Reflection;
 
 namespace Managed.Adb.Reflection {
+	/// <summary>
+	/// Reflection helper class
+	/// </summary>
 	internal static class ReflectionHelper {
 
 		/// <summary>
