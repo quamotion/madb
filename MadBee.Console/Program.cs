@@ -36,14 +36,12 @@ namespace MadBee.Console {
 							bridge.DeviceDisconnected += delegate ( object sender, DeviceEventArgs e ) {
 								System.Console.WriteLine ( "{0}\t{1}", e.Device.SerialNumber, e.Device.State );
 							};
-							/*if ( !bridge.Start ( ) ) {
-								System.Console.WriteLine ( "Unable to start Android Debug Bridge" );
-								break;
-							}*/
 							System.Console.ReadLine ( );
 							try {
+								AndroidDebugBridge.DisconnectBridge ( );
 								bridge.Stop ( );
-							} catch ( IOException ) {
+							} catch ( IOException e) {
+								System.Console.WriteLine ( e.ToString ( ) );
 								// ignore
 							}
 							break;

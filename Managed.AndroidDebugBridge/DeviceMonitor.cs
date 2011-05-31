@@ -203,6 +203,7 @@ namespace Managed.Adb {
 					Console.WriteLine ( ex );
 				}
 			} while ( IsRunning );
+			Console.WriteLine ( "No longer monitoring devices" );
 		}
 
 		/// <summary>

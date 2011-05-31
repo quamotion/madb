@@ -420,12 +420,16 @@ namespace Managed.Adb {
 			}
 
 			// kill the monitoring services
-			DeviceMonitor.Stop ( );
-			DeviceMonitor = null;
+			if ( DeviceMonitor != null ) {
+				DeviceMonitor.Stop ( );
+				DeviceMonitor = null;
+			}
 
-			/*if ( !StopAdb ( ) ) {
+
+
+			if ( !StopAdb ( ) ) {
 				return false;
-			}*/
+			}
 
 			Started = false;
 			return true;
