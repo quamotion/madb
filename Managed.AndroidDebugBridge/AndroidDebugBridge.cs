@@ -55,14 +55,43 @@ namespace Managed.Adb {
 		/// </summary>
 		private const String ADB_VERSION_PATTERN = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
+#if LINUX
 		/// <summary>
 		/// The ADB executive
 		/// </summary>
-		private const String ADB = "adb";
+		public const String ADB = "adb";
 		/// <summary>
 		/// The DDMS executive
 		/// </summary>
-		private const String DDMS = "ddms";
+		public const String DDMS = "ddms";
+		/// <summary>
+		/// The hierarchy viewer
+		/// </summary>
+		public const String HIERARCHYVIEWER = "hierarchyviewer";
+		/// <summary>
+		/// The AAPT executive
+		/// </summary>
+		public const String AAPT = "aapt";
+#else
+		/// <summary>
+		/// The ADB executive
+		/// </summary>
+		public const String ADB = "adb.exe";
+		/// <summary>
+		/// The DDMS executive
+		/// </summary>
+		public const String DDMS = "ddms.bat";
+		/// <summary>
+		/// The hierarchy viewer
+		/// </summary>
+		public const String HIERARCHYVIEWER = "hierarchyviewer.bat";
+		/// <summary>
+		/// The AAPT executive
+		/// </summary>
+		public const String AAPT = "aapt.exe";
+
+#endif
+
 
 		// Where to find the ADB bridge.
 		/// <summary>

@@ -26,7 +26,7 @@
 		<PlatformConstant Condition=" '$(Platform)' == 'x64' ">PLATFORMX64</PlatformConstant>
 		<PlatformConstant Condition=" '$(Platform)' == 'ia64' ">PLATFORMIA64</PlatformConstant>
 		<PlatformConstant Condition=" '$(PlatformConstant)' == '' ">PLATFORMX86</PlatformConstant>
-		<OSPlatform Condition=" '$(OSPlatform)' == '' ">PLATFORM_WINDOWS</OSPlatform>
+		<OSPlatform Condition=" '$(OSPlatform)' == '' ">WINDOWS</OSPlatform>
 
 		<SignAssemblies Condition="'$(SignAssemblies)' == ''">false</SignAssemblies>
 		<CCNetArtifactDirectory Condition="'$(CCNetArtifactDirectory)' == ''">$(MSBuildProjectDirectory)\..\bin\</CCNetArtifactDirectory>
@@ -38,6 +38,8 @@
 		<CompileDependsOn>$(CompileDependsOn)</CompileDependsOn>
 		<!--OutputPath>$(CCNetArtifactDirectory)$(Configuration)\$(CCNetLabel)\$(ReleasePlatform)\</OutputPath-->
 		<PublishMode Condition=" '$(PublishMode)' == '' ">None</PublishMode>
+
+		<DefineConstants>$(PlatformConstant) $(OSPlatform)</DefineConstants>
 	</PropertyGroup>
 
 	<Target Name="BuildPublish" Condition=" '$(PublishTarget)' == 'PublishTarget'">
@@ -59,7 +61,7 @@
 			<Output PropertyName="OutputPath" TaskParameter="Value" />
 		</CreateProperty>
 
-		<CreateProperty Value="OSPlatform=$(OSPlatform);ReleasePlatform=$(ReleasePlatform);SignAssemblies=$(SignAssemblies);Configuration=$(Configuration);OutputPath=$(OutputPath);CCNetLabel=$(CCNetLabel);CCNetIntegrationStatus=$(CCNetIntegrationStatus);CCNetBuildCondition=$(CCNetBuildCondition);CCNetProject=$(CCNetProject);CCNetBuildDate=$(CCNetBuildDate);CCNetLastIntegrationStatus=$(CCNetLastIntegrationStatus);CCNetBuildTime=$(CCNetBuildTime);CCNetArtifactDirectory=$(CCNetArtifactDirectory);CCNetWorkingDirectory=$(CCNetWorkingDirectory);CCNetRequestSource=$(CCNetRequestSource)">
+		<CreateProperty Value="DefineConstants=$(DefineConstants);OSPlatform=$(OSPlatform);ReleasePlatform=$(ReleasePlatform);SignAssemblies=$(SignAssemblies);Configuration=$(Configuration);OutputPath=$(OutputPath);CCNetLabel=$(CCNetLabel);CCNetIntegrationStatus=$(CCNetIntegrationStatus);CCNetBuildCondition=$(CCNetBuildCondition);CCNetProject=$(CCNetProject);CCNetBuildDate=$(CCNetBuildDate);CCNetLastIntegrationStatus=$(CCNetLastIntegrationStatus);CCNetBuildTime=$(CCNetBuildTime);CCNetArtifactDirectory=$(CCNetArtifactDirectory);CCNetWorkingDirectory=$(CCNetWorkingDirectory);CCNetRequestSource=$(CCNetRequestSource)">
 			<Output PropertyName="MSBuildProperties" TaskParameter="Value" />
 		</CreateProperty>
 		
