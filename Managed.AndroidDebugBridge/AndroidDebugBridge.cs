@@ -425,8 +425,6 @@ namespace Managed.Adb {
 				DeviceMonitor = null;
 			}
 
-
-
 			if ( !StopAdb ( ) ) {
 				return false;
 			}
@@ -711,7 +709,7 @@ namespace Managed.Adb {
 			} catch ( ThreadInterruptedException ie ) {
 				Log.d ( DDMS, "Unable to run 'adb': {0}", ie.Message );
 			} catch ( Exception e ) {
-				Console.WriteLine ( e.ToString ( ) );
+				Log.e ( DDMS, e );
 			}
 
 			if ( status != 0 ) {

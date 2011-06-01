@@ -190,16 +190,16 @@ namespace Managed.Adb {
 		/// <param name="req">The req.</param>
 		/// <returns></returns>
 		public byte[] FormAdbRequest ( String req ) {
-			String resultStr = String.Format ( "{0}{1}\n", req.Length.ToString ( "X4" ), req ); //$NON-NLS-1$
+			String resultStr = String.Format ( "{0}{1}\n", req.Length.ToString ( "X4" ), req );
 			byte[] result;
 			try {
-				result = resultStr.GetBytes ( AdbHelper.DEFAULT_ENCODING ); // Encoding.Default.GetBytes ( resultStr );
+				result = resultStr.GetBytes ( AdbHelper.DEFAULT_ENCODING ); 
 			} catch ( EncoderFallbackException efe ) {
 				Log.e ( TAG, efe );
 				return null;
 			}
 
-			System.Diagnostics.Debug.Assert ( result.Length == req.Length + 5, String.Format ( "result: {1}{0}\nreq: {3}{2}", result.Length, /*Encoding.Default.GetString ( result )*/ result.GetString ( AdbHelper.DEFAULT_ENCODING ), req.Length, req ) );
+			System.Diagnostics.Debug.Assert ( result.Length == req.Length + 5, String.Format ( "result: {1}{0}\nreq: {3}{2}", result.Length, result.GetString ( AdbHelper.DEFAULT_ENCODING ), req.Length, req ) );
 			return result;
 		}
 
@@ -325,7 +325,6 @@ namespace Managed.Adb {
 			try {
 				Read ( socket, data, -1, DdmPreferences.Timeout );
 			} catch ( AdbException e ) {
-				Log.e ( TAG, "readAll: IOException: {0}", e.Message );
 				return false;
 			}
 
@@ -460,6 +459,11 @@ namespace Managed.Adb {
 								&& reply[2] == (byte)'A' && reply[3] == (byte)'Y';
 		}
 
+		/// <summary>
+		/// Replies to string.
+		/// </summary>
+		/// <param name="reply">The reply.</param>
+		/// <returns></returns>
 		public String ReplyToString ( byte[] reply ) {
 			String result;
 			try {
@@ -640,13 +644,18 @@ namespace Managed.Adb {
 		/// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
 		public void ExecuteRemoteCommand ( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr ) {
 			Socket socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+
+			if ( !device.IsOnline) {
+				return;
+			}
+
 			try {
 				socket.Connect ( endPoint );
 				socket.Blocking = true;
 
 				SetDevice ( socket, device );
 
-				byte[] request = FormAdbRequest ( "shell:" + command ); //$NON-NLS-1$
+				byte[] request = FormAdbRequest ( "shell:" + command );
 				if ( !Write ( socket, request ) ) {
 					throw new AdbException ( "failed submitting shell command" );
 				}
@@ -659,7 +668,6 @@ namespace Managed.Adb {
 				byte[] data = new byte[16384];
 				int count = -1;
 				while ( count != 0 ) {
-
 					if ( rcvr != null && rcvr.IsCancelled ) {
 						Log.w ( TAG, "execute: cancelled" );
 						throw new OperationCanceledException ( );
@@ -706,10 +714,10 @@ namespace Managed.Adb {
 		/// <param name="adbChan">The adb chan.</param>
 		/// <param name="device">The device.</param>
 		public void SetDevice ( Socket adbChan, IDevice device ) {
-			// if the device is not -1, then we first tell adb we're looking to talk
+			// if the device is not null, then we first tell adb we're looking to talk
 			// to a specific device
 			if ( device != null ) {
-				String msg = "host:transport:" + device.SerialNumber; //$NON-NLS-1$
+				String msg = "host:transport:" + device.SerialNumber;
 				byte[] device_query = FormAdbRequest ( msg );
 
 				if ( !Write ( adbChan, device_query ) ) {

@@ -37,13 +37,6 @@ namespace MadBee.Console {
 								System.Console.WriteLine ( "{0}\t{1}", e.Device.SerialNumber, e.Device.State );
 							};
 							System.Console.ReadLine ( );
-							try {
-								AndroidDebugBridge.DisconnectBridge ( );
-								bridge.Stop ( );
-							} catch ( IOException e) {
-								System.Console.WriteLine ( e.ToString ( ) );
-								// ignore
-							}
 							break;
 						case Actions.Start_Server:
 							StartServer ( );
@@ -53,6 +46,14 @@ namespace MadBee.Console {
 						default:
 							break;
 					}
+					try {
+						AndroidDebugBridge.DisconnectBridge ( );
+						bridge.Stop ( );
+					} catch ( IOException e ) {
+						System.Console.WriteLine ( e.ToString ( ) );
+						// ignore
+					}
+
 					return;
 				}
 			}
