@@ -166,13 +166,6 @@ namespace Managed.Adb {
 		/// </value>
 		public String Group { get; set; }
 		/// <summary>
-		/// Gets or sets the other.
-		/// </summary>
-		/// <value>
-		/// The other.
-		/// </value>
-		public FilePermission Other { get; set; }
-		/// <summary>
 		/// Gets the type.
 		/// </summary>
 		public FileListingService.FileTypes Type { get; private set; }
