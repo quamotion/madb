@@ -191,29 +191,39 @@ namespace Managed.Adb {
 			/// Processes the new lines.
 			/// </summary>
 			/// <param name="lines">The lines.</param>
+			/// <workitem id="16000">Issues w/ BusyBox.cs/ProcessNewLines()</workitem>
 			protected override void ProcessNewLines ( string[] lines ) {
+				int state = 0;
+				BusyBox.Commands.Clear ( );
 				foreach ( var line in lines ) {
 					if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) ) {
 						continue;
 					}
 
-					Match m = Regex.Match ( line, BB_VERSION_PATTERN, RegexOptions.Compiled |  RegexOptions.IgnoreCase );
-					if ( m.Success ) {
-						BusyBox.Version = new Version ( m.Groups[1].Value );
-						BusyBox.Commands.Clear ( );
-						continue;
-					}
+					switch ( state ) {
+						case 0:
+							Match m = Regex.Match ( line, BB_VERSION_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase );
+							if ( m.Success ) {
+								BusyBox.Version = new Version ( m.Groups[1].Value );
+								state = 1;
+								continue;
+							}
+							break;
 
-					if ( line.Contains ( "defined functions" ) ) {
-						BusyBox.Commands.Clear ( );
-					}
+						case 1:
+							if ( line.Contains ( "defined functions" ) ) {
+								state = 2;
+							}
+							break;
 
-					m = Regex.Match ( line, BB_FUNCTIONS_PATTERN, RegexOptions.Compiled  );
-					while ( m.Success ) {
-						BusyBox.Commands.Add ( m.Groups[1].Value.Trim() );
-						m = m.NextMatch ( );
+						case 2:
+							m = Regex.Match ( line, BB_FUNCTIONS_PATTERN, RegexOptions.Compiled );
+							while ( m.Success ) {
+								BusyBox.Commands.Add ( m.Groups[1].Value.Trim ( ) );
+								m = m.NextMatch ( );
+							}
+							break;
 					}
-
 				}
 			}
 		}
