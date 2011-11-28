@@ -15,7 +15,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{49EA5373-6CDB-45BE-A763-80F421B8A22E}"
 	ProjectSection(SolutionItems) = preProject
 		Build\BuildAll.msbuild = Build\BuildAll.msbuild
-		Build\keyimport.bat = Build\keyimport.bat
 		Build\madbee.nuspec = Build\madbee.nuspec
 		Build\NuGetPublish.msbuild = Build\NuGetPublish.msbuild
 		Build\SharedProperties.msbuild = Build\SharedProperties.msbuild
@@ -66,8 +65,8 @@ Global
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Debug|x86.Build.0 = Debug|Any CPU
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|Mixed Platforms.ActiveCfg = Release|x64
-		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|Mixed Platforms.Build.0 = Release|x64
+		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|x64.ActiveCfg = Release|x64
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|x64.Build.0 = Release|x64
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|x86.ActiveCfg = Release|Any CPU

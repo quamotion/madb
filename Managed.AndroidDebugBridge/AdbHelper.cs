@@ -683,7 +683,7 @@ namespace Managed.Adb {
 						// do nothing
 					} else {
 
-						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries );
+						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
 						string sdata = data.GetString ( 0, count, AdbHelper.DEFAULT_ENCODING );
 						var sdataTrimmed = sdata.Trim ( );
 						if ( sdataTrimmed.EndsWith ( String.Format ( "{0}: not found", cmd[0] ) ) ) {
@@ -691,17 +691,24 @@ namespace Managed.Adb {
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}: not found'", cmd[0] ) );
 						}
 
-						if ( sdata.Trim ( ).EndsWith ( "No such file or directory" ) ) {
+						if ( sdataTrimmed.EndsWith ( "No such file or directory" ) ) {
 							Log.w ( "AdbHelper", "The remote execution returned: {0}", sdataTrimmed );
 							throw new FileNotFoundException ( String.Format ( "The remote execution returned: {0}", sdataTrimmed ) );
+						}
+
+						// for busybox applets 
+						// cmd: applet not found
+						if ( cmd.Length > 1 && sdataTrimmed.EndsWith ( String.Format ( "{0}: applet not found", cmd[1] ) ) ) {
+							Log.w ( "AdbHelper", "The remote execution returned: '{0}'", sdataTrimmed );
+							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}'", sdataTrimmed ) );
 						}
 
 						// checks if the permission to execute the command was denied.
 						// workitem: 16822
 						if ( sdataTrimmed.EndsWith ( String.Format ( "{0}: permission denied", cmd[0] ) ) ||
 							sdataTrimmed.EndsWith ( String.Format ( "{0}: access denied", cmd[0] ) ) ) {
-							Log.w ( "AdbHelper", "The remote execution returned: {0}", sdataTrimmed );
-							throw new PermissionDeniedException ( String.Format ( "The remote execution returned: {0}", sdataTrimmed ) );
+							Log.w ( "AdbHelper", "The remote execution returned: '{0}'", sdataTrimmed );
+							throw new PermissionDeniedException ( String.Format ( "The remote execution returned: '{0}'", sdataTrimmed ) );
 						}
 
 						// Add the data to the receiver

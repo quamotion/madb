@@ -59,7 +59,6 @@ namespace MadBee.Console {
 			}
 
 			PrintUsage ( );
-
 		}
 
 		private static void StartServer( ) {

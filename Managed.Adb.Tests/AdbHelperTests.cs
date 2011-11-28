@@ -7,7 +7,7 @@ using System.IO;
 using Managed.Adb.IO;
 
 namespace Managed.Adb.Tests {
-	public class AdbHelperTests {
+	public class AdbHelperTests : BaseDeviceTests {
 
 
 		[Fact]
@@ -240,33 +240,8 @@ namespace Managed.Adb.Tests {
 			Assert.True ( device.Properties.ContainsKey ( "ro.product.device" ) );
 		}
 
-		[Fact]
-		public void BusyBoxInstallTest ( ) {
-			Device device = GetFirstDevice ( );
-			bool avail = device.BusyBox.Available;
-			if ( !avail ) {
-				Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-					bool result = device.BusyBox.Install ( "/sdcard/busybox" );
-					Assert.True ( result, "BusyBox Install returned false" );
-				} ) );
-			}
-
-			device.ExecuteShellCommand ( "printenv", new ConsoleOutputReceiver ( ) );
-
-			Assert.True ( device.BusyBox.Available, "BusyBox is not installed" );
-		}
-
-		[Fact]
-		public void BusyBoxGetCommandsTest ( ) {
-			Device device = GetFirstDevice ( );
-			bool avail = device.BusyBox.Available;
-
-			foreach ( var item in device.BusyBox.Commands ) {
-				Console.Write ( "{0},", item );
-			}
-
-			Assert.True ( device.BusyBox.Commands.Count > 0 );
-		}
+		
+		
 
 		private String CreateTestFile ( ) {
 			String tfile = Path.GetTempFileName ( );
@@ -282,12 +257,7 @@ namespace Managed.Adb.Tests {
 			return tfile;
 		}
 
-		private Device GetFirstDevice ( ) {
-			List<Device> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
-			Assert.True ( devices.Count >= 1 );
-			return devices[0];
-		}
-
+		
 		public class FileListingServiceReceiver : IListingReceiver {
 
 			public void SetChildren ( FileEntry entry, FileEntry[] children ) {

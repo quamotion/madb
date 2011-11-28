@@ -50,7 +50,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
@@ -75,6 +75,8 @@
     </Compile>
     <Compile Include="AdbHelperTests.cs" />
     <Compile Include="AndroidDebugBridgeTests.cs" />
+    <Compile Include="BaseDeviceTests.cs" />
+    <Compile Include="BusyBoxTests.cs" />
     <Compile Include="FileEntryTests.cs" />
     <Compile Include="FileSystemTests.cs" />
     <Compile Include="LinuxPathTests.cs" />
