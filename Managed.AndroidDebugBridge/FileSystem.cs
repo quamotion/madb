@@ -62,7 +62,12 @@ namespace Managed.Adb {
 		/// <param name="fileEntry">The file entry.</param>
 		/// <returns></returns>
 		public FileEntry Create( FileEntry fileEntry ) {
-			return Create ( fileEntry.FullPath );
+			if ( fileEntry.IsDirectory ) {
+				MakeDirectory ( fileEntry.FullPath );
+				return Device.FileListingService.FindFileEntry ( fileEntry.FullPath );
+			} else {
+				return Create ( fileEntry.FullPath );
+			}
 		}
 
 		/// <summary>
@@ -109,28 +114,51 @@ namespace Managed.Adb {
 		public void MakeDirectory( String path ) {
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			try {
-				string[] segs = path.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
-				FileEntry current = Device.FileListingService.Root;
-				foreach ( var pathItem in segs ) {
-					FileEntry[] entries = Device.FileListingService.GetChildren ( current, true, null );
-					bool found = false;
-					foreach ( var e in entries ) {
-						if ( String.Compare ( e.Name, pathItem, false ) == 0 ) {
-							current = e;
-							found = true;
-							break;
-						}
+				var fileEntry = FileEntry.FindOrCreate ( Device, path );
+				// if we have busybox we can use the mkdir in there as it supports --parents
+				if ( Device.BusyBox.Available ) {
+					try {
+						Device.BusyBox.ExecuteShellCommand ( "mkdir -p {0}", cer, fileEntry.FullEscapedPath );
+					} catch {
+						try {
+							// if there was an error, then fallback too.
+							MakeDirectoryFallbackInternal ( path, cer );
+						} catch { }
 					}
-
-					if ( !found ) {
-						Device.ExecuteShellCommand ( "mkdir {0}", cer, LinuxPath.Combine ( current.FullPath, pathItem ) );
-					}
+				} else {
+					// if busybox is not available then we have to fallback
+					MakeDirectoryFallbackInternal ( path, cer );
 				}
 			} catch {
-
+				
 			}
 			if ( !String.IsNullOrEmpty ( cer.ErrorMessage ) ) {
 				throw new IOException ( cer.ErrorMessage );
+			}
+		}
+
+		/// <summary>
+		/// this is a fallback if the mkdir -p fails for somereason
+		/// </summary>
+		/// <param name="path"></param>
+		internal void MakeDirectoryFallbackInternal( String path, CommandErrorReceiver cer ) {
+			string[] segs = path.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
+			FileEntry current = Device.FileListingService.Root;
+			foreach ( var pathItem in segs ) {
+				FileEntry[] entries = Device.FileListingService.GetChildren ( current, true, null );
+				bool found = false;
+				foreach ( var e in entries ) {
+					if ( String.Compare ( e.Name, pathItem, false ) == 0 ) {
+						current = e;
+						found = true;
+						break;
+					}
+				}
+
+				if ( !found ) {
+					current = FileEntry.FindOrCreate ( Device, LinuxPath.Combine ( current.FullPath, pathItem ) );
+					Device.ExecuteShellCommand ( "mkdir {0}", cer, current.FullEscapedPath );
+				}
 			}
 		}
 

@@ -17,6 +17,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="device">The device.</param>
 		/// <param name="path">The path.</param>
+		/// <remarks>This does not create the FileEntry on disk. It only creates the FileEntry object.</remarks>
 		/// <returns></returns>
 		public static FileEntry FindOrCreate( Device device, String path ) {
 			if ( device == null ) {
@@ -210,6 +211,8 @@ namespace Managed.Adb {
 			}
 		}
 
+
+
 		/// <summary>
 		/// Gets a value indicating whether this <see cref="FileEntry"/> is exists.
 		/// </summary>
@@ -235,6 +238,23 @@ namespace Managed.Adb {
 					return true;
 				}
 
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Creates the file entry, if it does not exist.
+		/// </summary>
+		/// <returns></returns>
+		public bool Create( ) {
+			try {
+				if ( this.Exists ) {
+					return true;
+				}
+
+				var fe = this.Device.FileSystem.Create ( this );
+				return fe.Exists;
+			} catch {
 				return false;
 			}
 		}

@@ -126,6 +126,21 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Executes a busybox command on the device
+		/// </summary>
+		/// <param name="command"></param>
+		/// <param name="receiver"></param>
+		/// <param name="commandArgs"></param>
+		public void ExecuteShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
+			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
+			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
+		}
+
+		public void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
+			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
+			AdbHelper.Instance.ExecuteRemoteRootCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
+		}
 
 		/// <summary>
 		/// Gets or sets the device.

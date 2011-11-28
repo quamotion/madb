@@ -32,6 +32,8 @@ namespace Managed.Adb {
 		public event EventHandler<EventArgs> BuildInfoChanged;
 		public event EventHandler<EventArgs> ClientListChanged;
 
+		public const String TEMP_DIRECTORY_FOR_INSTALL = "/sdcard/tmp/";
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -169,8 +171,14 @@ namespace Managed.Adb {
 			}
 
 			try {
+				// workitem: 16822
+				// this now checks if permission was denied and accounts for that. 
+				// The nulloutput receiver is fine here because it doesn't need to send the output anywhere,
+				// the execute command can still handle the output with the null output receiver.
 				this.ExecuteRootShellCommand ( "echo \\\"I can haz root\\\"", NullOutputReceiver.Instance );
 				_canSU = true;
+			} catch ( PermissionDeniedException ) {
+				_canSU = false;
 			} catch ( FileNotFoundException ) {
 				_canSU = false;
 			}
@@ -588,7 +596,10 @@ namespace Managed.Adb {
 		public String SyncPackageToDevice( String localFilePath ) {
 			try {
 				String packageFileName = Path.GetFileName ( localFilePath );
-				String remoteFilePath = String.Format ( "/data/local/tmp/{0}", packageFileName );
+				// only root has access to /data/local/tmp/... not sure how adb does it then...
+				// workitem: 16823
+				// String remoteFilePath = String.Format ( "/data/local/tmp/{0}", packageFileName );
+				String remoteFilePath = LinuxPath.Combine ( TEMP_DIRECTORY_FOR_INSTALL, localFilePath );
 
 				Console.WriteLine ( String.Format ( "Uploading {0} onto device '{1}'", packageFileName, SerialNumber ) );
 				Log.d ( packageFileName, String.Format ( "Uploading {0} onto device '{1}'", packageFileName, SerialNumber ) );
