@@ -165,9 +165,7 @@ namespace Managed.Adb {
 				}
 
 				if ( !found ) {
-					Console.WriteLine ( LinuxPath.Combine ( current.FullPath, pathItem + new String ( new char[] {  LinuxPath.DirectorySeparatorChar } ) ) );
 					current = FileEntry.FindOrCreate ( Device, LinuxPath.Combine ( current.FullPath, pathItem + new String ( new char[] {  LinuxPath.DirectorySeparatorChar } ) ) );
-					Console.WriteLine ( "mkdir {0}", current.FullEscapedPath );
 					Device.ExecuteShellCommand ( "mkdir {0}", cer, current.FullEscapedPath );
 				}
 			}
