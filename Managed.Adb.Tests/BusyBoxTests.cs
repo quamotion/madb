@@ -12,12 +12,14 @@ namespace Managed.Adb.Tests {
 		public void GetCommandsTest( ) {
 			Device device = GetFirstDevice ( );
 			bool avail = device.BusyBox.Available;
+			Assert.True ( avail, "BusyBox is not available" );
+
 
 			foreach ( var item in device.BusyBox.Commands ) {
 				Console.Write ( "{0},", item );
 			}
 
-			Assert.True ( device.BusyBox.Commands.Count > 0 );
+			Assert.True ( avail && device.BusyBox.Commands.Count > 0 );
 		}
 
 		[Fact]

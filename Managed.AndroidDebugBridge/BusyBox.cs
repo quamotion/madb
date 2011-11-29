@@ -192,7 +192,7 @@ namespace Managed.Adb {
 			/// <summary>
 			/// the busybox commands list regex pattern
 			/// </summary>
-			private const String BB_FUNCTIONS_PATTERN = @"(?:([\[a-z0-9]+)(?:,\s|$))";
+			private const String BB_FUNCTIONS_PATTERN = @"(?:([\[a-z0-9]+)(?:,\s*))";
 
 			public BusyBoxCommandsReceiver ( BusyBox bb )
 				: base ( ) {
@@ -214,13 +214,13 @@ namespace Managed.Adb {
 			/// <param name="lines">The lines.</param>
 			/// <workitem id="16000">Issues w/ BusyBox.cs/ProcessNewLines()</workitem>
 			protected override void ProcessNewLines ( string[] lines ) {
+				
 				int state = 0;
-				BusyBox.Commands.Clear ( );
 				foreach ( var line in lines ) {
 					if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) ) {
 						continue;
 					}
-
+					//Console.WriteLine ( line );
 					switch ( state ) {
 						case 0:
 							Match m = Regex.Match ( line, BB_VERSION_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase );
@@ -230,15 +230,13 @@ namespace Managed.Adb {
 								continue;
 							}
 							break;
-
 						case 1:
 							if ( line.Contains ( "defined functions" ) ) {
 								state = 2;
 							}
 							break;
-
 						case 2:
-							m = Regex.Match ( line, BB_FUNCTIONS_PATTERN, RegexOptions.Compiled );
+							m = Regex.Match ( line.Trim(), BB_FUNCTIONS_PATTERN, RegexOptions.Compiled );
 							while ( m.Success ) {
 								BusyBox.Commands.Add ( m.Groups[1].Value.Trim ( ) );
 								m = m.NextMatch ( );
