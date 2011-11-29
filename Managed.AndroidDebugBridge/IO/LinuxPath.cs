@@ -554,12 +554,25 @@ namespace Managed.Adb.IO {
 		/// <summary>
 		/// Returns an escaped version of the entry name.
 		/// </summary>
-		/// <param name="entryName"></param>
+		/// <param name="path">The path.</param>
 		/// <returns></returns>
 		public static String Escape( String path ) {
 			return new Regex ( ESCAPEPATTERN ).Replace ( path, new MatchEvaluator ( delegate ( Match m ) {
 				return m.Result ( "\\\\$1" );
 			} ) );
+		}
+
+		/// <summary>
+		/// Quotes the specified path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
+		public static String Quote( String path ) {
+			if ( path.Contains ( " " ) ) {
+				return String.Format ( "\"{0}\"", path );
+			} else {
+				return path;
+			}
 		}
 
 

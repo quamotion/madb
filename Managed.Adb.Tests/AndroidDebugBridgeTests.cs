@@ -6,7 +6,7 @@ using Xunit;
 using System.IO;
 
 namespace Managed.Adb.Tests {
-	public class AndroidDebugBridgeTests {
+	public class AndroidDebugBridgeTests : BaseDeviceTests {
 
 		[Fact]
 		public void CreateBridgeTest ( ) {

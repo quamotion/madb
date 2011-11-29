@@ -351,7 +351,7 @@ namespace Managed.Adb {
 		public String FullEscapedPath {
 			get {
 				StringBuilder pathBuilder = new StringBuilder ( );
-				FillPathBuilder ( pathBuilder, true );
+				FillPathBuilder ( pathBuilder, true, true );
 
 				return pathBuilder.ToString ( );
 			}
@@ -425,7 +425,7 @@ namespace Managed.Adb {
 				pathBuilder.Append ( LinuxPath.DirectorySeparatorChar );
 			}
 
-			pathBuilder.Append ( escapePath ? LinuxPath.Escape ( n ) : n );
+			pathBuilder.Append ( escapePath ? LinuxPath.Quote ( n ) : n );
 		}
 
 		/// <summary>

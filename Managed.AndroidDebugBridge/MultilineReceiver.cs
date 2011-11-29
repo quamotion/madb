@@ -37,7 +37,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
 		/// </summary>
-		public MultiLineReceiver ( ) {
+		public MultiLineReceiver( ) {
 			Lines = new List<string> ( );
 		}
 
@@ -47,7 +47,7 @@ namespace Managed.Adb {
 		/// <param name="data">The data.</param>
 		/// <param name="offset">The offset.</param>
 		/// <param name="length">The length.</param>
-		public void AddOutput ( byte[] data, int offset, int length ) {
+		public void AddOutput( byte[] data, int offset, int length ) {
 			if ( !IsCancelled ) {
 				String s = null;
 				try {
@@ -66,7 +66,7 @@ namespace Managed.Adb {
 					}
 
 					// now we split the lines
-					Lines.Clear ( );
+					//Lines.Clear ( );
 					int start = 0;
 					do {
 						int index = s.IndexOf ( NEWLINE, start ); //$NON-NLS-1$
@@ -89,15 +89,6 @@ namespace Managed.Adb {
 						// move start to after the \r\n we found
 						start = index + 2;
 					} while ( true );
-
-					if ( Lines.Count > 0 ) {
-						// at this point we've split all the lines.
-						// make the array
-						String[] lines = Lines.ToArray ( );
-
-						// send it for final processing
-						ProcessNewLines ( lines );
-					}
 				}
 			}
 		}
@@ -105,8 +96,19 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Flushes the output.
 		/// </summary>
-		public void Flush ( ) {
-			if ( !String.IsNullOrEmpty ( UnfinishedLine ) ) {
+		public void Flush( ) {
+
+			if (!IsCancelled && Lines.Count > 0 ) {
+				// at this point we've split all the lines.
+				// make the array
+				String[] lines = Lines.ToArray ( );
+
+				// send it for final processing
+				ProcessNewLines ( lines );
+				Lines.Clear ( );
+			}
+
+			if ( !IsCancelled && !String.IsNullOrEmpty ( UnfinishedLine ) ) {
 				ProcessNewLines ( new String[] { UnfinishedLine } );
 			}
 
@@ -116,7 +118,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Finishes the receiver
 		/// </summary>
-		protected virtual void Done ( ) {
+		protected virtual void Done( ) {
 			// Do nothing
 		}
 
@@ -132,7 +134,7 @@ namespace Managed.Adb {
 		/// Processes the new lines.
 		/// </summary>
 		/// <param name="lines">The lines.</param>
-		protected abstract void ProcessNewLines ( String[] lines );
+		protected abstract void ProcessNewLines( String[] lines );
 	}
 
 }

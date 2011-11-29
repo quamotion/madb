@@ -717,10 +717,15 @@ namespace Managed.Adb {
 						}
 					}
 				}
-			} finally {
+			} /*catch ( Exception e ) {
+				Log.e ( "AdbHelper", e );
+				Console.Error.WriteLine ( e.ToString ( ) );
+				throw;
+			}*/ finally {
 				if ( socket != null ) {
 					socket.Close ( );
 				}
+				rcvr.Flush ( );
 			}
 		}
 

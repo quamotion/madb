@@ -134,6 +134,7 @@ namespace Managed.Adb {
 		/// <param name="commandArgs"></param>
 		public void ExecuteShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
+			Console.WriteLine ( "executing: {0}", cmd );
 			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
 		}
 
@@ -145,6 +146,7 @@ namespace Managed.Adb {
 		/// <param name="commandArgs">The command args.</param>
 		public void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
+			Console.WriteLine ( "executing as root: {0}", cmd );
 			AdbHelper.Instance.ExecuteRemoteRootCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
 		}
 
@@ -176,6 +178,10 @@ namespace Managed.Adb {
 		public bool Supports ( String command ) {
 			if ( String.IsNullOrEmpty ( command ) || String.IsNullOrEmpty ( command.Trim ( ) ) ) {
 				throw new ArgumentException ( "Command must not be empty", "command" );
+			}
+
+			if ( Available && ( Commands == null || Commands.Count == 0 ) ) {
+				CheckForBusyBox ( );
 			}
 
 			return Commands.Contains ( command );
@@ -217,10 +223,9 @@ namespace Managed.Adb {
 				
 				int state = 0;
 				foreach ( var line in lines ) {
-					if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) ) {
+					if ( String.IsNullOrEmpty ( line ) /*|| line.StartsWith ( "#" )*/ ) {
 						continue;
 					}
-					//Console.WriteLine ( line );
 					switch ( state ) {
 						case 0:
 							Match m = Regex.Match ( line, BB_VERSION_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase );

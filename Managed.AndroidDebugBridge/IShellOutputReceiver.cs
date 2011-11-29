@@ -16,8 +16,9 @@ namespace Managed.Adb {
 		/// <param name="length">The length.</param>
 		void AddOutput ( byte[] data, int offset, int length );
 		/// <summary>
-		/// Flushes the output.
+		/// Flushes the output. 
 		/// </summary>
+		/// <remarks>This should always be called at the end of the "process" in order to indicate that the data is ready to be processed further if needed.</remarks>
 		void Flush ( );
 		/// <summary>
 		/// Gets a value indicating whether this instance is cancelled.

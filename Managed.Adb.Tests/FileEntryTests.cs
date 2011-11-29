@@ -5,7 +5,7 @@ using System.Text;
 using Xunit;
 
 namespace Managed.Adb.Tests {
-	public class FileEntryTests {
+	public class FileEntryTests : BaseDeviceTests {
 
 		[Fact]
 		public void FindEntryTest ( ) {
@@ -16,10 +16,17 @@ namespace Managed.Adb.Tests {
 			fe = FileEntry.Find ( device, "/system/bin/" );
 		}
 
-		private Device GetFirstDevice ( ) {
-			List<Device> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
-			Assert.True ( devices.Count >= 1 );
-			return devices[0];
+
+		[Fact]
+		public void FindOrCreateTest( ) {
+			Device device = GetFirstDevice ( );
+			var path ="/mnt/sdcard/test/delete/";
+			FileEntry fe = FileEntry.FindOrCreate ( device, path );
+			Console.WriteLine ( fe.FullResolvedPath );
+			Assert.True ( fe.Exists );
+			Assert.True(String.Compare(fe.FullPath,path,false ) == 0 );
 		}
+
+
 	}
 }

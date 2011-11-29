@@ -11,12 +11,33 @@ using Managed.Adb.Exceptions;
 using Managed.Adb.IO;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum DeviceState {
+		/// <summary>
+		/// 
+		/// </summary>
 		Recovery,
+		/// <summary>
+		/// 
+		/// </summary>
 		BootLoader,
+		/// <summary>
+		/// 
+		/// </summary>
 		Offline,
+		/// <summary>
+		/// 
+		/// </summary>
 		Online,
+		/// <summary>
+		/// 
+		/// </summary>
 		Download,
+		/// <summary>
+		/// 
+		/// </summary>
 		Unknown
 	}
 
@@ -28,10 +49,22 @@ namespace Managed.Adb {
 		public const String MNT_DATA = "ANDROID_DATA";
 		public const String MNT_ROOT = "ANDROID_ROOT";
 
+		/// <summary>
+		/// Occurs when [state changed].
+		/// </summary>
 		public event EventHandler<EventArgs> StateChanged;
+		/// <summary>
+		/// Occurs when [build info changed].
+		/// </summary>
 		public event EventHandler<EventArgs> BuildInfoChanged;
+		/// <summary>
+		/// Occurs when [client list changed].
+		/// </summary>
 		public event EventHandler<EventArgs> ClientListChanged;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public const String TEMP_DIRECTORY_FOR_INSTALL = "/sdcard/tmp/";
 
 		/// <summary>
@@ -103,6 +136,9 @@ namespace Managed.Adb {
 			RetrieveDeviceInfo ( );
 		}
 
+		/// <summary>
+		/// Retrieves the device info.
+		/// </summary>
 		public void RetrieveDeviceInfo( ) {
 			RefreshMountPoints ( );
 			RefreshEnvironmentVariables ( );
@@ -186,6 +222,12 @@ namespace Managed.Adb {
 			return _canSU;
 		}
 
+		/// <summary>
+		/// Gets or sets the client monitoring socket.
+		/// </summary>
+		/// <value>
+		/// The client monitoring socket.
+		/// </value>
 		public Socket ClientMonitoringSocket { get; set; }
 
 		/// <summary>
@@ -342,6 +384,9 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Refreshes the environment variables.
+		/// </summary>
 		public void RefreshEnvironmentVariables( ) {
 			if ( !IsOffline ) {
 				try {
@@ -352,6 +397,9 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Refreshes the properties.
+		/// </summary>
 		public void RefreshProperties( ) {
 			if ( !IsOffline ) {
 				try {
@@ -377,6 +425,12 @@ namespace Managed.Adb {
 			Reboot ( String.Empty );
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this instance has clients.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance has clients; otherwise, <c>false</c>.
+		/// </value>
 		public bool HasClients {
 			get {
 				return Clients.Count > 0;
@@ -384,6 +438,9 @@ namespace Managed.Adb {
 		}
 
 
+		/// <summary>
+		/// Gets the list of clients
+		/// </summary>
 		public List<IClient> Clients { get; private set; }
 
 		/// <summary>
@@ -660,6 +717,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="packageName">Name of the package.</param>
 		/// <exception cref="IOException"></exception>
+		///   
 		/// <exception cref="PackageInstallException"></exception>
 		public void UninstallPackage( String packageName ) {
 			InstallReceiver receiver = new InstallReceiver ( );

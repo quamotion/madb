@@ -91,7 +91,7 @@ namespace Managed.Adb {
 				try {
 					FileEntry fe = Device.FileListingService.FindFileEntry ( path );
 					return fe != null;
-				} catch ( FileNotFoundException ) {
+				} catch ( FileNotFoundException e ) {
 					return false;
 				}
 			} else {
@@ -112,17 +112,26 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="path">The path.</param>
 		public void MakeDirectory( String path ) {
+			MakeDirectory ( path, false );
+		}
+
+		/// <summary>
+		/// Makes the directory.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <param name="forceDeviceMethod">if set to <c>true</c> forces the use of the "non-busybox" method.</param>
+		public void MakeDirectory( String path, bool forceDeviceMethod ) {
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			try {
-				var fileEntry = FileEntry.FindOrCreate ( Device, path );
+				//var fileEntry = FileEntry.FindOrCreate ( Device, path );
 				// if we have busybox we can use the mkdir in there as it supports --parents
-				if ( Device.BusyBox.Available ) {
+				if ( Device.BusyBox.Available && !forceDeviceMethod ) {
 					try {
-						Device.BusyBox.ExecuteShellCommand ( "mkdir -p {0}", cer, fileEntry.FullEscapedPath );
+						Device.BusyBox.ExecuteShellCommand ( "mkdir -p {0}", cer, path );
 					} catch {
 						try {
 							// if there was an error, then fallback too.
-							MakeDirectoryFallbackInternal ( path, cer );
+							MakeDirectoryFallbackInternal (  path, cer );
 						} catch { }
 					}
 				} else {
@@ -130,7 +139,7 @@ namespace Managed.Adb {
 					MakeDirectoryFallbackInternal ( path, cer );
 				}
 			} catch {
-				
+
 			}
 			if ( !String.IsNullOrEmpty ( cer.ErrorMessage ) ) {
 				throw new IOException ( cer.ErrorMessage );
@@ -156,7 +165,9 @@ namespace Managed.Adb {
 				}
 
 				if ( !found ) {
-					current = FileEntry.FindOrCreate ( Device, LinuxPath.Combine ( current.FullPath, pathItem ) );
+					Console.WriteLine ( LinuxPath.Combine ( current.FullPath, pathItem + new String ( new char[] {  LinuxPath.DirectorySeparatorChar } ) ) );
+					current = FileEntry.FindOrCreate ( Device, LinuxPath.Combine ( current.FullPath, pathItem + new String ( new char[] {  LinuxPath.DirectorySeparatorChar } ) ) );
+					Console.WriteLine ( "mkdir {0}", current.FullEscapedPath );
 					Device.ExecuteShellCommand ( "mkdir {0}", cer, current.FullEscapedPath );
 				}
 			}
