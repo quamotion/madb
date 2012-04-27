@@ -141,6 +141,29 @@ namespace Managed.Adb {
 		/// <param name="receiver">The receiver object getting the result from the command.</param>
 		void ExecuteShellCommand(String command, IShellOutputReceiver receiver);
 
+		/// <summary>
+		/// Executes a shell command on the device, and sends the result to a receiver.
+		/// </summary>
+		/// <param name="command">The command to execute</param>
+		/// <param name="receiver">The receiver object getting the result from the command.</param>
+		/// <param name="commandArgs">The command args.</param>
+		void ExecuteShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs );
+
+
+		/// <summary>
+		/// Executes a shell command on the device as root, and sends the result to a receiver.
+		/// </summary>
+		/// <param name="command">The command.</param>
+		/// <param name="receiver">The receiver.</param>
+		/// <param name="commandArgs">The command args.</param>
+		void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs );
+
+		/// <summary>
+		/// Executes a shell command on the device as root, and sends the result to a receiver.
+		/// </summary>
+		/// <param name="command">The command to execute</param>
+		/// <param name="receiver">The receiver object getting the result from the command.</param>
+		void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver );
 		/**
 		 * Runs the event log service and outputs the event log to the {@link LogReceiver}.
 		 * @param receiver the receiver to receive the event log entries.

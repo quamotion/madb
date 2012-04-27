@@ -14,6 +14,11 @@ namespace Managed.Adb.Tests {
 			FileEntry fe = FileEntry.Find ( device, "/system/" );
 
 			fe = FileEntry.Find ( device, "/system/bin/" );
+
+			fe = FileEntry.Find ( device, "/mnt/sdcard/Android/data/com.camalotdesigns.myandroider/Injector.jar" );
+			// test links
+			fe = FileEntry.Find ( device, "/sdcard/Android/data/com.camalotdesigns.myandroider/Injector.jar" );
+
 		}
 
 

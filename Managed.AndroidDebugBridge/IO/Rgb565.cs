@@ -53,7 +53,7 @@ namespace Managed.Adb.IO {
 		/// <param name="height">The height.</param>
 		/// <returns></returns>
 		public static Image ToImage( byte[] data, int width, int height ) {
-			return ToImage ( PixelFormat.Format16bppRgb565, data, width, height );
+			return ToImage ( PixelFormat.Format16bppGrayScale, data, width, height );
 		}
 
 		/// <summary>

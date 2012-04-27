@@ -386,17 +386,21 @@ namespace Managed.Adb {
 			foreach ( var pathItem in entriesString ) {
 				FileEntry[] entries = GetChildren ( current, true, null );
 				foreach ( var e in entries ) {
-					if ( String.Compare ( e.Name, pathItem, false ) == 0 ) {
+					if ( String.Compare ( e.Name, pathItem, false ) == 0 || String.Compare(e.LinkName,pathItem,false) == 0 ) {
 						current = e;
 						break;
 					}
 				}
 			}
+
 			// better checking if the file is the "same" based on the link or the reference
 			if ( String.Compare ( current.FullPath, path, false ) == 0 || String.Compare ( current.FullResolvedPath, path, false ) == 0 ||
 				( String.Compare(current.LinkName,path,false) == 0 && current.IsLink ) ) {
 				return current;
 			} else {
+				Console.Error.WriteLine ( "path:{0}", path );
+				Console.Error.WriteLine ( "link:{0}", current.LinkName );
+				Console.Error.WriteLine ( "full:{0}", current.FullResolvedPath );
 				throw new FileNotFoundException ( String.Format ( "Unable to locate {0}", path ) );
 			}
 		}
