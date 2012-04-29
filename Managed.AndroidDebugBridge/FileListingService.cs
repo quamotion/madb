@@ -381,12 +381,13 @@ namespace Managed.Adb {
 		/// <param name="path">The path.</param>
 		/// <returns></returns>
 		public FileEntry FindFileEntry ( FileEntry parent, String path ) {
-			String[] entriesString = path.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
+			var rpath = ResolveLink ( path );
+			String[] entriesString = rpath.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
 			FileEntry current = parent;
 			foreach ( var pathItem in entriesString ) {
 				FileEntry[] entries = GetChildren ( current, true, null );
 				foreach ( var e in entries ) {
-					if ( String.Compare ( e.Name, pathItem, false ) == 0 || String.Compare(e.LinkName,pathItem,false) == 0 ) {
+					if ( String.Compare ( e.Name, pathItem, false ) == 0 ) {
 						current = e;
 						break;
 					}
@@ -394,14 +395,29 @@ namespace Managed.Adb {
 			}
 
 			// better checking if the file is the "same" based on the link or the reference
-			if ( String.Compare ( current.FullPath, path, false ) == 0 || String.Compare ( current.FullResolvedPath, path, false ) == 0 ||
-				( String.Compare(current.LinkName,path,false) == 0 && current.IsLink ) ) {
+			if ( String.Compare ( current.FullPath, path, false ) == 0 || 
+				String.Compare ( current.FullResolvedPath, path, false ) == 0 ||
+				String.Compare ( current.FullPath, rpath, false ) == 0 ) {
 				return current;
 			} else {
-				Console.Error.WriteLine ( "path:{0}", path );
-				Console.Error.WriteLine ( "link:{0}", current.LinkName );
-				Console.Error.WriteLine ( "full:{0}", current.FullResolvedPath );
 				throw new FileNotFoundException ( String.Format ( "Unable to locate {0}", path ) );
+			}
+		}
+
+
+		/// <summary>
+		/// Resolves the link to the true path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
+		public String ResolveLink ( String path ) {
+			if ( this.Device.BusyBox.Available ) {
+				var cresult = new CommandResultReceiver();
+				this.Device.BusyBox.ExecuteShellCommand ( "readlink -f {0}", cresult, path );
+				return cresult.Result;
+			} else {
+				// what do we do here? readlink is not available on devices without busybox...
+				return path;
 			}
 		}
 	}

@@ -696,6 +696,18 @@ namespace Managed.Adb {
 							throw new FileNotFoundException ( String.Format ( "The remote execution returned: {0}", sdataTrimmed ) );
 						}
 
+						// for "unknown options"
+						if ( sdataTrimmed.Contains ( "Unknown option" ) ) {
+							Log.w ( "AdbHelper", "The remote execution returned: {0}", sdataTrimmed );
+							throw new UnknownOptionException ( sdataTrimmed );
+						}
+
+						// for "aborting" commands
+						if ( sdataTrimmed.EndsWith ( "Aborting." ) ) {
+							Log.w ( "AdbHelper", "The remote execution returned: {0}", sdataTrimmed );
+							throw new CommandAbortingException ( sdataTrimmed );
+						}
+
 						// for busybox applets 
 						// cmd: applet not found
 						if ( cmd.Length > 1 && sdataTrimmed.EndsWith ( String.Format ( "{0}: applet not found", cmd[1] ) ) ) {

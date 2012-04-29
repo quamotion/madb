@@ -576,6 +576,5 @@ namespace Managed.Adb.IO {
 		}
 
 
-
 	}
 }

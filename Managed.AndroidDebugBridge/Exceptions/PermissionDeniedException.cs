@@ -24,7 +24,7 @@ namespace Managed.Adb.Exceptions {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AdbException"/> class.
+		/// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
 		/// </summary>
 		/// <param name="serializationInfo">The serialization info.</param>
 		/// <param name="context">The context.</param>
@@ -33,7 +33,7 @@ namespace Managed.Adb.Exceptions {
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AdbException"/> class.
+		/// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
 		/// </summary>
 		/// <param name="message">The message.</param>
 		/// <param name="innerException">The inner exception.</param>
