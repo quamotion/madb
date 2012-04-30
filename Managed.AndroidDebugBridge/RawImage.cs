@@ -14,10 +14,15 @@ namespace Managed.Adb {
 	/// Data representing an image taken from a device frame buffer.
 	/// </summary>
 	public class RawImage {
+		private enum ByteColorOrder {
+			ARGB,
+			BRGA
+		}
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RawImage"/> class.
 		/// </summary>
-		public RawImage ( ) {
+		public RawImage( ) {
 			this.Red = new ColorData ( );
 			this.Blue = new ColorData ( );
 			this.Green = new ColorData ( );
@@ -96,6 +101,8 @@ namespace Managed.Adb {
 		/// </value>
 		public byte[] Data { get; set; }
 
+		private ByteColorOrder ColorOrder { get; set; }
+
 		/**
 		 * Reads the header of a RawImage from a {@link ByteBuffer}.
 		 * <p/>The way the data is sent over adb is defined in system/core/adb/framebuffer_service.c
@@ -103,9 +110,8 @@ namespace Managed.Adb {
 		 * @param buf the buffer to read from.
 		 * @return true if success
 		 */
-		public bool ReadHeader ( int version, BinaryReader buf ) {
+		public bool ReadHeader( int version, BinaryReader buf ) {
 			this.Version = version;
-			Console.WriteLine ( "version: {0}", version );
 			if ( version == 16 ) {
 				// compatibility mode with original protocol
 				this.Bpp = 16;
@@ -114,7 +120,6 @@ namespace Managed.Adb {
 				this.Size = buf.ReadInt32 ( );
 				this.Width = buf.ReadInt32 ( );
 				this.Height = buf.ReadInt32 ( );
-
 				// create default values for the rest. Format is 565
 				this.Red.Offset = 11;
 				this.Red.Length = 5;
@@ -125,23 +130,27 @@ namespace Managed.Adb {
 				this.Alpha.Offset = 0;
 				this.Alpha.Length = 0;
 			} else if ( version == 1 ) {
-				this.Bpp = buf.ReadInt32 ( );
+				this.Bpp = buf.ReadInt32 ( ); // 32
 				this.Size = buf.ReadInt32 ( );
-				this.Width = buf.ReadInt32 ( );
-				this.Height = buf.ReadInt32 ( );
-				this.Blue.Offset = buf.ReadInt32 ( );
-				this.Blue.Length = buf.ReadInt32 ( );
-				this.Green.Offset = buf.ReadInt32 ( );
-				this.Green.Length = buf.ReadInt32 ( );
-				this.Red.Offset = buf.ReadInt32 ( );
-				this.Red.Length = buf.ReadInt32 ( );
-				this.Alpha.Offset = buf.ReadInt32 ( );
-				this.Alpha.Length = buf.ReadInt32 ( );
-
-				Console.WriteLine ( this.ToString ( ) );
+				this.Width = buf.ReadInt32 ( ); // 480
+				this.Height = buf.ReadInt32 ( ); // 800
+				this.Red.Offset = buf.ReadInt32 ( ); // 8
+				this.Red.Length = buf.ReadInt32 ( ); // 8
+				this.Blue.Offset = buf.ReadInt32 ( );  // 0
+				this.Blue.Length = buf.ReadInt32 ( ); // 8
+				this.Green.Offset = buf.ReadInt32 ( ); // 16
+				this.Green.Length = buf.ReadInt32 ( ); // 8
+				this.Alpha.Offset = buf.ReadInt32 ( ); // 24
+				this.Alpha.Length = buf.ReadInt32 ( ); // 8
 			} else {
 				// unsupported protocol!
 				return false;
+			}
+
+			if ( this.Blue.Offset == 0 && this.Red.Offset == 8 && this.Green.Offset == 16 && this.Alpha.Offset == 24 ) {
+				this.ColorOrder = ByteColorOrder.BRGA;
+			} else {
+				this.ColorOrder = ByteColorOrder.ARGB;
 			}
 
 			return true;
@@ -151,7 +160,7 @@ namespace Managed.Adb {
 		 * Returns the mask value for the red color.
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
-		public int GetRedMask ( ) {
+		public int GetRedMask( ) {
 			return GetMask ( Red.Length, Red.Offset );
 		}
 
@@ -159,7 +168,7 @@ namespace Managed.Adb {
 		 * Returns the mask value for the green color.
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
-		public int GetGreenMask ( ) {
+		public int GetGreenMask( ) {
 			return GetMask ( Green.Length, Green.Offset );
 		}
 
@@ -167,7 +176,7 @@ namespace Managed.Adb {
 		 * Returns the mask value for the blue color.
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
-		public int GetBlueMask ( ) {
+		public int GetBlueMask( ) {
 			return GetMask ( Blue.Length, Blue.Offset );
 		}
 
@@ -176,12 +185,12 @@ namespace Managed.Adb {
 		 * @param version the version of the protocol
 		 * @return the number of int that makes up the header.
 		 */
-		public static int GetHeaderSize ( int version ) {
+		public static int GetHeaderSize( int version ) {
 			switch ( version ) {
 				case 16: // compatibility mode
 					return 3; // size, width, height
 				case 1:
-					return 12; // bpp, size, width, height, 4*(length, offset)
+					return 12; // bpp, size, width, height, re
 			}
 
 			return 0;
@@ -191,17 +200,17 @@ namespace Managed.Adb {
 		 * Returns a rotated version of the image
 		 * The image is rotated counter-clockwise.
 		 */
-		public RawImage GetRotated ( ) {
+		public RawImage GetRotated( ) {
 			RawImage rotated = new RawImage ( );
 			rotated.Version = this.Version;
 			rotated.Bpp = this.Bpp;
 			rotated.Size = this.Size;
 			rotated.Red.Offset = this.Red.Offset;
 			rotated.Red.Length = this.Red.Length;
-			rotated.Blue.Offset = this.Blue.Offset;
-			rotated.Blue.Length = this.Blue.Length;
 			rotated.Green.Offset = this.Green.Offset;
 			rotated.Green.Length = this.Green.Length;
+			rotated.Blue.Offset = this.Blue.Offset;
+			rotated.Blue.Length = this.Blue.Length;
 			rotated.Alpha.Offset = this.Alpha.Offset;
 			rotated.Alpha.Length = this.Alpha.Length;
 
@@ -219,10 +228,6 @@ namespace Managed.Adb {
 					Array.Copy ( this.Data, ( y * w + x ) * byteCount,
 						rotated.Data, ( ( w - x - 1 ) * h + y ) * byteCount,
 										byteCount );
-					/*System.arraycopy(
-									this.data, (y * w + x) * byteCount,
-									rotated.data, ((w-x-1) * h + y) * byteCount,
-									byteCount);*/
 				}
 			}
 
@@ -232,7 +237,7 @@ namespace Managed.Adb {
 		/**
 		 * Returns an ARGB integer value for the pixel at <var>index</var> in {@link #data}.
 		 */
-		public int GetARGB ( int index ) {
+		public int GetARGB( int index ) {
 			int value;
 			if ( Bpp == 16 ) {
 				value = Data[index] & 0x00FF;
@@ -253,50 +258,37 @@ namespace Managed.Adb {
 			int b = ( (int)( (uint)value >> Blue.Offset ) & GetMask ( Blue.Length ) ) << ( 8 - Blue.Length );
 			int a;
 			if ( Alpha.Length == 0 ) {
-				a = 0xFF; // force alpha to opaque if there's no alpha value in the framebuffer.
+				a = 0xFF; // force alpha to opaque if there's no alpha value in the frame buffer.
 			} else {
+				// based on (http://social.msdn.microsoft.com/Forums/en-US/csharpgeneral/thread/6c892d10-75ff-4f4e-a555-3017f72ec170/)
+				// casting as uint will perform a bit shift with zero fill, like >>> in java.
 				a = ( (int)( (uint)value >> Alpha.Offset ) & GetMask ( Alpha.Length ) ) << ( 8 - Alpha.Length );
 			}
 
-			return a << 24 | r << 16 | g << 8 | b;
+			return a << this.Alpha.Offset /*24*/ | r << this.Red.Offset /* 16 */ | g << this.Green.Offset /* 8 */ | b << this.Blue.Offset /* 0 */;
 		}
 
 		/**
 		 * creates a mask value based on a length and offset.
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
-		private int GetMask ( int length, int offset ) {
+		private int GetMask( int length, int offset ) {
 			int res = GetMask ( length ) << offset;
 
 			// if the bpp is 32 bits then we need to invert it because the buffer is in little endian
 			if ( Bpp == 32 ) {
-				//return BitConverter.ToInt32 ( ReverseBytes ( BitConverter.GetBytes ( res ) ), 0 );
 				return res.ReverseBytes ( );
 			}
 
 			return res;
 		}
 
-		private static byte[] ReverseBytes ( byte[] inArray ) {
-			byte temp;
-			int highCtr = inArray.Length - 1;
-
-			for ( int ctr = 0; ctr < inArray.Length / 2; ctr++ ) {
-				temp = inArray[ctr];
-				inArray[ctr] = inArray[highCtr];
-				inArray[highCtr] = temp;
-				highCtr -= 1;
-			}
-			return inArray;
-		}
-
-
 		/**
 		 * Creates a mask value based on a length.
 		 * @param length
 		 * @return
 		 */
-		private static int GetMask ( int length ) {
+		private static int GetMask( int length ) {
 			return ( 1 << length ) - 1;
 		}
 
@@ -306,16 +298,18 @@ namespace Managed.Adb {
 		/// <returns>
 		/// A <see cref="System.String"/> that represents this instance.
 		/// </returns>
-		public override string ToString ( ) {
-			return String.Format ( "height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\n",
+		public override string ToString( ) {
+			return String.Format ( "height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\ns: {11}",
 				this.Height, this.Width, this.Bpp,
 				this.Red.Offset, this.Red.Length,
 				this.Green.Offset, this.Green.Length,
 				this.Blue.Offset, this.Blue.Length,
-				this.Alpha.Offset, this.Alpha.Length );
+				this.Alpha.Offset, this.Alpha.Length, this.Size );
 		}
 
-		public Image ToImage ( PixelFormat format ) {
+
+
+		public Image ToImage( PixelFormat format ) {
 			int pixels = this.Size;
 			Bitmap bitmap = null;
 			Bitmap image = null;
@@ -326,12 +320,17 @@ namespace Managed.Adb {
 				image = new Bitmap ( this.Width, this.Height, format );
 
 				for ( int i = 0; i < this.Data.Length; i++ ) {
-					Marshal.WriteByte ( bitmapdata.Scan0, i, this.Data[i] );
+					// it seems that the colors are off in the byte. (at least for some devices)
+					// but, this isn't fixing anything...
+					/*var color = Data[i];
+					var r = (byte)( ( color & 0x00FF0000 ) << 8 );
+					var g = (byte)( ( color & 0x0000FF00 ) << 8 );
+					var b = (byte)( ( color & 0xFF000000 ) >> 16 );
+					var a = (byte)( ( color & 0x000000FF ) );
+					Marshal.WriteByte ( bitmapdata.Scan0, i, (byte)( a | r | g | b ) );*/
+					Marshal.WriteByte ( bitmapdata.Scan0, i, Data[i] );
 				}
 				bitmap.UnlockBits ( bitmapdata );
-
-
-
 				using ( Graphics g = Graphics.FromImage ( image ) ) {
 					g.DrawImage ( bitmap, new Point ( 0, 0 ) );
 					return image;

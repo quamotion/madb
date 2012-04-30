@@ -67,7 +67,7 @@ namespace Managed.Adb.Extensions {
 						 ( value & 0x00FF000000000000UL ) >> 40 | ( value & 0xFF00000000000000UL ) >> 56;
 		}
 
-		private static byte[] ReverseByteArray ( byte[] inArray ) {
+		public static byte[] ReverseByteArray ( this byte[] inArray ) {
 			byte temp;
 			int highCtr = inArray.Length - 1;
 
