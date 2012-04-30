@@ -3,23 +3,97 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using Managed.Adb.Extensions;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+
 
 namespace Managed.Adb {
+	/// <summary>
+	/// Data representing an image taken from a device frame buffer.
+	/// </summary>
 	public class RawImage {
-		public int Version { get; set; }
-		public int Bpp { get; set; }
-		public int Size { get; set; }
-		public int Width { get; set; }
-		public int Height { get; set; }
-		public int RedOffset { get; set; }
-		public int RedLength { get; set; }
-		public int BlueOffset { get; set; }
-		public int BlueLength { get; set; }
-		public int GreenOffset { get; set; }
-		public int GreenLength { get; set; }
-		public int AlphaOffset { get; set; }
-		public int AlphaLength { get; set; }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RawImage"/> class.
+		/// </summary>
+		public RawImage ( ) {
+			this.Red = new ColorData ( );
+			this.Blue = new ColorData ( );
+			this.Green = new ColorData ( );
+			this.Alpha = new ColorData ( );
+		}
 
+		/// <summary>
+		/// Gets or sets the version.
+		/// </summary>
+		/// <value>
+		/// The version.
+		/// </value>
+		public int Version { get; set; }
+		/// <summary>
+		/// Gets or sets the BPP.
+		/// </summary>
+		/// <value>
+		/// The BPP.
+		/// </value>
+		public int Bpp { get; set; }
+		/// <summary>
+		/// Gets or sets the size.
+		/// </summary>
+		/// <value>
+		/// The size.
+		/// </value>
+		public int Size { get; set; }
+		/// <summary>
+		/// Gets or sets the width.
+		/// </summary>
+		/// <value>
+		/// The width.
+		/// </value>
+		public int Width { get; set; }
+		/// <summary>
+		/// Gets or sets the height.
+		/// </summary>
+		/// <value>
+		/// The height.
+		/// </value>
+		public int Height { get; set; }
+		/// <summary>
+		/// Gets or sets the red.
+		/// </summary>
+		/// <value>
+		/// The red.
+		/// </value>
+		public ColorData Red { get; set; }
+		/// <summary>
+		/// Gets or sets the blue.
+		/// </summary>
+		/// <value>
+		/// The blue.
+		/// </value>
+		public ColorData Blue { get; set; }
+		/// <summary>
+		/// Gets or sets the green.
+		/// </summary>
+		/// <value>
+		/// The green.
+		/// </value>
+		public ColorData Green { get; set; }
+		/// <summary>
+		/// Gets or sets the alpha.
+		/// </summary>
+		/// <value>
+		/// The alpha.
+		/// </value>
+		public ColorData Alpha { get; set; }
+
+		/// <summary>
+		/// Gets or sets the data.
+		/// </summary>
+		/// <value>
+		/// The data.
+		/// </value>
 		public byte[] Data { get; set; }
 
 		/**
@@ -31,7 +105,7 @@ namespace Managed.Adb {
 		 */
 		public bool ReadHeader ( int version, BinaryReader buf ) {
 			this.Version = version;
-
+			Console.WriteLine ( "version: {0}", version );
 			if ( version == 16 ) {
 				// compatibility mode with original protocol
 				this.Bpp = 16;
@@ -42,27 +116,29 @@ namespace Managed.Adb {
 				this.Height = buf.ReadInt32 ( );
 
 				// create default values for the rest. Format is 565
-				this.RedOffset = 11;
-				this.RedLength = 5;
-				this.GreenOffset = 5;
-				this.GreenLength = 6;
-				this.BlueOffset = 0;
-				this.BlueLength = 5;
-				this.AlphaOffset = 0;
-				this.AlphaLength = 0;
+				this.Red.Offset = 11;
+				this.Red.Length = 5;
+				this.Green.Offset = 5;
+				this.Green.Length = 6;
+				this.Blue.Offset = 0;
+				this.Blue.Length = 5;
+				this.Alpha.Offset = 0;
+				this.Alpha.Length = 0;
 			} else if ( version == 1 ) {
 				this.Bpp = buf.ReadInt32 ( );
 				this.Size = buf.ReadInt32 ( );
 				this.Width = buf.ReadInt32 ( );
 				this.Height = buf.ReadInt32 ( );
-				this.RedOffset = buf.ReadInt32 ( );
-				this.RedLength = buf.ReadInt32 ( );
-				this.BlueOffset = buf.ReadInt32 ( );
-				this.BlueLength = buf.ReadInt32 ( );
-				this.GreenOffset = buf.ReadInt32 ( );
-				this.GreenLength = buf.ReadInt32 ( );
-				this.AlphaOffset = buf.ReadInt32 ( );
-				this.AlphaLength = buf.ReadInt32 ( );
+				this.Blue.Offset = buf.ReadInt32 ( );
+				this.Blue.Length = buf.ReadInt32 ( );
+				this.Green.Offset = buf.ReadInt32 ( );
+				this.Green.Length = buf.ReadInt32 ( );
+				this.Red.Offset = buf.ReadInt32 ( );
+				this.Red.Length = buf.ReadInt32 ( );
+				this.Alpha.Offset = buf.ReadInt32 ( );
+				this.Alpha.Length = buf.ReadInt32 ( );
+
+				Console.WriteLine ( this.ToString ( ) );
 			} else {
 				// unsupported protocol!
 				return false;
@@ -76,7 +152,7 @@ namespace Managed.Adb {
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
 		public int GetRedMask ( ) {
-			return GetMask ( RedLength, RedOffset );
+			return GetMask ( Red.Length, Red.Offset );
 		}
 
 		/**
@@ -84,7 +160,7 @@ namespace Managed.Adb {
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
 		public int GetGreenMask ( ) {
-			return GetMask ( GreenLength, GreenOffset );
+			return GetMask ( Green.Length, Green.Offset );
 		}
 
 		/**
@@ -92,7 +168,7 @@ namespace Managed.Adb {
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
 		public int GetBlueMask ( ) {
-			return GetMask ( BlueLength, BlueOffset );
+			return GetMask ( Blue.Length, Blue.Offset );
 		}
 
 		/**
@@ -120,14 +196,14 @@ namespace Managed.Adb {
 			rotated.Version = this.Version;
 			rotated.Bpp = this.Bpp;
 			rotated.Size = this.Size;
-			rotated.RedOffset = this.RedOffset;
-			rotated.RedLength = this.RedLength;
-			rotated.BlueOffset = this.BlueOffset;
-			rotated.BlueLength = this.BlueLength;
-			rotated.GreenOffset = this.GreenOffset;
-			rotated.GreenLength = this.GreenLength;
-			rotated.AlphaOffset = this.AlphaOffset;
-			rotated.AlphaLength = this.AlphaLength;
+			rotated.Red.Offset = this.Red.Offset;
+			rotated.Red.Length = this.Red.Length;
+			rotated.Blue.Offset = this.Blue.Offset;
+			rotated.Blue.Length = this.Blue.Length;
+			rotated.Green.Offset = this.Green.Offset;
+			rotated.Green.Length = this.Green.Length;
+			rotated.Alpha.Offset = this.Alpha.Offset;
+			rotated.Alpha.Length = this.Alpha.Length;
 
 			rotated.Width = this.Height;
 			rotated.Height = this.Width;
@@ -170,14 +246,16 @@ namespace Managed.Adb {
 				throw new ArgumentException ( "RawImage.getARGB(int) only works in 16 and 32 bit mode." );
 			}
 
-			int r = ( ( value >> RedOffset ) & GetMask ( RedLength ) ) << ( 8 - RedLength );
-			int g = ( ( value >> GreenOffset ) & GetMask ( GreenLength ) ) << ( 8 - GreenLength );
-			int b = ( ( value >> BlueOffset ) & GetMask ( BlueLength ) ) << ( 8 - BlueLength );
+			// based on (http://social.msdn.microsoft.com/Forums/en-US/csharpgeneral/thread/6c892d10-75ff-4f4e-a555-3017f72ec170/)
+			// casting as uint will perform a bit shift with zero fill, like >>> in java.
+			int r = ( (int)( (uint)value >> Red.Offset ) & GetMask ( Red.Length ) ) << ( 8 - Red.Length );
+			int g = ( (int)( (uint)value >> Green.Offset ) & GetMask ( Green.Length ) ) << ( 8 - Green.Length );
+			int b = ( (int)( (uint)value >> Blue.Offset ) & GetMask ( Blue.Length ) ) << ( 8 - Blue.Length );
 			int a;
-			if ( AlphaLength == 0 ) {
+			if ( Alpha.Length == 0 ) {
 				a = 0xFF; // force alpha to opaque if there's no alpha value in the framebuffer.
 			} else {
-				a = ( ( value >> AlphaOffset ) & GetMask ( AlphaLength ) ) << ( 8 - AlphaLength );
+				a = ( (int)( (uint)value >> Alpha.Offset ) & GetMask ( Alpha.Length ) ) << ( 8 - Alpha.Length );
 			}
 
 			return a << 24 | r << 16 | g << 8 | b;
@@ -192,7 +270,8 @@ namespace Managed.Adb {
 
 			// if the bpp is 32 bits then we need to invert it because the buffer is in little endian
 			if ( Bpp == 32 ) {
-				return BitConverter.ToInt32 ( ReverseBytes ( BitConverter.GetBytes ( res ) ), 0 );
+				//return BitConverter.ToInt32 ( ReverseBytes ( BitConverter.GetBytes ( res ) ), 0 );
+				return res.ReverseBytes ( );
 			}
 
 			return res;
@@ -219,6 +298,48 @@ namespace Managed.Adb {
 		 */
 		private static int GetMask ( int length ) {
 			return ( 1 << length ) - 1;
+		}
+
+		/// <summary>
+		/// Returns a <see cref="System.String"/> that represents this instance.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.String"/> that represents this instance.
+		/// </returns>
+		public override string ToString ( ) {
+			return String.Format ( "height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\n",
+				this.Height, this.Width, this.Bpp,
+				this.Red.Offset, this.Red.Length,
+				this.Green.Offset, this.Green.Length,
+				this.Blue.Offset, this.Blue.Length,
+				this.Alpha.Offset, this.Alpha.Length );
+		}
+
+		public Image ToImage ( PixelFormat format ) {
+			int pixels = this.Size;
+			Bitmap bitmap = null;
+			Bitmap image = null;
+			BitmapData bitmapdata = null;
+			try {
+				bitmap = new Bitmap ( this.Width, this.Height, format );
+				bitmapdata = bitmap.LockBits ( new Rectangle ( 0, 0, this.Width, this.Height ), ImageLockMode.WriteOnly, format );
+				image = new Bitmap ( this.Width, this.Height, format );
+
+				for ( int i = 0; i < this.Data.Length; i++ ) {
+					Marshal.WriteByte ( bitmapdata.Scan0, i, this.Data[i] );
+				}
+				bitmap.UnlockBits ( bitmapdata );
+
+
+
+				using ( Graphics g = Graphics.FromImage ( image ) ) {
+					g.DrawImage ( bitmap, new Point ( 0, 0 ) );
+					return image;
+				}
+
+			} catch ( Exception ) {
+				throw;
+			}
 		}
 	}
 }

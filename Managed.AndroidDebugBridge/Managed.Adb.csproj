@@ -118,8 +118,10 @@
     <Compile Include="BusyBox.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ClientData.cs" />
+    <Compile Include="ColorData.cs" />
     <Compile Include="Exceptions\CommandAbortingException.cs" />
     <Compile Include="Exceptions\UnknownOptionException.cs" />
+    <Compile Include="Extensions\IntegerHelper.cs" />
     <Compile Include="Receivers\CommandErrorReceiver.cs" />
     <Compile Include="Receivers\CommandResultReceiver.cs" />
     <Compile Include="Receivers\ConsoleOutputReceiver.cs" />
