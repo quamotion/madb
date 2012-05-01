@@ -22,7 +22,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RawImage"/> class.
 		/// </summary>
-		public RawImage( ) {
+		public RawImage ( ) {
 			this.Red = new ColorData ( );
 			this.Blue = new ColorData ( );
 			this.Green = new ColorData ( );
@@ -110,7 +110,7 @@ namespace Managed.Adb {
 		 * @param buf the buffer to read from.
 		 * @return true if success
 		 */
-		public bool ReadHeader( int version, BinaryReader buf ) {
+		public bool ReadHeader ( int version, BinaryReader buf ) {
 			this.Version = version;
 			if ( version == 16 ) {
 				// compatibility mode with original protocol
@@ -160,7 +160,7 @@ namespace Managed.Adb {
 		 * Returns the mask value for the red color.
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
-		public int GetRedMask( ) {
+		public int GetRedMask ( ) {
 			return GetMask ( Red.Length, Red.Offset );
 		}
 
@@ -168,7 +168,7 @@ namespace Managed.Adb {
 		 * Returns the mask value for the green color.
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
-		public int GetGreenMask( ) {
+		public int GetGreenMask ( ) {
 			return GetMask ( Green.Length, Green.Offset );
 		}
 
@@ -176,7 +176,7 @@ namespace Managed.Adb {
 		 * Returns the mask value for the blue color.
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
-		public int GetBlueMask( ) {
+		public int GetBlueMask ( ) {
 			return GetMask ( Blue.Length, Blue.Offset );
 		}
 
@@ -185,7 +185,7 @@ namespace Managed.Adb {
 		 * @param version the version of the protocol
 		 * @return the number of int that makes up the header.
 		 */
-		public static int GetHeaderSize( int version ) {
+		public static int GetHeaderSize ( int version ) {
 			switch ( version ) {
 				case 16: // compatibility mode
 					return 3; // size, width, height
@@ -200,7 +200,7 @@ namespace Managed.Adb {
 		 * Returns a rotated version of the image
 		 * The image is rotated counter-clockwise.
 		 */
-		public RawImage GetRotated( ) {
+		public RawImage GetRotated ( ) {
 			RawImage rotated = new RawImage ( );
 			rotated.Version = this.Version;
 			rotated.Bpp = this.Bpp;
@@ -237,7 +237,7 @@ namespace Managed.Adb {
 		/**
 		 * Returns an ARGB integer value for the pixel at <var>index</var> in {@link #data}.
 		 */
-		public int GetARGB( int index ) {
+		public int GetARGB ( int index ) {
 			int value;
 			if ( Bpp == 16 ) {
 				value = Data[index] & 0x00FF;
@@ -253,26 +253,26 @@ namespace Managed.Adb {
 
 			// based on (http://social.msdn.microsoft.com/Forums/en-US/csharpgeneral/thread/6c892d10-75ff-4f4e-a555-3017f72ec170/)
 			// casting as uint will perform a bit shift with zero fill, like >>> in java.
-			int r = ( (int)( (uint)value >> Red.Offset ) & GetMask ( Red.Length ) ) << ( 8 - Red.Length );
-			int g = ( (int)( (uint)value >> Green.Offset ) & GetMask ( Green.Length ) ) << ( 8 - Green.Length );
-			int b = ( (int)( (uint)value >> Blue.Offset ) & GetMask ( Blue.Length ) ) << ( 8 - Blue.Length );
+			int r = ( value >> Red.Offset ) & GetMask ( Red.Length ) << ( 8 - Red.Length );
+			int g = ( value >> Green.Offset ) & GetMask ( Green.Length ) << ( 8 - Green.Length );
+			int b = ( value >> Blue.Offset ) & GetMask ( Blue.Length ) << ( 8 - Blue.Length );
 			int a;
 			if ( Alpha.Length == 0 ) {
 				a = 0xFF; // force alpha to opaque if there's no alpha value in the frame buffer.
 			} else {
 				// based on (http://social.msdn.microsoft.com/Forums/en-US/csharpgeneral/thread/6c892d10-75ff-4f4e-a555-3017f72ec170/)
 				// casting as uint will perform a bit shift with zero fill, like >>> in java.
-				a = ( (int)( (uint)value >> Alpha.Offset ) & GetMask ( Alpha.Length ) ) << ( 8 - Alpha.Length );
+				a = ( value >> Alpha.Offset ) & GetMask ( Alpha.Length ) << ( 8 - Alpha.Length );
 			}
 
-			return a << this.Alpha.Offset /*24*/ | r << this.Red.Offset /* 16 */ | g << this.Green.Offset /* 8 */ | b << this.Blue.Offset /* 0 */;
+			return a << /*this.Alpha.Offset*/ 24 | r << /*this.Red.Offset*/ 16 | g << /*this.Green.Offset*/ 8 | b << /*this.Blue.Offset*/ 0;
 		}
 
 		/**
 		 * creates a mask value based on a length and offset.
 		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
 		 */
-		private int GetMask( int length, int offset ) {
+		private int GetMask ( int length, int offset ) {
 			int res = GetMask ( length ) << offset;
 
 			// if the bpp is 32 bits then we need to invert it because the buffer is in little endian
@@ -288,7 +288,7 @@ namespace Managed.Adb {
 		 * @param length
 		 * @return
 		 */
-		private static int GetMask( int length ) {
+		private static int GetMask ( int length ) {
 			return ( 1 << length ) - 1;
 		}
 
@@ -298,7 +298,7 @@ namespace Managed.Adb {
 		/// <returns>
 		/// A <see cref="System.String"/> that represents this instance.
 		/// </returns>
-		public override string ToString( ) {
+		public override string ToString ( ) {
 			return String.Format ( "height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\ns: {11}",
 				this.Height, this.Width, this.Bpp,
 				this.Red.Offset, this.Red.Length,
@@ -309,7 +309,12 @@ namespace Managed.Adb {
 
 
 
-		public Image ToImage( PixelFormat format ) {
+		/// <summary>
+		/// Converts this raw image to an Image
+		/// </summary>
+		/// <param name="format">The format.</param>
+		/// <returns></returns>
+		public Image ToImage ( PixelFormat format ) {
 			int pixels = this.Size;
 			Bitmap bitmap = null;
 			Bitmap image = null;
@@ -322,12 +327,30 @@ namespace Managed.Adb {
 				for ( int i = 0; i < this.Data.Length; i++ ) {
 					// it seems that the colors are off in the byte. (at least for some devices)
 					// but, this isn't fixing anything...
-					/*var color = Data[i];
-					var r = (byte)( ( color & 0x00FF0000 ) << 8 );
-					var g = (byte)( ( color & 0x0000FF00 ) << 8 );
-					var b = (byte)( ( color & 0xFF000000 ) >> 16 );
-					var a = (byte)( ( color & 0x000000FF ) );
-					Marshal.WriteByte ( bitmapdata.Scan0, i, (byte)( a | r | g | b ) );*/
+					//var color =GetARGB(i);
+					/*var r = ( (uint) (color & 0x00FF0000 ) );
+					var g = ( (uint)( color & 0x0000FF00 ) );
+					var b = ( (uint)( color & 0xFF000000 )  );
+					var a = ( (uint)( color & 0x000000FF ) );*/
+					/*int r = ( color >> Red.Offset ) & GetMask ( Red.Length ) << ( 8 - Red.Length );
+					int g = ( color >> Green.Offset ) & GetMask ( Green.Length ) << ( 8 - Green.Length );
+					int b = ( color >> Blue.Offset ) & GetMask ( Blue.Length ) << ( 8 - Blue.Length );
+					int a;
+					if ( Alpha.Length == 0 ) {
+						a = 0xFF; // force alpha to opaque if there's no alpha value in the frame buffer.
+					} else {
+						// based on (http://social.msdn.microsoft.com/Forums/en-US/csharpgeneral/thread/6c892d10-75ff-4f4e-a555-3017f72ec170/)
+						// casting as uint will perform a bit shift with zero fill, like >>> in java.
+						a = ( color >> Alpha.Offset ) & GetMask ( Alpha.Length ) << ( 8 - Alpha.Length );
+					}*/
+
+					//byte[] bytes = BitConverter.GetBytes ( color );
+					//Console.WriteLine ( bytes.ToHex ( ) );
+					//foreach ( var b1 in bytes ) {
+						//Marshal.WriteByte ( bitmapdata.Scan0, i, b1 );
+
+					//}
+
 					Marshal.WriteByte ( bitmapdata.Scan0, i, Data[i] );
 				}
 				bitmap.UnlockBits ( bitmapdata );
