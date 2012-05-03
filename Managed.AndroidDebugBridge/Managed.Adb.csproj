@@ -119,6 +119,11 @@
     <Compile Include="Client.cs" />
     <Compile Include="ClientData.cs" />
     <Compile Include="ColorData.cs" />
+    <Compile Include="Conversion\BigEndianBitConverter.cs" />
+    <Compile Include="Conversion\DoubleConverter.cs" />
+    <Compile Include="Conversion\EndianBitConverter.cs" />
+    <Compile Include="Conversion\Endianness.cs" />
+    <Compile Include="Conversion\LittleEndianBitConverter.cs" />
     <Compile Include="Exceptions\CommandAbortingException.cs" />
     <Compile Include="Exceptions\UnknownOptionException.cs" />
     <Compile Include="Extensions\IntegerHelper.cs" />

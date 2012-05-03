@@ -6,6 +6,20 @@ using System.Text;
 namespace Managed.Adb.Extensions {
 	public static class IntegerHelper {
 
+		public static Int32 BitShiftRight( this Int32 value, int bits ) {
+			return (Int32)( (UInt32)value >> bits );
+		}
+
+		public static Int16 BitShiftRight( this Int16 value, int bits ) {
+			return (Int16)( (UInt16)value >> bits );
+		}
+
+		public static Int64 BitShiftRight( this Int64 value, int bits ) {
+			return (Int64)( (UInt64)value >> bits );
+		}
+
+
+
 		// reverse byte order (16-bit)
 		/// <summary>
 		/// reverse byte order (16-bit)
