@@ -687,31 +687,31 @@ namespace Managed.Adb {
 						string sdata = data.GetString ( 0, count, AdbHelper.DEFAULT_ENCODING );
 						var sdataTrimmed = sdata.Trim ( );
 						if ( sdataTrimmed.EndsWith ( String.Format ( "{0}: not found", cmd[0] ) ) ) {
-							Log.w ( "AdbHelper", "The remote execution returned: '{0}: not found'", cmd[0] );
+							Log.w ( TAG, "The remote execution returned: '{0}: not found'", cmd[0] );
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}: not found'", cmd[0] ) );
 						}
 
 						if ( sdataTrimmed.EndsWith ( "No such file or directory" ) ) {
-							Log.w ( "AdbHelper", "The remote execution returned: {0}", sdataTrimmed );
+							Log.w ( TAG, "The remote execution returned: {0}", sdataTrimmed );
 							throw new FileNotFoundException ( String.Format ( "The remote execution returned: {0}", sdataTrimmed ) );
 						}
 
 						// for "unknown options"
 						if ( sdataTrimmed.Contains ( "Unknown option" ) ) {
-							Log.w ( "AdbHelper", "The remote execution returned: {0}", sdataTrimmed );
+							Log.w ( TAG, "The remote execution returned: {0}", sdataTrimmed );
 							throw new UnknownOptionException ( sdataTrimmed );
 						}
 
 						// for "aborting" commands
 						if ( sdataTrimmed.EndsWith ( "Aborting." ) ) {
-							Log.w ( "AdbHelper", "The remote execution returned: {0}", sdataTrimmed );
+							Log.w ( TAG, "The remote execution returned: {0}", sdataTrimmed );
 							throw new CommandAbortingException ( sdataTrimmed );
 						}
 
 						// for busybox applets 
 						// cmd: applet not found
 						if ( cmd.Length > 1 && sdataTrimmed.EndsWith ( String.Format ( "{0}: applet not found", cmd[1] ) ) ) {
-							Log.w ( "AdbHelper", "The remote execution returned: '{0}'", sdataTrimmed );
+							Log.w ( TAG, "The remote execution returned: '{0}'", sdataTrimmed );
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}'", sdataTrimmed ) );
 						}
 
@@ -719,7 +719,7 @@ namespace Managed.Adb {
 						// workitem: 16822
 						if ( sdataTrimmed.EndsWith ( String.Format ( "{0}: permission denied", cmd[0] ) ) ||
 							sdataTrimmed.EndsWith ( String.Format ( "{0}: access denied", cmd[0] ) ) ) {
-							Log.w ( "AdbHelper", "The remote execution returned: '{0}'", sdataTrimmed );
+							Log.w ( TAG, "The remote execution returned: '{0}'", sdataTrimmed );
 							throw new PermissionDeniedException ( String.Format ( "The remote execution returned: '{0}'", sdataTrimmed ) );
 						}
 
@@ -730,7 +730,7 @@ namespace Managed.Adb {
 					}
 				}
 			} /*catch ( Exception e ) {
-				Log.e ( "AdbHelper", e );
+				Log.e ( TAG, e );
 				Console.Error.WriteLine ( e.ToString ( ) );
 				throw;
 			}*/ finally {

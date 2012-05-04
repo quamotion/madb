@@ -226,29 +226,30 @@ namespace Managed.Adb {
 		 */
 		public int GetARGB( int index ) {
 			int value;
+
 			if ( Bpp == 16 ) {
 				value = Data[index] & 0x00FF;
 				value |= ( Data[index + 1] << 8 ) & 0x0FF00;
 			} else if ( Bpp == 32 ) {
-				value = Data[index] & 0x00FF;
-				value |= ( Data[index + 1] & 0x00FF ) << 8;
-				value |= ( Data[index + 2] & 0x00FF ) << 16;
-				value |= ( Data[index + 3] & 0x00FF ) << 24;
+				value = ( Data[index] & 0xff );
+				value |= ( Data[index + 1] & 0xff ) << 8;
+				value |= ( Data[index + 2] & 0xff ) << 16;
+				value |= ( Data[index + 3] & 0xff ) << 24;
 			} else {
-				throw new ArgumentException ( "RawImage.getARGB(int) only works in 16 and 32 bit mode." );
+				throw new NotImplementedException ( "RawImage.GetARGB(int) only works in 16 and 32 bit mode." );
 			}
 
-			int r = (int)( ( (uint)value >> Red.Offset ) & GetMask ( Red.Length ) ) << ( 8 - Red.Length );
-			int g = (int)( ( (uint)value >> Green.Offset ) & GetMask ( Green.Length ) ) << ( 8 - Green.Length );
-			int b = (int)( ( (uint)value >> Blue.Offset ) & GetMask ( Blue.Length ) ) << ( 8 - Blue.Length );
+			int r = ( value >> Red.Offset ) & 0xff;
+			int g = ( value >> Green.Offset ) & 0xff;
+			int b = ( value >> Blue.Offset) & 0xff;
 			int a;
 			if ( Alpha.Length == 0 ) {
 				a = 0xFF; // force alpha to opaque if there's no alpha value in the framebuffer.
 			} else {
-				a = (int)( ( (uint)value >> Alpha.Offset ) & GetMask ( Alpha.Length ) ) << ( 8 - Alpha.Length );
+				a = ( value >> Alpha.Offset ) & 0xff;
 			}
 
-			var argb = a << 24 | r << 16 | g << 8 | b;
+			var argb = (byte)a << 24 | (byte)r << 16 | (byte)g << 8 | (byte)b ;
 			return argb;
 		}
 
@@ -299,7 +300,7 @@ namespace Managed.Adb {
 		/// <param name="format">The format.</param>
 		/// <returns></returns>
 		public Image ToImage( PixelFormat format ) {
-			
+
 			Bitmap bitmap = null;
 			Bitmap image = null;
 			BitmapData bitmapdata = null;
@@ -310,18 +311,24 @@ namespace Managed.Adb {
 				var bypp = this.Bpp / 8;
 				int pixels = Data.Length / bypp;
 
-				for ( int i = 0; i < this.Data.Length; i++ ) {
-					//var argb = GetARGB ( i );
-					/*if ( Bpp == 16 ) {
+				for ( int i = 0; i < pixels; i++ ) {
+					var argb = GetARGB ( i );
+					if ( Bpp == 16 ) {
 						Marshal.WriteInt16 ( bitmapdata.Scan0, (short)argb );
 					} else {
+						var bb = BitConverter.GetBytes ( argb );
+						//Console.Write ( bb.ToHex ( ) );
 						Marshal.WriteInt32 ( bitmapdata.Scan0, argb );
-					}*/
+						//Console.Write ( " " );
+					}
+
 					//Console.Write ( Data[i].ToHex ( ) );
 					//if ( i % 4 == 0 && i > 2 ) {
-						//Console.Write ( " " );
+					//Console.Write ( " " );
 					//}
-					Marshal.WriteByte ( bitmapdata.Scan0, i, Data[i] );
+					/*Console.Write ( Data[i].ToHex ( ) );
+					Console.Write ( " " );
+					Marshal.WriteByte ( bitmapdata.Scan0, i, Data[i] );*/
 				}
 				bitmap.UnlockBits ( bitmapdata );
 				using ( Graphics g = Graphics.FromImage ( image ) ) {
