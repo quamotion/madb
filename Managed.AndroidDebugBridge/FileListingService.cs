@@ -108,11 +108,11 @@ namespace Managed.Adb {
 		/// <summary>
 		/// 
 		/// </summary>
-		public const String BUSYBOX_LS = "busybox ls -lF --color=never {0}";
+		public const String BUSYBOX_LS = "busybox ls -lFa --color=never {0}";
 		/// <summary>
 		/// 
 		/// </summary>
-		public const String TOOLBOX_LS = "ls -l {0}";
+		public const String TOOLBOX_LS = "ls -la {0}";
 
 		/// <summary>
 		/// 

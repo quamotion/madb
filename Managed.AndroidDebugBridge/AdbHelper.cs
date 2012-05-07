@@ -626,6 +626,7 @@ namespace Managed.Adb {
 		/// <param name="command">The command.</param>
 		/// <param name="device">The device.</param>
 		/// <param name="rcvr">The RCVR.</param>
+		/// <remarks>Should check if you CanSU before calling this.</remarks>
 		public void ExecuteRemoteRootCommand( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr ) {
 			ExecuteRemoteCommand ( endPoint, String.Format ( "su -c \"{0}\"", command ), device, rcvr );
 		}
