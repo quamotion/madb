@@ -272,14 +272,29 @@ namespace Managed.Adb {
 		public Dictionary<String, String> EnvironmentVariables { get; private set; }
 
 		/// <summary>
-		/// Gets the property.
+		/// Gets the property value.
 		/// </summary>
-		/// <param name="name">The name of the value to return.</param>
+		/// <param name="name">The name of the property.</param>
 		/// <returns>
 		/// the value or <code>null</code> if the property does not exist.
 		/// </returns>
 		public String GetProperty( String name ) {
 			return Properties[name];
+		}
+
+		/// <summary>
+		/// Gets the first property that exists in the array of property names.
+		/// </summary>
+		/// <param name="name">The array of property names.</param>
+		/// <returns></returns>
+		public String GetFirstProperty ( params String[] name ) {
+			foreach ( var item in name ) {
+				if ( Properties.ContainsKey ( item ) ) {
+					return Properties[item];
+				}
+			}
+
+			return null;
 		}
 
 		/// <summary>

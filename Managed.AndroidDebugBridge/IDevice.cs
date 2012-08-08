@@ -64,6 +64,23 @@ namespace Managed.Adb {
 		Dictionary<String, String> Properties { get; }
 
 		/// <summary>
+		/// Gets the property value.
+		/// </summary>
+		/// <param name="name">The name of the property.</param>
+		/// <returns>
+		/// the value or <code>null</code> if the property does not exist.
+		/// </returns>
+		String GetProperty ( String name );
+		/// <summary>
+		/// Gets the first property that exists in the array of property names.
+		/// </summary>
+		/// <param name="name">The array of property names.</param>
+		/// <returns>
+		/// the value or <code>null</code> if the property does not exist.
+		/// </returns>
+		String GetFirstProperty ( params String[] name );
+
+		/// <summary>
 		/// Gets a value indicating whether the device is online.
 		/// </summary>
 		/// <value><c>true</c> if the device is online; otherwise, <c>false</c>.</value>
