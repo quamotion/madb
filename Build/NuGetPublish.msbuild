@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Build">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Publish">
 	<PropertyGroup>
 		<SharedProperties>SharedProperties</SharedProperties>
-		<PublishTarget Condition=" '$(PublishMode)' == 'NuGet' ">PublishTarget</PublishTarget>
+		<PublishNuGet Condition=" '$(PublishMode)' == 'NuGet' ">PublishNuGet</PublishNuGet>
 	</PropertyGroup>
 	
 	<Target Name="Publish" DependsOnTargets="NuGetPackage" Condition=" '$(PublishMode)' == 'NuGet' ">
-		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push $(CCNetProject).$(CCNetLabel).nupkg $(NuGetKey) –source http://packages.nuget.org/v1/" />
+		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push setApiKey $(NuGetKey)" />
+		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push $(CCNetProject).$(CCNetLabel).nupkg $(NuGetKey)" />
 	</Target>
 
 	<Target Name="NuGetPackage">

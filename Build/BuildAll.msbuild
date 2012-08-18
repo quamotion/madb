@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5" DefaultTargets="Build">
-	<Import Project="$(MSBuildProjectDirectory)\SharedProperties.msbuild" Condition="Exists('$(MSBuildProjectDirectory)\SharedProperties.msbuild') AND '$(SharedProperties)' != 'SharedProperties' " />
+	<Import Project="$(MSBuildProjectDirectory)\SharedProperties.msbuild" 
+					Condition="Exists('$(MSBuildProjectDirectory)\SharedProperties.msbuild') AND '$(SharedProperties)' != 'SharedProperties' " />
 
-	<Import Project="$(MSBuildProjectDirectory)\NuGetPublish.msbuild" Condition="Exists('$(MSBuildProjectDirectory)\NuGetPublish.msbuild') AND '$(PublishTarget)' != 'PublishTarget' " />
+	<Import Project="$(MSBuildProjectDirectory)\NuGetPublish.msbuild" 
+					Condition="Exists('$(MSBuildProjectDirectory)\NuGetPublish.msbuild') AND '$(PublishNuGet)' != 'PublishNuGet' " />
 
-	<Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" Condition="'$(MSBuildCommunityTasksPath)' == ''"/>
+	<Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" 
+					Condition="'$(MSBuildCommunityTasksPath)' == ''"/>
 
 	<ItemGroup>
 		<ProjectsToBuild Include="$(CCNetWorkingDirectory)**\*.csproj" Exclude="$(CCNetWorkingDirectory)**\*Tests*.csproj;"/>
@@ -19,7 +22,7 @@
 	</Target>
 
 	
-	<Target Name="Build" DependsOnTargets="CleanBuild;CoreBuild;ReleaseCleanup;BuildPublish">
+	<Target Name="Build" DependsOnTargets="CleanBuild;CoreBuild;ReleaseCleanup;Publish">
 	</Target>
 
 	
