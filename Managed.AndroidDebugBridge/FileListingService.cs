@@ -382,6 +382,7 @@ namespace Managed.Adb {
 		/// <returns></returns>
 		public FileEntry FindFileEntry ( FileEntry parent, String path ) {
 			var rpath = ResolveLink ( path );
+
 			String[] entriesString = rpath.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
 			FileEntry current = parent;
 			foreach ( var pathItem in entriesString ) {
@@ -414,7 +415,8 @@ namespace Managed.Adb {
 			if ( this.Device.BusyBox.Available ) {
 				var cresult = new CommandResultReceiver();
 				this.Device.BusyBox.ExecuteShellCommand ( "readlink -f {0}", cresult, path );
-				return cresult.Result;
+				// if cresult is empty, return the path
+				return String.IsNullOrEmpty ( cresult.Result ) ? path : cresult.Result;
 			} else {
 				// what do we do here? readlink is not available on devices without busybox...
 				return path;

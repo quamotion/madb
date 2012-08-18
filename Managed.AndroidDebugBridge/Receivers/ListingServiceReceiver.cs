@@ -71,22 +71,11 @@ namespace Managed.Adb {
 				}
 				// get the name
 				String name = m.Groups[9].Value;
-				// if the parent is root, we only accept selected items
-				// eff that - you get it all...
-				/*if ( Parent.IsRoot ) {
-					bool found = false;
-					foreach ( String approved in FileListingService.RootLevelApprovedItems ) {
-						if ( String.Compare ( approved, name, false ) == 0 ) {
-							found = true;
-							break;
-						}
-					}
 
-					// if it's not in the approved list we skip this entry.
-					if ( found == false ) {
-						continue;
-					}
-				}*/
+				if ( String.Compare ( name, ".", true ) == 0 || String.Compare ( name, "..", true ) == 0 ) {
+					// we don't care if the entry is a "." or ".."
+					continue;
+				}
 
 				// get the rest of the groups
 				String permissions = m.Groups[1].Value;
