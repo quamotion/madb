@@ -163,7 +163,31 @@
     <Compile Include="Conversion\LittleEndianBitConverter.cs" />
     <Compile Include="Exceptions\CommandAbortingException.cs" />
     <Compile Include="Exceptions\UnknownOptionException.cs" />
+    <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="Extensions\IntegerHelper.cs" />
+    <Compile Include="MoreLinq\AssertCount.cs" />
+    <Compile Include="MoreLinq\Batch.cs" />
+    <Compile Include="MoreLinq\Concat.cs" />
+    <Compile Include="MoreLinq\Consume.cs" />
+    <Compile Include="MoreLinq\DistinctBy.cs" />
+    <Compile Include="MoreLinq\ExceptBy.cs" />
+    <Compile Include="MoreLinq\ForEach.cs" />
+    <Compile Include="MoreLinq\Generate.cs" />
+    <Compile Include="MoreLinq\GenerateByIndex.cs" />
+    <Compile Include="MoreLinq\GroupAdjacent.cs" />
+    <Compile Include="MoreLinq\Index.cs" />
+    <Compile Include="MoreLinq\KeyValuePair.cs" />
+    <Compile Include="MoreLinq\MaxBy.cs" />
+    <Compile Include="MoreLinq\MinBy.cs" />
+    <Compile Include="MoreLinq\MoreEnumerable.cs" />
+    <Compile Include="MoreLinq\Pad.cs" />
+    <Compile Include="MoreLinq\Pairwise.cs" />
+    <Compile Include="MoreLinq\Pipe.cs" />
+    <Compile Include="MoreLinq\Prepend.cs" />
+    <Compile Include="MoreLinq\PreScan.cs" />
+    <Compile Include="MoreLinq\SequenceException.cs" />
+    <Compile Include="MoreLinq\ThrowIf.cs" />
+    <Compile Include="RawImage.cs" />
     <Compile Include="Receivers\CommandErrorReceiver.cs" />
     <Compile Include="Receivers\CommandResultReceiver.cs" />
     <Compile Include="Receivers\ConsoleOutputReceiver.cs" />
@@ -217,12 +241,10 @@
     <Compile Include="PackageManager.cs" />
     <Compile Include="Receivers\PackageManagerReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RawImage.cs" />
     <Compile Include="Reflection\ReflectionHelper.cs" />
     <Compile Include="SyncResult.cs" />
     <Compile Include="SyncService.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>

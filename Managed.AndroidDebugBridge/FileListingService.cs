@@ -6,6 +6,7 @@ using System.Threading;
 using System.IO;
 using System.Text.RegularExpressions;
 using Managed.Adb.IO;
+using Managed.Adb.MoreLinq;
 
 namespace Managed.Adb {
 	/// <summary>
@@ -21,13 +22,6 @@ namespace Managed.Adb {
 		/// 
 		/// </summary>
 		public const String PM_FULL_LISTING = "pm list packages -f";
-
-		// mine is better, it supports both toolbox ls and busybox ls
-		/// <summary>
-		/// DO NOT USE
-		/// </summary>
-		[Obsolete ( "Use LS_PATTERN_EX, it supports busybox, plus standard ls", true )]
-		public const String LS_PATTERN = "^([bcdlsp-][-r][-w][-xsS][-r][-w][-xsS][-r][-w][-xstST])\\s+(\\S+)\\s+(\\S+)\\s+([\\d\\s,]*)\\s+(\\d{4}-\\d\\d-\\d\\d)\\s+(\\d\\d:\\d\\d)\\s+(.*)$";
 
 		/// <summary>
 		/// This is the pattern that supports busybox ls and toolbox ls.
@@ -250,7 +244,7 @@ namespace Managed.Adb {
 			// we launch a thread that will do ls and give the listing
 			// to the receiver
 			Thread t = new Thread ( new ParameterizedThreadStart ( delegate ( object stateData ) {
-				ThreadState state = stateData as ThreadState;
+				var state = stateData as ThreadState;
 
 				DoLS ( entry );
 
@@ -258,12 +252,11 @@ namespace Managed.Adb {
 
 				FileEntry[] children = state.Entry.Children.ToArray ( );
 				if ( children.Length > 0 && children[0].IsApplicationPackage ) {
-					Dictionary<String, FileEntry> map = new Dictionary<String, FileEntry> ( );
+					var map = new Dictionary<String, FileEntry> ( );
 
-					foreach ( FileEntry child in children ) {
-						String path = child.FullPath;
-						map.Add ( path, child );
-					}
+					children.ForEach( child => {
+						map.Add ( child.FullPath, child );
+					} );
 
 					// call pm.
 					String command = PM_FULL_LISTING;

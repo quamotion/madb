@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Managed.Adb.Conversion;
+using Managed.Adb.Extensions;
 
 
 namespace Managed.Adb {
@@ -124,18 +125,18 @@ namespace Managed.Adb {
 				this.Alpha.Offset = 0;
 				this.Alpha.Length = 0;
 			} else if ( version == 1 ) {
-				this.Bpp = buf.ReadInt32 ( ); // 32
-				this.Size = buf.ReadInt32 ( );
-				this.Width = buf.ReadInt32 ( ); // 480
-				this.Height = buf.ReadInt32 ( ); // 800
-				this.Red.Offset = buf.ReadInt32 ( ); // 8
-				this.Red.Length = buf.ReadInt32 ( ); // 8
-				this.Blue.Offset = buf.ReadInt32 ( );  // 0
-				this.Blue.Length = buf.ReadInt32 ( ); // 8
-				this.Green.Offset = buf.ReadInt32 ( ); // 16
-				this.Green.Length = buf.ReadInt32 ( ); // 8
-				this.Alpha.Offset = buf.ReadInt32 ( ); // 24
-				this.Alpha.Length = buf.ReadInt32 ( ); // 8
+				this.Bpp = (int)buf.ReadInt32 ( ); // 32
+				this.Size = (int)buf.ReadInt32 ( );
+				this.Width = (int)buf.ReadInt32 ( ); // 480
+				this.Height = (int)buf.ReadInt32 ( ); // 800
+				this.Red.Offset = (int)buf.ReadInt32 ( ); // 8
+				this.Red.Length = (int)buf.ReadInt32 ( ); // 8
+				this.Blue.Offset = (int)buf.ReadInt32 ( );  // 0
+				this.Blue.Length = (int)buf.ReadInt32 ( ); // 8
+				this.Green.Offset = (int)buf.ReadInt32 ( ); // 16
+				this.Green.Length = (int)buf.ReadInt32 ( ); // 8
+				this.Alpha.Offset = (int)buf.ReadInt32 ( ); // 24
+				this.Alpha.Length = (int)buf.ReadInt32 ( ); // 8
 			} else {
 				// unsupported protocol!
 				return false;
@@ -300,7 +301,6 @@ namespace Managed.Adb {
 		/// <param name="format">The format.</param>
 		/// <returns></returns>
 		public Image ToImage ( PixelFormat format ) {
-
 			Bitmap bitmap = null;
 			Bitmap image = null;
 			BitmapData bitmapdata = null;
@@ -308,26 +308,11 @@ namespace Managed.Adb {
 				bitmap = new Bitmap ( this.Width, this.Height, format );
 				bitmapdata = bitmap.LockBits ( new Rectangle ( 0, 0, this.Width, this.Height ), ImageLockMode.WriteOnly, format );
 				image = new Bitmap ( this.Width, this.Height, format );
-				var bypp = this.Bpp / 8;
-				int pixels = Data.Length / bypp;
-				//Marshal.Copy ( Data, 0, bitmapdata.Scan0, this.Size );
-				for ( int i = 0; i < Data.Length; i++ ) {
-					/*var argb = GetARGB ( i );
-					if ( Bpp == 16 ) {
-						Marshal.WriteInt16 ( bitmapdata.Scan0, (short)argb );
-					} else {
-						var bb = BitConverter.GetBytes ( argb );
-						//Console.Write ( bb.ToHex ( ) );
-						Marshal.WriteInt32 ( bitmapdata.Scan0, argb );
-						//Console.Write ( " " );
-					}*/
-
-					//Console.Write ( Data[i].ToHex ( ) );
-					//if ( i % 4 == 0 && i > 2 ) {
-					//Console.Write ( " " );
-					//}
-					Marshal.WriteByte ( bitmapdata.Scan0, i, Data[i] );
-				}
+				var tdata = Data;
+				if ( Bpp == 32 ) {
+					tdata = Swap ( tdata );
+				} 
+				Marshal.Copy ( tdata, 0, bitmapdata.Scan0, this.Size );
 				bitmap.UnlockBits ( bitmapdata );
 				using ( Graphics g = Graphics.FromImage ( image ) ) {
 					g.DrawImage ( bitmap, new Point ( 0, 0 ) );
@@ -338,5 +323,15 @@ namespace Managed.Adb {
 				throw;
 			}
 		}
+
+		private byte[] Swap ( byte[] b ) {
+			var clone = new List<byte> ();
+			b.IntReverseForRawImage ( bitem => {
+				clone.AddRange ( bitem );
+			} );
+			return clone.ToArray ( );
+		}
+
+		
 	}
 }

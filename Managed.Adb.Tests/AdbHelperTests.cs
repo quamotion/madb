@@ -5,6 +5,7 @@ using System.Text;
 using Xunit;
 using System.IO;
 using Managed.Adb.IO;
+using System.Drawing.Imaging;
 
 namespace Managed.Adb.Tests {
 	public class AdbHelperTests : BaseDeviceTests {
@@ -118,6 +119,8 @@ namespace Managed.Adb.Tests {
 			Assert.Equal<int> ( 32, rawImage.Bpp );
 			Assert.Equal<int> ( 480, rawImage.Width );
 			Assert.Equal<int> ( 800, rawImage.Height );
+
+			rawImage.ToImage ( PixelFormat.Format32bppArgb ).Save ( @"c:\Users\Ryan\Desktop\file.png",ImageFormat.Png );
 
 		}
 

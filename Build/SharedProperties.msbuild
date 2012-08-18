@@ -36,7 +36,6 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<BuildAllDependsOn>AssemblyInfo;CleanBuild;ReleaseCleanup</BuildAllDependsOn>
 		<CompileDependsOn>$(CompileDependsOn)</CompileDependsOn>
-		<!--OutputPath>$(CCNetArtifactDirectory)$(Configuration)\$(CCNetLabel)\$(ReleasePlatform)\</OutputPath-->
 		<PublishMode Condition=" '$(PublishMode)' == '' ">None</PublishMode>
 
 		<DefineConstants>$(PlatformConstant) $(OSPlatform)</DefineConstants>
@@ -74,10 +73,7 @@
 
 
 	<Target Name="ReleaseCleanup" DependsOnTargets="ZipRelease">
-		<!--CreateItem Include="$(OutputPath)*.*" Exclude="$(OutputPath)*.msi;$(OutputPath)*.zip;$(OutputPath)*.vshost.*">
-			<Output ItemName="Files" TaskParameter="Include"/>
-		</CreateItem>
-		<Delete Files="@(Files)" ContinueOnError="true" /-->
+		<!--Delete Files="@(Files)" ContinueOnError="true" /-->
 	</Target>
 
 
@@ -91,10 +87,35 @@
 			<Output ItemName="ZipFiles" TaskParameter="Include" />
 		</CreateItem>
 
-		<Zip Comment="$(CCNetBuildDate) $(CCNetBuildTime) $(CCNetProject) version $(CCNetLabel)" Files="@(ZipFiles);@(AndroidTools)"
+		<Zip Comment="$(CCNetBuildDate) $(CCNetBuildTime) $(CCNetProject) version $(CCNetLabel)" Files="@(ZipFiles)"
 				 WorkingDirectory="$(OutputPath)"
 				 ZipFileName="$(OutputPath)$(CCNetProject).$(CCNetLabel).$(Platform).zip" ZipLevel="9" Flatten="False" />
 	</Target>
 
+	<Target Name="ILMergeAssemblies">
+		<CreateItem Include="$(OutputPath)*.dll" Exclude="$(OutputPath)*Tests.dll">
+			<Output ItemName="InputAssemblies" TaskParameter="Include"/>
+		</CreateItem>
 
+		<CreateItem Include="$(OutputPath)*.xml" Exclude="$(OutputPath)*MSBuild.Deployment.Tasks.xml">
+			<Output ItemName="XmlFilesAssemblies" TaskParameter="Include"/>
+		</CreateItem>
+
+		<MakeDir Directories="$(OutputPath)Temp\" />
+
+		<ILMerge
+			InputAssemblies="@(InputAssemblies)"
+			DebugInfo="True"
+			OutputFile="$(OutputPath)Temp\MSBuild.Deployment.Tasks.dll"
+			LogFile="$(OutputPath)ilmerge.log"
+			XmlDocumentation="true" />
+
+		<Delete Files="@(InputAssemblies);@(XmlFilesAssemblies)" TreatErrorsAsWarnings="true" />
+
+		<Copy SourceFiles="$(OutputPath)Temp\MSBuild.Deployment.Tasks.dll" DestinationFolder="$(OutputPath)" />
+
+		<Delete Files="$(OutputPath)Temp\MSBuild.Deployment.Tasks.dll" />
+		<RemoveDir Directories="$(OutputPath)Temp\" />
+
+	</Target>
 </Project>

@@ -7,6 +7,10 @@ using System.Net;
 using System.IO;
 using System.Threading;
 using Managed.Adb.Exceptions;
+using Managed.Adb.MoreLinq;
+using Managed.Adb.IO;
+
+
 namespace Managed.Adb {
 	/// <summary>
 	/// The ADB Helper class
@@ -517,9 +521,10 @@ namespace Managed.Adb {
 
 				List<Device> s = new List<Device> ( );
 				String[] data = Encoding.Default.GetString ( reply ).Split ( new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries );
-				foreach ( var item in data ) {
+				data.ForEach ( item => {
 					s.Add ( Device.CreateFromAdbData ( item ) );
-				}
+				} );
+
 				return s;
 			} finally {
 				socket.Close ( );
@@ -554,7 +559,7 @@ namespace Managed.Adb {
 
 				AdbResponse resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
 				if ( !resp.IOSuccess || !resp.Okay ) {
-					Log.e ( TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message );
+					Log.w ( TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message );
 					adbChan.Close ( );
 					return null;
 				}
@@ -562,7 +567,7 @@ namespace Managed.Adb {
 				// first the protocol version.
 				reply = new byte[4];
 				if ( !Read ( adbChan, reply ) ) {
-					Log.e ( TAG, "got partial reply from ADB fb:" );
+					Log.w ( TAG, "got partial reply from ADB fb:" );
 
 					adbChan.Close ( );
 					return null;
@@ -571,8 +576,7 @@ namespace Managed.Adb {
 				int version = 0;
 				using ( MemoryStream ms = new MemoryStream ( reply ) ) {
 					buf = new BinaryReader ( ms );
-
-					version = buf.ReadInt32 ( );
+					version = buf.ReadInt16 ( );
 				}
 
 				// get the header size (this is a count of int)
@@ -585,9 +589,10 @@ namespace Managed.Adb {
 					adbChan.Close ( );
 					return null;
 				}
+
 				using ( MemoryStream ms = new MemoryStream ( reply ) ) {
 					buf = new BinaryReader ( ms );
-
+					
 					// fill the RawImage with the header
 					if ( imageParams.ReadHeader ( version, buf ) == false ) {
 						Log.w ( TAG, "Unsupported protocol: " + version );
