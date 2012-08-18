@@ -22,7 +22,7 @@
 		<ReleasePlatform Condition=" '$(ReleasePlatform)' == '' OR '$(ReleasePlatform)' == 'Any CPU' OR '$(ReleasePlatform)' == 'BPC' ">x86</ReleasePlatform>
 		<Platform Condition="'$(Platform)' != 'AnyCPU' AND '$(Platform)' != 'x64'">x86</Platform>
 
-		<PlatformConstant Condition=" '$(Platform)' == 'x86' ">PLATFORMX86</PlatformConstant>
+		<PlatformConstant Condition=" '$(Platform)' == 'x86' OR '$(Platform)' == 'AnyCPU' ">PLATFORMX86</PlatformConstant>
 		<PlatformConstant Condition=" '$(Platform)' == 'x64' ">PLATFORMX64</PlatformConstant>
 		<PlatformConstant Condition=" '$(Platform)' == 'ia64' ">PLATFORMIA64</PlatformConstant>
 		<PlatformConstant Condition=" '$(PlatformConstant)' == '' ">PLATFORMX86</PlatformConstant>
@@ -73,7 +73,7 @@
 
 
 	<Target Name="ReleaseCleanup" DependsOnTargets="ZipRelease">
-		<!--Delete Files="@(Files)" ContinueOnError="true" /-->
+		<Delete Files="@(Files)" ContinueOnError="true" />
 	</Target>
 
 
@@ -82,10 +82,18 @@
 		<MakeDir Directories="$(OutputPath)" Condition="!Exists('$(OutputPath)')" />
 	</Target>
 
-	<Target Name="ZipRelease" Condition=" '$(ReleaseMode)' == 'Binary' ">
-		<CreateItem Include="$(OutputPath)**\*.*" Exclude="$(OutputPath)*.zip;$(OutputPath)*.vshost.*;$(OutputPath)*.msi;$(OutputPath)*.wixpdb">
+	<Target Name="ZipRelease" DependsOnTargets="ILMergeAssemblies">
+		<CreateItem Include="$(OutputPath)**\*.*" Exclude="$(OutputPath)*.zip">
+			<Output ItemName="Files" TaskParameter="Include" />
+		</CreateItem>
+		
+		<CreateItem Include="$(OutputPath)**\*.*" Exclude="$(OutputPath)*.pdb;$(OutputPath)*.zip;$(OutputPath)*.vshost.*;$(OutputPath)*.msi;$(OutputPath)*.wixpdb">
 			<Output ItemName="ZipFiles" TaskParameter="Include" />
 		</CreateItem>
+
+		<CreateProperty Value="$(OutputPath)$(CCNetProject).$(CCNetLabel).$(Platform).zip">
+			<Output PropertyName="ZipFile" TaskParameter="Value" />
+		</CreateProperty>
 
 		<Zip Comment="$(CCNetBuildDate) $(CCNetBuildTime) $(CCNetProject) version $(CCNetLabel)" Files="@(ZipFiles)"
 				 WorkingDirectory="$(OutputPath)"
@@ -97,7 +105,7 @@
 			<Output ItemName="InputAssemblies" TaskParameter="Include"/>
 		</CreateItem>
 
-		<CreateItem Include="$(OutputPath)*.xml" Exclude="$(OutputPath)*MSBuild.Deployment.Tasks.xml">
+		<CreateItem Include="$(OutputPath)*.xml">
 			<Output ItemName="XmlFilesAssemblies" TaskParameter="Include"/>
 		</CreateItem>
 
@@ -106,15 +114,15 @@
 		<ILMerge
 			InputAssemblies="@(InputAssemblies)"
 			DebugInfo="True"
-			OutputFile="$(OutputPath)Temp\MSBuild.Deployment.Tasks.dll"
+			OutputFile="$(OutputPath)Temp\$(CCNetProject).dll"
 			LogFile="$(OutputPath)ilmerge.log"
 			XmlDocumentation="true" />
 
 		<Delete Files="@(InputAssemblies);@(XmlFilesAssemblies)" TreatErrorsAsWarnings="true" />
 
-		<Copy SourceFiles="$(OutputPath)Temp\MSBuild.Deployment.Tasks.dll" DestinationFolder="$(OutputPath)" />
+		<Copy SourceFiles="$(OutputPath)Temp\$(CCNetProject).dll" DestinationFolder="$(OutputPath)" />
 
-		<Delete Files="$(OutputPath)Temp\MSBuild.Deployment.Tasks.dll" />
+		<Delete Files="$(OutputPath)Temp\CCNetProject.dll" />
 		<RemoveDir Directories="$(OutputPath)Temp\" />
 
 	</Target>

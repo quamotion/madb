@@ -1,18 +1,82 @@
 <?xml version="1.0"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Publish">
-	<PropertyGroup>
-		<SharedProperties>SharedProperties</SharedProperties>
-		<PublishNuGet Condition=" '$(PublishMode)' == 'NuGet' ">PublishNuGet</PublishNuGet>
-	</PropertyGroup>
+	<Import Project="$(MSBuildProjectDirectory)\SharedProperties.msbuild"
+				Condition="Exists('$(MSBuildProjectDirectory)\SharedProperties.msbuild') AND '$(SharedProperties)' != 'SharedProperties' " />
 	
-	<Target Name="Publish" DependsOnTargets="NuGetPackage" Condition=" '$(PublishMode)' == 'NuGet' ">
+	<PropertyGroup>
+		<PublishNuGet Condition=" '$(PublishMode)' == 'NuGet' ">PublishNuGet</PublishNuGet>
+		<NuSpecFile Condition=" '$(NuSpecFile)' == '' ">madbee.nuspec</NuSpecFile>
+
+		<MSBuildDeploymentTasksPath>$(MSBuildProjectDirectory)\..\3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.Targets</MSBuildDeploymentTasksPath>		
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Project>madb</Project>
+		<ProjectFriendlyName>MadBee</ProjectFriendlyName>
+
+		<IsDefaultRelease>true</IsDefaultRelease>
+		<IsShown>true</IsShown>
+		<Status>Beta</Status>
+		<ReleaseTimeout>60</ReleaseTimeout>
+
+		<CanPublish Condition=" Exists('$(MSBuildDeploymentTasksPath)') ">True</CanPublish>
+		<CanPublish Condition=" '$(CanPublish)' == '' ">False</CanPublish>
+		<ReleaseName>$(ProjectFriendlyName) $(Version) $(Status)</ReleaseName>
+	</PropertyGroup>
+
+	<Import Project="$(MSBuildDeploymentTasksPath)" Condition=" '$(CanPublish)' == 'True' "/>
+
+
+	<Target Name="Publish" DependsOnTargets="CodePlexPublish" Condition=" '$(PublishMode)' == 'NuGet' ">
+		<Error Condition=" '$(NuGetKey)' == '' " Code="500" Text="'NuGetKey' property was not set."></Error>
+		<Error Condition=" '$(NuSpecFile)' == '' " Code="500" Text="'NuSpecFile' property was not set."></Error>
+		<Error Condition=" '$(CPUsername)' == '' " Code="500" Text="'CPUsername' property was not set."></Error>
+		<Error Condition=" '$(CPPassword)' == '' " Code="500" Text="'CPPassword' property was not set."></Error>
+
 		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push setApiKey $(NuGetKey)" />
 		<Exec WorkingDirectory="$(OutputPath)" Command="nuget push $(CCNetProject).$(CCNetLabel).nupkg $(NuGetKey)" />
 	</Target>
 
+
+	<Target Name="CodePlexPublish" DependsOnTargets="NuGetPackage;ZipRelease" Condition=" '$(PublishMode)' == 'NuGet' ">
+		<ReadTextFile Files="$(MSBuildProjectDirectory)\publish-changelog.txt">
+			<Output TaskParameter="OutputText" PropertyName="ReleaseDescription" />
+		</ReadTextFile>
+
+		<CreateProperty Condition=" '$(Version)' == '' " Value="$(CCNetLabel)">
+			<Output PropertyName="Version" TaskParameter="Value" />
+		</CreateProperty>
+
+
+		<CodePlexCreateRelease
+		  ContinueOnError="True"
+			Project="$(Project)"
+			Username="$(CPUsername)"
+			Password="$(CPPassword)"
+			ProjectFriendlyName="$(ProjectFriendlyName)"
+			Version="$(Version)"
+			Description="$(ReleaseDescription)"
+			IsDefaultRelease="$(IsDefaultRelease)"
+			IsShownToPublic="$(IsShown)"
+			TreatErrorsAsWarnings="True"
+			Status="$(Status)"
+			Timeout="$(ReleaseTimeout)">
+			<Output PropertyName="ReleaseName" TaskParameter="ReleaseName" />
+			<Output PropertyName="ReleaseId" TaskParameter="ReleaseId" />
+			<Output PropertyName="ReleaseUrl" TaskParameter="ReleaseUrl" />
+		</CodePlexCreateRelease>
+
+		<CodePlexUpload
+			Project="$(Project)"
+			Username="$(CPUsername)"
+			Password="$(CPPassword)"
+			ReleaseName="$(ReleaseName)"
+			FileType="RuntimeBinary"
+			File="$(ZipFile)"
+			Timeout="$(UploadTimeout)" />
+	</Target>
+
 	<Target Name="NuGetPackage">
-		<Error Condition=" '$(NuGetKey)' == '' " Code="500" Text="'NuGetKey' property was not set."></Error>
-		<Error Condition=" '$(NuSpecFile)' == '' " Code="500" Text="'NuSpecFile' property was not set."></Error>
 
 		<CreateProperty Value="$(OutputPath)\$(CCNetProject).$(CCNetLabel)">
 			<Output TaskParameter="Value" PropertyName="PackagePath" />
@@ -20,7 +84,7 @@
 		
 		
 		<MakeDir Directories="$(PackagePath)\lib" Condition="!Exists('$(PackagePath)\lib')" />
-		<Copy SourceFiles="$(NuSpecFile)" DestinationFiles="$(PackagePath)\$(CCNetProject).nuspec" />
+		<Copy SourceFiles="$(MSBuildProjectDirectory)\$(NuSpecFile)" DestinationFiles="$(PackagePath)\$(CCNetProject).nuspec" />
 		
 		<CreateItem Include="$(OutputPath)*.*" Exclude="$(OutputPath)*.msi;$(OutputPath)*.zip;$(OutputPath)*.vshost.*;$(OutputPath)madb.*">
 			<Output ItemName="CopyFiles" TaskParameter="Include"/>

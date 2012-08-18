@@ -22,6 +22,6 @@
 	</Target>
 
 	
-	<Target Name="Build" DependsOnTargets="CleanBuild;CoreBuild;ReleaseCleanup;ILMergeAssemblies;Publish">
+	<Target Name="Build" DependsOnTargets="CleanBuild;CoreBuild;Publish;ReleaseCleanup;">
 	</Target>
 </Project>

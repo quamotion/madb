@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{49EA5373
 		Build\BuildAll.msbuild = Build\BuildAll.msbuild
 		Build\madbee.nuspec = Build\madbee.nuspec
 		Build\NuGetPublish.msbuild = Build\NuGetPublish.msbuild
+		Build\publish-changelog.txt = Build\publish-changelog.txt
 		Build\SharedProperties.msbuild = Build\SharedProperties.msbuild
 	EndProjectSection
 EndProject
@@ -26,6 +27,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{9AA331
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MadBee.Console", "MadBee.Console\MadBee.Console.csproj", "{F9A436F4-0606-4326-8607-9EA4D9E6AF18}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "msbuildtasks", "msbuildtasks", "{2A9166E3-7655-4DB8-9F7A-DB150428821F}"
+	ProjectSection(SolutionItems) = preProject
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.dll = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.dll
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.pdb = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.pdb
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.Targets = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.Targets
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.XML = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.XML
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.xsd = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.xsd
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,5 +102,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E9A9E417-965C-461D-ABCA-3A32E5BF15B2} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
+		{2A9166E3-7655-4DB8-9F7A-DB150428821F} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
 	EndGlobalSection
 EndGlobal
