@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Managed.Adb.IO;
+using Managed.Adb.MoreLinq;
 using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
@@ -38,6 +39,8 @@ namespace Managed.Adb {
 		/// <param name="busybox">The path to the busybox binary to install.</param>
 		/// <returns><c>true</c>, if successful; otherwise, <c>false</c></returns>
 		public bool Install ( String busybox ) {
+			busybox.ThrowIfNullOrWhiteSpace ( "busybox" );
+
 			FileEntry bb = null;
 
 			try {
@@ -76,15 +79,8 @@ namespace Managed.Adb {
 
 				// check if this path exists in the path already
 				if ( Device.EnvironmentVariables.ContainsKey ( "PATH" ) ) {
-					String[] paths = Device.EnvironmentVariables["PATH"].Split ( ':' );
-					bool found = false;
-					foreach ( var tpath in paths ) {
-						if ( String.Compare ( tpath, BUSYBOX_BIN, false ) == 0 ) {
-							Console.WriteLine ( "Already in PATH" );
-							found = true;
-							break;
-						}
-					}
+					var paths = Device.EnvironmentVariables["PATH"].Split ( ':' );
+					var found = paths.Where ( p => String.Compare ( p, BUSYBOX_BIN, false ) == 0 ).Count ( ) > 0;
 
 					// we didnt find it, so add it.
 					if ( !found ) {
@@ -133,8 +129,9 @@ namespace Managed.Adb {
 		/// <param name="receiver"></param>
 		/// <param name="commandArgs"></param>
 		public void ExecuteShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
+			command.ThrowIfNullOrWhiteSpace ( "command" );
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
-			Console.WriteLine ( "executing: {0}", cmd );
+			Log.d ( "executing: {0}", cmd );
 			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
 		}
 
@@ -145,8 +142,9 @@ namespace Managed.Adb {
 		/// <param name="receiver">The receiver.</param>
 		/// <param name="commandArgs">The command args.</param>
 		public void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
+			command.ThrowIfNullOrWhiteSpace ( "command" );
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
-			Console.WriteLine ( "executing as root: {0}", cmd );
+			Log.d ( "executing (su): {0}", cmd );
 			AdbHelper.Instance.ExecuteRemoteRootCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
 		}
 
@@ -176,15 +174,13 @@ namespace Managed.Adb {
 		/// <param name="command">The command name to check</param>
 		/// <returns><c>true</c>, if supported; otherwise, <c>false</c>.</returns>
 		public bool Supports ( String command ) {
-			if ( String.IsNullOrEmpty ( command ) || String.IsNullOrEmpty ( command.Trim ( ) ) ) {
-				throw new ArgumentException ( "Command must not be empty", "command" );
-			}
+			command.ThrowIfNullOrWhiteSpace ( "command" );
 
 			if ( Available && ( Commands == null || Commands.Count == 0 ) ) {
 				CheckForBusyBox ( );
 			}
 
-			return Commands.Contains ( command );
+			return Commands.Where( c => String.Compare(c,command,false) == 0).FirstOrDefault() != null;
 		}
 
 		/// <summary>
@@ -223,7 +219,7 @@ namespace Managed.Adb {
 				
 				int state = 0;
 				foreach ( var line in lines ) {
-					if ( String.IsNullOrEmpty ( line ) /*|| line.StartsWith ( "#" )*/ ) {
+					if ( line.IsNullOrWhiteSpace() ) {
 						continue;
 					}
 					switch ( state ) {

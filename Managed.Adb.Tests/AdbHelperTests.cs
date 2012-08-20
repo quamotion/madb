@@ -6,6 +6,7 @@ using Xunit;
 using System.IO;
 using Managed.Adb.IO;
 using System.Drawing.Imaging;
+using Managed.Adb.Exceptions;
 
 namespace Managed.Adb.Tests {
 	public class AdbHelperTests : BaseDeviceTests {
@@ -55,14 +56,18 @@ namespace Managed.Adb.Tests {
 
 		[Fact]
 		public void ExecuteRemoteCommandTest ( ) {
+
 			Device device = GetFirstDevice ( );
 			ConsoleOutputReceiver creciever = new ConsoleOutputReceiver ( );
+
+
+			device.ExecuteShellCommand("pm list packages -f",creciever);
 
 			Console.WriteLine ( "Executing 'ls':" );
 			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
 				try {
 					device.ExecuteShellCommand ( "ls -lF --color=never", creciever );
-				} catch ( FileNotFoundException ) {
+				} catch ( UnknownOptionException ) {
 					device.ExecuteShellCommand ( "ls -l", creciever );
 				}
 			} ) );
@@ -99,14 +104,24 @@ namespace Managed.Adb.Tests {
 			ConsoleOutputReceiver creciever = new ConsoleOutputReceiver ( );
 
 			Console.WriteLine ( "Executing 'ls':" );
-			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-				try {
-					device.ExecuteRootShellCommand ( "ls -lF --color=never", creciever );
-				} catch ( FileNotFoundException ) {
-					device.ExecuteRootShellCommand ( "ls -l", creciever );
-				}
-			} ) );
-
+			if ( device.CanSU ( ) ) {
+				Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
+					try {
+						device.ExecuteRootShellCommand ( "busybox ls -lFa --color=never", creciever );
+					} catch ( UnknownOptionException ) {
+						device.ExecuteRootShellCommand ( "ls -lF", creciever );
+					}
+				} ) );
+			} else {
+				// if the device doesn't have root, then we check that it is throwing the PermissionDeniedException
+				Assert.Throws<PermissionDeniedException> ( new Assert.ThrowsDelegate(delegate ( ) {
+					try {
+						device.ExecuteRootShellCommand ( "busybox ls -lFa --color=never", creciever );
+					} catch ( UnknownOptionException ) {
+						device.ExecuteRootShellCommand ( "ls -lF", creciever );
+					}
+				} ) );
+			}
 		}
 
 		[Fact]

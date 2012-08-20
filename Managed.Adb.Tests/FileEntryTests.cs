@@ -27,9 +27,8 @@ namespace Managed.Adb.Tests {
 			Device device = GetFirstDevice ( );
 			var path ="/mnt/sdcard/test/delete/";
 			FileEntry fe = FileEntry.FindOrCreate ( device, path );
-			Console.WriteLine ( fe.FullResolvedPath );
 			Assert.True ( fe.Exists );
-			Assert.True(String.Compare(fe.FullPath,path,false ) == 0 );
+			device.FileSystem.Delete ( fe.FullResolvedPath );
 		}
 
 

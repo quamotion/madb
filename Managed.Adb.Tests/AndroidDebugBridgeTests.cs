@@ -11,23 +11,19 @@ namespace Managed.Adb.Tests {
 		[Fact]
 		public void CreateBridgeTest ( ) {
 			try {
-				AndroidDebugBridge adb = CreateBridge ( @"C:\tools\android-sdk\platform-tools\adb.exe" );
+				AndroidDebugBridge adb = CreateBridge ( @"C:\android\android-sdk\platform-tools\adb.exe" );
 				bool result = adb.Start ( );
 				Assert.True ( result, "Failed to start ADB" );
-
-				foreach ( var device in adb.Devices ) {
-					Console.WriteLine ( "{0}\t{1}", device.SerialNumber, device.State );
-				}
+				
+				adb.Devices.ForEach ( d => {
+					Console.WriteLine ( "{0}\t{1}", d.SerialNumber, d.State );
+				} );
 
 				adb.Stop ( );
 			} catch ( Exception ex ) {
 				Console.WriteLine ( ex.ToString ( ) );
 				throw;
 			}
-		}
-
-		void adb_DeviceChanged ( object sender, DeviceEventArgs e ) {
-			throw new NotImplementedException ( );
 		}
 
 		private AndroidDebugBridge CreateBridge ( String location ) {

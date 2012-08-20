@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using Managed.Adb.MoreLinq;
 
 namespace Managed.Adb {
 	/// <summary>
@@ -168,8 +169,7 @@ namespace Managed.Adb {
 							ConnectionAttemptCount = 0;
 						}
 					}
-					//break;
-					if ( MainAdbConnection != null && !IsMonitoring ) {
+					if ( MainAdbConnection != null && !IsMonitoring && MainAdbConnection.Connected ) {
 						IsMonitoring = SendDeviceListMonitoringRequest ( );
 					}
 
@@ -186,7 +186,6 @@ namespace Managed.Adb {
 						}
 					}
 				} catch ( IOException ioe ) {
-					Console.WriteLine ( ioe );
 					if ( !IsRunning ) {
 						Log.e ( TAG, "Adb connection Error: ", ioe );
 						IsMonitoring = false;
@@ -253,18 +252,16 @@ namespace Managed.Adb {
 				String result = Read ( MainAdbConnection, buffer );
 
 				String[] devices = result.Split ( new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries );
-
-				foreach ( String d in devices ) {
+				devices.ForEach ( d => {
 					try {
-						Device device = Device.CreateFromAdbData ( d );
-						if ( device != null ) {
-							list.Add ( device );
+						var dv = Device.CreateFromAdbData ( d );
+						if ( dv != null ) {
+							list.Add ( dv );
 						}
 					} catch ( ArgumentException ae ) {
 						Log.e ( TAG, ae );
 					}
-				}
-
+				} );
 			}
 
 			// now merge the new devices with the old ones.

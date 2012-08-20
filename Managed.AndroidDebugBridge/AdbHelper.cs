@@ -716,15 +716,14 @@ namespace Managed.Adb {
 
 						// for busybox applets 
 						// cmd: applet not found
-						if ( cmd.Length > 1 && sdataTrimmed.EndsWith ( String.Format ( "{0}: applet not found", cmd[1] ) ) ) {
+						if ( sdataTrimmed.Match("applet not found$") && cmd.Length > 1 ) {
 							Log.w ( TAG, "The remote execution returned: '{0}'", sdataTrimmed );
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}'", sdataTrimmed ) );
 						}
 
 						// checks if the permission to execute the command was denied.
 						// workitem: 16822
-						if ( sdataTrimmed.EndsWith ( String.Format ( "{0}: permission denied", cmd[0] ) ) ||
-							sdataTrimmed.EndsWith ( String.Format ( "{0}: access denied", cmd[0] ) ) ) {
+						if ( sdataTrimmed.Match("(permission|access) denied$") ) {
 							Log.w ( TAG, "The remote execution returned: '{0}'", sdataTrimmed );
 							throw new PermissionDeniedException ( String.Format ( "The remote execution returned: '{0}'", sdataTrimmed ) );
 						}

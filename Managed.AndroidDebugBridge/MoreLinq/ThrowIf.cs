@@ -24,6 +24,18 @@ namespace Managed.Adb.MoreLinq {
 			}
 		}
 
+		public static void ThrowIfNullOrEmpty ( this String argument, Expression<Func<String, string>> func ) {
+			if ( String.IsNullOrEmpty(argument) ) {
+				ThrowException ( s => new ArgumentNullException ( s ), func );
+			}
+		}
+
+		public static void ThrowIfNullOrWhiteSpace ( this String argument, Expression<Func<String, string>> func ) {
+			if ( String.IsNullOrEmpty ( argument ) || String.IsNullOrEmpty(argument.Trim()) ) {
+				ThrowException ( s => new ArgumentNullException ( s ), func );
+			}
+		}
+
 		private static void ThrowException<T, E> ( Func<string, E> e, Expression<Func<T, string>> func ) where E : Exception {
 			string name = string.Empty;
 			Expression body = func.Body;
@@ -34,6 +46,18 @@ namespace Managed.Adb.MoreLinq {
 
 		internal static void ThrowIfNull<T> ( this T argument, string name ) where T : class {
 			if ( argument == null ) {
+				throw new ArgumentNullException ( name );
+			}
+		}
+
+		internal static void ThrowIfNullOrEmpty ( this String argument, string name ) {
+			if ( String.IsNullOrEmpty(argument) ) {
+				throw new ArgumentNullException ( name );
+			}
+		}
+
+		internal static void ThrowIfNullOrWhiteSpace ( this String argument, string name ) {
+			if ( String.IsNullOrEmpty ( argument ) || String.IsNullOrEmpty ( argument.Trim ( ) ) ) {
 				throw new ArgumentNullException ( name );
 			}
 		}

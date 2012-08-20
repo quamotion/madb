@@ -39,22 +39,13 @@
 
 
 	<Target Name="CodePlexPublish" DependsOnTargets="NuGetPackage;ZipRelease" Condition=" '$(PublishMode)' == 'NuGet' ">
-		<ReadTextFile Files="$(MSBuildProjectDirectory)\publish-changelog.txt">
-			<Output TaskParameter="OutputText" PropertyName="ReleaseDescription" />
-		</ReadTextFile>
-
-		<CreateProperty Condition=" '$(Version)' == '' " Value="$(CCNetLabel)">
-			<Output PropertyName="Version" TaskParameter="Value" />
-		</CreateProperty>
-
-
 		<CodePlexCreateRelease
 		  ContinueOnError="True"
 			Project="$(Project)"
 			Username="$(CPUsername)"
 			Password="$(CPPassword)"
 			ProjectFriendlyName="$(ProjectFriendlyName)"
-			Version="$(Version)"
+			Version="$(CCNetLabel)"
 			Description="$(ReleaseDescription)"
 			IsDefaultRelease="$(IsDefaultRelease)"
 			IsShownToPublic="$(IsShown)"
@@ -77,6 +68,10 @@
 	</Target>
 
 	<Target Name="NuGetPackage">
+		<ReadTextFile Files="$(MSBuildProjectDirectory)\publish-changelog.txt">
+			<Output TaskParameter="OutputText" PropertyName="ReleaseDescription" />
+		</ReadTextFile>
+
 
 		<CreateProperty Value="$(OutputPath)\$(CCNetProject).$(CCNetLabel)">
 			<Output TaskParameter="Value" PropertyName="PackagePath" />
@@ -98,7 +93,11 @@
 			XPath="/package/metadata/id"
 			XmlFileName="$(PackagePath)\$(CCNetProject).nuspec"
 			Value="$(CCNetProject)"/>
-
+		<XmlUpdate
+			XPath="/package/metadata/description"
+			XmlFileName="$(PackagePath)\$(CCNetProject).nuspec"
+			Value="$(ReleaseDescription)"/>
+		
 		<Exec WorkingDirectory="$(OutputPath)" Command="nuget pack &quot;$(PackagePath)\$(CCNetProject).nuspec&quot;" />
 		<RemoveDir Directories="$(PackagePath)" Condition="Exists('$(PackagePath)')" ContinueOnError="true" />
 	</Target>

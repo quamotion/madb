@@ -279,7 +279,7 @@ namespace Managed.Adb {
 		/// the value or <code>null</code> if the property does not exist.
 		/// </returns>
 		public String GetProperty( String name ) {
-			return Properties[name];
+			return GetProperty ( new String[] { name } );
 		}
 
 		/// <summary>
@@ -287,7 +287,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="name">The array of property names.</param>
 		/// <returns></returns>
-		public String GetFirstProperty ( params String[] name ) {
+		public String GetProperty ( params String[] name ) {
 			foreach ( var item in name ) {
 				if ( Properties.ContainsKey ( item ) ) {
 					return Properties[item];

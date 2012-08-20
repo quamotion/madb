@@ -1,1 +1,9 @@
-* Fixed the issue with the color of the screenshots
+A managed library for communicating with the Android Debug Bridge.
+
+* Renamed GetFirstProperty to just GetProperty
+* Updated the publish script to include the changelog in the nuget spec
+* removed some unused methods in RawImage that I don't think worked correctly anyhow
+* changed the DeviceBlocks (get) to return a collection of FileEntry instead of just the name of the block
+* Changed the check for permission denied to use a Regex Match.
+* upgraded xunit to 1.9.1
+* Some bug fixes and code refactoring

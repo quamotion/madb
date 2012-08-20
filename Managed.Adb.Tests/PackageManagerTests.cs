@@ -27,7 +27,6 @@ namespace Managed.Adb.Tests {
 			} ) );
 
 			Assert.True ( pm.Packages.ContainsKey ( "com.android.contacts" ) );
-			Assert.True ( pm.Packages.ContainsKey ( "com.android.gallery" ) );
 			Assert.True ( pm.Packages.ContainsKey ( "android" ) ); // the framework
 		}
 

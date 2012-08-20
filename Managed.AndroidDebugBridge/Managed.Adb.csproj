@@ -63,27 +63,27 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-		<DebugSymbols>true</DebugSymbols>
-		<DefineConstants>$(PlatformConstant);DEBUG;TRACE</DefineConstants>
-		<DebugType>full</DebugType>
-		<CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-		<CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-		<ErrorReport>prompt</ErrorReport>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Optimize>true</Optimize>
-		<PlatformTarget>x86</PlatformTarget>
-		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-		<DefineConstants>$(PlatformConstant);TRACE</DefineConstants>
-		<Optimize>true</Optimize>
-		<DebugType>pdbonly</DebugType>
-		<CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-		<CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-		<ErrorReport>prompt</ErrorReport>
-		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-	</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>$(PlatformConstant);DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DefineConstants>$(PlatformConstant);TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>$(PlatformConstant);DEBUG;TRACE</DefineConstants>
@@ -105,11 +105,11 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-	<PropertyGroup>
-		<OutputPath Condition=" '$(OutputPath)' == '' ">..\bin\$(Configuration)\$(CCNetLabel)\$(Platform)\</OutputPath>
-		<DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
-	</PropertyGroup>
-	<ItemGroup>
+  <PropertyGroup>
+    <OutputPath Condition=" '$(OutputPath)' == '' ">..\bin\$(Configuration)\$(CCNetLabel)\$(Platform)\</OutputPath>
+    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>

@@ -8,8 +8,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Managed.Adb.Conversion;
-using Managed.Adb.Extensions;
-
 
 namespace Managed.Adb {
 	/// <summary>
@@ -145,30 +143,6 @@ namespace Managed.Adb {
 		}
 
 		/**
-		 * Returns the mask value for the red color.
-		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
-		 */
-		public int GetRedMask ( ) {
-			return GetMask ( Red.Length, Red.Offset );
-		}
-
-		/**
-		 * Returns the mask value for the green color.
-		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
-		 */
-		public int GetGreenMask ( ) {
-			return GetMask ( Green.Length, Green.Offset );
-		}
-
-		/**
-		 * Returns the mask value for the blue color.
-		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
-		 */
-		public int GetBlueMask ( ) {
-			return GetMask ( Blue.Length, Blue.Offset );
-		}
-
-		/**
 		 * Returns the size of the header for a specific version of the framebuffer adb protocol.
 		 * @param version the version of the protocol
 		 * @return the number of int that makes up the header.
@@ -222,62 +196,6 @@ namespace Managed.Adb {
 			return rotated;
 		}
 
-		/**
-		 * Returns an ARGB integer value for the pixel at <var>index</var> in {@link #data}.
-		 */
-		public int GetARGB ( int index ) {
-			int value;
-
-			if ( Bpp == 16 ) {
-				value = Data[index] & 0x00FF;
-				value |= ( Data[index + 1] << 8 ) & 0x0FF00;
-			} else if ( Bpp == 32 ) {
-				value = ( Data[index] & 0xff );
-				value |= ( Data[index + 1] & 0xff ) << 8;
-				value |= ( Data[index + 2] & 0xff ) << 16;
-				value |= ( Data[index + 3] & 0xff ) << 24;
-			} else {
-				throw new NotImplementedException ( "RawImage.GetARGB(int) only works in 16 and 32 bit mode." );
-			}
-
-			int r = ( value >> Red.Offset ) & 0xff;
-			int g = ( value >> Green.Offset ) & 0xff;
-			int b = ( value >> Blue.Offset ) & 0xff;
-			int a;
-			if ( Alpha.Length == 0 ) {
-				a = 0xFF; // force alpha to opaque if there's no alpha value in the framebuffer.
-			} else {
-				a = ( value >> Alpha.Offset ) & 0xff;
-			}
-
-			var argb = (byte)a << 24 | (byte)r << 16 | (byte)g << 8 | (byte)b;
-			return argb;
-		}
-
-		/**
-		 * creates a mask value based on a length and offset.
-		 * <p/>This value is compatible with org.eclipse.swt.graphics.PaletteData
-		 */
-		private int GetMask ( int length, int offset ) {
-			int res = GetMask ( length ) << offset;
-
-			// if the bpp is 32 bits then we need to invert it because the buffer is in little endian
-			if ( Bpp == 32 ) {
-				return res.ReverseBytes ( );
-			}
-
-			return res;
-		}
-
-		/**
-		 * Creates a mask value based on a length.
-		 * @param length
-		 * @return
-		 */
-		private static int GetMask ( int length ) {
-			return ( 1 << length ) - 1;
-		}
-
 		/// <summary>
 		/// Returns a <see cref="System.String"/> that represents this instance.
 		/// </summary>
@@ -322,6 +240,14 @@ namespace Managed.Adb {
 			} catch ( Exception ) {
 				throw;
 			}
+		}
+
+		/// <summary>
+		/// Converts this raw image to an Image
+		/// </summary>
+		/// <returns></returns>
+		public Image ToImage ( ) {
+			return ToImage ( this.Bpp == 32 ? PixelFormat.Format32bppArgb : PixelFormat.Format16bppRgb565 );
 		}
 
 		private byte[] Swap ( byte[] b ) {

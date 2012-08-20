@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Managed.Adb.Exceptions;
 
 namespace Managed.Adb {
 	public class PackageManagerReceiver : MultiLineReceiver {
@@ -13,6 +14,11 @@ namespace Managed.Adb {
 		/// </summary>
 		public const String PM_PACKAGE_PATTERN = "^package:(.+?)=(.+)$";
 
+		/// <summary>
+		/// Creates an instance of PackageManagerReceiver
+		/// </summary>
+		/// <param name="device"></param>
+		/// <param name="pm"></param>
 		public PackageManagerReceiver ( Device device, PackageManager pm ) {
 			Device = device;
 			PackageManager = pm;
@@ -36,9 +42,16 @@ namespace Managed.Adb {
 								entry.Info = m.Groups[2].Value;
 							}
 						} else {
-							entry = FileEntry.Find ( Device, m.Groups[1].Value );
-							entry.Info = m.Groups[2].Value;
-							PackageManager.Packages.Add ( m.Groups[2].Value, entry );
+							try {
+								entry = FileEntry.Find ( Device, m.Groups[1].Value );
+								entry.Info = m.Groups[2].Value;
+								PackageManager.Packages.Add ( m.Groups[2].Value, entry );
+							} catch ( PermissionDeniedException ) {
+								// root required for device packages
+								entry = FileEntry.CreateNoPermissions ( Device, m.Groups[1].Value );
+								entry.Info = m.Groups[2].Value;
+								PackageManager.Packages.Add ( m.Groups[2].Value, entry );
+							}
 						}
 					}
 				}

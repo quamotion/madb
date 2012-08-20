@@ -201,7 +201,7 @@ namespace Managed.Adb {
 			get {
 				if ( Device != null ) {
 					if ( _root == null ) {
-						_root = new FileEntry (this.Device,  null /* parent */, string.Empty /* name */, FileTypes.Directory, true /* isRoot */ );
+						_root = new FileEntry ( this.Device, null /* parent */, string.Empty /* name */, FileTypes.Directory, true /* isRoot */ );
 					}
 					return _root;
 				}
@@ -254,7 +254,7 @@ namespace Managed.Adb {
 				if ( children.Length > 0 && children[0].IsApplicationPackage ) {
 					var map = new Dictionary<String, FileEntry> ( );
 
-					children.ForEach( child => {
+					children.ForEach ( child => {
 						map.Add ( child.FullPath, child );
 					} );
 
@@ -374,10 +374,11 @@ namespace Managed.Adb {
 		/// <param name="path">The path.</param>
 		/// <returns></returns>
 		public FileEntry FindFileEntry ( FileEntry parent, String path ) {
-			var rpath = ResolveLink ( path );
-
-			String[] entriesString = rpath.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
+			var rpath = Device.FileSystem.ResolveLink ( path );
+			var entriesString = rpath.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
 			FileEntry current = parent;
+
+
 			foreach ( var pathItem in entriesString ) {
 				FileEntry[] entries = GetChildren ( current, true, null );
 				foreach ( var e in entries ) {
@@ -389,30 +390,13 @@ namespace Managed.Adb {
 			}
 
 			// better checking if the file is the "same" based on the link or the reference
-			if ( String.Compare ( current.FullPath, path, false ) == 0 || 
+			if ( ( String.Compare ( current.FullPath, path, false ) == 0 ||
 				String.Compare ( current.FullResolvedPath, path, false ) == 0 ||
-				String.Compare ( current.FullPath, rpath, false ) == 0 ) {
+				String.Compare ( current.FullPath, rpath, false ) == 0 ||
+				String.Compare ( current.FullResolvedPath, rpath, false ) == 0 ) ) {
 				return current;
 			} else {
 				throw new FileNotFoundException ( String.Format ( "Unable to locate {0}", path ) );
-			}
-		}
-
-
-		/// <summary>
-		/// Resolves the link to the true path.
-		/// </summary>
-		/// <param name="path">The path.</param>
-		/// <returns></returns>
-		public String ResolveLink ( String path ) {
-			if ( this.Device.BusyBox.Available ) {
-				var cresult = new CommandResultReceiver();
-				this.Device.BusyBox.ExecuteShellCommand ( "readlink -f {0}", cresult, path );
-				// if cresult is empty, return the path
-				return String.IsNullOrEmpty ( cresult.Result ) ? path : cresult.Result;
-			} else {
-				// what do we do here? readlink is not available on devices without busybox...
-				return path;
 			}
 		}
 	}

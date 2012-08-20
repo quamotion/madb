@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace System {
 	/// <summary>
@@ -128,6 +129,23 @@ namespace System {
 		public static String GetString ( this byte[] bytes, int index, int count, String encoding ) {
 			Encoding enc = Encoding.GetEncoding ( encoding );
 			return GetString ( bytes, index, count, enc );
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		public static bool IsNullOrWhiteSpace( this String source ) {
+			return String.IsNullOrEmpty ( source ) || String.IsNullOrEmpty ( source.Trim ( ) );
+		}
+
+		public static bool Match ( this String source, String pattern ) {
+			return Match ( source, pattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase );
+		}
+
+		public static bool Match ( this String source, String pattern, RegexOptions options ) {
+			return Regex.IsMatch ( source, pattern, options );
 		}
 	}
 }

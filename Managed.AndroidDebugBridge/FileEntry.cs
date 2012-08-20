@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using Managed.Adb.IO;
+using Managed.Adb.MoreLinq;
 
 namespace Managed.Adb {
 	/// <summary>
@@ -19,24 +20,27 @@ namespace Managed.Adb {
 		/// <param name="path">The path.</param>
 		/// <remarks>This does not create the FileEntry on disk. It only creates the FileEntry object.</remarks>
 		/// <returns></returns>
-		public static FileEntry FindOrCreate( Device device, String path ) {
-			if ( device == null ) {
-				throw new ArgumentNullException ( "device", "Device cannot be null." );
-			}
-
-			if ( String.IsNullOrEmpty ( path ) ) {
-				throw new ArgumentNullException ( "path", "Path cannot be null or empty." );
-			}
+		public static FileEntry FindOrCreate ( Device device, String path ) {
+			device.ThrowIfNull ( "device" );
+			path.ThrowIfNullOrEmpty ( "path" );
 
 			if ( !device.IsOffline ) {
 				try {
 					return device.FileListingService.FindFileEntry ( path );
 				} catch ( FileNotFoundException ) {
-					return new FileEntry ( device, path );
+					var fe = new FileEntry ( device, path );
+					fe.Create ( );
+					return fe;
 				}
 			} else {
 				throw new IOException ( "Device is not online" );
 			}
+		}
+
+		public static FileEntry CreateNoPermissions ( Device device, String path ) {
+			var fe = new FileEntry ( device, path );
+			fe.Permissions = new FilePermissions ( );
+			return fe;
 		}
 
 		/// <summary>
@@ -48,14 +52,9 @@ namespace Managed.Adb {
 		/// <exception cref="ArgumentNullException">If the device or path is null.</exception>
 		/// <exception cref="FileNotFoundException">If the entrty is not found.</exception>
 		/// <returns></returns>
-		public static FileEntry Find( Device device, String path ) {
-			if ( device == null ) {
-				throw new ArgumentNullException ( "device", "Device cannot be null." );
-			}
-
-			if ( String.IsNullOrEmpty ( path ) ) {
-				throw new ArgumentNullException ( "path", "Path cannot be null or empty." );
-			}
+		public static FileEntry Find ( Device device, String path ) {
+			device.ThrowIfNull ( "device" );
+			path.ThrowIfNullOrEmpty ( "path" );
 
 			if ( !device.IsOffline ) {
 				return device.FileListingService.FindFileEntry ( path );
@@ -74,7 +73,7 @@ namespace Managed.Adb {
 		/// <param name="name">name of the entry.</param>
 		/// <param name="type">entry type.</param>
 		/// <param name="isRoot">if set to <c>true</c> [is root].</param>
-		internal FileEntry( Device device, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
+		internal FileEntry ( Device device, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
 			this.FetchTime = 0;
 			this.Parent = parent;
 			this.Name = name;
@@ -91,7 +90,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="device">The device.</param>
 		/// <param name="path">The path.</param>
-		internal FileEntry( Device device, String path ) {
+		internal FileEntry ( Device device, String path ) {
 			this.FetchTime = 0;
 			this.Parent = null;
 			bool isDir = path.EndsWith ( new String ( LinuxPath.DirectorySeparatorChar, 1 ) );
@@ -246,14 +245,26 @@ namespace Managed.Adb {
 		/// Creates the file entry, if it does not exist.
 		/// </summary>
 		/// <returns></returns>
-		public bool Create( ) {
+		public bool Create ( ) {
 			try {
 				if ( this.Exists ) {
 					return true;
 				}
-
 				var fe = this.Device.FileSystem.Create ( this );
 				return fe.Exists;
+			} catch {
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Deletes the file entry from the file system.
+		/// </summary>
+		/// <returns></returns>
+		public bool Delete ( ) {
+			try {
+				this.Device.FileSystem.Delete ( this.FullEscapedPath );
+				return true;
 			} catch {
 				return false;
 			}
@@ -263,7 +274,7 @@ namespace Managed.Adb {
 		/// Adds a child file entry
 		/// </summary>
 		/// <param name="child">The child file entry</param>
-		public void AddChild( FileEntry child ) {
+		public void AddChild ( FileEntry child ) {
 			Children.Add ( child );
 		}
 
@@ -274,13 +285,10 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="name">the name of the child to return.</param>
 		/// <return>the FileEntry matching the name or null.</return>
-		public FileEntry FindChild( String name ) {
-			foreach ( FileEntry entry in Children ) {
-				if ( String.Compare ( entry.Name, name, false ) == 0 ) {
-					return entry;
-				}
-			}
-			return null;
+		public FileEntry FindChild ( String name ) {
+			var entry = Children.Where ( e => String.Compare ( e.Name, name, false ) == 0 ).FirstOrDefault ( );
+
+			return entry;
 		}
 
 
@@ -337,11 +345,7 @@ namespace Managed.Adb {
 				if ( IsRoot ) {
 					return FileListingService.FILE_ROOT;
 				}
-
-				StringBuilder pathBuilder = new StringBuilder ( );
-				FillPathBuilder ( pathBuilder, false, true );
-
-				return pathBuilder.ToString ( );
+				return Device.FileSystem.ResolveLink ( this.FullPath );
 			}
 		}
 
@@ -362,7 +366,7 @@ namespace Managed.Adb {
 		/// </summary>
 		public String[] PathSegments {
 			get {
-				List<String> list = new List<String> ( );
+				var list = new List<String> ( );
 				FillPathSegments ( list );
 
 				return list.ToArray ( );
@@ -375,7 +379,7 @@ namespace Managed.Adb {
 		/// directory like /data/app or /system/app or /sd/app or /sd-ext/app. The last two are common for
 		/// apps2sd on rooted phones
 		/// </summary>
-		private void CheckAppPackageStatus( ) {
+		private void CheckAppPackageStatus ( ) {
 			IsApplicationPackage = false;
 
 			String[] segments = PathSegments;
@@ -392,7 +396,7 @@ namespace Managed.Adb {
 		/// Recursively fills the segment list with the full path.
 		/// </summary>
 		/// <param name="list">The list of segments to fill.</param>
-		protected void FillPathSegments( List<String> list ) {
+		protected void FillPathSegments ( List<String> list ) {
 			if ( IsRoot ) {
 				return;
 			}
@@ -410,7 +414,7 @@ namespace Managed.Adb {
 		/// <param name="pathBuilder">a StringBuilder used to create the path.</param>
 		/// <param name="escapePath">Whether the path need to be escaped for consumption by a shell command line.</param>
 		/// <param name="resolveLinks">if set to <c>true</c> [resolve links].</param>
-		protected void FillPathBuilder( StringBuilder pathBuilder, bool escapePath, bool resolveLinks ) {
+		protected void FillPathBuilder ( StringBuilder pathBuilder, bool escapePath, bool resolveLinks ) {
 			if ( IsRoot ) {
 				return;
 			}
@@ -420,7 +424,7 @@ namespace Managed.Adb {
 			}
 
 			String n = resolveLinks && !String.IsNullOrEmpty ( LinkName ) ? LinkName : Name;
-			
+
 			if ( n[0] != LinuxPath.DirectorySeparatorChar ) {
 				pathBuilder.Append ( LinuxPath.DirectorySeparatorChar );
 			}
@@ -433,8 +437,16 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="pathBuilder">The path builder.</param>
 		/// <param name="escapePath">if set to <c>true</c> [escape path].</param>
-		protected void FillPathBuilder( StringBuilder pathBuilder, bool escapePath ) {
+		protected void FillPathBuilder ( StringBuilder pathBuilder, bool escapePath ) {
 			FillPathBuilder ( pathBuilder, escapePath, false );
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString ( ) {
+			return this.FullResolvedPath;
 		}
 
 		/// <summary>
@@ -448,7 +460,7 @@ namespace Managed.Adb {
 			/// <param name="x">The x.</param>
 			/// <param name="y">The y.</param>
 			/// <returns></returns>
-			public override int Compare( FileEntry x, FileEntry y ) {
+			public override int Compare ( FileEntry x, FileEntry y ) {
 				return x.Name.CompareTo ( y.Name );
 			}
 		}

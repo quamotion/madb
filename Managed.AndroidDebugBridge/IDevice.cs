@@ -78,7 +78,7 @@ namespace Managed.Adb {
 		/// <returns>
 		/// the value or <code>null</code> if the property does not exist.
 		/// </returns>
-		String GetFirstProperty ( params String[] name );
+		String GetProperty ( params String[] name );
 
 		/// <summary>
 		/// Gets a value indicating whether the device is online.

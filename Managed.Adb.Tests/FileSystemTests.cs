@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xunit;
+using Managed.Adb.MoreLinq;
 
 namespace Managed.Adb.Tests {
 	public class FileSystemTests : BaseDeviceTests {
 		[Fact]
 		public void GetDeviceBlocksTest( ) {
 			Device d = GetFirstDevice ( );
-			List<String> blocks = d.FileSystem.DeviceBlocks;
-			Assert.True ( blocks.Count > 0 );
+			IEnumerable<FileEntry> blocks = d.FileSystem.DeviceBlocks;
+			blocks.ForEach ( b => {
+				Console.WriteLine ( b.ToString ( ) );
+			} );
+			Assert.True ( blocks.Count() > 0 );
 		}
 
 		[Fact]

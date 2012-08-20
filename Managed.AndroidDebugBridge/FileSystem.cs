@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Managed.Adb.IO;
+using Managed.Adb.MoreLinq;
 using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
@@ -23,12 +24,9 @@ namespace Managed.Adb {
 		/// <param name="path">The path.</param>
 		/// <returns></returns>
 		public FileEntry Create( String path ) {
-			if ( Device == null ) {
-				throw new ArgumentNullException ( "device", "Device cannot be null." );
-			}
-			if ( String.IsNullOrEmpty ( path ) ) {
-				throw new ArgumentNullException ( "path", "Path cannot be null or empty." );
-			}
+			Device.ThrowIfNull ( "Device" );
+
+			path.ThrowIfNullOrWhiteSpace ( "path" );
 
 			if ( !Device.IsOffline ) {
 				if ( Exists ( path ) ) {
@@ -73,19 +71,13 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets if the specified path exists on the device.
 		/// </summary>
-		/// <param name="device">The device to check</param>
 		/// <param name="path">the path to check</param>
 		/// <returns><c>true</c>, if the path exists; otherwise, <c>false</c></returns>
 		/// <exception cref="IOException">If the device is not connected.</exception>
 		/// <exception cref="ArgumentNullException">If the device or path is null.</exception>
 		public bool Exists( String path ) {
-			if ( Device == null ) {
-				throw new ArgumentNullException ( "device", "Device cannot be null." );
-			}
-
-			if ( String.IsNullOrEmpty ( path ) ) {
-				throw new ArgumentNullException ( "path", "Path cannot be null or empty." );
-			}
+			Device.ThrowIfNull ( "Device" );
+			path.ThrowIfNullOrWhiteSpace ( "path" );
 
 			if ( !Device.IsOffline ) {
 				try {
@@ -121,6 +113,9 @@ namespace Managed.Adb {
 		/// <param name="path">The path.</param>
 		/// <param name="forceDeviceMethod">if set to <c>true</c> forces the use of the "non-busybox" method.</param>
 		public void MakeDirectory( String path, bool forceDeviceMethod ) {
+			Device.ThrowIfNull ( "Device" );
+			path.ThrowIfNullOrWhiteSpace ( "path" );
+
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			try {
 				//var fileEntry = FileEntry.FindOrCreate ( Device, path );
@@ -150,25 +145,9 @@ namespace Managed.Adb {
 		/// this is a fallback if the mkdir -p fails for somereason
 		/// </summary>
 		/// <param name="path"></param>
+		/// <param name="cer"></param>
 		internal void MakeDirectoryFallbackInternal( String path, CommandErrorReceiver cer ) {
-			string[] segs = path.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
-			FileEntry current = Device.FileListingService.Root;
-			foreach ( var pathItem in segs ) {
-				FileEntry[] entries = Device.FileListingService.GetChildren ( current, true, null );
-				bool found = false;
-				foreach ( var e in entries ) {
-					if ( String.Compare ( e.Name, pathItem, false ) == 0 ) {
-						current = e;
-						found = true;
-						break;
-					}
-				}
-
-				if ( !found ) {
-					current = FileEntry.FindOrCreate ( Device, LinuxPath.Combine ( current.FullPath, pathItem + new String ( new char[] {  LinuxPath.DirectorySeparatorChar } ) ) );
-					Device.ExecuteShellCommand ( "mkdir {0}", cer, current.FullEscapedPath );
-				}
-			}
+			Device.ExecuteShellCommand ( "mkdir {0}", cer, path );
 		}
 
 		/// <summary>
@@ -177,6 +156,10 @@ namespace Managed.Adb {
 		/// <param name="source">The source.</param>
 		/// <param name="destination">The destination.</param>
 		public void Copy( String source, String destination ) {
+			Device.ThrowIfNull ( "Device" );
+			source.ThrowIfNullOrWhiteSpace ( "source" );
+			destination.ThrowIfNullOrWhiteSpace ( "destination" );
+
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			FileEntry sfe = Device.FileListingService.FindFileEntry ( source );
 
@@ -192,6 +175,10 @@ namespace Managed.Adb {
 		/// <param name="source">The source.</param>
 		/// <param name="destination">The destination.</param>
 		public void Move( String source, String destination ) {
+			Device.ThrowIfNull ( "Device" );
+			source.ThrowIfNullOrWhiteSpace ( "source" );
+			destination.ThrowIfNullOrWhiteSpace ( "destination" );
+			
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			FileEntry sfe = Device.FileListingService.FindFileEntry ( source );
 
@@ -207,6 +194,10 @@ namespace Managed.Adb {
 		/// <param name="path">The path.</param>
 		/// <param name="permissions">The permissions.</param>
 		public void Chmod( String path, String permissions ) {
+			Device.ThrowIfNull ( "Device" );
+			path.ThrowIfNullOrWhiteSpace ( "path" );
+			permissions.ThrowIfNullOrWhiteSpace ( "permissions" );
+
 			FileEntry entry = Device.FileListingService.FindFileEntry ( path );
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			Device.ExecuteShellCommand ( "chmod {0} {1}", cer, permissions, entry.FullEscapedPath );
@@ -218,6 +209,10 @@ namespace Managed.Adb {
 		/// <param name="path">The path.</param>
 		/// <param name="permissions">The permissions.</param>
 		public void Chmod( String path, FilePermissions permissions ) {
+			Device.ThrowIfNull ( "Device" );
+			path.ThrowIfNullOrWhiteSpace ( "path" );
+			permissions.ThrowIfNull ( "permissions" );
+
 			FileEntry entry = Device.FileListingService.FindFileEntry ( path );
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			Device.ExecuteShellCommand ( "chmod {0} {1}", cer, permissions.ToChmod ( ), entry.FullEscapedPath );
@@ -230,6 +225,9 @@ namespace Managed.Adb {
 		/// <returns><code>true</code>, if read-only; otherwise, <code>false</code></returns>
 		/// <exception cref="IOException">If mount point doesnt exist</exception>
 		public bool IsMountPointReadOnly( String mount ) {
+			Device.ThrowIfNull ( "Device" );
+			mount.ThrowIfNullOrWhiteSpace ( mount );
+
 			if ( !Device.MountPoints.ContainsKey ( mount ) ) {
 				throw new IOException ( "Invalid mount point" );
 			}
@@ -242,14 +240,29 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="path">The path.</param>
 		public void Delete( String path ) {
+			Device.ThrowIfNull ( "Device" );
+			path.ThrowIfNullOrWhiteSpace ( "path" );
+
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			FileEntry entry = Device.FileListingService.FindFileEntry ( path );
-			if ( entry != null ) {
-				Device.ExecuteShellCommand ( "rm -f {0} {1}", cer, entry.IsDirectory ? "-r" : String.Empty, entry.FullEscapedPath );
-			}
 
-			if ( !String.IsNullOrEmpty ( cer.ErrorMessage ) ) {
-				throw new IOException ( cer.ErrorMessage );
+			Delete ( entry );
+		}
+
+		/// <summary>
+		/// Deletes the specified path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		public void Delete ( FileEntry fileEntry ) {
+			Device.ThrowIfNull ( "Device" );
+			fileEntry.ThrowIfNull ( "fileEntry" );
+			if ( fileEntry.Exists ) {
+				CommandErrorReceiver cer = new CommandErrorReceiver ( );
+				Device.ExecuteShellCommand ( "rm -f {0} {1}", cer, fileEntry.IsDirectory ? "-r" : String.Empty, fileEntry.FullResolvedPath );
+
+				if ( !String.IsNullOrEmpty ( cer.ErrorMessage ) ) {
+					throw new IOException ( cer.ErrorMessage );
+				}
 			}
 		}
 
@@ -257,33 +270,34 @@ namespace Managed.Adb {
 		/// Gets the dev blocks for the device.
 		/// </summary>
 		/// <exception cref="System.IO.FileNotFoundException">Throws if unable to locate /dev/block </exception>
-		public List<String> DeviceBlocks {
+		public IEnumerable<FileEntry> DeviceBlocks {
 			get {
-				List<String> result = new List<String> ( );
-				FileEntry blocks = FileEntry.Find ( Device, "/dev/block/" );
-				blocks.Children = new List<FileEntry> ( Device.FileListingService.GetChildren ( blocks, true, null ) );
+				Device.ThrowIfNull ( "Device" );
 
-				foreach ( var block in blocks.Children ) {
-					Console.WriteLine ( "b: {0}", block.Name );
-					if ( block.Type == FileListingService.FileTypes.Block ) {
-						result.Add ( block.Name );
-					}
-				}
-				return result;
+				var blocks = FileEntry.Find ( Device, "/dev/block/" );
+				blocks.Children = Device.FileListingService.GetChildren ( blocks, true, null ).ToList();
+				return blocks.Children.Where ( b => b.Type == FileListingService.FileTypes.Block );
 			}
 		}
 
 		/// <summary>
 		/// Mounts the specified device.
 		/// </summary>
-		/// <param name="mp">The mp.</param>
+		/// <param name="mountPoint">The mp.</param>
 		/// <param name="options">The options.</param>
-		public void Mount( MountPoint mp, String options ) {
+		public void Mount ( MountPoint mountPoint, String options ) {
+			mountPoint.ThrowIfNull ( "mountPoint" );
+			Device.ThrowIfNull ( "Device" );
+
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			if ( Device.BusyBox.Available ) {
-				Device.ExecuteShellCommand ( "busybox mount {0} {4} -t {1} {2} {3}", cer, mp.IsReadOnly ? "-r" : "-w", mp.FileSystem, mp.Block, mp.Name, !String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty );
+				Device.ExecuteShellCommand ( "busybox mount {0} {4} -t {1} {2} {3}", cer, mountPoint.IsReadOnly ? "-r" : "-w",
+					mountPoint.FileSystem, mountPoint.Block, mountPoint.Name, 
+					!String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty );
 			} else {
-				Device.ExecuteShellCommand ( "mount {0} {4} -t {1} {2} {3}", cer, mp.IsReadOnly ? "-r" : "-w", mp.FileSystem, mp.Block, mp.Name, !String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty );
+				Device.ExecuteShellCommand ( "mount {0} {4} -t {1} {2} {3}", cer, mountPoint.IsReadOnly ? "-r" : "-w",
+					mountPoint.FileSystem, mountPoint.Block, mountPoint.Name, 
+					!String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty );
 			}
 		}
 
@@ -293,6 +307,9 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="mountPoint"></param>
 		public void Mount( String mountPoint ) {
+			mountPoint.ThrowIfNull ( "mountPoint" );
+			Device.ThrowIfNull ( "Device" );
+
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			if ( Device.BusyBox.Available ) {
 				Device.ExecuteShellCommand ( "busybox mount {0}", cer, mountPoint );
@@ -344,9 +361,11 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Unmounts the specified mount point.
 		/// </summary>
-		/// <param name="mp">The mountPoint.</param>
+		/// <param name="mountPoint">The mountPoint.</param>
 		/// <param name="options">The options.</param>
 		public void Unmount( MountPoint mountPoint, String options ) {
+			mountPoint.ThrowIfNull ( "mountPoint" );
+
 			Unmount ( mountPoint.Name, options );
 		}
 
@@ -364,11 +383,31 @@ namespace Managed.Adb {
 		/// <param name="mountPoint">The mount point.</param>
 		/// <param name="options">The options.</param>
 		public void Unmount( String mountPoint, String options ) {
+			mountPoint.ThrowIfNull ( "mountPoint" );
+			Device.ThrowIfNull ( "Device" );
+
 			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			if ( Device.BusyBox.Available ) {
 				Device.ExecuteShellCommand ( "busybox umount {1} {0}", cer, !String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty, mountPoint );
 			} else {
 				Device.ExecuteShellCommand ( "umount {1} {0}", cer, !String.IsNullOrEmpty ( options ) ? String.Format ( "-o {0}", options ) : String.Empty, mountPoint );
+			}
+		}
+
+		/// <summary>
+		/// Resolves the link to the true path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
+		public String ResolveLink ( String path ) {
+			if ( this.Device.BusyBox.Available ) {
+				var cresult = new CommandResultReceiver ( );
+				this.Device.BusyBox.ExecuteShellCommand ( "readlink -f {0}", cresult, path );
+				// if cresult is empty, return the path
+				return (cresult == null || String.IsNullOrEmpty ( cresult.Result )) ? path : cresult.Result;
+			} else {
+				// what do we do here? readlink is not available on devices without busybox...
+				return path;
 			}
 		}
 
