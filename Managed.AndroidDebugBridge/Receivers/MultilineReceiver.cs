@@ -123,10 +123,10 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
-		/// Gets a value indicating whether this instance is cancelled.
+		/// Gets a value indicating whether this instance is canceled.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is cancelled; otherwise, <c>false</c>.
+		/// 	<c>true</c> if this instance is canceled; otherwise, <c>false</c>.
 		/// </value>
 		public virtual bool IsCancelled { get; protected set; }
 

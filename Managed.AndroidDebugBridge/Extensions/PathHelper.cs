@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace System.IO {
+namespace Managed.Adb {
 	/// <summary>
 	/// 
 	/// </summary>
-	public static class PathHelper {
+	public static partial class MadbExtensions {
 
 		/// <summary>
 		/// Combines the specified paths.

@@ -8,7 +8,7 @@ namespace System.IO {
 	/// <summary>
 	/// 
 	/// </summary>
-	public static class FileInfoHelper {
+	public static partial class MadbExtensions {
 
 		/// <summary>
 		/// Determines whether the specified path is directory.

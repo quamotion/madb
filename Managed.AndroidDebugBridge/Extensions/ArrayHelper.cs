@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace System {
-	public static class ArrayHelper {
+namespace Managed.Adb {
+	public static partial class ArrayHelper {
 
 		/// <summary>
 		/// Swaps an unsigned value around, and puts the result in an array that can be sent to a device.

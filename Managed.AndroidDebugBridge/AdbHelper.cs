@@ -9,6 +9,7 @@ using System.Threading;
 using Managed.Adb.Exceptions;
 using Managed.Adb.MoreLinq;
 using Managed.Adb.IO;
+using Managed.Adb.Logs;
 
 
 namespace Managed.Adb {
@@ -32,7 +33,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Prevents a default instance of the <see cref="AdbHelper"/> class from being created.
 		/// </summary>
-		private AdbHelper( ) {
+		private AdbHelper ( ) {
 
 		}
 
@@ -60,7 +61,7 @@ namespace Managed.Adb {
 		/// <param name="device">The device.</param>
 		/// <param name="port">The port.</param>
 		/// <returns></returns>
-		public Socket Open( IPAddress address, IDevice device, int port ) {
+		public Socket Open ( IPAddress address, IDevice device, int port ) {
 			Socket s = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
 				s.Connect ( address, port );
@@ -86,11 +87,54 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
+		/// Kills the adb server.
+		/// </summary>
+		/// <param name="address">The address.</param>
+		/// <returns></returns>
+		/// <exception cref="System.IO.IOException">failed asking to kill adb</exception>
+		public int KillAdb ( IPEndPoint address ) {
+			byte[] request = FormAdbRequest ( "host:kill" );
+			byte[] reply;
+			using ( var adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp ) ) {
+				adbChan.Connect ( address );
+				adbChan.Blocking = true;
+				if ( !Write ( adbChan, request ) ) {
+					throw new IOException ( "failed asking to kill adb" );
+				}
+				var resp = ReadAdbResponse ( adbChan, false );
+				if ( !resp.IOSuccess || !resp.Okay ) {
+					Log.e ( TAG, "Got timeout or unhappy response from ADB req: " + resp.Message );
+					adbChan.Close ( );
+					return -1;
+				}
+
+				reply = new byte[4];
+				if ( !Read ( adbChan, reply ) ) {
+					Log.e ( TAG, "error in getting data length" );
+					adbChan.Close ( );
+					return -1;
+				}
+
+				// todo: complete this
+
+				return 0;
+			}
+		}
+
+		public void Backup ( ) {
+			throw new NotImplementedException ( );
+		}
+
+		public void Restore ( ) {
+			throw new NotImplementedException ( );
+		}
+
+		/// <summary>
 		/// Gets the adb version.
 		/// </summary>
 		/// <param name="address">The address.</param>
 		/// <returns></returns>
-		public int GetAdbVersion( IPEndPoint address ) {
+		public int GetAdbVersion ( IPEndPoint address ) {
 			byte[] request = FormAdbRequest ( "host:version" );
 			byte[] reply;
 			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
@@ -144,7 +188,7 @@ namespace Managed.Adb {
 		/// to the first available device.</param>
 		/// <param name="pid">the process pid to connect to.</param>
 		/// <returns>The Socket</returns>
-		public Socket CreatePassThroughConnection( IPEndPoint endpoint, Device device, int pid ) {
+		public Socket CreatePassThroughConnection ( IPEndPoint endpoint, Device device, int pid ) {
 			Socket socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
 				socket.Connect ( endpoint );
@@ -178,7 +222,7 @@ namespace Managed.Adb {
 		/// <param name="address">The address.</param>
 		/// <param name="port">The port.</param>
 		/// <returns></returns>
-		public byte[] CreateAdbForwardRequest( String address, int port ) {
+		public byte[] CreateAdbForwardRequest ( String address, int port ) {
 			String request;
 
 			if ( address == null )
@@ -193,7 +237,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="req">The req.</param>
 		/// <returns></returns>
-		public byte[] FormAdbRequest( String req ) {
+		public byte[] FormAdbRequest ( String req ) {
 			String resultStr = String.Format ( "{0}{1}\n", req.Length.ToString ( "X4" ), req );
 			byte[] result;
 			try {
@@ -213,7 +257,7 @@ namespace Managed.Adb {
 		/// <param name="socket">The socket.</param>
 		/// <param name="data">The data.</param>
 		/// <returns></returns>
-		public bool Write( Socket socket, byte[] data ) {
+		public bool Write ( Socket socket, byte[] data ) {
 			try {
 				Write ( socket, data, -1, DdmPreferences.Timeout );
 			} catch ( IOException e ) {
@@ -231,7 +275,7 @@ namespace Managed.Adb {
 		/// <param name="data">The data.</param>
 		/// <param name="length">The length.</param>
 		/// <param name="timeout">The timeout.</param>
-		public void Write( Socket socket, byte[] data, int length, int timeout ) {
+		public void Write ( Socket socket, byte[] data, int length, int timeout ) {
 			//using ( var buf = new MemoryStream ( data, 0, length != -1 ? length : data.Length ) ) {
 			int numWaits = 0;
 			int count = -1;
@@ -266,7 +310,7 @@ namespace Managed.Adb {
 		/// <param name="socket">The socket.</param>
 		/// <param name="readDiagString">if set to <c>true</c> [read diag string].</param>
 		/// <returns></returns>
-		public AdbResponse ReadAdbResponse( Socket socket, bool readDiagString ) {
+		public AdbResponse ReadAdbResponse ( Socket socket, bool readDiagString ) {
 
 			AdbResponse resp = new AdbResponse ( );
 
@@ -325,7 +369,7 @@ namespace Managed.Adb {
 		/// <param name="socket">The socket.</param>
 		/// <param name="data">The data.</param>
 		/// <returns></returns>
-		public bool Read( Socket socket, byte[] data ) {
+		public bool Read ( Socket socket, byte[] data ) {
 			try {
 				Read ( socket, data, -1, DdmPreferences.Timeout );
 			} catch ( AdbException e ) {
@@ -342,7 +386,7 @@ namespace Managed.Adb {
 		/// <param name="data">The data.</param>
 		/// <param name="length">The length.</param>
 		/// <param name="timeout">The timeout.</param>
-		public void Read( Socket socket, byte[] data, int length, int timeout ) {
+		public void Read ( Socket socket, byte[] data, int length, int timeout ) {
 			int expLen = length != -1 ? length : data.Length;
 			int count = -1;
 			int totalRead = 0;
@@ -376,7 +420,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="pid">The pid.</param>
 		/// <returns></returns>
-		private byte[] CreateJdwpForwardRequest( int pid ) {
+		private byte[] CreateJdwpForwardRequest ( int pid ) {
 			String req = String.Format ( "jdwp:{0}", pid );
 			return FormAdbRequest ( req );
 		}
@@ -389,7 +433,7 @@ namespace Managed.Adb {
 		/// <param name="localPort">The local port.</param>
 		/// <param name="remotePort">The remote port.</param>
 		/// <returns></returns>
-		public bool CreateForward( IPEndPoint adbSockAddr, Device device, int localPort, int remotePort ) {
+		public bool CreateForward ( IPEndPoint adbSockAddr, Device device, int localPort, int remotePort ) {
 
 			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
@@ -424,7 +468,7 @@ namespace Managed.Adb {
 		/// <param name="localPort">The local port.</param>
 		/// <param name="remotePort">The remote port.</param>
 		/// <returns></returns>
-		public bool RemoveForward( IPEndPoint adbSockAddr, Device device, int localPort, int remotePort ) {
+		public bool RemoveForward ( IPEndPoint adbSockAddr, Device device, int localPort, int remotePort ) {
 
 			Socket adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 			try {
@@ -458,7 +502,7 @@ namespace Managed.Adb {
 		/// <returns>
 		///   <c>true</c> if the specified reply is okay; otherwise, <c>false</c>.
 		/// </returns>
-		public bool IsOkay( byte[] reply ) {
+		public bool IsOkay ( byte[] reply ) {
 			return reply[0] == (byte)'O' && reply[1] == (byte)'K'
 								&& reply[2] == (byte)'A' && reply[3] == (byte)'Y';
 		}
@@ -468,7 +512,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="reply">The reply.</param>
 		/// <returns></returns>
-		public String ReplyToString( byte[] reply ) {
+		public String ReplyToString ( byte[] reply ) {
 			String result;
 			try {
 				result = Encoding.Default.GetString ( reply );
@@ -484,7 +528,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="address">The address.</param>
 		/// <returns></returns>
-		public List<Device> GetDevices( IPEndPoint address ) {
+		public List<Device> GetDevices ( IPEndPoint address ) {
 			byte[] request = FormAdbRequest ( "host:devices" ); //$NON-NLS-1$
 			byte[] reply;
 			Socket socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
@@ -537,7 +581,7 @@ namespace Managed.Adb {
 		/// <param name="adbSockAddr">The adb sock addr.</param>
 		/// <param name="device">The device.</param>
 		/// <returns></returns>
-		public RawImage GetFrameBuffer( IPEndPoint adbSockAddr, IDevice device ) {
+		public RawImage GetFrameBuffer ( IPEndPoint adbSockAddr, IDevice device ) {
 
 			RawImage imageParams = new RawImage ( );
 			byte[] request = FormAdbRequest ( "framebuffer:" ); //$NON-NLS-1$
@@ -592,7 +636,7 @@ namespace Managed.Adb {
 
 				using ( MemoryStream ms = new MemoryStream ( reply ) ) {
 					buf = new BinaryReader ( ms );
-					
+
 					// fill the RawImage with the header
 					if ( imageParams.ReadHeader ( version, buf ) == false ) {
 						Log.w ( TAG, "Unsupported protocol: " + version );
@@ -632,23 +676,38 @@ namespace Managed.Adb {
 		/// <param name="device">The device.</param>
 		/// <param name="rcvr">The RCVR.</param>
 		/// <remarks>Should check if you CanSU before calling this.</remarks>
-		public void ExecuteRemoteRootCommand( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr ) {
-			ExecuteRemoteCommand ( endPoint, String.Format ( "su -c \"{0}\"", command ), device, rcvr );
+		public void ExecuteRemoteRootCommand ( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr ) {
+			ExecuteRemoteRootCommand ( endPoint, String.Format ( "su -c \"{0}\"", command ), device, rcvr, int.MaxValue );
 		}
-
 
 		/// <summary>
 		/// Executes a shell command on the remote device
 		/// </summary>
-		/// <param name="endPoint">The socket end point</param>
-		/// <param name="command">The command to execute</param>
-		/// <param name="device">The device to execute on</param>
-		/// <param name="rcvr">The shell output receiver</param>
-		/// <exception cref="FileNotFoundException">Throws if the result is 'command': not found</exception>
-		/// <exception cref="IOException">Throws if there is a problem reading / writing to the socket</exception>
-		/// <exception cref="OperationCanceledException">Throws if the execution was canceled</exception>
-		/// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
-		public void ExecuteRemoteCommand( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr ) {
+		/// <param name="endPoint">The end point.</param>
+		/// <param name="command">The command.</param>
+		/// <param name="device">The device.</param>
+		/// <param name="rcvr">The RCVR.</param>
+		/// <param name="maxTimeToOutputResponse">The max time to output response.</param>
+		public void ExecuteRemoteRootCommand ( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse ) {
+			ExecuteRemoteCommand ( endPoint, String.Format ( "su -c \"{0}\"", command ), device, rcvr );
+		}
+
+		/// <summary>
+		/// Executes the remote command.
+		/// </summary>
+		/// <param name="endPoint">The end point.</param>
+		/// <param name="command">The command.</param>
+		/// <param name="device">The device.</param>
+		/// <param name="rcvr">The RCVR.</param>
+		/// <param name="maxTimeToOutputResponse">The max time to output response.</param>
+		/// <exception cref="AdbException">failed submitting shell command</exception>
+		/// <exception cref="System.OperationCanceledException"></exception>
+		/// <exception cref="Managed.Adb.Exceptions.ShellCommandUnresponsiveException"></exception>
+		/// <exception cref="System.IO.FileNotFoundException"></exception>
+		/// <exception cref="UnknownOptionException"></exception>
+		/// <exception cref="CommandAbortingException"></exception>
+		/// <exception cref="PermissionDeniedException"></exception>
+		public void ExecuteRemoteCommand ( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse ) {
 			Socket socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 
 			if ( !device.IsOnline ) {
@@ -672,8 +731,11 @@ namespace Managed.Adb {
 				}
 
 				byte[] data = new byte[16384];
-				int count = -1;
-				while ( count != 0 ) {
+				int timeToResponseCount = 0;
+
+				while ( true ) {
+					int count;
+
 					if ( rcvr != null && rcvr.IsCancelled ) {
 						Log.w ( TAG, "execute: cancelled" );
 						throw new OperationCanceledException ( );
@@ -683,14 +745,23 @@ namespace Managed.Adb {
 					if ( count < 0 ) {
 						// we're at the end, we flush the output
 						rcvr.Flush ( );
-						Log.w ( TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count );
-						throw new EndOfStreamException ( );
+						Log.v ( "ddms", "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count );
+						break;
 					} else if ( count == 0 ) {
-						// do nothing
+						try {
+							int wait = WAIT_TIME * 5;
+							timeToResponseCount += wait;
+							if ( maxTimeToOutputResponse > 0 && timeToResponseCount > maxTimeToOutputResponse ) {
+								throw new ShellCommandUnresponsiveException ( );
+							}
+							Thread.Sleep ( wait );
+						} catch ( ThreadInterruptedException ) { }
 					} else {
+						timeToResponseCount = 0;
 
 						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
 						string sdata = data.GetString ( 0, count, AdbHelper.DEFAULT_ENCODING );
+
 						var sdataTrimmed = sdata.Trim ( );
 						if ( sdataTrimmed.EndsWith ( String.Format ( "{0}: not found", cmd[0] ) ) ) {
 							Log.w ( TAG, "The remote execution returned: '{0}: not found'", cmd[0] );
@@ -709,21 +780,21 @@ namespace Managed.Adb {
 						}
 
 						// for "aborting" commands
-						if ( sdataTrimmed.EndsWith ( "Aborting." ) ) {
+						if ( sdataTrimmed.IsMatch ( "Aborting.$" ) ) {
 							Log.w ( TAG, "The remote execution returned: {0}", sdataTrimmed );
 							throw new CommandAbortingException ( sdataTrimmed );
 						}
 
 						// for busybox applets 
 						// cmd: applet not found
-						if ( sdataTrimmed.Match("applet not found$") && cmd.Length > 1 ) {
+						if ( sdataTrimmed.IsMatch ( "applet not found$" ) && cmd.Length > 1 ) {
 							Log.w ( TAG, "The remote execution returned: '{0}'", sdataTrimmed );
 							throw new FileNotFoundException ( string.Format ( "The remote execution returned: '{0}'", sdataTrimmed ) );
 						}
 
 						// checks if the permission to execute the command was denied.
 						// workitem: 16822
-						if ( sdataTrimmed.Match("(permission|access) denied$") ) {
+						if ( sdataTrimmed.IsMatch ( "(permission|access) denied$" ) ) {
 							Log.w ( TAG, "The remote execution returned: '{0}'", sdataTrimmed );
 							throw new PermissionDeniedException ( String.Format ( "The remote execution returned: '{0}'", sdataTrimmed ) );
 						}
@@ -747,11 +818,26 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
+		/// Executes a shell command on the remote device
+		/// </summary>
+		/// <param name="endPoint">The socket end point</param>
+		/// <param name="command">The command to execute</param>
+		/// <param name="device">The device to execute on</param>
+		/// <param name="rcvr">The shell output receiver</param>
+		/// <exception cref="FileNotFoundException">Throws if the result is 'command': not found</exception>
+		/// <exception cref="IOException">Throws if there is a problem reading / writing to the socket</exception>
+		/// <exception cref="OperationCanceledException">Throws if the execution was canceled</exception>
+		/// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
+		public void ExecuteRemoteCommand ( IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr ) {
+			ExecuteRemoteCommand ( endPoint, command, device, rcvr, int.MaxValue );
+		}
+
+		/// <summary>
 		/// Sets the device.
 		/// </summary>
 		/// <param name="adbChan">The adb chan.</param>
 		/// <param name="device">The device.</param>
-		public void SetDevice( Socket adbChan, IDevice device ) {
+		public void SetDevice ( Socket adbChan, IDevice device ) {
 			// if the device is not null, then we first tell adb we're looking to talk
 			// to a specific device
 			if ( device != null ) {
@@ -771,7 +857,79 @@ namespace Managed.Adb {
 					}
 				}
 			}
+		}
 
+		/// <summary>
+		/// Runs the Event log service on the Device, and provides its output to the LogReceiver.
+		/// </summary>
+		/// <param name="address">The address.</param>
+		/// <param name="device">The device.</param>
+		/// <param name="rcvr">The RCVR.</param>
+		public void RunEventLogService ( IPEndPoint address, Device device, LogReceiver rcvr ) {
+			RunLogService ( address, device, "events", rcvr );
+		}
+
+		/// <summary>
+		/// Runs the Event log service on the Device, and provides its output to the LogReceiver.
+		/// </summary>
+		/// <param name="address">The address.</param>
+		/// <param name="device">The device.</param>
+		/// <param name="logName">Name of the log.</param>
+		/// <param name="rcvr">The RCVR.</param>
+		/// <exception cref="AdbException">failed asking for log</exception>
+		/// <exception cref="Managed.Adb.Exceptions.AdbCommandRejectedException"></exception>
+		public void RunLogService ( IPEndPoint address, Device device, String logName, LogReceiver rcvr ) {
+			try {
+				using ( var adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp ) ) {
+					adbChan.Connect ( address );
+					adbChan.Blocking = true;
+					// if the device is not -1, then we first tell adb we're looking to talk
+					// to a specific device
+					SetDevice ( adbChan, device );
+
+					var request = FormAdbRequest ( "log:" + logName );
+					if ( !Write ( adbChan, request ) ) {
+						throw new AdbException ( "failed asking for log" );
+					}
+
+					var resp = ReadAdbResponse ( adbChan, false /* readDiagString */);
+					if ( resp.Okay == false ) {
+						throw new AdbCommandRejectedException ( resp.Message );
+					}
+
+					byte[] data = new byte[16384];
+					using ( var ms = new MemoryStream ( data ) ) {
+						int offset = 0;
+
+						while ( true ) {
+							int count;
+							if ( rcvr != null && rcvr.IsCancelled ) {
+								break;
+							}
+							var buffer = new byte[4 * 1024];
+
+							count = adbChan.Receive ( buffer );
+							if ( count < 0 ) {
+								break;
+							} else if ( count == 0 ) {
+								try {
+									Thread.Sleep ( WAIT_TIME * 5 );
+								} catch ( ThreadInterruptedException ie ) {
+								}
+							} else {
+								ms.Write ( buffer, offset, count );
+								offset += count;
+								if ( rcvr != null ) {
+									var d = ms.ToArray ( );
+									rcvr.ParseNewData ( d, 0, d.Length );
+								}
+							}
+						}
+					}
+				}
+			} finally {
+
+			}
 		}
 
 		/// <summary>
@@ -779,7 +937,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="adbSocketAddress">The adb socket address.</param>
 		/// <param name="device">The device.</param>
-		public void Reboot( IPEndPoint adbSocketAddress, Device device ) {
+		public void Reboot ( IPEndPoint adbSocketAddress, Device device ) {
 			Reboot ( "", adbSocketAddress, device );
 		}
 
@@ -789,7 +947,7 @@ namespace Managed.Adb {
 		/// <param name="into">The into.</param>
 		/// <param name="adbSockAddr">The adb sock addr.</param>
 		/// <param name="device">The device.</param>
-		public void Reboot( String into, IPEndPoint adbSockAddr, Device device ) {
+		public void Reboot ( String into, IPEndPoint adbSockAddr, Device device ) {
 			byte[] request;
 			if ( into == null ) {
 				request = FormAdbRequest ( "reboot:" ); //$NON-NLS-1$

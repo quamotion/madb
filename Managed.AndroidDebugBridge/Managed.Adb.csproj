@@ -136,6 +136,7 @@
     <Compile Include="AllocationInfo.cs" />
     <Compile Include="AndroidDebugBridge.cs" />
     <Compile Include="AndroidDebugBridgeEventArgs.cs" />
+    <Compile Include="BatteryInfo.cs" />
     <Compile Include="BusyBox.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ClientData.cs" />
@@ -145,10 +146,15 @@
     <Compile Include="Conversion\EndianBitConverter.cs" />
     <Compile Include="Conversion\Endianness.cs" />
     <Compile Include="Conversion\LittleEndianBitConverter.cs" />
+    <Compile Include="Exceptions\AdbCommandRejectedException.cs" />
     <Compile Include="Exceptions\CommandAbortingException.cs" />
+    <Compile Include="Exceptions\ShellCommandUnresponsiveException.cs" />
     <Compile Include="Exceptions\UnknownOptionException.cs" />
     <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="Extensions\IntegerHelper.cs" />
+    <Compile Include="Extensions\MadbExtensions.cs" />
+    <Compile Include="Logs\ILogListener.cs" />
+    <Compile Include="Logs\LogEntry.cs" />
     <Compile Include="MoreLinq\AssertCount.cs" />
     <Compile Include="MoreLinq\Batch.cs" />
     <Compile Include="MoreLinq\Concat.cs" />
@@ -172,6 +178,7 @@
     <Compile Include="MoreLinq\SequenceException.cs" />
     <Compile Include="MoreLinq\ThrowIf.cs" />
     <Compile Include="RawImage.cs" />
+    <Compile Include="Receivers\BatteryReceiver.cs" />
     <Compile Include="Receivers\CommandErrorReceiver.cs" />
     <Compile Include="Receivers\CommandResultReceiver.cs" />
     <Compile Include="Receivers\ConsoleOutputReceiver.cs" />
@@ -218,6 +225,7 @@
     <Compile Include="LogLevel.cs" />
     <Compile Include="MonitorThread.cs" />
     <Compile Include="MountPoint.cs" />
+    <Compile Include="Logs\LogReceiver.cs" />
     <Compile Include="Receivers\MountPointReceiver.cs" />
     <Compile Include="Receivers\MultilineReceiver.cs" />
     <Compile Include="Receivers\NullOutputReceiver.cs" />
@@ -245,6 +253,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="MoreLinq\MoreLinq-License.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

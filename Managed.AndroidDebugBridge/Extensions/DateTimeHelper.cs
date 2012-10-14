@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Globalization;
 
-namespace System {
-	public static class DateTimeHelper {
+namespace Managed.Adb {
+	public static partial class MadbExtensions {
 		/// <summary>
 		/// Gets EPOCH time
 		/// </summary>
