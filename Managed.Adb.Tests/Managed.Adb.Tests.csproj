@@ -77,7 +77,9 @@
     <Compile Include="AdbHelperTests.cs" />
     <Compile Include="AndroidDebugBridgeTests.cs" />
     <Compile Include="BaseDeviceTests.cs" />
+    <Compile Include="BatteryInfoTests.cs" />
     <Compile Include="BusyBoxTests.cs" />
+    <Compile Include="DeviceTests.cs" />
     <Compile Include="FileEntryTests.cs" />
     <Compile Include="FileSystemTests.cs" />
     <Compile Include="LinuxPathTests.cs" />

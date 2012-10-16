@@ -94,35 +94,45 @@ namespace Managed.Adb {
 		/// <exception cref="System.IO.IOException">failed asking to kill adb</exception>
 		public int KillAdb ( IPEndPoint address ) {
 			byte[] request = FormAdbRequest ( "host:kill" );
-			byte[] reply;
-			using ( var adbChan = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp ) ) {
-				adbChan.Connect ( address );
-				adbChan.Blocking = true;
-				if ( !Write ( adbChan, request ) ) {
+			using ( var socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp ) ) {
+				socket.Connect ( address );
+				socket.Blocking = true;
+				if ( !Write ( socket, request ) ) {
 					throw new IOException ( "failed asking to kill adb" );
 				}
-				var resp = ReadAdbResponse ( adbChan, false );
+				var resp = ReadAdbResponse ( socket, false );
 				if ( !resp.IOSuccess || !resp.Okay ) {
 					Log.e ( TAG, "Got timeout or unhappy response from ADB req: " + resp.Message );
-					adbChan.Close ( );
+					socket.Close ( );
 					return -1;
 				}
-
-				reply = new byte[4];
-				if ( !Read ( adbChan, reply ) ) {
-					Log.e ( TAG, "error in getting data length" );
-					adbChan.Close ( );
-					return -1;
-				}
-
-				// todo: complete this
-
 				return 0;
 			}
 		}
 
-		public void Backup ( ) {
-			throw new NotImplementedException ( );
+		[Obsolete("This is not yet functional")]
+		public void Backup ( IPEndPoint address ) {
+			byte[] request = FormAdbRequest ( "backup:all" );
+			using ( var socket = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp ) ) {
+				socket.Connect ( address );
+				socket.Blocking = true;
+				if ( !Write ( socket, request ) ) {
+					throw new IOException ( "failed asking to backup device" );
+				}
+				var resp = ReadAdbResponse ( socket, false );
+				if ( !resp.IOSuccess || !resp.Okay ) {
+					Log.e ( TAG, "Got timeout or unhappy response from ADB req: " + resp.Message );
+					socket.Close ( );
+					return;
+				}
+
+				var data = new byte[6000];
+				int count = -1;
+				while ( count != 0 ) {
+					count = socket.Receive ( data );
+					Console.Write ( "received: {0}", count );
+				}
+			}
 		}
 
 		public void Restore ( ) {
@@ -716,6 +726,8 @@ namespace Managed.Adb {
 
 			try {
 				socket.Connect ( endPoint );
+				socket.ReceiveTimeout = maxTimeToOutputResponse;
+				socket.SendTimeout = maxTimeToOutputResponse;
 				socket.Blocking = true;
 
 				SetDevice ( socket, device );
@@ -731,10 +743,8 @@ namespace Managed.Adb {
 				}
 
 				byte[] data = new byte[16384];
-				int timeToResponseCount = 0;
-
-				while ( true ) {
-					int count;
+				int count = -1;
+				while ( count != 0 ) {
 
 					if ( rcvr != null && rcvr.IsCancelled ) {
 						Log.w ( TAG, "execute: cancelled" );
@@ -742,23 +752,11 @@ namespace Managed.Adb {
 					}
 
 					count = socket.Receive ( data );
-					if ( count < 0 ) {
+					if ( count == 0 ) {
 						// we're at the end, we flush the output
 						rcvr.Flush ( );
-						Log.v ( "ddms", "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count );
-						break;
-					} else if ( count == 0 ) {
-						try {
-							int wait = WAIT_TIME * 5;
-							timeToResponseCount += wait;
-							if ( maxTimeToOutputResponse > 0 && timeToResponseCount > maxTimeToOutputResponse ) {
-								throw new ShellCommandUnresponsiveException ( );
-							}
-							Thread.Sleep ( wait );
-						} catch ( ThreadInterruptedException ) { }
+						Log.w ( TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count );
 					} else {
-						timeToResponseCount = 0;
-
 						string[] cmd = command.Trim ( ).Split ( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
 						string sdata = data.GetString ( 0, count, AdbHelper.DEFAULT_ENCODING );
 
@@ -803,13 +801,12 @@ namespace Managed.Adb {
 						if ( rcvr != null ) {
 							rcvr.AddOutput ( data, 0, count );
 						}
+
 					}
 				}
-			} /*catch ( Exception e ) {
-				Log.e ( TAG, e );
-				Console.Error.WriteLine ( e.ToString ( ) );
-				throw;
-			}*/ finally {
+			} catch ( SocketException s ) {
+				throw new ShellCommandUnresponsiveException ( );
+			} finally {
 				if ( socket != null ) {
 					socket.Close ( );
 				}

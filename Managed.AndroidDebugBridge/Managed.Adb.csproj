@@ -153,6 +153,10 @@
     <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="Extensions\IntegerHelper.cs" />
     <Compile Include="Extensions\MadbExtensions.cs" />
+    <Compile Include="IO\BEBinaryReader.cs" />
+    <Compile Include="IO\BEBinaryWriter.cs" />
+    <Compile Include="IO\ByteBuffer.cs" />
+    <Compile Include="IO\ByteOrder.cs" />
     <Compile Include="Logs\ILogListener.cs" />
     <Compile Include="Logs\LogEntry.cs" />
     <Compile Include="MoreLinq\AssertCount.cs" />

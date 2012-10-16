@@ -199,6 +199,19 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Determines whether this device can perform a backup.
+		/// </summary>
+		/// <returns>
+		///   <c>true</c> if this device can perform a backup; otherwise, <c>false</c>.
+		/// </returns>
+		public bool CanBackup ( ) {
+			return this.FileSystem.Exists ( "/system/bin/bu" );
+		}
+
+		public void Backup ( ) {
+			AdbHelper.Instance.Backup ( AndroidDebugBridge.SocketAddress );
+		}
 
 		/// <summary>
 		/// Determines whether this instance can use the SU shell.

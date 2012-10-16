@@ -22,6 +22,12 @@ namespace Managed.Adb.Tests {
 		}
 
 		[Fact]
+		public void KillAdbTest ( ) {
+			var device = GetFirstDevice ( );
+			AdbHelper.Instance.KillAdb ( AndroidDebugBridge.SocketAddress );
+		}
+
+		[Fact]
 		public void DeviceGetMountPointsTest ( ) {
 			Device device = GetFirstDevice ( );
 			foreach ( var item in device.MountPoints.Keys ) {

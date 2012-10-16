@@ -11,12 +11,33 @@ namespace Managed.Adb {
 	/// </summary>
 	public interface IDevice {
 
+		/// <summary>
+		/// Occurs when device state changed.
+		/// </summary>
 		event EventHandler<EventArgs> StateChanged;
+		/// <summary>
+		/// Occurs when build info changed.
+		/// </summary>
 		event EventHandler<EventArgs> BuildInfoChanged;
+		/// <summary>
+		/// Occurs when client list changed.
+		/// </summary>
 		event EventHandler<EventArgs> ClientListChanged;
 
+		/// <summary>
+		/// Gets the file system.
+		/// </summary>
+		/// <value>
+		/// The file system.
+		/// </value>
 		FileSystem FileSystem { get; }
 
+		/// <summary>
+		/// Gets the busy box.
+		/// </summary>
+		/// <value>
+		/// The busy box.
+		/// </value>
 		BusyBox BusyBox { get; }
 
 		/// <summary>
@@ -156,7 +177,15 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="command">The command to execute</param>
 		/// <param name="receiver">The receiver object getting the result from the command.</param>
-		void ExecuteShellCommand(String command, IShellOutputReceiver receiver);
+		void ExecuteShellCommand ( String command, IShellOutputReceiver receiver );
+		/// <summary>
+		/// Executes a shell command on the device, and sends the result to a receiver.
+		/// </summary>
+		/// </summary>
+		/// <param name="command">The command to execute</param>
+		/// <param name="receiver">The receiver object getting the result from the command.</param>
+		/// <param name="maxTimeToOutputResponse">The max time to output response.</param>
+		void ExecuteShellCommand ( String command, IShellOutputReceiver receiver, int maxTimeToOutputResponse );
 
 		/// <summary>
 		/// Executes a shell command on the device, and sends the result to a receiver.
@@ -164,23 +193,49 @@ namespace Managed.Adb {
 		/// <param name="command">The command to execute</param>
 		/// <param name="receiver">The receiver object getting the result from the command.</param>
 		/// <param name="commandArgs">The command args.</param>
-		void ExecuteShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs );
-
+		void ExecuteShellCommand ( String command, IShellOutputReceiver receiver, params object[] commandArgs );
 
 		/// <summary>
-		/// Executes a shell command on the device as root, and sends the result to a receiver.
+		/// Executes a shell command on the device, and sends the result to a receiver.
 		/// </summary>
-		/// <param name="command">The command.</param>
-		/// <param name="receiver">The receiver.</param>
+		/// <param name="command">The command to execute</param>
+		/// <param name="receiver">The receiver object getting the result from the command.</param>
+		/// <param name="maxTimeToOutputResponse">The max time to output response.</param>
 		/// <param name="commandArgs">The command args.</param>
-		void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs );
+		void ExecuteShellCommand ( String command, IShellOutputReceiver receiver, int maxTimeToOutputResponse, params object[] commandArgs );
+
 
 		/// <summary>
 		/// Executes a shell command on the device as root, and sends the result to a receiver.
 		/// </summary>
 		/// <param name="command">The command to execute</param>
 		/// <param name="receiver">The receiver object getting the result from the command.</param>
-		void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver );
+		/// <param name="commandArgs">The command args.</param>
+		void ExecuteRootShellCommand ( String command, IShellOutputReceiver receiver, params object[] commandArgs );
+
+		/// <summary>
+		/// Executes a shell command on the device as root, and sends the result to a receiver.
+		/// </summary>
+		/// <param name="command">The command to execute</param>
+		/// <param name="receiver">The receiver object getting the result from the command.</param>
+		/// <param name="maxTimeToOutputResponse">The max time to output response.</param>
+		/// <param name="commandArgs">The command args.</param>
+		void ExecuteRootShellCommand ( String command, IShellOutputReceiver receiver, int maxTimeToOutputResponse, params object[] commandArgs );
+
+		/// <summary>
+		/// Executes a shell command on the device as root, and sends the result to a receiver.
+		/// </summary>
+		/// <param name="command">The command to execute</param>
+		/// <param name="receiver">The receiver object getting the result from the command.</param>
+		void ExecuteRootShellCommand ( String command, IShellOutputReceiver receiver );
+
+		/// <summary>
+		/// Executes a shell command on the device as root, and sends the result to a receiver.
+		/// </summary>
+		/// <param name="command">The command to execute</param>
+		/// <param name="receiver">The receiver object getting the result from the command.</param>
+		/// <param name="maxTimeToOutputResponse">The max time to output response.</param>
+		void ExecuteRootShellCommand ( String command, IShellOutputReceiver receiver, int maxTimeToOutputResponse );
 		/**
 		 * Runs the event log service and outputs the event log to the {@link LogReceiver}.
 		 * @param receiver the receiver to receive the event log entries.
@@ -242,12 +297,6 @@ namespace Managed.Adb {
 		/// <param name="reinstall">set to <code>true</code> if re-install of app should be performed</param>
 		void InstallRemotePackage(String remoteFilePath, bool reinstall);
 
-		/*
-		 * Remove a file from device
-		 * @param remoteFilePath path on device of file to remove
-		 * @throws IOException if file removal failed
-		 */
-
 
 		/// <summary>
 		/// Remove a file from device
@@ -264,10 +313,19 @@ namespace Managed.Adb {
 		/// <exception cref="PackageInstallException"></exception>
 		void UninstallPackage(String packageName) ;
 
+		/// <summary>
+		/// Refreshes the environment variables.
+		/// </summary>
 		void RefreshEnvironmentVariables ( );
 
+		/// <summary>
+		/// Refreshes the mount points.
+		/// </summary>
 		void RefreshMountPoints ( );
 
+		/// <summary>
+		/// Refreshes the properties.
+		/// </summary>
 		void RefreshProperties ( );
 	}
 }
