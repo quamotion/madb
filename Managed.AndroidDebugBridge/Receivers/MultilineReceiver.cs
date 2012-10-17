@@ -32,13 +32,13 @@ namespace Managed.Adb {
 		/// Gets or sets the lines.
 		/// </summary>
 		/// <value>The lines.</value>
-		protected List<String> Lines { get; set; }
+		protected ICollection<String> Lines { get; set; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
 		/// </summary>
 		public MultiLineReceiver( ) {
-			Lines = new List<string> ( );
+			Lines = new List<String> ( );
 		}
 
 		/// <summary>
@@ -52,7 +52,7 @@ namespace Managed.Adb {
 				String s = null;
 				try {
 					s = Encoding.GetEncoding ( ENCODING ).GetString ( data, offset, length ); //$NON-NLS-1$
-				} catch ( DecoderFallbackException e ) {
+				} catch ( DecoderFallbackException ) {
 					// normal encoding didn't work, try the default one
 					s = Encoding.Default.GetString ( data, offset, length );
 				}
@@ -97,7 +97,6 @@ namespace Managed.Adb {
 		/// Flushes the output.
 		/// </summary>
 		public void Flush( ) {
-
 			if (!IsCancelled && Lines.Count > 0 ) {
 				// at this point we've split all the lines.
 				// make the array

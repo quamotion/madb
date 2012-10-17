@@ -162,7 +162,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets the version of busybox
 		/// </summary>
-		public Version Version { get; private set; }
+		public Version Version { get; internal set; }
 		/// <summary>
 		/// Gets a collection of the supported commands
 		/// </summary>
@@ -216,17 +216,17 @@ namespace Managed.Adb {
 			/// <param name="lines">The lines.</param>
 			/// <workitem id="16000">Issues w/ BusyBox.cs/ProcessNewLines()</workitem>
 			protected override void ProcessNewLines ( string[] lines ) {
-				
+				Match match = null;
 				int state = 0;
 				foreach ( var line in lines ) {
-					if ( line.IsNullOrWhiteSpace() ) {
+					if ( line.IsNullOrWhiteSpace ( ) ) {
 						continue;
 					}
 					switch ( state ) {
 						case 0:
-							Match m = Regex.Match ( line, BB_VERSION_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase );
-							if ( m.Success ) {
-								BusyBox.Version = new Version ( m.Groups[1].Value );
+							match = line.Match ( BB_VERSION_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase );
+							if ( match.Success ) {
+								BusyBox.Version = new Version ( match.Groups[1].Value );
 								state = 1;
 								continue;
 							}
@@ -237,10 +237,10 @@ namespace Managed.Adb {
 							}
 							break;
 						case 2:
-							m = Regex.Match ( line.Trim(), BB_FUNCTIONS_PATTERN, RegexOptions.Compiled );
-							while ( m.Success ) {
-								BusyBox.Commands.Add ( m.Groups[1].Value.Trim ( ) );
-								m = m.NextMatch ( );
+							match = line.Trim ( ).Match ( BB_FUNCTIONS_PATTERN, RegexOptions.Compiled );
+							while ( match.Success ) {
+								BusyBox.Commands.Add ( match.Groups[1].Value.Trim ( ) );
+								match = match.NextMatch ( );
 							}
 							break;
 					}

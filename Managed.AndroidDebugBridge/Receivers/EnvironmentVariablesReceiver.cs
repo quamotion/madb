@@ -9,7 +9,13 @@ namespace Managed.Adb {
 	/// 
 	/// </summary>
 	public sealed class EnvironmentVariablesReceiver : MultiLineReceiver {
+		/// <summary>
+		/// 
+		/// </summary>
 		public const String ENV_COMMAND = "printenv";
+		/// <summary>
+		/// 
+		/// </summary>
 		private const String ENV_PATTERN = @"^([^=\s]+)\s*=\s*(.*)$";
 		/// <summary>
 		/// Initializes a new instance of the <see cref="EnvironmentVariablesReceiver"/> class.

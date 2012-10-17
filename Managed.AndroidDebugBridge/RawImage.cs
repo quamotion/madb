@@ -122,6 +122,8 @@ namespace Managed.Adb {
 				this.Alpha.Offset = 0;
 				this.Alpha.Length = 0;
 			} else if ( version == 1 ) {
+				// https://github.com/android/platform_system_core/blob/master/adb/framebuffer_service.c
+				// this should be changed to support the other versions.
 				this.Bpp = (int)buf.ReadInt32 ( ); // 32
 				this.Size = (int)buf.ReadInt32 ( );
 				this.Width = (int)buf.ReadInt32 ( ); // 480

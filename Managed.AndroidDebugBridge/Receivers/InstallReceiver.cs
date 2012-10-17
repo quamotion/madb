@@ -5,6 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class InstallReceiver : MultiLineReceiver {
 		/// <summary>
 		/// 
@@ -16,7 +19,7 @@ namespace Managed.Adb {
 		private const String FAILURE_PATTERN = @"Failure(?:\s+\[(.*)\])?";
 
 
-		private const String UNKNOWN_ERROR = "An unknown error occured.";
+		private const String UNKNOWN_ERROR = "An unknown error occurred.";
 		/// <summary>
 		/// Processes the new lines.
 		/// </summary>
@@ -24,16 +27,15 @@ namespace Managed.Adb {
 		protected override void ProcessNewLines ( string[] lines ) {
 			foreach ( String line in lines ) {
 				if ( line.Length > 0 ) {
-					Console.WriteLine ( line );
 					if ( line.StartsWith ( SUCCESS_OUTPUT ) ) {
 						ErrorMessage = null;
 						Success = true;
 					} else {
-						Match m = Regex.Match ( line, FAILURE_PATTERN );
+						var m = line.Match ( FAILURE_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase );
 						ErrorMessage = UNKNOWN_ERROR;
 						if ( m.Success ) {
 							string msg = m.Groups[1].Value;
-							ErrorMessage = String.IsNullOrEmpty ( msg ) ? UNKNOWN_ERROR : msg;
+							ErrorMessage = String.IsNullOrEmpty ( msg ) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
 						}
 						Success = false;
 					}

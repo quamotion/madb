@@ -153,6 +153,7 @@
     <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="Extensions\IntegerHelper.cs" />
     <Compile Include="Extensions\MadbExtensions.cs" />
+    <Compile Include="Extensions\ReflectionHelper.cs" />
     <Compile Include="IO\BEBinaryReader.cs" />
     <Compile Include="IO\BEBinaryWriter.cs" />
     <Compile Include="IO\ByteBuffer.cs" />
@@ -237,7 +238,6 @@
     <Compile Include="PackageManager.cs" />
     <Compile Include="Receivers\PackageManagerReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reflection\ReflectionHelper.cs" />
     <Compile Include="SyncResult.cs" />
     <Compile Include="SyncService.cs" />
   </ItemGroup>
@@ -261,6 +261,7 @@
   <ItemGroup>
     <Content Include="MoreLinq\MoreLinq-License.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 			 Other similar extension points exist, see Microsoft.Common.targets.

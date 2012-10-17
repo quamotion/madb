@@ -61,12 +61,9 @@ namespace Managed.Adb {
 					continue;
 				}
 				// run the line through the regexp
-				Regex regex = new Regex ( FileListingService.LS_PATTERN_EX, RegexOptions.Compiled );
-				Match m = regex.Match ( line.Trim() );
-
-
+				var m = line.Trim ( ).Match ( FileListingService.LS_PATTERN_EX, RegexOptions.Compiled );
 				if ( !m.Success ) {
-					Console.WriteLine ( "not match: {0}", line );
+					Log.v ( "madb", "no match on file pattern: {0}", line );
 					continue;
 				}
 				// get the name

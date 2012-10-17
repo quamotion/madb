@@ -5,6 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public sealed class GetPropReceiver : MultiLineReceiver {
 		/// <summary>
 		/// The getprop command
@@ -41,8 +44,7 @@ namespace Managed.Adb {
 				if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) || line.StartsWith("$") ) {
 					continue;
 				}
-
-				Match m = Regex.Match ( line, GETPROP_PATTERN );
+				var m = line.Match ( GETPROP_PATTERN, RegexOptions.Compiled );
 				if ( m.Success ) {
 					String label = m.Groups[1].Value.Trim ( );
 					String value = m.Groups[2].Value.Trim ( );

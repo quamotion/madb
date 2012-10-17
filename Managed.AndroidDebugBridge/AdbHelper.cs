@@ -11,7 +11,7 @@ using Managed.Adb.MoreLinq;
 using Managed.Adb.IO;
 using Managed.Adb.Logs;
 
-
+// services that are supported by adb: https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT
 namespace Managed.Adb {
 	/// <summary>
 	/// The ADB Helper class
@@ -110,6 +110,13 @@ namespace Managed.Adb {
 			}
 		}
 
+
+		//https://github.com/android/platform_system_core/blob/master/adb/backup_service.c
+		/// <summary>
+		/// Backups the specified address.
+		/// </summary>
+		/// <param name="address">The address.</param>
+		/// <exception cref="System.IO.IOException">failed asking to backup device</exception>
 		[Obsolete("This is not yet functional")]
 		public void Backup ( IPEndPoint address ) {
 			byte[] request = FormAdbRequest ( "backup:all" );
@@ -135,6 +142,12 @@ namespace Managed.Adb {
 			}
 		}
 
+		// https://github.com/android/platform_system_core/blob/master/adb/backup_service.c
+		/// <summary>
+		/// Restores this instance.
+		/// </summary>
+		/// <exception cref="System.NotImplementedException"></exception>
+		[Obsolete ( "This is not yet functional" )]
 		public void Restore ( ) {
 			throw new NotImplementedException ( );
 		}
