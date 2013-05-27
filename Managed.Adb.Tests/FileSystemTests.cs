@@ -34,6 +34,27 @@ namespace Managed.Adb.Tests {
 			Console.WriteLine ( "Deleting {0}", testPath );
 			d.FileSystem.Delete ( testPath );
 			Assert.True ( !d.FileSystem.Exists ( testPath ) );
+		}
+
+		[Fact]
+		public void ResolveLink ( ) {
+			Device d = GetFirstDevice ( );
+			var vendor = d.FileSystem.ResolveLink ( "/vendor" );
+			Assert.Equal ( vendor, "/system/vendor" );
+			Console.WriteLine ( "/vendor -> {0}".With ( vendor ) );
+
+			var nonsymlink = d.FileSystem.ResolveLink ( "/system" );
+			Assert.Equal ( nonsymlink, "/system" );
+			Console.WriteLine ( "/system -> {0}".With ( nonsymlink ) );
+
+
+			var legacy = "/storage/emulated/legacy";
+			var sdcard0 = "/storage/sdcard0";
+
+			var sdcard = d.FileSystem.ResolveLink ( "/sdcard" );
+			// depending on the version of android
+			Assert.True ( sdcard.Equals ( legacy ) || sdcard.Equals ( sdcard0 ) );
+			Console.WriteLine ( "/sdcard -> {0}".With ( sdcard ) );
 
 		}
 	}

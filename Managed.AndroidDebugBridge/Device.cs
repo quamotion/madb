@@ -105,7 +105,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Device list info regex
 		/// </summary>
-		private const String RE_DEVICELIST_INFO = @"^([^\s]+)\s+(device|offline|unknown|bootloader|recovery|download)$";
+		private const String RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s[a-z0-9_-]+)?)\s+(device|offline|unknown|bootloader|recovery|download)$";
 		/// <summary>
 		/// Tag
 		/// </summary>
@@ -765,8 +765,8 @@ namespace Managed.Adb {
 				String packageFileName = Path.GetFileName ( localFilePath );
 				// only root has access to /data/local/tmp/... not sure how adb does it then...
 				// workitem: 16823
-				// String remoteFilePath = String.Format ( "/data/local/tmp/{0}", packageFileName );
-				String remoteFilePath = LinuxPath.Combine ( TEMP_DIRECTORY_FOR_INSTALL, localFilePath );
+				// workitem: 19711
+				String remoteFilePath = LinuxPath.Combine ( TEMP_DIRECTORY_FOR_INSTALL, packageFileName );
 
 				Console.WriteLine ( String.Format ( "Uploading {0} onto device '{1}'", packageFileName, SerialNumber ) );
 				Log.d ( packageFileName, String.Format ( "Uploading {0} onto device '{1}'", packageFileName, SerialNumber ) );

@@ -10,6 +10,21 @@ namespace Managed.Adb {
 	/// </summary>
 	public static partial class MadbExtensions {
 		/// <summary>
+		/// Formats the string with the specified arguments
+		/// </summary>
+		/// <param name="s">The string.</param>
+		/// <param name="args">The arguments.</param>
+		/// <returns>The newly formatted string.</returns>
+		public static String With ( this String s, params object[] args ) {
+			return String.Format ( s, args );
+		}
+
+		public static String ToArgumentSafe ( this String s ) {
+			return "{0}{1}{0}".With ( s.Contains ( " " ) ? "\"" : String.Empty, s );
+		}
+
+
+		/// <summary>
 		/// Gets the bytes from a string.
 		/// </summary>
 		/// <param name="str">The string.</param>

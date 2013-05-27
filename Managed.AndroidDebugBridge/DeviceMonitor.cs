@@ -45,11 +45,11 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets the devices.
 		/// </summary>
-		public List<Device> Devices { get; private set; }
+		public IList<Device> Devices { get; private set; }
 		/// <summary>
 		/// Gets the debugger ports.
 		/// </summary>
-		public List<int> DebuggerPorts { get; private set; }
+		public IList<int> DebuggerPorts { get; private set; }
 		/// <summary>
 		/// Gets the clients to reopen.
 		/// </summary>

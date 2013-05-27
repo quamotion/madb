@@ -121,9 +121,8 @@ namespace Managed.Adb {
 				this.Blue.Length = 5;
 				this.Alpha.Offset = 0;
 				this.Alpha.Length = 0;
-			} else if ( version == 1 ) {
+			} else if ( version >= 1 && version <= 5 ) {
 				// https://github.com/android/platform_system_core/blob/master/adb/framebuffer_service.c
-				// this should be changed to support the other versions.
 				this.Bpp = (int)buf.ReadInt32 ( ); // 32
 				this.Size = (int)buf.ReadInt32 ( );
 				this.Width = (int)buf.ReadInt32 ( ); // 480
@@ -153,6 +152,10 @@ namespace Managed.Adb {
 				case 16: // compatibility mode
 					return 3; // size, width, height
 				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
 					return 12; // bpp, size, width, height, 4*(length, offset)
 			}
 

@@ -225,6 +225,7 @@
     <Compile Include="IPacketConsumer.cs" />
     <Compile Include="Receivers\IShellOutputReceiver.cs" />
     <Compile Include="ISyncProgressMonitor.cs" />
+    <Compile Include="Receivers\LinkResoverReceiver.cs" />
     <Compile Include="Receivers\ListingServiceReceiver.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogLevel.cs" />

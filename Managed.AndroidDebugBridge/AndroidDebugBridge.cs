@@ -63,7 +63,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// The DDMS executive
 		/// </summary>
-		public const String DDMS = "ddms";
+		public const String DDMS = "monitor";
 		/// <summary>
 		/// The hierarchy viewer
 		/// </summary>
@@ -80,7 +80,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// The DDMS executive
 		/// </summary>
-		public const String DDMS = "ddms.bat";
+		public const String DDMS = "monitor.bat";
 		/// <summary>
 		/// The hierarchy viewer
 		/// </summary>
@@ -473,7 +473,7 @@ namespace Managed.Adb {
 		/// Gets the devices.
 		/// </summary>
 		/// <value>The devices.</value>
-		public List<Device> Devices {
+		public IList<Device> Devices {
 			get {
 				if ( DeviceMonitor != null ) {
 					return DeviceMonitor.Devices;

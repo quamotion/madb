@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Xunit;
 using System.IO;
-
+using Managed.Adb.MoreLinq;
 namespace Managed.Adb.Tests {
 	public class AndroidDebugBridgeTests : BaseDeviceTests {
 
