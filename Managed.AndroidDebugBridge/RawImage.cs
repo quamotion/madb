@@ -104,40 +104,44 @@ namespace Managed.Adb {
 		 */
 		public bool ReadHeader ( int version, BinaryReader buf ) {
 			this.Version = version;
-			if ( version == 16 ) {
-				// compatibility mode with original protocol
-				this.Bpp = 16;
+			// https://github.com/android/platform_system_core/blob/master/adb/framebuffer_service.c
+			switch ( version ) {
+				case 1: /* RGBA_8888 */
+				case 2: /* RGBX_8888 */
+				case 3: /* RGB_888 */
+				case 4: /* RGB_565 */
+				case 5: /* BGRA_8888 */
+					this.Bpp = (int)buf.ReadInt32 ( );
+					this.Size = (int)buf.ReadInt32 ( );
+					this.Width = (int)buf.ReadInt32 ( ); // 480
+					this.Height = (int)buf.ReadInt32 ( ); // 800
+					this.Red.Offset = (int)buf.ReadInt32 ( ); // 8
+					this.Red.Length = (int)buf.ReadInt32 ( ); // 8
+					this.Blue.Offset = (int)buf.ReadInt32 ( );  // 0
+					this.Blue.Length = (int)buf.ReadInt32 ( ); // 8
+					this.Green.Offset = (int)buf.ReadInt32 ( ); // 16
+					this.Green.Length = (int)buf.ReadInt32 ( ); // 8
+					this.Alpha.Offset = (int)buf.ReadInt32 ( ); // 24
+					this.Alpha.Length = (int)buf.ReadInt32 ( ); // 8
+					break;
+				default:
+					// compatibility mode with original protocol
+					this.Bpp = 16;
 
-				// read actual values.
-				this.Size = buf.ReadInt32 ( );
-				this.Width = buf.ReadInt32 ( );
-				this.Height = buf.ReadInt32 ( );
-				// create default values for the rest. Format is 565
-				this.Red.Offset = 11;
-				this.Red.Length = 5;
-				this.Green.Offset = 5;
-				this.Green.Length = 6;
-				this.Blue.Offset = 0;
-				this.Blue.Length = 5;
-				this.Alpha.Offset = 0;
-				this.Alpha.Length = 0;
-			} else if ( version >= 1 && version <= 5 ) {
-				// https://github.com/android/platform_system_core/blob/master/adb/framebuffer_service.c
-				this.Bpp = (int)buf.ReadInt32 ( ); // 32
-				this.Size = (int)buf.ReadInt32 ( );
-				this.Width = (int)buf.ReadInt32 ( ); // 480
-				this.Height = (int)buf.ReadInt32 ( ); // 800
-				this.Red.Offset = (int)buf.ReadInt32 ( ); // 8
-				this.Red.Length = (int)buf.ReadInt32 ( ); // 8
-				this.Blue.Offset = (int)buf.ReadInt32 ( );  // 0
-				this.Blue.Length = (int)buf.ReadInt32 ( ); // 8
-				this.Green.Offset = (int)buf.ReadInt32 ( ); // 16
-				this.Green.Length = (int)buf.ReadInt32 ( ); // 8
-				this.Alpha.Offset = (int)buf.ReadInt32 ( ); // 24
-				this.Alpha.Length = (int)buf.ReadInt32 ( ); // 8
-			} else {
-				// unsupported protocol!
-				return false;
+					// read actual values.
+					this.Size = buf.ReadInt32 ( );
+					this.Width = buf.ReadInt32 ( );
+					this.Height = buf.ReadInt32 ( );
+					// create default values for the rest. Format is 565
+					this.Red.Offset = 11;
+					this.Red.Length = 5;
+					this.Green.Offset = 5;
+					this.Green.Length = 6;
+					this.Blue.Offset = 0;
+					this.Blue.Length = 5;
+					this.Alpha.Offset = 0;
+					this.Alpha.Length = 0;
+					break;
 			}
 			return true;
 		}
@@ -233,7 +237,7 @@ namespace Managed.Adb {
 				var tdata = Data;
 				if ( Bpp == 32 ) {
 					tdata = Swap ( tdata );
-				} 
+				}
 				Marshal.Copy ( tdata, 0, bitmapdata.Scan0, this.Size );
 				bitmap.UnlockBits ( bitmapdata );
 				using ( Graphics g = Graphics.FromImage ( image ) ) {
@@ -255,13 +259,13 @@ namespace Managed.Adb {
 		}
 
 		private byte[] Swap ( byte[] b ) {
-			var clone = new List<byte> ();
+			var clone = new List<byte> ( );
 			b.IntReverseForRawImage ( bitem => {
 				clone.AddRange ( bitem );
 			} );
 			return clone.ToArray ( );
 		}
 
-		
+
 	}
 }
