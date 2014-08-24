@@ -553,8 +553,10 @@ namespace Managed.Adb {
 			}
 
 			// files pushed have no permissions...
-			this.Device.FileSystem.Chmod ( remotePath, "0666" );
-
+			// lets check if we can get to the file...
+			if(this.Device.FileSystem.Exists(remotePath)) {
+				this.Device.FileSystem.Chmod(remotePath, "0666");
+			}
 			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
 		}
 
@@ -665,7 +667,7 @@ namespace Managed.Adb {
 			using ( fos ) {
 				// loop to get data until we're done.
 				while ( true ) {
-					// check if we're cancelled
+					// check if we're canceled
 					if ( monitor.IsCanceled ) {
 						return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
 					}
@@ -697,7 +699,7 @@ namespace Managed.Adb {
 					}
 					// write the content in the file
 					try {
-						fos.Write ( data, 0, data.Length );
+						fos.Write ( data, 0, length );
 					} catch ( IOException e ) {
 						return new SyncResult ( ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e );
 					}
@@ -859,6 +861,9 @@ namespace Managed.Adb {
 			}
 		}
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
 		public void Dispose ( ) {
 			this.Close ( );
 		}

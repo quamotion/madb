@@ -263,9 +263,8 @@ namespace Managed.Adb {
 		/// Removes a port forwarding between a local and a remote port.
 		/// </summary>
 		/// <param name="localPort"> the local port to forward</param>
-		/// <param name="remotePort">the remote port.</param>
 		/// <returns><code>true</code> if success.</returns>
-		bool RemoveForward ( int localPort, int remotePort );
+		bool RemoveForward ( int localPort );
 
 		/**
 		 * Returns the name of the client by pid or <code>null</code> if pid is unknown
