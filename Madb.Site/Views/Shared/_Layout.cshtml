@@ -2,7 +2,7 @@
 <html lang="en">
 <head prefix="og:http://ogp.me/ns# fb:http://ogp.me/ns/fb#">
 	<meta charset="utf-8" />
-	<title>@(ViewBag.Title)</title>
+	<title>@(Html.SiteName()):@(ViewBag.Title)</title>
 
 	<link href="~/assets/images/madbee-16.png" rel="shortcut icon" type="image/png" />
 	<meta name="msapplication-TileColor" content="#FFFFFF">
@@ -20,7 +20,7 @@
 	<meta name="viewport" content="width=device-width" />
 	<meta property="og:title" content="@(ViewBag.Title)" />
 	<meta property="og:image" content="~/assets/images/madbee-152.png" />
-	<meta property="og:description" content="EndpointMvc is a library that builds documentation for your ASP.NET MVC and Web API endpoints so you don't have to." />
+	<meta property="og:description" content="A managed port of the Android Debug Bridge." />
 
 	@(Styles.Render("~/css/site"))
 	@(RenderSection("styles", required: false))
@@ -32,11 +32,11 @@
 	</header>
 	<div class="container" data-spy="scroll" data-target=".epm-nav .nav">
 		<div id="home"></div>
-		<section class="featured jumbotron jumbotron-info mbl">
+		<section class="featured jumbotron jumbotron-warning mbl">
 			<div class="container">
 				<div class="title">
 					<i class="logo pull-left"></i>
-					<h1>@ViewBag.Title.</h1>
+					<h1>@(Html.SiteName()).</h1>
 					<h2 class="muted">A managed port of the Android Debug Bridge.</h2>
 				</div>
 			</div>

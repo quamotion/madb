@@ -1,11 +1,14 @@
 ﻿<div id="nuget">
 	@(Html.Partial("_AdPartial"))
-	<div class="panel panel-default pan">
+	<div class="panel panel-success pan">
 		<div class="panel-heading"><h1 class="zero lowercase"><i class="fa fa-download mrm"></i>Nuget</h1></div>
 		<div class="panel-body">
 			<div class="nuget-badge mtl">
-				<code class="text-success">PM&gt; Install-Package Managed.Adb</code>
-				<div class="close mtn4 mrs"><a title="Visit nuget.org" href="https://nuget.org/packages/managed.adb/" target="_blank"><i class="fa-2x fa fa-external-link"></i></a></div>
+				<code class="">PM&gt; <span data-id="Managed.Adb">Install-Package Managed.Adb</span></code>
+				<div class="pull-right mtn4 mrs">
+					<a title="copy" href="#" data-copy="click" data-copy-target="[data-id='Managed.Adb']" class="btn btn-round btn-info z-depth-1 mtml mrs"><i class="fa fa-copy"></i></a>
+					<a title="Visit nuget.org" href="https://nuget.org/packages/managed.adb/" target="_blank" class="btn btn-round btn-success z-depth-1 mtml"><i class="fa fa-external-link"></i></a>
+				</div>
 			</div>
 			<div class="clearfix"></div>
 		</div>

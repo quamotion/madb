@@ -9,7 +9,7 @@
 			@(Html.Partial("Paypal"))
 		</div>
 		<div class="pull-right mtm mrl">
-			<a class="pull-right navbar-brand uppercase bold" href="@(Url.Action("",""))">Camalot.Common</a>
+			<a class="pull-right navbar-brand uppercase bold" href="@(Url.Action("",""))">@(Html.SiteName())</a>
 		</div>
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -28,16 +28,14 @@
 						<li><a href="@Url.Action("Index","Home")#about" class="track"><i class="mrs fa fa-question-circle"></i><span>About</span></a></li>
 						<li><a href="@Url.Action("Index","Home")#nuget" class="track"><i class="mrs fa fa-download"></i><span>Nuget</span></a></li>
 						<li class="divider"></li>
-						<li><a href="@Url.Action("Index", "Documentation", new { id = "Camalot.Common" })" class="track"><i class="mrs fa fa-code"></i><span>Camalot.Common</span></a></li>
-						<li><a href="@Url.Action("Index", "Documentation", new { id = "Camalot.Common.Mvc" })" class="track"><i class="mrs fa fa-code"></i><span>Camalot.Common.Mvc</span></a></li>
-						<li class="divider"></li>
 						<li><a href="@Url.Action("","")#license" class="track"><i class="mrs fa fa-certificate"></i><span>License</span></a></li>
 					</ul>
 				</li>
 				<li class="divider-vertical"></li>
-				<li><a href="https://github.com/camalot/camalot.common/star" class="track" title="Stars"><i class="fa fa-star mrs"></i><span data-github="stargazers_count" class="badge"></span></a></li>
-				<li><a href="https://github.com/camalot/camalot.common/fork" class="track" title="Forks"><i class="fa fa-code-fork mrs"></i><span data-github="forks_count" class="badge"></span></a></li>
-				<li><a href="https://github.com/camalot/camalot.common/" class="track"><i class="mrs fa fa-github-square text-white"></i><span>Fork Me!</span></a></li>
+				<li class="expandable-label"><a href="https://madb.codeplex.com/SourceControl/latest#trunk/Managed.AndroidDebugBridge/"><i class="fa fa-code-fork" title="Source"></i><span class="label">Source</span></a></li>
+				<li class="expandable-label"><a href="https://madb.codeplex.com/releases"><i class="fa fa-download" title="Download"></i><span class="label">Download</span></a></li>
+				<li class="expandable-label"><a href="https://madb.codeplex.com/workitem/list/basic"><i class="fa fa-bug" title="Issues"></i><span class="label">Issues</span></a></li>
+				<li class="expandable-label"><a href="https://madb.codeplex.com/discussions"><i class="fa fa-quote-left" title="Discussions"></i><span class="label">Discussions</span></a></li>
 				<li class="divider-vertical"></li>
 				<li><a href="@Url.Action("","")#license" class="track"><i class="mrs fa fa-certificate text-white"></i><span>License</span></a></li>
 				<li class="divider-vertical"></li>
@@ -45,6 +43,7 @@
 					<a href="#" data-toggle="dropdown"><i class="mrs fa fa-bookmark text-white"></i><span class="mrs">Other Projects</span><b class="caret caret-white"></b></a>
 					<ul class="dropdown-menu">
 						<li><a href="http://endpointmvc.bit13.com/"><i class="mrs icon-endpointmvc"></i><span>EndpointMvc</span></a></li>
+						<li><a href="http://camalotcommon.bit13.com/"><i class="mrs icon-camalotcommon"></i><span>Camalot.Common</span></a></li>
 					</ul>
 				</li>
 			</ul>

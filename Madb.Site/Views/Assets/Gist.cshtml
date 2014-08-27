@@ -1,0 +1,12 @@
+﻿@model String
+<div class="gist-container">
+	<div class="gist-data-host">
+		<div class="button-controls">
+			<a title="copy" href="#" data-copy="click" data-copy-target="[data-id='@Model'] .file-data .line-data pre" class="btn btn-round btn-info z-depth-1 mtml mrs"><i class="fa fa-copy"></i></a>
+			<a title="view raw" target="_blank" href="//gist.github.com/camalot/@Model/raw/" class="btn btn-round btn-info z-depth-1 mtml"><i class="fa fa-eye"></i></a>
+		</div>
+		<div data-id="@Model">
+			<script src="https://gist.github.com/@(Model).js"></script>
+		</div>
+	</div>
+</div>

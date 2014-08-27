@@ -136,7 +136,9 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Controllers\AssetsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Extensions\HtmlHelper.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -394,6 +396,7 @@
     <Content Include="Views\Home\_AboutPartial.cshtml" />
     <Content Include="Views\Home\_LicensePartial.cshtml" />
     <Content Include="Views\Home\_NugetPartial.cshtml" />
+    <Content Include="Views\Assets\Gist.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

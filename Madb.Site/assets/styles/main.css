@@ -2,6 +2,9 @@
   padding-bottom: 40px;
   padding-top: 40px;
   cursor: default;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }
 .icon-camalotcommon {
   background-image: url("//camalotcommon.bit13.com/assets/images/icon-16.png");
@@ -10,8 +13,15 @@
   width: 16px;
   display: inline-block;
 }
+.icon-endpointmvc {
+  background-image: url("//endpointmvc.bit13.com/assets/images/endpointmvc-16.png");
+  background-repeat: no-repeat;
+  height: 16px;
+  width: 16px;
+  display: inline-block;
+}
 .logo {
-  background-image: url(../images/logo.svg);
+  background-image: url(../images/madbee-114.png);
   background-repeat: no-repeat;
   background-position: center center;
   height: 114px;
@@ -37,6 +47,36 @@
 .cursor-help {
   cursor: help;
 }
+.expandable-label {
+  position: relative;
+  white-space: nowrap;
+  display: inline-block;
+  -moz-transition: all ease-in-out 300ms;
+  -o-transition: all ease-in-out 300ms;
+  -webkit-transition: all ease-in-out 300ms;
+  transition: all ease-in-out 300ms;
+}
+.expandable-label:hover .label {
+  width: 100%;
+  margin-left: 5px;
+}
+.expandable-label .label {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  margin: 0;
+  font-weight: normal;
+  color: inherit;
+  font-size: 1em;
+  border-radius: 0;
+  text-align: left;
+  width: 0;
+  padding: 0;
+  -moz-transition: all ease-in-out 300ms;
+  -o-transition: all ease-in-out 300ms;
+  -webkit-transition: all ease-in-out 300ms;
+  transition: all ease-in-out 300ms;
+}
 .metro-nav {
   margin: 0 0 20px 0;
   padding: 0;
@@ -49,4 +89,4 @@
 .metro-nav > ul.nav > li > .alert {
   margin: 0 3px 0 0;
 }
-/*# sourceMappingURL=site.css.map */
+/*# sourceMappingURL=main.css.map */
