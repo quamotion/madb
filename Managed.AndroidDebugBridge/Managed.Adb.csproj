@@ -39,6 +39,8 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(CCNetLabel)' == '' ">
     <DefineConstants>TRACE;DEBUG</DefineConstants>
@@ -110,6 +112,9 @@
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MoreLinq">
+      <HintPath>..\packages\morelinq.1.1.0\lib\net35\MoreLinq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -152,7 +157,6 @@
     <Compile Include="Exceptions\UnknownOptionException.cs" />
     <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="Extensions\IntegerHelper.cs" />
-    <Compile Include="Extensions\MadbExtensions.cs" />
     <Compile Include="Extensions\ReflectionHelper.cs" />
     <Compile Include="IO\BEBinaryReader.cs" />
     <Compile Include="IO\BEBinaryWriter.cs" />
@@ -160,28 +164,9 @@
     <Compile Include="IO\ByteOrder.cs" />
     <Compile Include="Logs\ILogListener.cs" />
     <Compile Include="Logs\LogEntry.cs" />
-    <Compile Include="MoreLinq\AssertCount.cs" />
-    <Compile Include="MoreLinq\Batch.cs" />
-    <Compile Include="MoreLinq\Concat.cs" />
-    <Compile Include="MoreLinq\Consume.cs" />
-    <Compile Include="MoreLinq\DistinctBy.cs" />
-    <Compile Include="MoreLinq\ExceptBy.cs" />
-    <Compile Include="MoreLinq\ForEach.cs" />
-    <Compile Include="MoreLinq\Generate.cs" />
-    <Compile Include="MoreLinq\GenerateByIndex.cs" />
-    <Compile Include="MoreLinq\GroupAdjacent.cs" />
-    <Compile Include="MoreLinq\Index.cs" />
-    <Compile Include="MoreLinq\KeyValuePair.cs" />
-    <Compile Include="MoreLinq\MaxBy.cs" />
-    <Compile Include="MoreLinq\MinBy.cs" />
-    <Compile Include="MoreLinq\MoreEnumerable.cs" />
-    <Compile Include="MoreLinq\Pad.cs" />
-    <Compile Include="MoreLinq\Pairwise.cs" />
-    <Compile Include="MoreLinq\Pipe.cs" />
-    <Compile Include="MoreLinq\Prepend.cs" />
-    <Compile Include="MoreLinq\PreScan.cs" />
-    <Compile Include="MoreLinq\SequenceException.cs" />
-    <Compile Include="MoreLinq\ThrowIf.cs" />
+    <Compile Include="Extensions\ThrowIf.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="RawImage.cs" />
     <Compile Include="Receivers\BatteryReceiver.cs" />
     <Compile Include="Receivers\CommandErrorReceiver.cs" />
@@ -260,10 +245,17 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="MoreLinq\MoreLinq-License.txt" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 			 Other similar extension points exist, see Microsoft.Common.targets.
 	<Target Name="BeforeBuild">

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Managed.Adb.MoreLinq;
+using MoreLinq;
 
 namespace Managed.Adb {
 	public class BatteryInfo {

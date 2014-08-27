@@ -1,10 +1,22 @@
 <?xml version="1.0"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0" DefaultTargets="Build">
+
 	<PropertyGroup>
 		<Major>1</Major>
 		<Minor>0</Minor>
 		<Build>0</Build>
 		<Revision>0</Revision>
+	</PropertyGroup>
+	<PropertyGroup>
+		<!--MSBuild 4.0 property-->
+		<ProgramFiles32>$(MSBuildProgramFiles32)</ProgramFiles32>
+		<!--Use OS env var as a fallback:- 32 bit MSBuild 2.0/3.5 on x64 will use this-->
+		<ProgramFiles32 Condition=" '' == '$(ProgramFiles32)'">$(ProgramFiles%28x86%29)</ProgramFiles32>
+		<!-- Handle MSBuild 2.0/3.5 running in 64 bit mode - neither of the above env vars are available. http://stackoverflow.com/questions/336633
+       NB this trick (Adding a literal " (x86)" to the 64 bit Program Files path) may or may not work on all versions/locales of Windows -->
+		<ProgramFiles32 Condition ="'$(ProgramFiles32)'=='' AND 'AMD64' == '$(PROCESSOR_ARCHITECTURE)'">$(ProgramFiles) (x86)</ProgramFiles32>
+		<!--Catch-all - handles .NET 2.0/3.5 non-AMD64 and .NET 2.0 on x86 -->
+		<ProgramFiles32 Condition=" '' == '$(ProgramFiles32)' ">$(ProgramFiles)</ProgramFiles32>
 	</PropertyGroup>
 	<PropertyGroup>
 		<CCNetProject Condition="'$(CCNetProject)' == ''">Managed.Adb</CCNetProject>
@@ -14,8 +26,7 @@
 		<SVN_HOME Condition=" '$(SVN_HOME)' == '' ">$(ProgramFiles32)\subversion\</SVN_HOME>
 	</PropertyGroup>
 	<PropertyGroup>
-		<SharedProperties>SharedProperties</SharedProperties>
-		
+		<SharedProperties>SharedProperties</SharedProperties>		
 		<Configuration Condition="'$(CCNetBuildCondition)' == 'ForceBuild'">Release</Configuration>
 		<Configuration Condition="'$(CCNetBuildCondition)' != 'ForceBuild'">Debug</Configuration>
 		<ReleasePlatform>$(Platform)</ReleasePlatform>
@@ -40,6 +51,8 @@
 
 		<DefineConstants>$(PlatformConstant) $(OSPlatform)</DefineConstants>
 	</PropertyGroup>
+	
+	<Import Project="$(MSBuildProjectDirectory)\..\.build\MSBuild.Community.Tasks.targets" Condition="'$(MSBuildCommunityTasksPath)' == ''"/>
 
 	<Target Name="BuildPublish" Condition=" '$(PublishTarget)' == 'PublishTarget'">
 		<CallTarget Targets="Publish" />
@@ -47,8 +60,7 @@
 
 	<Target Name="AssemblyInfo"
 					Outputs="$(MSBuildProjectDirectory)\..\Shared\AssemblyVersionInfo.cs">
-
-		<SvnVersion LocalPath="$(MSBuildProjectDirectory)" ToolPath="$(SVN_HOME)\bin">
+		<SvnVersion LocalPath="$(MSBuildProjectDirectory)" ToolPath="$(SVN_HOME)">
 			<Output TaskParameter="Revision" PropertyName="Revision" />
 		</SvnVersion>
 
@@ -126,4 +138,6 @@
 		<RemoveDir Directories="$(OutputPath)Temp\" />
 
 	</Target>
+
+
 </Project>

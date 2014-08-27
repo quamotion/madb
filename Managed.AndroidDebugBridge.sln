@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb", "Managed.AndroidDebugBridge\Managed.Adb.csproj", "{65473257-E70F-410B-9269-D0C0F771EA87}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb.Tests", "Managed.Adb.Tests\Managed.Adb.Tests.csproj", "{2C43B828-BE5E-47B6-93BB-A624B6B36633}"
@@ -43,6 +45,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{AA1EF3
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{4E89FCCE-DDF2-46CE-8E69-9975FD3A39DD}"
+	ProjectSection(SolutionItems) = preProject
+		.build\MSBuild.Community.Tasks.dll = .build\MSBuild.Community.Tasks.dll
+		.build\MSBuild.Community.Tasks.targets = .build\MSBuild.Community.Tasks.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ilmerge", "ilmerge", "{325AB15A-3710-4C89-9732-2F46E93036B0}"
+	ProjectSection(SolutionItems) = preProject
+		3rdParty\ilmerge\Download ILMerge from Official Microsoft Download Center.url = 3rdParty\ilmerge\Download ILMerge from Official Microsoft Download Center.url
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{9A4671AA-B664-4BC5-AE31-5074DDEB9E67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Madb.Site", "Madb.Site\Madb.Site.csproj", "{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,6 +120,18 @@ Global
 		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Release|x64.Build.0 = Release|x64
 		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Release|x86.ActiveCfg = Release|x86
 		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Release|x86.Build.0 = Release|x86
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Release|x64.ActiveCfg = Release|Any CPU
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,5 +139,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E9A9E417-965C-461D-ABCA-3A32E5BF15B2} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
 		{2A9166E3-7655-4DB8-9F7A-DB150428821F} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
+		{325AB15A-3710-4C89-9732-2F46E93036B0} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
+		{A3BA455F-4829-4412-9ACC-DEFBC1BC84FC} = {9A4671AA-B664-4BC5-AE31-5074DDEB9E67}
 	EndGlobalSection
 EndGlobal

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Managed.Adb.MoreLinq;
+using MoreLinq;
 
 namespace Managed.Adb {
 	internal sealed class LinkResoverReceiver : MultiLineReceiver {

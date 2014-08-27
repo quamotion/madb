@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using Managed.Adb.IO;
-using Managed.Adb.MoreLinq;
+using MoreLinq;
 
 namespace Managed.Adb {
 	/// <summary>

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Managed.Adb.Extensions {
-	public static partial class MadbExtensions {
+namespace Managed.Adb {
+	public static partial class ManagedAdbExtenstions {
 		/// <summary>
 		/// Gets the custom attributes.
 		/// </summary>

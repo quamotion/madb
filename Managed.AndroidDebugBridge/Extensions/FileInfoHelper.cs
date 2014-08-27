@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace System.IO {
+namespace Managed.Adb {
 	/// <summary>
 	/// 
 	/// </summary>
-	public static partial class MadbExtensions {
+	public static partial class ManagedAdbExtenstions {
 
 		/// <summary>
 		/// Determines whether the specified path is directory.

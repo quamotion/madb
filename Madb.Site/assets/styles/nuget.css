@@ -1,0 +1,13 @@
+﻿.nuget-badge {
+  background-color: #607d8b;
+  padding: 15px 0 15px 0;
+  border: 4px solid #b7c6cd;
+  border-radius: 5px;
+}
+.nuget-badge code {
+  color: #00bcd4;
+  background-color: transparent;
+  font-size: 1.5em;
+  font-family: 'andale mono', 'lucida console', monospace;
+}
+/*# sourceMappingURL=nuget.css.map */

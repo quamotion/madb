@@ -475,10 +475,11 @@ namespace Managed.Adb {
 		/// <value>The devices.</value>
 		public IList<Device> Devices {
 			get {
-				if ( DeviceMonitor != null ) {
-					return DeviceMonitor.Devices;
-				}
-				return new List<Device> ( );
+				//if ( DeviceMonitor != null ) {
+				//	return DeviceMonitor.Devices;
+				//}
+				//return new List<Device> ( );
+				return AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress);
 			}
 		}
 

@@ -1,0 +1,25 @@
+﻿@{
+	ViewBag.Title = "Camalot.Common";
+}
+
+@section Styles {
+}
+
+
+@section featured {
+	<div id="home"></div>
+	<section class="featured jumbotron jumbotron-info mbl">
+		<div class="container">
+			<div class="title">
+				<i class="logo pull-left"></i>
+				<h1>@ViewBag.Title.</h1>
+				<h2 class="muted">You may find it useful, or you may not.</h2>
+			</div>
+		</div>
+	</section>
+}
+
+@(Html.Partial("_AboutPartial"))
+@(Html.Partial("_NugetPartial"))
+
+@(Html.Partial("_LicensePartial"))

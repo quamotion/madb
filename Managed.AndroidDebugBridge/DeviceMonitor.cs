@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
-using Managed.Adb.MoreLinq;
+using MoreLinq;
 
 namespace Managed.Adb {
 	/// <summary>

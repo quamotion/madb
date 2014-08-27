@@ -8,7 +8,7 @@ namespace Managed.Adb {
 	/// <summary>
 	/// String Helper Class
 	/// </summary>
-	public static partial class MadbExtensions {
+	public static partial class ManagedAdbExtenstions {
 		/// <summary>
 		/// Formats the string with the specified arguments
 		/// </summary>

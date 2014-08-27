@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Managed.Adb.Exceptions;
-using Managed.Adb.MoreLinq;
+using MoreLinq;
 
 namespace Managed.Adb {
 	/// <summary>

@@ -10,6 +10,7 @@ using System.ComponentModel;
 using Managed.Adb.Exceptions;
 using Managed.Adb.IO;
 using Managed.Adb.Logs;
+using System.Net;
 
 namespace Managed.Adb {
 	/// <summary>
@@ -66,7 +67,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// 
 		/// </summary>
-		public const String TEMP_DIRECTORY_FOR_INSTALL = "/sdcard/tmp/";
+		public const String TEMP_DIRECTORY_FOR_INSTALL = "/storage/sdcard0/tmp/";
 
 		/// <summary>
 		/// 
@@ -91,7 +92,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Serial number of the first connected emulator. 
 		/// </summary>
-		public const String FIRST_EMULATOR_SN = "emulator-5554"; //$NON-NLS-1$
+		public const String FIRST_EMULATOR_SN = "emulator-5554";
 
 		/** @deprecated Use {@link #PROP_BUILD_API_LEVEL}. */
 		[Obsolete("Use PROP_BUILD_API_LEVEL")]
@@ -100,7 +101,7 @@ namespace Managed.Adb {
 		/// <summary>
 		///  Emulator Serial Number regexp.
 		/// </summary>
-		private const String RE_EMULATOR_SN = @"emulator-(\d+)"; //$NON-NLS-1$
+		private const String RE_EMULATOR_SN = @"emulator-(\d+)";
 
 		/// <summary>
 		/// Device list info regex
@@ -118,10 +119,11 @@ namespace Managed.Adb {
 		/// <summary>
 		/// 
 		/// </summary>
-		private string avdName;
+		private string _avdName;
+		private IPEndPoint _endpoint;
 		private bool _canSU = false;
-		private BatteryInfo lastBatteryInfo = null;
-		private DateTime lastBatteryCheckTime = DateTime.MinValue;
+		private BatteryInfo _lastBatteryInfo = null;
+		private DateTime _lastBatteryCheckTime = DateTime.MinValue;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Device"/> class.
@@ -143,7 +145,7 @@ namespace Managed.Adb {
 
 			Model = model;
 			Product = product;
-			DeviceIdentifier = device;
+			DeviceProperty = device;
 
 			RetrieveDeviceInfo();
 		}
@@ -256,22 +258,51 @@ namespace Managed.Adb {
 		public String SerialNumber { get; private set; }
 
 		/// <summary>
+		/// Gets the TCP endpoint defined when the transport is TCP.
+		/// </summary>
+		/// <value>
+		/// The endpoint.
+		/// </value>
+		public IPEndPoint Endpoint { get; private set; }
+
+		public TransportType TransportType { get; private set; }
+
+
+		/// <summary>
 		/// Gets or sets the Avd name.
 		/// </summary>
 		public String AvdName {
-			get { return avdName; }
+			get { return _avdName; }
 			set {
 				if(!IsEmulator) {
 					throw new ArgumentException("Cannot set the AVD name of the device is not an emulator");
 				}
-				avdName = value;
+				_avdName = value;
 			}
 		}
 
 
+		/// <summary>
+		/// Gets the product.
+		/// </summary>
+		/// <value>
+		/// The product.
+		/// </value>
 		public string Product { get; private set; }
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
+		/// <value>
+		/// The model.
+		/// </value>
 		public string Model { get; private set; }
-		public string DeviceIdentifier { get; private set; }
+		/// <summary>
+		/// Gets the device.
+		/// </summary>
+		/// <value>
+		/// The device identifier.
+		/// </value>
+		public string DeviceProperty { get; private set; }
 
 		/// <summary>
 		/// Gets the device state
@@ -479,15 +510,15 @@ namespace Managed.Adb {
 		/// <param name="freshness">The freshness.</param>
 		/// <returns></returns>
 		public BatteryInfo GetBatteryInfo(long freshness) {
-			if(lastBatteryInfo != null
-								&& this.lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness))) {
-				return lastBatteryInfo;
+			if(_lastBatteryInfo != null
+								&& this._lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness))) {
+				return _lastBatteryInfo;
 			}
 			var receiver = new BatteryReceiver();
 			ExecuteShellCommand("dumpsys battery", receiver, BATTERY_TIMEOUT);
-			lastBatteryInfo = receiver.BatteryInfo;
-			lastBatteryCheckTime = DateTime.Now;
-			return lastBatteryInfo;
+			_lastBatteryInfo = receiver.BatteryInfo;
+			_lastBatteryCheckTime = DateTime.Now;
+			return _lastBatteryInfo;
 		}
 
 		/// <summary>

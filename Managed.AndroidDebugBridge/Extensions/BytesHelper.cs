@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Managed.Adb {
-	public static partial class MadbExtensions {
+	public static partial class ManagedAdbExtenstions {
 
 		/// <summary>
 		/// Reverses the bytes.

@@ -501,7 +501,7 @@ namespace Managed.Adb {
 
 				// now send the data to the device
 				// first write the amount read
-				ArrayHelper.Swap32bitsToArray ( readCount, DataBuffer, 4 );
+				readCount.Swap32bitsToArray(DataBuffer, 4);
 
 				// now write it
 				try {
@@ -536,7 +536,7 @@ namespace Managed.Adb {
 				if ( !CheckResult ( result, OKAY.GetBytes ( ) ) ) {
 					if ( CheckResult ( result, FAIL.GetBytes ( ) ) ) {
 						// read some error message...
-						int len = ArrayHelper.Swap32bitFromArray ( result, 4 );
+						int len = result.Swap32bitFromArray ( 4 );
 
 						AdbHelper.Instance.Read ( Channel, DataBuffer, len, timeOut );
 
@@ -680,7 +680,7 @@ namespace Managed.Adb {
 						// hmm there's an error
 						return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR );
 					}
-					int length = ArrayHelper.Swap32bitFromArray ( pullResult, 4 );
+					int length = pullResult.Swap32bitFromArray ( 4 );
 					if ( length > SYNC_DATA_MAX ) {
 						// buffer overrun!
 						// error and exit

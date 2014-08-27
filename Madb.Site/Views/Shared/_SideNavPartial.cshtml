@@ -1,0 +1,32 @@
+﻿@using Camalot.Common.Site.Models;
+@{
+	var navPosition = NavigationPositions.Right;
+	var scrollTopOffset = -50;
+}
+
+<div class="@(navPosition.ToString().ToLower()) epm-nav expanded epm-nav-primary">
+	<div class="epm-nav-host">
+		<div class="navbar-toggle epm-nav-toggle" title="Close" data-epm-target=".epm-nav" data-epm-toggle="expanded">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</div>
+	</div>
+	<ul class="nav">
+		<li class="no-filter nav-search man mbs pan">
+			<div class="form-group man pan">
+				<input type="search" placeholder="Search" class="search-field man" />
+				<button type="button" class="clear hidden" title="Clear">&times;</button>
+			</div>
+		</li>
+		<li class=""><a data-epm-scroll="click" data-epm-scroll-offset="@(scrollTopOffset)" href="@(Url.Action("",""))"><i class="mrs fa fa-home"></i><span>Home</span></a></li>
+		<li class="divider"></li>
+		<li><a data-epm-scroll="click" data-epm-scroll-offset="@(scrollTopOffset)" href="@(Url.Action("",""))#about" class="track"><i class="mrs fa fa-question-circle"></i><span>About</span></a></li>
+		<li><a data-epm-scroll="click" data-epm-scroll-offset="@(scrollTopOffset)" href="@(Url.Action("",""))#nuget" class="track"><i class="mrs fa fa-download"></i><span>Nuget</span></a></li>
+		@Html.Action("Navigation", new { controller = "Documentation", id = "Camalot.Common"})
+		@Html.Action("Navigation", new { controller = "Documentation", id = "Camalot.Common.Mvc" })
+		<li class="divider"></li>
+		<li><a data-epm-scroll="click" data-epm-scroll-offset="@(scrollTopOffset)" href="@(Url.Action("",""))#license" class="track"><i class="mrs fa fa-certificate"></i><span>License</span></a></li>
+	</ul>
+</div>
+

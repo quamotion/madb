@@ -4,8 +4,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Managed.Adb.MoreLinq {
-	public partial class MoreEnumerable {
+namespace Managed.Adb {
+	public static partial class ManagedAdbExtenstions {
 		internal static void ThrowIfNegative<T> ( this int argument, Expression<Func<T, string>> func ) {
 			if ( argument < 0 ) {
 				ThrowException ( s => new ArgumentOutOfRangeException ( s ), func );

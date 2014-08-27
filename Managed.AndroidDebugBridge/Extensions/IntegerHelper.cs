@@ -7,7 +7,7 @@ namespace Managed.Adb {
 	/// <summary>
 	/// 
 	/// </summary>
-	public static partial class MadbExtensions {
+	public static partial class ManagedAdbExtenstions {
 
 		/// <summary>
 		/// Bits the shift right.

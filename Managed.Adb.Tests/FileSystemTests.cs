@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xunit;
-using Managed.Adb.MoreLinq;
+using MoreLinq;
 
 namespace Managed.Adb.Tests {
 	public class FileSystemTests : BaseDeviceTests {

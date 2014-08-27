@@ -1,5 +1,11 @@
 A managed library for communicating with the Android Debug Bridge.
 
-* fixed sync package to device to use the correct file name
-* improved the FileSystem.ResolveLink to work with devices that don't have busybox
-* improved the device listing to allow device names with spaces.
+*** CONTAINS BREAKING CHANGES ***
+Fixed issue with SyncService.DoPushFile failing because of the chmod. Although, it is now just checking if it can do the chmod first. Which means if it can't, instead of failing, it just wont do the chmod (workitem:20040)
+Udated the signature for the RemoveForward to not include the remotePort. I guess this changed in some later version of ADB becuase it used to take it. (workitem:21236) *** BREAKING CHANGE ***
+Updated the regex used to get the connected devices. This will allow "remote" (or TCP) devices to be returned. Also added the "-l" flag to the call to get the devices. This returns more information about the connected devices. (workitem:21136)
+Fixed the issue with the SyncService.PullFile writing the wrong number of bytes. (workitem:20831)
+Fixed the date parsing issue where "CultureInfo.CurrentCulture" was used. This was mainly when getting the directory contents. It is now forcing "en-US". Until there is a case were this does not work, this is what will be used. (workitem:20458)
+Added a unified method to execute query commands to the adb server. 
+Added method to Remove All Forwards to the AdbHelper.
+Changed the constuctor of Device to now take model, product, and device. These are information that is returned now from the AdbHelper.GetDevices since it contains the "-l" flag. *** BREAKING CHANGE ***

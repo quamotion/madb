@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Net;
 
 namespace Managed.Adb {
 
@@ -45,6 +46,21 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <value>The serial number.</value>
 		String SerialNumber { get; }
+		/// <summary>
+		/// Gets the TCP endpoint defined when the transport is TCP.
+		/// </summary>
+		/// <value>
+		/// The endpoint.
+		/// </value>
+		IPEndPoint Endpoint { get; }
+
+		/// <summary>
+		/// Gets the type of the transport used to connect to this device.
+		/// </summary>
+		/// <value>
+		/// The type of the transport.
+		/// </value>
+		TransportType TransportType { get; }
 
 		/// <summary>
 		/// Returns the name of the AVD the emulator is running.

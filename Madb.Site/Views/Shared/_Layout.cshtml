@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head prefix="og:http://ogp.me/ns# fb:http://ogp.me/ns/fb#">
+	<meta charset="utf-8" />
+	<title>@(ViewBag.Title)</title>
+
+	<link href="~/assets/images/madbee-16.png" rel="shortcut icon" type="image/png" />
+	<meta name="msapplication-TileColor" content="#FFFFFF">
+	<meta name="msapplication-TileImage" content="~/assets/images/madbee-144.png">
+
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="~/assets/images/madbee-152.png">
+	<link rel="apple-touch-icon-precomposed" sizes="152x152" href="~/assets/images/madbee-152.png">
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="~/assets/images/madbee-144.png">
+	<link rel="apple-touch-icon-precomposed" sizes="120x120" href="~/assets/images/madbee-120.png">
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="~/assets/images/madbee-114.png">
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="~/assets/images/madbee-72.png">
+	<link rel="apple-touch-icon-precomposed" href="~/assets/images/madbee-57.png">
+	<link href="~/assets/images/madbee-32.png" sizes="32x32" rel="icon" type="image/png" />
+
+	<meta name="viewport" content="width=device-width" />
+	<meta property="og:title" content="@(ViewBag.Title)" />
+	<meta property="og:image" content="~/assets/images/madbee-152.png" />
+	<meta property="og:description" content="EndpointMvc is a library that builds documentation for your ASP.NET MVC and Web API endpoints so you don't have to." />
+
+	@(Styles.Render("~/css/site"))
+	@(RenderSection("styles", required: false))
+</head>
+
+<body>
+	<header>
+		@(Html.Partial("_Navbar"))
+	</header>
+	<div class="container" data-spy="scroll" data-target=".epm-nav .nav">
+		<div id="home"></div>
+		<section class="featured jumbotron jumbotron-info mbl">
+			<div class="container">
+				<div class="title">
+					<i class="logo pull-left"></i>
+					<h1>@ViewBag.Title.</h1>
+					<h2 class="muted">A managed port of the Android Debug Bridge.</h2>
+				</div>
+			</div>
+		</section>
+		@(RenderSection("featured", required: false))
+		@(RenderBody())
+	</div>
+	<div class="clear-fix"></div>
+	<footer class="navbar-fixed-bottom navbar navbar-default">
+		<div class="container">
+			<div class="center mts text-white">
+				<p>Copyright &copy; Ryan Conrad @DateTime.Now.Year. All Rights Reserved.</p>
+			</div>
+		</div>
+	</footer>
+
+	@(Scripts.Render("~/js/jquery"))
+	@(Scripts.Render("~/js/bootstrap"))
+	@(Scripts.Render("~/js/mousetrap"))
+	@(Scripts.Render("~/js/site"))
+	@(RenderSection("scripts", required: false))
+	@(Html.Partial("Analytics"))
+	@*@(Html.Partial("_AddThisSideBarPartial"))*@
+</body>
+</html>

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using Xunit;
 using System.IO;
-using Managed.Adb.MoreLinq;
+using MoreLinq;
 namespace Managed.Adb.Tests {
 	public class AndroidDebugBridgeTests : BaseDeviceTests {
 
 		[Fact]
 		public void CreateBridgeTest ( ) {
 			try {
-				AndroidDebugBridge adb = CreateBridge ( @"C:\android\android-sdk\platform-tools\adb.exe" );
+				AndroidDebugBridge adb = CreateBridge ( @"d:\android\android-sdk\platform-tools\adb.exe" );
 				bool result = adb.Start ( );
 				Assert.True ( result, "Failed to start ADB" );
 				

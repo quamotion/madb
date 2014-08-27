@@ -7,12 +7,20 @@ using System.Net;
 using System.IO;
 using System.Threading;
 using Managed.Adb.Exceptions;
-using Managed.Adb.MoreLinq;
+using MoreLinq;
 using Managed.Adb.IO;
 using Managed.Adb.Logs;
 
 // services that are supported by adb: https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT
 namespace Managed.Adb {
+
+	public enum TransportType {
+		Usb,
+		Local,
+		Any,
+		Host
+	}
+
 	/// <summary>
 	/// The ADB Helper class
 	/// </summary>
@@ -52,6 +60,8 @@ namespace Managed.Adb {
 				return _instance;
 			}
 		}
+
+
 
 
 		/// <summary>
@@ -463,6 +473,9 @@ namespace Managed.Adb {
 				adbChan.Connect(adbSockAddr);
 				adbChan.Blocking = true;
 
+				// host-serial should be different based on the transport...
+
+
 				byte[] request = FormAdbRequest(String.Format("host-serial:{0}:forward:tcp:{1};tcp:{2}", //$NON-NLS-1$
 								device.SerialNumber, localPort, remotePort));
 
@@ -481,6 +494,10 @@ namespace Managed.Adb {
 			}
 
 			return true;
+		}
+
+		public void ListForward(IPEndPoint address, Device device) {
+
 		}
 
 		/// <summary>
@@ -796,6 +813,7 @@ namespace Managed.Adb {
 			ExecuteRemoteCommand(endPoint, command, device, rcvr, int.MaxValue);
 		}
 
+
 		/// <summary>
 		/// Sets the device.
 		/// </summary>
@@ -972,6 +990,20 @@ namespace Managed.Adb {
 				throw new AdbException("Device rejected command: {0}".With(resp.Message));
 			}
 			return adbChan;
+		}
+
+		private string HostPrefixFromDevice(IDevice device) {
+			switch(device.TransportType) {
+				case TransportType.Host:
+					return "host-serial";
+				case TransportType.Usb:
+					return "host-usb";
+				case TransportType.Local:
+					return "host-local";
+				case TransportType.Any:
+				default:
+					return "host";
+			}
 		}
 	}
 }

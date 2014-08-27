@@ -1,0 +1,85 @@
+﻿
+@string: #85fb82;
+@comment: @string;
+@text: #f3f3f3;
+@background: #282424;
+@border: #303030;
+@line-numbers: #2b91af;
+@attributes: #686868;
+@keywords: #a2c4fd;
+@functions: #fdf8b9;
+
+.gist-container {
+	.gist-data-host {
+		position: relative;
+		> .button-controls {
+			position: absolute; 
+			right: 10px; 
+			bottom: -15px;
+		}
+	}
+	.gist {
+		.gist-file {
+			border-width: 1px;
+			border-radius: 0;
+		}
+
+		.gist-meta {
+			background: @background !important;
+			text-shadow: none !important;
+
+			a {
+				color: @line-numbers !important;
+			}
+
+			a:nth-child(1) {
+				display: none !important;
+			}
+		}
+
+		.gist-syntax {
+			background: @background !important;
+			color: @text !important;
+			border-bottom-color: @border !important;
+
+			.sx, .s {
+				color: @string;
+			}
+
+			.c1 {
+				color: @comment;
+			}
+
+			.n, .p, .o {
+				color: @text;
+			}
+
+			.na {
+				color: @attributes;
+			}
+
+			.kt, .k {
+				color: @keywords;
+			}
+
+			.nn, .nc, .nf {
+				color: @functions;
+			}
+
+			.nt {
+				color: @keywords;
+			}
+		}
+
+		.line-numbers {
+			background: @background !important;
+			color: @line-numbers !important;
+			border-right-color: @border !important;
+			border-right-width: 6px !important;
+		}
+
+		article.markdown-body {
+			padding: 10px;
+		}
+	}
+}

@@ -6,11 +6,8 @@
 	<Import Project="$(MSBuildProjectDirectory)\NuGetPublish.msbuild" 
 					Condition="Exists('$(MSBuildProjectDirectory)\NuGetPublish.msbuild') AND '$(PublishNuGet)' != 'PublishNuGet' " />
 
-	<Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" 
-					Condition="'$(MSBuildCommunityTasksPath)' == ''"/>
-
 	<ItemGroup>
-		<ProjectsToBuild Include="$(CCNetWorkingDirectory)**\*.csproj" Exclude="$(CCNetWorkingDirectory)**\*Tests*.csproj;"/>
+		<ProjectsToBuild Include="$(CCNetWorkingDirectory)**\*.csproj" Exclude="$(CCNetWorkingDirectory)**\*Tests*.csproj;$(CCNetWorkingDirectory)**\.localhistory\**"/>
 	</ItemGroup>
 
 
