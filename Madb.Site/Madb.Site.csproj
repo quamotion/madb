@@ -232,8 +232,11 @@
     <Content Include="assets\styles\nuget.min.css">
       <DependentUpon>nuget.less</DependentUpon>
     </Content>
-    <Content Include="assets\styles\site.min.css">
-      <DependentUpon>site.less</DependentUpon>
+    <Content Include="assets\styles\main.css">
+      <DependentUpon>main.less</DependentUpon>
+    </Content>
+    <Content Include="assets\styles\main.min.css">
+      <DependentUpon>main.less</DependentUpon>
     </Content>
     <Content Include="assets\styles\spacing.css">
       <DependentUpon>spacing.less</DependentUpon>
@@ -353,10 +356,10 @@
       <DependentUpon>nuget.less</DependentUpon>
     </Content>
     <Content Include="assets\styles\nuget.less" />
-    <Content Include="assets\styles\site.css.map">
-      <DependentUpon>site.less</DependentUpon>
+    <Content Include="assets\styles\main.css.map">
+      <DependentUpon>main.less</DependentUpon>
     </Content>
-    <Content Include="assets\styles\site.less" />
+    <Content Include="assets\styles\main.less" />
     <Content Include="assets\styles\spacing.css.map">
       <DependentUpon>spacing.less</DependentUpon>
     </Content>
