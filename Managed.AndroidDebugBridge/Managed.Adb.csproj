@@ -55,6 +55,7 @@
     <ErrorReport>prompt</ErrorReport>
     <Optimize>true</Optimize>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>..\bin\Debug\0.5.0.1\x64\Managed.Adb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DefineConstants>$(PlatformConstant);TRACE</DefineConstants>
@@ -74,8 +75,9 @@
     <ErrorReport>prompt</ErrorReport>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>..\bin\Debug\0.5.0.1\AnyCPU\Managed.Adb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DefineConstants>$(PlatformConstant);TRACE</DefineConstants>
@@ -97,6 +99,7 @@
     <Optimize>true</Optimize>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>..\bin\Debug\0.5.0.1\x86\Managed.Adb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DefineConstants>$(PlatformConstant);TRACE</DefineConstants>
@@ -110,6 +113,9 @@
   <PropertyGroup>
     <OutputPath Condition=" '$(OutputPath)' == '' ">..\bin\$(Configuration)\$(CCNetLabel)\$(Platform)\</OutputPath>
     <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ia64'">
+    <DocumentationFile>..\bin\Debug\0.5.0.1\ia64\Managed.Adb.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MoreLinq">

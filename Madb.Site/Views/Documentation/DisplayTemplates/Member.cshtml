@@ -1,0 +1,101 @@
+﻿@model Madb.Site.Models.Documentation.Xml.Member
+@{
+	const int scrollOffset = -70;
+}
+<div class="member">
+	@if(Model.Summary.Count > 0) {
+		<div class="alert alert-success">
+			@foreach(var s in Model.Summary) {
+				if(!string.IsNullOrWhiteSpace(s.Value)) {
+					<p class="man mbs pan">@Html.Raw(s)</p>
+				}
+			}
+		</div>
+	}
+
+	@if(Model.Remarks.Count > 0) {
+		<div class="alert alert-primary">
+			@foreach(var s in Model.Remarks) {
+				if(!string.IsNullOrWhiteSpace(s.Value)) {
+					<p class="man mbs pan">@Html.Raw(s)</p>
+				}
+			}
+		</div>
+	}
+
+	@if(Model.Gists.Count > 0) {
+		<div class="gist-host">
+			@foreach(var s in Model.Gists) {
+				if(!string.IsNullOrWhiteSpace(s.Description)) {
+					<div class="callout">@s.Description</div>
+				}
+				<text>@Html.Action("Gist", new { controller = "Assets", id = s.Id })</text>
+			}
+		</div>
+	}
+
+	@if(Model.Params.Count > 0) {
+		<h4 class="zero">Parameters</h4>
+		<div class="">
+			<table class="table table-bordered table-condensed table-striped">
+				<tr>
+					<th>Name</th>
+					<th>Description</th>
+				</tr>
+				@foreach(var s in Model.Params) {
+					if(!string.IsNullOrWhiteSpace(s.Name)) {
+						<tr>
+							<td>@s.Name</td>
+							<td>@s.Value</td>
+						</tr>
+					}
+				}
+			</table>
+		</div>
+	}
+
+	@if(Model.Exceptions.Any()) {
+		<h4>Exceptions</h4>
+		<div class="">
+			<ul>
+				@foreach(var s in Model.Exceptions) {
+					if(!string.IsNullOrWhiteSpace(s.Link)) {
+						var text = Url.ParseReferenceAsText(string.IsNullOrWhiteSpace(s.Description) ? s.Link : "[{0}] {1}".With(s.Link.Substring(2),s.Description));
+						// process the link to internals.
+						var link = Url.ParseReferenceUrl(s.Link);
+						<li>
+							@if(link.StartsWith("#")) {
+								<a href="@link" data-scroll="click" data-scroll-offset="@scrollOffset">@text</a>
+							} else {
+								<a href="@link" target="_blank">@text</a>
+							}
+						</li>
+					}
+				}
+			</ul>
+
+		</div>
+	}
+
+	@if(Model.SeeAlsos.Any() || Model.Sees.Any()) {
+		<h4>References</h4>
+		<div class="blockquote">
+			<ul>
+				@foreach(var s in Model.SeeAlsos.Concat(Model.Sees)) {
+					if(!string.IsNullOrWhiteSpace(s.Link)) {
+						var text = Url.ParseReferenceAsText(string.IsNullOrWhiteSpace(s.Description) ? s.Link : s.Description);
+						// process the link to internals.
+						var link = Url.ParseReferenceUrl(s.Link);
+						<li>
+							@if(link.StartsWith("#")) {
+								<a href="@link" data-scroll="click" data-scroll-offset="@scrollOffset">@text</a>
+							} else {
+								<a href="@link" target="_blank">@text</a>
+							}
+						</li>
+					}
+				}
+			</ul>
+		</div>
+	}
+</div>

@@ -31,7 +31,7 @@
 		@(Html.Partial("_Navbar"))
 	</header>
 	<div class="container" data-spy="scroll" data-target=".epm-nav .nav">
-		<div id="home"></div>
+		@*<div id="home"></div>
 		<section class="featured jumbotron jumbotron-warning mbl">
 			<div class="container">
 				<div class="title">
@@ -40,7 +40,7 @@
 					<h2 class="muted">A managed port of the Android Debug Bridge.</h2>
 				</div>
 			</div>
-		</section>
+		</section>*@
 		@(RenderSection("featured", required: false))
 		@(RenderBody())
 	</div>
@@ -56,7 +56,8 @@
 	@(Scripts.Render("~/js/jquery"))
 	@(Scripts.Render("~/js/bootstrap"))
 	@(Scripts.Render("~/js/mousetrap"))
-	@(Scripts.Render("~/js/site"))
+	@(Scripts.Render("~/js/system"))
+	@(Html.Partial("_SideNavPartial"))
 	@(RenderSection("scripts", required: false))
 	@(Html.Partial("Analytics"))
 	@*@(Html.Partial("_AddThisSideBarPartial"))*@

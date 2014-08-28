@@ -1,5 +1,8 @@
-﻿<nav class="navbar navbar-default navbar-fixed-top">
-
+﻿@{
+	var scrollTopOffset = -50;
+}
+<nav class="navbar navbar-default navbar-fixed-top">
+	
 	<div class="pull-left mtm mlm">
 		@(Html.Partial("_AddThisCountPartial"))
 	</div>
@@ -9,6 +12,7 @@
 			@(Html.Partial("Paypal"))
 		</div>
 		<div class="pull-right mtm mrl">
+			<span class="logo small logo-hidden" data-scroll-show-low="200" data-scroll-toggle="logo-hidden"></span>
 			<a class="pull-right navbar-brand uppercase bold" href="@(Url.Action("",""))">@(Html.SiteName())</a>
 		</div>
 		<div class="navbar-header">
@@ -23,12 +27,14 @@
 				<li class="dropdown">
 					<a href="#" data-toggle="dropdown"><i class="mrs fa fa-book text-white"></i><span class="mrs">Documentation</span><b class="caret caret-white"></b></a>
 					<ul class="dropdown-menu">
-						<li><a href="@Url.Action("Index","Home")"><i class="mrs fa fa-home"></i><span>Home</span></a></li>
+						<li><a href="@Url.Action("","")#home" data-scroll="click" data-scroll-offset="@(scrollTopOffset)"><i class="mrs fa fa-home"></i><span>Home</span></a></li>
 						<li class="divider"></li>
-						<li><a href="@Url.Action("Index","Home")#about" class="track"><i class="mrs fa fa-question-circle"></i><span>About</span></a></li>
-						<li><a href="@Url.Action("Index","Home")#nuget" class="track"><i class="mrs fa fa-download"></i><span>Nuget</span></a></li>
+						<li><a href="@Url.Action("","")#about" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-question-circle"></i><span>About</span></a></li>
+						<li><a href="@Url.Action("","")#nuget" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-download"></i><span>Nuget</span></a></li>
 						<li class="divider"></li>
-						<li><a href="@Url.Action("","")#license" class="track"><i class="mrs fa fa-certificate"></i><span>License</span></a></li>
+						<li><a href="@Url.Action("","")#license" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-certificate"></i><span>License</span></a></li>
+						<li class="divider"></li>
+						<li><a href="@Url.Action("","")#documentation" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-book"></i><span>Documentation</span></a></li>
 					</ul>
 				</li>
 				<li class="divider-vertical"></li>
@@ -37,7 +43,7 @@
 				<li class="expandable-label"><a href="https://madb.codeplex.com/workitem/list/basic"><i class="fa fa-bug" title="Issues"></i><span class="label">Issues</span></a></li>
 				<li class="expandable-label"><a href="https://madb.codeplex.com/discussions"><i class="fa fa-quote-left" title="Discussions"></i><span class="label">Discussions</span></a></li>
 				<li class="divider-vertical"></li>
-				<li><a href="@Url.Action("","")#license" class="track"><i class="mrs fa fa-certificate text-white"></i><span>License</span></a></li>
+				<li><a href="@Url.Action("","")#license" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-certificate text-white"></i><span>License</span></a></li>
 				<li class="divider-vertical"></li>
 				<li class="dropdown">
 					<a href="#" data-toggle="dropdown"><i class="mrs fa fa-bookmark text-white"></i><span class="mrs">Other Projects</span><b class="caret caret-white"></b></a>

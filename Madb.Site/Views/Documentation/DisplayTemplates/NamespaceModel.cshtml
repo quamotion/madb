@@ -1,0 +1,16 @@
+﻿@using Madb.Site.Extensions;
+
+@model Madb.Site.Models.Documentation.NamespaceModel
+
+<div id="@(Model.Id)">
+	<div class="page-header">
+		<h2 class="zero"><i class="fa fa-code mrm"></i>@Model.Name<small class="mll text-muted pull-right">@Html.DirectLink(Model.Id)</small></h2>
+	</div>
+	<div class="mhl">
+		@foreach(var c in Model.Classes) {
+			if(!c.Ignore) {
+				@Html.DisplayFor(d => c)
+			}
+		}
+	</div>
+</div>

@@ -6,6 +6,9 @@ using System.Text;
 using MoreLinq;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class BatteryInfo {
 		/// <summary>
 		/// Battery Status Types

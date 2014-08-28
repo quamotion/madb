@@ -1,0 +1,85 @@
+﻿@md-color-red: #e51c23; // red 500
+@md-color-pink: #e91e63; // pink 500
+@md-color-purple: #9c27b0; // purple 500
+@md-color-deep-purple: #673ab7; // deep purple 500
+@md-color-indigo: #3f51b5; // indigo 500
+@md-color-blue: #5677fc; // blue 500
+@md-color-light-blue: #03a9f4; // light blue 500
+@md-color-cyan: #00bcd4; // cyan 500
+@md-color-teal: #009688; // teal 500
+@md-color-green: #259b24; // green 500
+@md-color-light-green: #8bc34a; // light green 500
+@md-color-lime: #cddc39; // lime 500
+@md-color-yellow: #ffeb3b; // yellow 500
+@md-color-amber: #ffc107; //amber 500
+@md-color-orange: #ff9800; //orange 500
+@md-color-deep-orange: #ff5722; // deep orange 500
+@md-color-brown: #795548; // brown 500
+@md-color-grey: #9e9e9e; // grey 500
+@md-color-blue-grey: #607d8b; // blue grey 500
+
+@color-primary:         #9c27b0; // purple 500
+@color-success:         #259b24; // green 500
+@color-info:            #00bcd4; // cyan 500
+@color-warning:         #ff5722; // deep orange 500
+@color-danger:          #e51c23; // red 500
+
+@navbar-default-bg: #4285f4;
+@navbar-inverse-bg: #9c27b0;
+
+@epm-nav-border: darken(@epm-nav-toggle-bg,6.5%);
+
+@epm-nav-toggle-bg: @navbar-default-bg;
+@epm-nav-toggle-border: @epm-nav-border;
+
+@epm-nav-toggle-icon-bar-bg: #ddd;
+@epm-nav-toggle-icon-bar-hover-bg: lighten(@epm-nav-toggle-icon-bar-bg,3%);
+
+@epm-nav-link-bg: transparent;
+@epm-nav-link-hover-bg: lighten(@navbar-default-bg, 7.5%);
+
+@nav-search-input-color: #fff;
+@nav-search-input-bg: @navbar-default-bg;
+@nav-search-input-border: @epm-nav-border;
+@nav-search-input-hover-border: @epm-nav-link-hover-bg;
+
+@epm-nav-width: 300px;
+
+.placeholder(@color: @epm-nav-toggle-icon-bar-bg) {
+  &::-moz-placeholder           { color: @color; } // Firefox
+  &:-ms-input-placeholder       { color: @color; } // Internet Explorer 10+
+  &::-webkit-input-placeholder  { color: @color; } // Safari and Chrome
+}
+
+.transition(@property: all, @ease: linear, @duration: 300ms){
+	-moz-transition: @arguments;
+	-o-transition: @arguments;
+	-webkit-transition: @arguments;
+	transition: @arguments;
+}
+
+.box-shadow(@x: 0; @y: 0; @blur: 1px; @color: #000) {
+  -webkit-box-shadow: @arguments;
+     -moz-box-shadow: @arguments;
+          box-shadow: @arguments;
+}
+
+.z-depth-1() {
+	box-shadow: 0 0.1em .2em 0 rgba(0, 0, 0, 0.258824);
+}
+
+.z-depth-2() {
+	box-shadow: 0 0.2em .5em 0 rgba(0, 0, 0, 0.258824);
+}
+
+.z-depth-3() {
+	box-shadow: 0 0.3em 1em 0 rgba(0, 0, 0, 0.258824);
+}
+
+.z-depth-4() {
+	box-shadow: 0 0.7em 1.3em 0 rgba(0, 0, 0, 0.258824);
+}
+
+.z-depth-5() {
+	box-shadow: 0 0.9em 1.3em 0 rgba(0, 0, 0, 0.258824);
+}

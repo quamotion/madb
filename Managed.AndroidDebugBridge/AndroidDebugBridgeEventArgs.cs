@@ -7,6 +7,7 @@ namespace Managed.Adb {
 	/// <summary>
 	/// 
 	/// </summary>
+	/// <ignore>true</ignore>
 	public class AndroidDebugBridgeEventArgs : EventArgs {
 
 		/// <summary>

@@ -32,6 +32,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -137,17 +140,36 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AssetsController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\DocumentationController.cs" />
     <Compile Include="Extensions\HtmlHelper.cs" />
+    <Compile Include="Extensions\Type.cs" />
+    <Compile Include="Extensions\UrlHelper.cs" />
+    <Compile Include="Extensions\XmlDocumentationReader.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AdSenseModel.cs" />
+    <Compile Include="Models\Documentation\ClassModel.cs" />
+    <Compile Include="Models\Documentation\MethodModel.cs" />
+    <Compile Include="Models\Documentation\NamespaceModel.cs" />
+    <Compile Include="Models\Documentation\ParameterModel.cs" />
+    <Compile Include="Models\Documentation\PropertyModel.cs" />
+    <Compile Include="Models\Documentation\TypeModel.cs" />
+    <Compile Include="Models\Documentation\Xml\Assembly.cs" />
+    <Compile Include="Models\Documentation\Xml\Document.cs" />
+    <Compile Include="Models\Documentation\Xml\Gist.cs" />
+    <Compile Include="Models\Documentation\Xml\Member.cs" />
+    <Compile Include="Models\Documentation\Xml\Param.cs" />
+    <Compile Include="Models\Documentation\Xml\Reference.cs" />
+    <Compile Include="Models\Documentation\Xml\Simple.cs" />
     <Compile Include="Models\NavigationPositions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\DocumentationService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\Managed.AndroidDebugBridge.dll" />
+    <Content Include="App_Data\Managed.AndroidDebugBridge.xml" />
     <Content Include="assets\images\madbee-114.png" />
     <Content Include="assets\images\madbee-120.png" />
     <Content Include="assets\images\madbee-144.png" />
@@ -157,6 +179,10 @@
     <Content Include="assets\images\madbee-57.png" />
     <Content Include="assets\images\madbee-72.png" />
     <Content Include="assets\images\madbee-logo.png" />
+    <Content Include="assets\Scripts\endpointmvc.js" />
+    <Content Include="assets\Scripts\endpointmvc.min.js">
+      <DependentUpon>endpointmvc.js</DependentUpon>
+    </Content>
     <Content Include="assets\Scripts\jquery.scrollto.js" />
     <Content Include="assets\Scripts\jquery.scrollto.min.js">
       <DependentUpon>jquery.scrollto.js</DependentUpon>
@@ -169,10 +195,16 @@
     <Content Include="assets\Scripts\system.copy.min.js">
       <DependentUpon>system.copy.js</DependentUpon>
     </Content>
+    <Content Include="assets\Scripts\system.expandable.js" />
+    <Content Include="assets\Scripts\system.expandable.min.js">
+      <DependentUpon>system.expandable.js</DependentUpon>
+    </Content>
     <Content Include="assets\Scripts\system.floating-label.js" />
     <Content Include="assets\Scripts\system.floating-label.min.js">
       <DependentUpon>system.floating-label.js</DependentUpon>
     </Content>
+    <Content Include="assets\Scripts\system.scroll-show.js" />
+    <Content Include="assets\Scripts\system.scroll.js" />
     <Content Include="assets\Scripts\system.toastr.js" />
     <Content Include="assets\Scripts\system.toastr.min.js">
       <DependentUpon>system.toastr.js</DependentUpon>
@@ -210,6 +242,18 @@
     </Content>
     <Content Include="assets\styles\bootswatch.min.css">
       <DependentUpon>bootswatch.less</DependentUpon>
+    </Content>
+    <Content Include="assets\styles\endpointmvc-variables.css">
+      <DependentUpon>endpointmvc-variables.less</DependentUpon>
+    </Content>
+    <Content Include="assets\styles\endpointmvc-variables.min.css">
+      <DependentUpon>endpointmvc-variables.css</DependentUpon>
+    </Content>
+    <Content Include="assets\styles\endpointmvc.css">
+      <DependentUpon>endpointmvc.less</DependentUpon>
+    </Content>
+    <Content Include="assets\styles\endpointmvc.min.css">
+      <DependentUpon>endpointmvc.css</DependentUpon>
     </Content>
     <Content Include="assets\styles\font-awesome.css" />
     <Content Include="assets\styles\font-awesome.min.css">
@@ -256,7 +300,6 @@
     <Content Include="assets\styles\typography.min.css">
       <DependentUpon>typography.css</DependentUpon>
     </Content>
-    <Content Include="favicon.ico" />
     <Content Include="assets\fonts\glyphicons-halflings-regular.svg">
       <DependentUpon>glyphicons-halflings-regular.eot</DependentUpon>
     </Content>
@@ -284,6 +327,9 @@
       <DependentUpon>FontAwesome.otf</DependentUpon>
     </Content>
     <Content Include="assets\fonts\FontAwesome.otf" />
+    <Content Include="assets\Scripts\endpointmvc.min.js.map">
+      <DependentUpon>endpointmvc.min.js</DependentUpon>
+    </Content>
     <None Include="assets\Scripts\jquery-2.1.1.intellisense.js">
       <DependentUpon>jquery-2.1.1.js</DependentUpon>
     </None>
@@ -337,7 +383,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="assets\styles\bootswatch-paper.css.map">
       <DependentUpon>bootswatch-paper.less</DependentUpon>
     </Content>
@@ -393,13 +438,35 @@
     <Content Include="Views\Shared\_SideNavPartial.cshtml" />
     <Content Include="Views\Shared\_AddThisCountPartial.cshtml" />
     <Content Include="Views\Shared\_AddThisSideBarPartial.cshtml" />
-    <Content Include="Views\Home\_AboutPartial.cshtml" />
-    <Content Include="Views\Home\_LicensePartial.cshtml" />
-    <Content Include="Views\Home\_NugetPartial.cshtml" />
+    <Content Include="Views\Documentation\_AboutPartial.cshtml" />
+    <Content Include="Views\Documentation\_LicensePartial.cshtml" />
+    <Content Include="Views\Documentation\_NugetPartial.cshtml" />
     <Content Include="Views\Assets\Gist.cshtml" />
+    <Content Include="assets\styles\endpointmvc-variables.less" />
+    <Content Include="assets\styles\endpointmvc.less" />
+    <Content Include="assets\styles\endpointmvc-variables.css.map">
+      <DependentUpon>endpointmvc-variables.css</DependentUpon>
+    </Content>
+    <Content Include="assets\styles\endpointmvc.css.map">
+      <DependentUpon>endpointmvc.css</DependentUpon>
+    </Content>
+    <Content Include="Views\Documentation\Navigation.cshtml" />
+    <Content Include="Views\Documentation\Index.cshtml" />
+    <Content Include="Views\Documentation\DisplayTemplates\ClassModel.cshtml" />
+    <Content Include="Views\Documentation\DisplayTemplates\Member.cshtml" />
+    <Content Include="Views\Documentation\DisplayTemplates\MethodModel.cshtml" />
+    <Content Include="Views\Documentation\DisplayTemplates\NamespaceModel.cshtml" />
+    <Content Include="Views\Documentation\DisplayTemplates\PropertyModel.cshtml" />
+    <Content Include="assets\Scripts\system.expandable.min.js.map">
+      <DependentUpon>system.expandable.min.js</DependentUpon>
+    </Content>
+    <Content Include="Views\Shared\_DirectLink.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
+    <ProjectReference Include="..\Managed.AndroidDebugBridge\Managed.Adb.csproj">
+      <Project>{65473257-e70f-410b-9269-d0c0f771ea87}</Project>
+      <Name>Managed.Adb</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -439,6 +506,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(ProjectDir)$(OutDir)Managed.AndroidDebugBridge.* $(ProjectDir)App_Data /h /i /c /k /y
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

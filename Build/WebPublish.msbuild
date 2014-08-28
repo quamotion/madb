@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12" DefaultTargets="Publish">
+
+	<PropertyGroup>
+		<VisualStudioVersion>12.0</VisualStudioVersion>
+		<ProjectName Condition="'$(ProjectName)' == ''">Madb.Site</ProjectName>
+
+		<SourcePath>$(MSBuildProjectDirectory)\..\$(ProjectName)</SourcePath>
+		<DestinationPath>S:\deploy\$(ProjectName)</DestinationPath>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<OutputPath>bin\</OutputPath>
+		
+		<DeleteFirst Condition="'$(DeleteFirst)' == ''">True</DeleteFirst>
+		<MSBuildProperties>Configuration=$(Configuration);Platform=$(Platform);OutputPath=$(OutputPath);VisualStudioVersion=12.0;DefineConstants=MVC5</MSBuildProperties>
+
+	</PropertyGroup>
+
+  <ItemGroup>
+		<ProjectsToBuild Include="$(SourcePath)\**\*.csproj" />
+		<PublishFiles Include="$(SourcePath)\**\*" Exclude="$(SourcePath)\**\.localhistory\**;$(SourcePath)\**\*.csproj*;$(SourcePath)\**\.svn\**;$(SourcePath)\**\obj\**;$(SourcePath)\**\packages.config;$(SourcePath)\**\*.user;$(SourcePath)\**\*.tt;$(SourcePath)\**\*.edmx;$(SourcePath)\**\*.cs;$(SourcePath)\**\*.diagram" />
+		<DeleteFiles Include="$(DestinationPath)\**\*" />
+	</ItemGroup>
+	
+	<Target Name="Build">
+		<MSBuild Projects ="@(ProjectsToBuild)" ContinueOnError="false" Properties="$(MSBuildProperties)">
+			<Output ItemName="OutputFiles" TaskParameter="TargetOutputs"/>
+		</MSBuild>
+	</Target>
+	
+	<Target Name="Prep" DependsOnTargets="Build">
+		<Error Code="99" Text="ProjectName is not defined" Condition=" '$(ProjectName)' == ''" />
+		<Error Code="100" Text="SourcePath does not exist" Condition=" !Exists($(SourcePath)) " />
+
+		<MakeDir Directories="$(DestinationPath)" Condition=" !Exists($(DestinationPath)) " />
+		<Error Code="101" Text="DestinationPath does not exist" Condition=" !Exists($(DestinationPath)) " />
+
+		
+		<Delete Files="@(DeleteFiles)" ContinueOnError="true" Condition="'$(DeleteFirst)' == 'True'" />
+	</Target>
+
+	<Target Name="Publish" DependsOnTargets="Prep">
+		<Copy SourceFiles="@(PublishFiles)" DestinationFolder="$(DestinationPath)\%(RecursiveDir)" SkipUnchangedFiles="true" />
+	</Target>
+	
+</Project>

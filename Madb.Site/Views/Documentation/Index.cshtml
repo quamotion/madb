@@ -1,0 +1,39 @@
+﻿@model Madb.Site.Models.Documentation.NamespaceModel
+
+@{
+	ViewBag.Title = Model.Name;
+}
+
+@section featured {
+	<div id="home"></div>
+	<section class="featured jumbotron jumbotron-warning mbl">
+		<div class="container">
+			<div class="title">
+				<i class="logo pull-left"></i>
+				<h1>@(Html.SiteName()).</h1>
+				<h2 class="muted">A managed port of the Android Debug Bridge.</h2>
+				<hr />
+				<h3>@Model.Name <small class="text-white">Version @Model.AssemblyVersion</small></h3>
+			</div>
+		</div>
+	</section>
+}
+
+@(Html.Partial("_AboutPartial"))
+@(Html.Partial("_NugetPartial"))
+@(Html.Partial("_LicensePartial"))
+
+<div id="documentation">
+	@(Html.Partial("_AdPartial"))
+	<div class="panel panel-success pan">
+		<div class="panel-heading"><h1 class="zero lowercase"><i class="fa fa-book mrm"></i>Documentation</h1></div>
+		<div class="panel-body">
+			@foreach(var ns in Model.Namespaces) {
+				if(!ns.Ignore) {
+					@(Html.Partial("_AdPartial"))
+					@Html.DisplayFor(d => ns)
+				}
+			}
+		</div>
+	</div>
+</div>

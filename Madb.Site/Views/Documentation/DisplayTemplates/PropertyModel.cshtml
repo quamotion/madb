@@ -1,0 +1,22 @@
+﻿@using Camalot.Common.Extensions;
+@using Camalot.Common.Mvc.Extensions;
+@using Madb.Site.Extensions;
+
+@model Madb.Site.Models.Documentation.PropertyModel
+
+<div id="@Model.Id" data-xml-name="@Model.XmlName">
+	<div class="page-header">
+		<h4 class="zero">
+			<i class="fa fa-gavel mrm"></i>
+			<code class="method-returntype"><abbr title="@Model.ReturnType.ToSafeFullName()">@Model.ReturnType.ToSafeName()</abbr></code>
+			<span>
+				<span>@Model.ToString()</span>
+			</span>
+			<small class="mll text-muted pull-right">@Html.DirectLink(Model.Id)</small>
+		</h4>
+
+	</div>
+	@if(Model.Documentation != null) {
+		@Html.DisplayFor(x => Model.Documentation)
+	}
+</div>

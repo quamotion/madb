@@ -1,0 +1,241 @@
+﻿.epm-content {
+  background-color: #fff;
+}
+.epm-nav-host {
+  position: fixed;
+  top: 49px;
+  width: 50px;
+  z-index: 1036;
+}
+.epm-nav-host.expanded.left {
+  left: 299px;
+}
+.epm-nav-host.expanded.right {
+  right: 299px;
+}
+.epm-nav-host.left {
+  left: 0;
+  -moz-transition: left linear 300ms;
+  -o-transition: left linear 300ms;
+  -webkit-transition: left linear 300ms;
+  transition: left linear 300ms;
+}
+.epm-nav-host.left .epm-nav-toggle {
+  border-right: solid 1px #2371f2;
+  margin-right: 5px;
+}
+.epm-nav-host.right {
+  right: 0;
+  -moz-transition: right linear 300ms;
+  -o-transition: right linear 300ms;
+  -webkit-transition: right linear 300ms;
+  transition: right linear 300ms;
+}
+.epm-nav-host.right .epm-nav-toggle {
+  border-left: solid 1px #2371f2;
+  margin-left: 5px;
+}
+.epm-nav-host .epm-nav-toggle {
+  box-shadow: 0 0.5em 1em -3px rgba(0, 0, 0, 0.258824);
+  display: block;
+  border: none;
+  background-color: #4285f4;
+  border-bottom: solid 1px #2371f2;
+  border-radius: 0;
+  cursor: pointer;
+  padding: 10px;
+  z-index: 1030;
+}
+.epm-nav-host .epm-nav-toggle > .icon-bar {
+  background-color: #dddddd;
+  display: block;
+  width: 22px;
+  height: 3px;
+}
+.epm-nav-host .epm-nav-toggle > .icon-bar + .icon-bar {
+  margin-top: 4px;
+}
+.epm-nav-host .epm-nav-toggle > .icon-bar:hover > .icon-bar {
+  background-color: #e5e5e5;
+}
+.epm-nav {
+  box-shadow: 0 0.3em 1em 0 rgba(0, 0, 0, 0.258824);
+  z-index: 1035;
+  border: none;
+  background-color: #4285f4;
+  width: 300px;
+  max-width: 300px;
+  position: fixed;
+  top: 49px;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.epm-nav::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.epm-nav::-webkit-scrollbar-track {
+  background-color: transparent;
+  -webkit-border-radius: 5px;
+}
+.epm-nav::-webkit-scrollbar-thumb:vertical {
+  background-color: #2371f2;
+  -webkit-border-radius: 6px;
+}
+.epm-nav::-webkit-scrollbar-thumb:vertical:hover,
+.epm-nav::-webkit-scrollbar-thumb:horizontal:hover {
+  background-color: #669cf6;
+}
+.epm-nav::-webkit-scrollbar-thumb:horizontal {
+  background-color: #2371f2;
+  -webkit-border-radius: 6px;
+}
+.epm-nav .nav.nested {
+  height: 0;
+  overflow: hidden;
+}
+.epm-nav .nav.nested.nav-always-expanded,
+.epm-nav .nav.nested.nav-expanded {
+  height: auto;
+}
+.epm-nav.left {
+  left: -305px;
+  border-right: solid 1px #2371f2;
+  -moz-transition: left linear 300ms;
+  -o-transition: left linear 300ms;
+  -webkit-transition: left linear 300ms;
+  transition: left linear 300ms;
+}
+.epm-nav.left li > a {
+  border-right: 2px solid #4285f4;
+}
+.epm-nav.left li.active > a {
+  border-right-color: #ffffff;
+}
+.epm-nav.left.epm-nav-primary li.active > a {
+  border-right-color: #9c27b0;
+}
+.epm-nav.left.epm-nav-success li.active > a {
+  border-right-color: #259b24;
+}
+.epm-nav.left.epm-nav-danger li.active > a {
+  border-right-color: #e51c23;
+}
+.epm-nav.left.epm-nav-warning li.active > a {
+  border-right-color: #ff5722;
+}
+.epm-nav.left.epm-nav-info li.active > a {
+  border-right-color: #00bcd4;
+}
+.epm-nav.right {
+  right: -305px;
+  border-left: solid 1px #2371f2;
+  -moz-transition: right linear 300ms;
+  -o-transition: right linear 300ms;
+  -webkit-transition: right linear 300ms;
+  transition: right linear 300ms;
+}
+.epm-nav.right li > a {
+  border-left: 2px solid #4285f4;
+}
+.epm-nav.right li.active > a {
+  border-left-color: #ffffff;
+}
+.epm-nav.right.epm-nav-primary li.active > a {
+  border-left-color: #9c27b0;
+}
+.epm-nav.right.epm-nav-success li.active > a {
+  border-left-color: #259b24;
+}
+.epm-nav.right.epm-nav-danger li.active > a {
+  border-left-color: #e51c23;
+}
+.epm-nav.right.epm-nav-warning li.active > a {
+  border-left-color: #ff5722;
+}
+.epm-nav.right.epm-nav-info li.active > a {
+  border-left-color: #00bcd4;
+}
+.epm-nav.expanded.left {
+  left: 0;
+}
+.epm-nav.expanded.left > .epm-nav-host {
+  left: 257px;
+}
+.epm-nav.expanded.right {
+  right: 0;
+}
+.epm-nav.expanded.right > .epm-nav-host {
+  right: 234px;
+}
+.epm-nav .nav-search {
+  margin: 0 2px 0 0;
+}
+.epm-nav .nav-search button.clear {
+  border: none;
+  background-color: transparent;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 0 0 0 -20px;
+  padding: 0;
+  color: #ddd;
+}
+.epm-nav .nav-search input[type="search"] {
+  border: solid 1px #2371f2;
+  background-color: #4285f4;
+  width: 100%;
+  color: #ffffff;
+  padding: 2px 15px 2px 4px;
+  -moz-transition: none linear 300ms;
+  -o-transition: none linear 300ms;
+  -webkit-transition: none linear 300ms;
+  transition: none linear 300ms;
+  margin: 0;
+}
+.epm-nav .nav-search input[type="search"]::-moz-placeholder {
+  color: #dddddd;
+}
+.epm-nav .nav-search input[type="search"]:-ms-input-placeholder {
+  color: #dddddd;
+}
+.epm-nav .nav-search input[type="search"]::-webkit-input-placeholder {
+  color: #dddddd;
+}
+.epm-nav .nav-search input[type="search"]:hover,
+.epm-nav .nav-search input[type="search"]:focus,
+.epm-nav .nav-search input[type="search"]:focus:valid,
+.epm-nav .nav-search input[type="search"]:focus:invalid {
+  border-color: #669cf6;
+  -webkit-box-shadow: none 0 1px #000000;
+  -moz-box-shadow: none 0 1px #000000;
+  box-shadow: none 0 1px #000000;
+}
+.epm-nav li {
+  -moz-transition: height linear 300ms;
+  -o-transition: height linear 300ms;
+  -webkit-transition: height linear 300ms;
+  transition: height linear 300ms;
+}
+.epm-nav li > a {
+  padding: 5px;
+  white-space: nowrap;
+  color: #ddd;
+}
+.epm-nav li > a:focus,
+.epm-nav li > a:hover,
+.epm-nav li > a:active {
+  background-color: #669cf6;
+  border-left-color: #669cf6;
+  border-right-color: #669cf6;
+  color: #fff;
+}
+.epm-nav li.divider {
+  height: 1px;
+  line-height: 1px;
+  font-size: 0;
+  border-top: solid 1px #2371f2;
+  margin: 2px 0 2px 0;
+}
+/*# sourceMappingURL=endpointmvc.css.map */

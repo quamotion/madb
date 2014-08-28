@@ -1,4 +1,5 @@
 ﻿@import "bootswatch-variables";
+@import "endpointmvc-variables";
 
 body {
 	padding-bottom: 40px;
@@ -35,13 +36,19 @@ body {
 	height: 114px;
 	width: 114px;
 	margin-right: 20px;
+	display: inline-block;
+	opacity: 1;
+	.transition(opacity);
+	&.small {
+		background-image: url(../images/madbee-32.png);
+		height: 32px;
+		width: 32px;
+	}
+	&.logo-hidden {
+		opacity: 0;
+	}
 }
 
-.logo-x.tiny {
-	height: 24px;
-	width: 24px;
-	margin-right: 5px;
-}
 
 .divider-vertical {
 	width: 1px;
@@ -112,4 +119,8 @@ body {
 
 .metro-nav > ul.nav > li > .alert {
 	margin: 0 3px 0 0;
+}
+
+.panel-body > .page-header:first-child {
+	margin-top: 0;
 }

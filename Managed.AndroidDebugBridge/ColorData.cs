@@ -7,6 +7,7 @@ namespace Managed.Adb {
 	/// <summary>
 	/// 
 	/// </summary>
+	/// <ignore>true</ignore>
 	public class ColorData {
 		/// <summary>
 		/// Gets or sets the length.

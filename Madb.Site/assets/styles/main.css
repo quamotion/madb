@@ -27,11 +27,20 @@
   height: 114px;
   width: 114px;
   margin-right: 20px;
+  display: inline-block;
+  opacity: 1;
+  -moz-transition: opacity linear 300ms;
+  -o-transition: opacity linear 300ms;
+  -webkit-transition: opacity linear 300ms;
+  transition: opacity linear 300ms;
 }
-.logo-x.tiny {
-  height: 24px;
-  width: 24px;
-  margin-right: 5px;
+.logo.small {
+  background-image: url(../images/madbee-32.png);
+  height: 32px;
+  width: 32px;
+}
+.logo.logo-hidden {
+  opacity: 0;
 }
 .divider-vertical {
   width: 1px;
@@ -88,5 +97,8 @@
 }
 .metro-nav > ul.nav > li > .alert {
   margin: 0 3px 0 0;
+}
+.panel-body > .page-header:first-child {
+  margin-top: 0;
 }
 /*# sourceMappingURL=main.css.map */

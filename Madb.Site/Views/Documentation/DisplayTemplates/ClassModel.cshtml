@@ -1,0 +1,24 @@
+﻿@using Madb.Site.Extensions;
+
+@model Madb.Site.Models.Documentation.ClassModel
+
+<div id="@Model.Id" data-xml-name="@Model.XmlName">
+	<div class="page-header">
+		<h3 class="zero"><i class="fa fa-bolt mrm"></i>@Model.Name<small class="mll text-muted pull-right">@Html.DirectLink(Model.Id)</small></h3>
+	</div>
+	@if(Model.Documentation != null) {
+		@Html.DisplayFor(x => Model.Documentation)
+	}
+	<div class="mhl">
+		@foreach(var m in Model.Properties) {
+			if(!m.Ignore) {
+				@Html.DisplayFor(x => m)
+			}
+		}
+		@foreach(var m in Model.Methods) {
+			if(!m.Ignore) {
+				@Html.DisplayFor(x => m)
+			}
+		}
+	</div>
+</div>

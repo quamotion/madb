@@ -17,22 +17,27 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Occurs when [bridge changed].
 		/// </summary>
+		/// <ignore>true</ignore>
 		public event EventHandler<AndroidDebugBridgeEventArgs> BridgeChanged;
 		/// <summary>
 		/// Occurs when [device changed].
 		/// </summary>
+		/// <ignore>true</ignore>
 		public event EventHandler<DeviceEventArgs> DeviceChanged;
 		/// <summary>
 		/// Occurs when [device connected].
 		/// </summary>
+		/// <ignore>true</ignore>
 		public event EventHandler<DeviceEventArgs> DeviceConnected;
 		/// <summary>
 		/// Occurs when [device disconnected].
 		/// </summary>
+		/// <ignore>true</ignore>
 		public event EventHandler<DeviceEventArgs> DeviceDisconnected;
 		/// <summary>
 		/// Occurs when [client changed].
 		/// </summary>
+		/// <ignore>true</ignore>
 		public event EventHandler<ClientEventArgs> ClientChanged;
 
 		/*
