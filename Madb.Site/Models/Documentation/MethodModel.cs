@@ -19,7 +19,11 @@ namespace Madb.Site.Models.Documentation {
 		public IList<ParameterModel> Parameters { get; set; }
 		public IList<TypeModel> GenericParameters { get; set; }
 		public bool IsStatic { get; set; }
-
+		public bool IsExtension {
+			get {
+				return ExtensionOf != null;
+			}
+		}
 		public Type ExtensionOf { get; set; }
 
 		public string Id {

@@ -1,0 +1,12 @@
+﻿@using Madb.Site.Models.Documentation;
+@using Madb.Site.Extensions;
+@using Camalot.Common.Extensions;
+@using Camalot.Common.Mvc.Extensions;
+@model ParameterModel
+<!--
+--><span class="parameter @(Model.IsOptional ? "parameter-optional" : "")">
+	@Html.DisplayFor(m => Model.Type.BaseType)
+	@Html.Icon("fa-forward", Model.IsIn, "In")
+	@Html.Icon("fa-reply", Model.IsIn, "Out")
+	<span class="parameter-name">@Model.Name</span>
+</span>

@@ -9,10 +9,8 @@
 				var high = parseInt(self.data("scroll-show-high") || "-1", 0);
 				var toggle = self.data("scroll-toggle") || "hidden";
 				if ( (scrollPosition >= low || low < 0 ) && ( scrollPosition <= high || high < 0 )) {
-					console.log("show");
 					self.removeClass(toggle);
 				} else {
-					console.log("hide");
 					self.addClass(toggle);
 				}
 			});

@@ -33,6 +33,7 @@ namespace Managed.Adb.IO {
 	/// <summary>
 	/// Summary description for ByteBuffer.
 	/// </summary>
+	/// <ignore>true</ignore>
 	public class ByteBuffer : MemoryStream {
 		private ByteOrder order = ByteOrder.LITTLE_ENDIAN;
 		private BinaryReader reader = null;

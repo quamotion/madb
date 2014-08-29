@@ -5,6 +5,7 @@ using System.Text;
 using System.Globalization;
 
 namespace Managed.Adb {
+	/// <ignore>true</ignore>
 	public static partial class ManagedAdbExtenstions {
 		/// <summary>
 		/// Gets EPOCH time

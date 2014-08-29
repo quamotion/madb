@@ -4,7 +4,14 @@
 
 <div id="@Model.Id" data-xml-name="@Model.XmlName">
 	<div class="page-header">
-		<h3 class="zero"><i class="fa fa-bolt mrm"></i>@Model.Name<small class="mll text-muted pull-right">@Html.DirectLink(Model.Id)</small></h3>
+		<h3 class="zero">
+			<i class="fa fa-bolt mrm"></i>
+			<span>@Model.Name</span>
+			<small class="mll text-muted pull-right">
+				@Html.StaticIcon(Model.IsStatic)
+				@Html.DirectLink(Model.Id)
+			</small>
+		</h3>
 	</div>
 	@if(Model.Documentation != null) {
 		@Html.DisplayFor(x => Model.Documentation)

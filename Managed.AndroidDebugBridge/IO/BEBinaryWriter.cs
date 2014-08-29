@@ -33,6 +33,7 @@ namespace Managed.Adb.IO {
 	/// <summary> 
 	/// Big-Endian Binary Writer 
 	/// </summary> 
+	/// <ignore>true</ignore>
 	public class BEBinaryWriter : BinaryWriter {
 		public BEBinaryWriter ( MemoryStream s )
 			: base ( s ) {

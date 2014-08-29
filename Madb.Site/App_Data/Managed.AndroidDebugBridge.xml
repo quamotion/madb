@@ -8,6 +8,9 @@
             <summary>
             The ADB Helper class
             </summary>
+            <seealso cref="!:https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
+            <seealso cref="!:https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
+            <seealso cref="!:https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso>
         </member>
         <member name="F:Managed.Adb.AdbHelper.TAG">
             <summary>
@@ -42,6 +45,11 @@
             <param name="device">The device.</param>
             <param name="port">The port.</param>
             <returns></returns>
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">
+            failed submitting request to ADB
+            or
+            connection request rejected
+            </exception>
         </member>
         <member name="M:Managed.Adb.AdbHelper.KillAdb(System.Net.IPEndPoint)">
             <summary>
@@ -70,16 +78,24 @@
             </summary>
             <param name="address">The address.</param>
             <returns></returns>
+            <exception cref="T:System.IO.IOException">failed asking for adb version</exception>
         </member>
         <member name="M:Managed.Adb.AdbHelper.CreatePassThroughConnection(System.Net.IPEndPoint,Managed.Adb.Device,System.Int32)">
             <summary>
             Creates and connects a new pass-through socket, from the host to a port on the device.
             </summary>
-            <param name="endpoint"></param>
-            <param name="device">the device to connect to. Can be null in which case the connection will be 
+            <param name="endpoint">The endpoint.</param>
+            <param name="device">the device to connect to. Can be null in which case the connection will be
             to the first available device.</param>
             <param name="pid">the process pid to connect to.</param>
-            <returns>The Socket</returns>
+            <returns>
+            The Socket
+            </returns>
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">
+            failed submitting request to ADB
+            or
+            connection request rejected:  + resp.Message
+            </exception>
         </member>
         <member name="M:Managed.Adb.AdbHelper.CreateAdbForwardRequest(System.String,System.Int32)">
             <summary>
@@ -112,6 +128,11 @@
             <param name="data">The data.</param>
             <param name="length">The length.</param>
             <param name="timeout">The timeout.</param>
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">
+            channel EOF
+            or
+            timeout
+            </exception>
         </member>
         <member name="M:Managed.Adb.AdbHelper.ReadAdbResponse(System.Net.Sockets.Socket,System.Boolean)">
             <summary>
@@ -137,6 +158,11 @@
             <param name="data">The data.</param>
             <param name="length">The length.</param>
             <param name="timeout">The timeout.</param>
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">
+            EOF 
+            or 
+            No Data to read: exception.Message
+            </exception>
         </member>
         <member name="M:Managed.Adb.AdbHelper.CreateJdwpForwardRequest(System.Int32)">
             <summary>
@@ -154,6 +180,19 @@
             <param name="localPort">The local port.</param>
             <param name="remotePort">The remote port.</param>
             <returns></returns>
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">
+            failed to submit the forward command.
+            or
+            Device rejected command:  + resp.Message
+            </exception>
+        </member>
+        <member name="M:Managed.Adb.AdbHelper.ListForward(System.Net.IPEndPoint,Managed.Adb.Device)">
+            <summary>
+            Lists the forward.
+            </summary>
+            <param name="address">The address.</param>
+            <param name="device">The device.</param>
+            <exception cref="T:System.NotImplementedException"></exception>
         </member>
         <member name="M:Managed.Adb.AdbHelper.RemoveForward(System.Net.IPEndPoint,Managed.Adb.Device,System.Int32)">
             <summary>
@@ -202,6 +241,11 @@
             <param name="adbSockAddr">The adb sock addr.</param>
             <param name="device">The device.</param>
             <returns></returns>
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">
+            failed asking for frame buffer
+            or
+            failed nudging
+            </exception>
         </member>
         <member name="M:Managed.Adb.AdbHelper.ExecuteRemoteRootCommand(System.Net.IPEndPoint,System.String,Managed.Adb.Device,Managed.Adb.IShellOutputReceiver)">
             <summary>
@@ -211,7 +255,9 @@
             <param name="command">The command.</param>
             <param name="device">The device.</param>
             <param name="rcvr">The RCVR.</param>
-            <remarks>Should check if you CanSU before calling this.</remarks>
+            <remarks>
+            Should check if you CanSU before calling this.
+            </remarks>
         </member>
         <member name="M:Managed.Adb.AdbHelper.ExecuteRemoteRootCommand(System.Net.IPEndPoint,System.String,Managed.Adb.Device,Managed.Adb.IShellOutputReceiver,System.Int32)">
             <summary>
@@ -232,10 +278,14 @@
             <param name="device">The device.</param>
             <param name="rcvr">The RCVR.</param>
             <param name="maxTimeToOutputResponse">The max time to output response.</param>
-            <exception cref="T:Managed.Adb.Exceptions.AdbException">failed submitting shell command</exception>
             <exception cref="T:System.OperationCanceledException"></exception>
+            <exception cref="T:System.IO.FileNotFoundException">
+            </exception>
+            <exception cref="T:Managed.Adb.Exceptions.UnknownOptionException"></exception>
+            <exception cref="T:Managed.Adb.Exceptions.CommandAbortingException"></exception>
+            <exception cref="T:Managed.Adb.Exceptions.PermissionDeniedException"></exception>
             <exception cref="T:Managed.Adb.Exceptions.ShellCommandUnresponsiveException"></exception>
-            <exception cref="T:System.IO.FileNotFoundException"></exception>
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">failed submitting shell command</exception>
             <exception cref="T:Managed.Adb.Exceptions.UnknownOptionException"></exception>
             <exception cref="T:Managed.Adb.Exceptions.CommandAbortingException"></exception>
             <exception cref="T:Managed.Adb.Exceptions.PermissionDeniedException"></exception>
@@ -259,6 +309,12 @@
             </summary>
             <param name="adbChan">The adb chan.</param>
             <param name="device">The device.</param>
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">
+            failed submitting device ( + device + ) request to ADB
+            or
+            device ( + device + ) request rejected:  + resp.Message
+            </exception>
+            <exception cref="T:Managed.Adb.Exceptions.DeviceNotFoundException"></exception>
         </member>
         <member name="M:Managed.Adb.AdbHelper.RunEventLogService(System.Net.IPEndPoint,Managed.Adb.Device,Managed.Adb.Logs.LogReceiver)">
             <summary>
@@ -298,14 +354,13 @@
             <summary>
             Executes a raw socket command.
             </summary>
-            <param name="adbSockAddr">The adb sock addr.</param>
+            <param name="address">The address.</param>
+            <param name="device">The device.</param>
             <param name="command">The command.</param>
             <returns></returns>
-            <exception cref="T:Managed.Adb.Exceptions.AdbException">
-            failed to submit the command: {0}.With(command)
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">failed to submit the command: {0}.With(command)
             or
-            Device rejected command: {0}.With(resp.Message)
-            </exception>
+            Device rejected command: {0}.With(resp.Message)</exception>
         </member>
         <member name="M:Managed.Adb.AdbHelper.ExecuteRawSocketCommand(System.Net.IPEndPoint,System.String)">
             <summary>
@@ -332,12 +387,24 @@
             <param name="command">The command. Should call FormAdbRequest on the string to create the byte array.</param>
             <returns></returns>
             <exception cref="T:Managed.Adb.Exceptions.AdbException">
-            Device is offline. 
+            Device is offline
             or
-            failed to submit the command: {0}.With(command)
+            failed to submit the command: {0}..With(command.GetString().Trim())
             or
             Device rejected command: {0}.With(resp.Message)
             </exception>
+            <exception cref="T:Managed.Adb.Exceptions.AdbException">Device is offline.
+            or
+            failed to submit the command: {0}.With(command)
+            or
+            Device rejected command: {0}.With(resp.Message)</exception>
+        </member>
+        <member name="M:Managed.Adb.AdbHelper.HostPrefixFromDevice(Managed.Adb.IDevice)">
+            <summary>
+            
+            </summary>
+            <param name="device">The device.</param>
+            <returns></returns>
         </member>
         <member name="P:Managed.Adb.AdbHelper.Instance">
             <summary>
@@ -2394,18 +2461,15 @@
             <param name="innerException">The inner exception.</param>
         </member>
         <member name="T:Managed.Adb.ManagedAdbExtenstions">
-            <summary>
-            
-            </summary>
-            <summary>
-            
-            </summary>
-            <summary>
-            
-            </summary>
-            <summary>
-            String Helper Class
-            </summary>
+            <ignore>true</ignore>
+            <ignore>true</ignore>
+            <ignore>true</ignore>
+            <ignore>true</ignore>
+            <ignore>true</ignore>
+            <ignore>true</ignore>
+            <ignore>true</ignore>
+            <ignore>true</ignore>
+            <ignore>true</ignore>
         </member>
         <member name="M:Managed.Adb.ManagedAdbExtenstions.ReverseBytes(System.UInt16)">
             <summary>
@@ -3044,6 +3108,7 @@
             <summary> 
             Big-Endian Binary Reader 
             </summary> 
+            <ignore>true</ignore>
         </member>
         <member name="M:Managed.Adb.IO.BEBinaryReader.ReadInt16">
             <summary> 
@@ -3084,6 +3149,7 @@
             <summary> 
             Big-Endian Binary Writer 
             </summary> 
+            <ignore>true</ignore>
         </member>
         <member name="M:Managed.Adb.IO.BEBinaryWriter.Write(System.Int16)">
             <summary> 
@@ -3124,6 +3190,7 @@
             <summary>
             Summary description for ByteBuffer.
             </summary>
+            <ignore>true</ignore>
         </member>
         <member name="M:Managed.Adb.IO.ByteBuffer.#ctor(System.Byte[],Managed.Adb.IO.ByteOrder)">
             Constructor
@@ -3219,6 +3286,38 @@
         </member>
         <member name="M:Managed.Adb.IO.ByteBuffer.Wrap(System.Byte[])">
             Public Class Methods
+        </member>
+        <member name="T:Managed.Adb.IO.ByteOrder">
+            <summary>
+            
+            </summary>
+            <ignore>true</ignore>
+        </member>
+        <member name="F:Managed.Adb.IO.ByteOrder.BIG_ENDIAN">
+            <summary>
+            The big endian
+            </summary>
+        </member>
+        <member name="F:Managed.Adb.IO.ByteOrder.LITTLE_ENDIAN">
+            <summary>
+            The little endian
+            </summary>
+        </member>
+        <member name="M:Managed.Adb.IO.ByteOrder.ToString">
+            <summary>
+            Returns a <see cref="T:System.String" /> that represents the current <see cref="T:System.Object" />.
+            </summary>
+            <returns>
+            A <see cref="T:System.String" /> that represents the current <see cref="T:System.Object" />.
+            </returns>
+        </member>
+        <member name="P:Managed.Adb.IO.ByteOrder.Name">
+            <summary>
+            Gets the name.
+            </summary>
+            <value>
+            The name.
+            </value>
         </member>
         <member name="M:Managed.Adb.Logs.ILogListener.NewEntry(Managed.Adb.Logs.LogEntry)">
             <summary>

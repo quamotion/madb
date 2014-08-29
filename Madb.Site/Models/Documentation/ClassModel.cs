@@ -17,6 +17,8 @@ namespace Madb.Site.Models.Documentation {
 		public Xml.Member Documentation { get; set; }
 		public string XmlName { get; set; }
 		public bool Ignore { get { return Documentation != null && Documentation.Ignore; } }
+		public bool IsStatic { get; set; }
+
 		public IList<MethodModel> Methods {get;set;}
 
 		public IList<PropertyModel> Properties { get; set; }

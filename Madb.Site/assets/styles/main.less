@@ -5,11 +5,9 @@ body {
 	padding-bottom: 40px;
 	padding-top: 40px;
 	cursor: default;
-
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
-
 }
 
 .icon-camalotcommon {
@@ -39,11 +37,13 @@ body {
 	display: inline-block;
 	opacity: 1;
 	.transition(opacity);
+
 	&.small {
 		background-image: url(../images/madbee-32.png);
 		height: 32px;
 		width: 32px;
 	}
+
 	&.logo-hidden {
 		opacity: 0;
 	}
@@ -71,7 +71,6 @@ body {
 	position: relative;
 	white-space: nowrap;
 	display: inline-block;
-
 	-moz-transition: all ease-in-out 300ms;
 	-o-transition: all ease-in-out 300ms;
 	-webkit-transition: all ease-in-out 300ms;
@@ -96,13 +95,21 @@ body {
 		text-align: left;
 		width: 0;
 		padding: 0;
-
 		-moz-transition: all ease-in-out 300ms;
 		-o-transition: all ease-in-out 300ms;
 		-webkit-transition: all ease-in-out 300ms;
 		transition: all ease-in-out 300ms;
+	}
+}
 
+.go-to-top {
+	position: fixed;
+	right: 30px;
+	bottom: 60px;
+	z-index: 9999;
 
+	a.btn-round {
+		.z-depth-2();
 	}
 }
 

@@ -162,6 +162,7 @@
     <Compile Include="Models\Documentation\Xml\Param.cs" />
     <Compile Include="Models\Documentation\Xml\Reference.cs" />
     <Compile Include="Models\Documentation\Xml\Simple.cs" />
+    <Compile Include="Models\IconHelperModel.cs" />
     <Compile Include="Models\NavigationPositions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\DocumentationService.cs" />
@@ -242,6 +243,12 @@
     </Content>
     <Content Include="assets\styles\bootswatch.min.css">
       <DependentUpon>bootswatch.less</DependentUpon>
+    </Content>
+    <Content Include="assets\styles\documentation.css">
+      <DependentUpon>documentation.less</DependentUpon>
+    </Content>
+    <Content Include="assets\styles\documentation.min.css">
+      <DependentUpon>documentation.css</DependentUpon>
     </Content>
     <Content Include="assets\styles\endpointmvc-variables.css">
       <DependentUpon>endpointmvc-variables.less</DependentUpon>
@@ -461,6 +468,13 @@
       <DependentUpon>system.expandable.min.js</DependentUpon>
     </Content>
     <Content Include="Views\Shared\_DirectLink.cshtml" />
+    <Content Include="Views\Shared\_IconPartial.cshtml" />
+    <Content Include="Views\Documentation\DisplayTemplates\ParameterModel.cshtml" />
+    <Content Include="Views\Documentation\DisplayTemplates\Type.cshtml" />
+    <Content Include="assets\styles\documentation.less" />
+    <Content Include="assets\styles\documentation.css.map">
+      <DependentUpon>documentation.css</DependentUpon>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Managed.AndroidDebugBridge\Managed.Adb.csproj">

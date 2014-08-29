@@ -21,5 +21,9 @@ namespace Madb.Site.Models.Documentation {
 				return Name.Slug();
 			}
 		}
+
+		public override string ToString() {
+			return this.Name;
+		}
 	}
 }

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 
 namespace Managed.Adb {
+	/// <ignore>true</ignore>
 	public static partial class ManagedAdbExtenstions {
 		internal static void ThrowIfNegative<T> ( this int argument, Expression<Func<T, string>> func ) {
 			if ( argument < 0 ) {

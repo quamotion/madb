@@ -27,10 +27,15 @@ namespace Madb.Site.Extensions {
 			}
 		}
 
+
+
 		public static string ToSafeFullName(this Type type) {
 				return "{1}.{0}".With(ToSafeName(type), type.Namespace);
 		}
 
+		public static string ToSafeUrlFullName(this Type type) {
+			return "{1}.{0}".With(type.Name.REReplace(@"\[|\]",""), type.Namespace);
+		}
 		
 	}
 }

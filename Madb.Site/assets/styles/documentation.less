@@ -1,0 +1,50 @@
+﻿@import "bootswatch-variables.less";
+@import "endpointmvc-variables.less";
+.method {
+	font-family: Consolas, Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+	white-space: normal;
+	word-spacing: normal;
+	a {
+		text-decoration: underline;
+		-moz-text-decoration-line: underline;
+		text-decoration-line: underline;
+		-moz-text-decoration-color: @text-color;
+		text-decoration-color: @text-color;
+		color: inherit;
+	}
+
+	.method-name {
+	}
+
+	.method-arguments {
+		&:before {
+			content: "(";
+			margin-right: 5px;
+		}
+
+		&:after {
+			content: ")";
+			margin-left: 5px;
+		}
+
+		.method-param-separator {
+			&:after {
+				content: ",";
+				margin-right: 5px;
+			}
+		}
+	}
+
+	.parameter {
+
+		&.parameter-optional {
+			&:before {
+				content: "[";
+			}
+
+			&:after {
+				content: "]";
+			}
+		}
+	}
+}

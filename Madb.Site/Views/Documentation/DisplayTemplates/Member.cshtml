@@ -3,7 +3,7 @@
 	const int scrollOffset = -70;
 }
 <div class="member">
-	@if(Model.Summary.Count > 0) {
+	@if(Model.Summary.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Any()) {
 		<div class="alert alert-success">
 			@foreach(var s in Model.Summary) {
 				if(!string.IsNullOrWhiteSpace(s.Value)) {
@@ -13,7 +13,7 @@
 		</div>
 	}
 
-	@if(Model.Remarks.Count > 0) {
+	@if(Model.Remarks.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Any()) {
 		<div class="alert alert-primary">
 			@foreach(var s in Model.Remarks) {
 				if(!string.IsNullOrWhiteSpace(s.Value)) {
@@ -23,7 +23,7 @@
 		</div>
 	}
 
-	@if(Model.Gists.Count > 0) {
+	@if(Model.Gists.Where(m => !string.IsNullOrWhiteSpace(m.Description)).Any()) {
 		<div class="gist-host">
 			@foreach(var s in Model.Gists) {
 				if(!string.IsNullOrWhiteSpace(s.Description)) {
@@ -34,7 +34,7 @@
 		</div>
 	}
 
-	@if(Model.Params.Count > 0) {
+	@if(Model.Params.Where(m => !string.IsNullOrWhiteSpace(m.Value)).Any()) {
 		<h4 class="zero">Parameters</h4>
 		<div class="">
 			<table class="table table-bordered table-condensed table-striped">
@@ -60,7 +60,7 @@
 			<ul>
 				@foreach(var s in Model.Exceptions) {
 					if(!string.IsNullOrWhiteSpace(s.Link)) {
-						var text = Url.ParseReferenceAsText(string.IsNullOrWhiteSpace(s.Description) ? s.Link : "[{0}] {1}".With(s.Link.Substring(2),s.Description));
+						var text = Url.ParseReferenceAsText(string.IsNullOrWhiteSpace(s.Description) ? s.Link : "[{0}] {1}".With(s.Link.Substring(2), s.Description));
 						// process the link to internals.
 						var link = Url.ParseReferenceUrl(s.Link);
 						<li>

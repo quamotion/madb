@@ -5,9 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Managed.Adb {
-	/// <summary>
-	/// String Helper Class
-	/// </summary>
+	/// <ignore>true</ignore>
 	public static partial class ManagedAdbExtenstions {
 		/// <summary>
 		/// Formats the string with the specified arguments

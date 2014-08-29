@@ -156,19 +156,19 @@ namespace Madb.Site.Services {
 				XmlName = type.GetXmlDocumentationName(),
 				Documentation = xml.GetDocumenation(type),
 				Methods = ProcessMethods(type, xml),
+				IsStatic = type.IsAbstract && type.IsSealed,
 				Properties = ProcessProperties(type,xml)
 			};
 		}
 
 		private IList<PropertyModel> ProcessProperties(Type type, XmlDocument xml) {
-			return type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.DeclaredOnly)
+			return type.GetProperties(System.Reflection.BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.DeclaredOnly)
 				.Where(m => true).Select(m => new PropertyModel {
 					Name = m.Name,
 					Documentation = xml.GetDocumenation(m),
 					XmlName = m.GetXmlDocumentationName(),
-					//GenericParameters = ProcessMethodGenericParameters(m),
-					//Parameters = ProcessParams(m),
-					//ExtensionOf = m.ExtensionOf(),
+					IsStatic = m.GetSetMethod() != null ? m.GetSetMethod().IsStatic : m.GetGetMethod() != null ? m.GetGetMethod().IsStatic : false,
+					IsReadOnly = m.GetSetMethod() == null,
 					Parent = type,
 					ReturnType = m.PropertyType
 				}).OrderBy(x => x.Name).ToList();
@@ -198,6 +198,7 @@ namespace Madb.Site.Services {
 					Parameters = ProcessParams(m),
 					ExtensionOf = m.ExtensionOf(),
 					Parent = type,
+					IsStatic = m.IsStatic,
 					ReturnType = m.ReturnType
 				}).OrderBy(x => x.Name).ThenBy(x => x.ExtensionOf == null ? "" : x.ExtensionOf.ToSafeFullName()).ThenBy(x => x.Parameters.Count).ToList();
 		}

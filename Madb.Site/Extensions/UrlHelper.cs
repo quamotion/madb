@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Mvc.Html;
 using Camalot.Common.Extensions;
 using Camalot.Common.Mvc.Extensions;
 
@@ -29,6 +30,21 @@ namespace Madb.Site.Extensions {
 				return "{0}".With(url.Substring(2));
 			} else {
 				return url;
+			}
+		}
+
+		public static string UrlForType(this UrlHelper helper, Type type) {
+			var baseDocumentationNamespace = helper.RequestContext.RouteData.GetRequiredString("id");
+			if(type.IsInNamespace(baseDocumentationNamespace) || type.IsInChildNamespace(baseDocumentationNamespace)) {
+				// local type
+				return "#{0}".With(type.ToSafeFullName().Slug());
+			} else {
+				// remote type
+				if(type.IsGenericType) {
+					return "http://social.msdn.microsoft.com/Search/en-US?query={0}&ac=3".With(type.ToSafeFullName());
+				} else {
+					return "http://msdn.microsoft.com/en-us/library/{0}.aspx".With(type.ToSafeUrlFullName().ToLowerInvariant());
+				}
 			}
 		}
 	}

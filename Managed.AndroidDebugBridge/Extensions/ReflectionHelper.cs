@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 
 namespace Managed.Adb {
+	/// <ignore>true</ignore>
 	public static partial class ManagedAdbExtenstions {
 		/// <summary>
 		/// Gets the custom attributes.

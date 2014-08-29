@@ -45,6 +45,8 @@
 		@(RenderBody())
 	</div>
 	<div class="clear-fix"></div>
+
+
 	<footer class="navbar-fixed-bottom navbar navbar-default">
 		<div class="container">
 			<div class="center mts text-white">
@@ -61,5 +63,11 @@
 	@(RenderSection("scripts", required: false))
 	@(Html.Partial("Analytics"))
 	@*@(Html.Partial("_AddThisSideBarPartial"))*@
+
+	<div class="go-to-top fade" data-scroll-show-low="265" data-scroll-toggle="fade">
+		<a href="#home" data-scroll="click" class="btn btn-round btn-success btn-lg"><i class="fa fa-arrow-up"></i></a>
+	</div>
+
+
 </body>
 </html>

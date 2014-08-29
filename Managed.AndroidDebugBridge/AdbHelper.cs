@@ -24,6 +24,9 @@ namespace Managed.Adb {
 	/// <summary>
 	/// The ADB Helper class
 	/// </summary>
+	/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
+	/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
+	/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso>
 	public class AdbHelper {
 		/// <summary>
 		/// Logging tag
@@ -68,6 +71,11 @@ namespace Managed.Adb {
 		/// <param name="device">The device.</param>
 		/// <param name="port">The port.</param>
 		/// <returns></returns>
+		/// <exception cref="Managed.Adb.Exceptions.AdbException">
+		/// failed submitting request to ADB
+		/// or
+		/// connection request rejected
+		/// </exception>
 		public Socket Open(IPAddress address, IDevice device, int port) {
 			Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			try {
@@ -164,6 +172,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="address">The address.</param>
 		/// <returns></returns>
+		/// <exception cref="System.IO.IOException">failed asking for adb version</exception>
 		public int GetAdbVersion(IPEndPoint address) {
 			byte[] request = FormAdbRequest("host:version");
 			byte[] reply;
@@ -213,11 +222,18 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Creates and connects a new pass-through socket, from the host to a port on the device.
 		/// </summary>
-		/// <param name="endpoint"></param>
-		/// <param name="device">the device to connect to. Can be null in which case the connection will be 
+		/// <param name="endpoint">The endpoint.</param>
+		/// <param name="device">the device to connect to. Can be null in which case the connection will be
 		/// to the first available device.</param>
 		/// <param name="pid">the process pid to connect to.</param>
-		/// <returns>The Socket</returns>
+		/// <returns>
+		/// The Socket
+		/// </returns>
+		/// <exception cref="Managed.Adb.Exceptions.AdbException">
+		/// failed submitting request to ADB
+		/// or
+		/// connection request rejected:  + resp.Message
+		/// </exception>
 		public Socket CreatePassThroughConnection(IPEndPoint endpoint, Device device, int pid) {
 			Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			try {
@@ -305,6 +321,11 @@ namespace Managed.Adb {
 		/// <param name="data">The data.</param>
 		/// <param name="length">The length.</param>
 		/// <param name="timeout">The timeout.</param>
+		/// <exception cref="Managed.Adb.Exceptions.AdbException">
+		/// channel EOF
+		/// or
+		/// timeout
+		/// </exception>
 		public void Write(Socket socket, byte[] data, int length, int timeout) {
 			//using ( var buf = new MemoryStream ( data, 0, length != -1 ? length : data.Length ) ) {
 			int numWaits = 0;
@@ -416,6 +437,11 @@ namespace Managed.Adb {
 		/// <param name="data">The data.</param>
 		/// <param name="length">The length.</param>
 		/// <param name="timeout">The timeout.</param>
+		/// <exception cref="Managed.Adb.Exceptions.AdbException">
+		/// EOF 
+		/// or 
+		/// No Data to read: exception.Message
+		/// </exception>
 		public void Read(Socket socket, byte[] data, int length, int timeout) {
 			int expLen = length != -1 ? length : data.Length;
 			int count = -1;
@@ -463,6 +489,11 @@ namespace Managed.Adb {
 		/// <param name="localPort">The local port.</param>
 		/// <param name="remotePort">The remote port.</param>
 		/// <returns></returns>
+		/// <exception cref="Managed.Adb.Exceptions.AdbException">
+		/// failed to submit the forward command.
+		/// or
+		/// Device rejected command:  + resp.Message
+		/// </exception>
 		public bool CreateForward(IPEndPoint adbSockAddr, Device device, int localPort, int remotePort) {
 
 			Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -493,8 +524,14 @@ namespace Managed.Adb {
 			return true;
 		}
 
+		/// <summary>
+		/// Lists the forward.
+		/// </summary>
+		/// <param name="address">The address.</param>
+		/// <param name="device">The device.</param>
+		/// <exception cref="System.NotImplementedException"></exception>
 		public void ListForward(IPEndPoint address, Device device) {
-
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -591,6 +628,11 @@ namespace Managed.Adb {
 		/// <param name="adbSockAddr">The adb sock addr.</param>
 		/// <param name="device">The device.</param>
 		/// <returns></returns>
+		/// <exception cref="Managed.Adb.Exceptions.AdbException">
+		/// failed asking for frame buffer
+		/// or
+		/// failed nudging
+		/// </exception>
 		public RawImage GetFrameBuffer(IPEndPoint adbSockAddr, IDevice device) {
 
 			RawImage imageParams = new RawImage();
@@ -685,7 +727,9 @@ namespace Managed.Adb {
 		/// <param name="command">The command.</param>
 		/// <param name="device">The device.</param>
 		/// <param name="rcvr">The RCVR.</param>
-		/// <remarks>Should check if you CanSU before calling this.</remarks>
+		/// <remarks>
+		/// Should check if you CanSU before calling this.
+		/// </remarks>
 		public void ExecuteRemoteRootCommand(IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr) {
 			ExecuteRemoteRootCommand(endPoint, String.Format("su -c \"{0}\"", command), device, rcvr, int.MaxValue);
 		}
@@ -710,10 +754,14 @@ namespace Managed.Adb {
 		/// <param name="device">The device.</param>
 		/// <param name="rcvr">The RCVR.</param>
 		/// <param name="maxTimeToOutputResponse">The max time to output response.</param>
-		/// <exception cref="AdbException">failed submitting shell command</exception>
 		/// <exception cref="System.OperationCanceledException"></exception>
+		/// <exception cref="System.IO.FileNotFoundException">
+		/// </exception>
+		/// <exception cref="Managed.Adb.Exceptions.UnknownOptionException"></exception>
+		/// <exception cref="Managed.Adb.Exceptions.CommandAbortingException"></exception>
+		/// <exception cref="Managed.Adb.Exceptions.PermissionDeniedException"></exception>
 		/// <exception cref="Managed.Adb.Exceptions.ShellCommandUnresponsiveException"></exception>
-		/// <exception cref="System.IO.FileNotFoundException"></exception>
+		/// <exception cref="AdbException">failed submitting shell command</exception>
 		/// <exception cref="UnknownOptionException"></exception>
 		/// <exception cref="CommandAbortingException"></exception>
 		/// <exception cref="PermissionDeniedException"></exception>
@@ -816,6 +864,12 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="adbChan">The adb chan.</param>
 		/// <param name="device">The device.</param>
+		/// <exception cref="Managed.Adb.Exceptions.AdbException">
+		/// failed submitting device ( + device + ) request to ADB
+		/// or
+		/// device ( + device + ) request rejected:  + resp.Message
+		/// </exception>
+		/// <exception cref="Managed.Adb.Exceptions.DeviceNotFoundException"></exception>
 		public void SetDevice(Socket adbChan, IDevice device) {
 			// if the device is not null, then we first tell adb we're looking to talk
 			// to a specific device
@@ -922,14 +976,13 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Executes a raw socket command.
 		/// </summary>
-		/// <param name="adbSockAddr">The adb sock addr.</param>
+		/// <param name="address">The address.</param>
+		/// <param name="device">The device.</param>
 		/// <param name="command">The command.</param>
 		/// <returns></returns>
-		/// <exception cref="AdbException">
-		/// failed to submit the command: {0}.With(command)
+		/// <exception cref="AdbException">failed to submit the command: {0}.With(command)
 		/// or
-		/// Device rejected command: {0}.With(resp.Message)
-		/// </exception>
+		/// Device rejected command: {0}.With(resp.Message)</exception>
 		private Socket ExecuteRawSocketCommand(IPEndPoint address, Device device, string command) {
 			return ExecuteRawSocketCommand(address, device, FormAdbRequest(command));
 		}
@@ -960,13 +1013,18 @@ namespace Managed.Adb {
 		/// <param name="device">The device.</param>
 		/// <param name="command">The command. Should call FormAdbRequest on the string to create the byte array.</param>
 		/// <returns></returns>
-		/// <exception cref="AdbException">
-		/// Device is offline. 
+		/// <exception cref="Managed.Adb.Exceptions.AdbException">
+		/// Device is offline
 		/// or
-		/// failed to submit the command: {0}.With(command)
+		/// failed to submit the command: {0}..With(command.GetString().Trim())
 		/// or
 		/// Device rejected command: {0}.With(resp.Message)
 		/// </exception>
+		/// <exception cref="AdbException">Device is offline.
+		/// or
+		/// failed to submit the command: {0}.With(command)
+		/// or
+		/// Device rejected command: {0}.With(resp.Message)</exception>
 		private Socket ExecuteRawSocketCommand(IPEndPoint address, Device device, byte[] command) {
 			if(device != null && !device.IsOnline) {
 				throw new AdbException("Device is offline");
@@ -989,6 +1047,11 @@ namespace Managed.Adb {
 			return adbChan;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="device">The device.</param>
+		/// <returns></returns>
 		private string HostPrefixFromDevice(IDevice device) {
 			switch(device.TransportType) {
 				case TransportType.Host:

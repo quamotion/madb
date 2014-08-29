@@ -86,6 +86,15 @@
   -webkit-transition: all ease-in-out 300ms;
   transition: all ease-in-out 300ms;
 }
+.go-to-top {
+  position: fixed;
+  right: 30px;
+  bottom: 60px;
+  z-index: 9999;
+}
+.go-to-top a.btn-round {
+  box-shadow: 0 0.2em 0.5em 0 rgba(0, 0, 0, 0.258824);
+}
 .metro-nav {
   margin: 0 0 20px 0;
   padding: 0;

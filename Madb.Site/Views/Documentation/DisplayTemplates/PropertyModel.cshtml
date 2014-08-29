@@ -7,12 +7,16 @@
 <div id="@Model.Id" data-xml-name="@Model.XmlName">
 	<div class="page-header">
 		<h4 class="zero">
-			<i class="fa fa-gavel mrm"></i>
-			<code class="method-returntype"><abbr title="@Model.ReturnType.ToSafeFullName()">@Model.ReturnType.ToSafeName()</abbr></code>
-			<span>
-				<span>@Model.ToString()</span>
+			<i class="fa fa-certificate mrm"></i>
+			<span class="method">
+				<span class="method-returntype">@Html.DisplayFor(m => Model.ReturnType)</span>
+				<span class="method-name">@Model.Name</span>
 			</span>
-			<small class="mll text-muted pull-right">@Html.DirectLink(Model.Id)</small>
+			<small class="mll text-muted pull-right">
+				@Html.StaticIcon(Model.IsStatic)
+				@Html.ReadonlyIcon(Model.IsReadOnly)
+				@Html.DirectLink(Model.Id)
+			</small>
 		</h4>
 
 	</div>

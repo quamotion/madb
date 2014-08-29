@@ -14,6 +14,7 @@ namespace Madb.Site.Models.Documentation {
 		public Type ReturnType { get; set; }
 		public Type Parent { get; set; }
 		public bool IsStatic { get; set; }
+		public bool IsReadOnly { get; set; }
 		public string Id {
 			get {
 				return "{0}.{1}".With(Parent.ToSafeFullName(), Name).Slug();

@@ -32,6 +32,7 @@ namespace Managed.Adb.IO {
 	/// <summary> 
 	/// Big-Endian Binary Reader 
 	/// </summary> 
+	/// <ignore>true</ignore>
 	public class BEBinaryReader : BinaryReader {
 		public BEBinaryReader ( MemoryStream s )
 			: base ( s ) {

@@ -1,0 +1,32 @@
+﻿.method {
+  font-family: Consolas, Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  white-space: normal;
+  word-spacing: normal;
+}
+.method a {
+  text-decoration: underline;
+  -moz-text-decoration-line: underline;
+  text-decoration-line: underline;
+  -moz-text-decoration-color: #333333;
+  text-decoration-color: #333333;
+  color: inherit;
+}
+.method .method-arguments:before {
+  content: "(";
+  margin-right: 5px;
+}
+.method .method-arguments:after {
+  content: ")";
+  margin-left: 5px;
+}
+.method .method-arguments .method-param-separator:after {
+  content: ",";
+  margin-right: 5px;
+}
+.method .parameter.parameter-optional:before {
+  content: "[";
+}
+.method .parameter.parameter-optional:after {
+  content: "]";
+}
+/*# sourceMappingURL=documentation.css.map */

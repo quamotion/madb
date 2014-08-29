@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Managed.Adb {
-	/// <summary>
-	/// 
-	/// </summary>
+	/// <ignore>true</ignore>
 	public static partial class ManagedAdbExtenstions {
 
 		/// <summary>

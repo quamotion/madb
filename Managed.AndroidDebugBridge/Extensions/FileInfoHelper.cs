@@ -5,9 +5,7 @@ using System.Text;
 using System.IO;
 
 namespace Managed.Adb {
-	/// <summary>
-	/// 
-	/// </summary>
+	/// <ignore>true</ignore>
 	public static partial class ManagedAdbExtenstions {
 
 		/// <summary>
