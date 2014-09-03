@@ -1,6 +1,19 @@
 ﻿(function ($, mouseTrap) {
 	"use strict";
 	$(function () {
+
+		$(".root.container").each(function (idx, item) {
+			var self = $(item);
+			var nav = $(".epm-nav");			
+			if (!nav.hasClass("left") && !nav.hasClass("right")) {
+				throw new Error("Navigation is not setup correctly. Missing direction");
+			}
+			var isLeft = nav.hasClass("left");
+
+			// init the root container
+			self.addClass(isLeft ? "left" : "right");
+		});
+
 		// wire up the popovers
 		$("[data-toggle='popover']").each(function () {
 			var self = $(this);
@@ -21,9 +34,14 @@
 				target.removeClass(toggle).addClass(collapsed);
 				self.parent().removeClass(toggle).addClass(collapsed);
 				self.attr("title", "Open");
+
+				// find root container
+				$(".root.container").removeClass("epm-nav-expanded");
 			} else {
 				target.removeClass(collapsed).addClass(toggle);
 				self.parent().removeClass(collapsed).addClass(toggle);
+				// find root container
+				$(".root.container").addClass("epm-nav-expanded");
 				self.attr("title", "Close");
 			}
 			self.trigger("click.epm-mousetrap");
@@ -50,10 +68,18 @@
 		// this clears the search box and resets the navigation
 		$(".epm-nav .nav-search button.clear").on("click", function (event) {
 			$(".epm-nav .nav-search input.search-field").val("").trigger("reset.epm-search");
-		}).on("show-clear.epm-search",function(event){
-			$(this).removeClass("hidden");
+		}).on("show-clear.epm-search", function (event) {
+			var $t = $(this);
+			var clearTitle = $t.data("clear-title") || "Clear";
+			var clearIcon = $t.data("clear-icon") || "fa-close";
+			var searchIcon = $t.data("search-icon") || "fa-search";
+			$t.removeClass(searchIcon).addClass(clearIcon).attr("title",clearTitle);
 		}).on("hide-clear.epm-search", function (event) {
-			$(this).addClass("hidden");
+			var $t = $(this);
+			var searchTitle = $t.data("search-title") || "Search";
+			var clearIcon = $t.data("clear-icon") || "fa-close";
+			var searchIcon = $t.data("search-icon") || "fa-search";
+			$t.removeClass(clearIcon).addClass(searchIcon).attr("title", searchTitle);
 		});
 
 		// set up scrollspy on the body

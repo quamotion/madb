@@ -30,17 +30,7 @@
 	<header>
 		@(Html.Partial("_Navbar"))
 	</header>
-	<div class="container" data-spy="scroll" data-target=".epm-nav .nav">
-		@*<div id="home"></div>
-		<section class="featured jumbotron jumbotron-warning mbl">
-			<div class="container">
-				<div class="title">
-					<i class="logo pull-left"></i>
-					<h1>@(Html.SiteName()).</h1>
-					<h2 class="muted">A managed port of the Android Debug Bridge.</h2>
-				</div>
-			</div>
-		</section>*@
+	<div class="container root epm-nav-expanded" data-spy="scroll" data-target=".epm-nav > .nav">
 		@(RenderSection("featured", required: false))
 		@(RenderBody())
 	</div>

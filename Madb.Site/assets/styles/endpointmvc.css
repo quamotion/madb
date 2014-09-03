@@ -176,9 +176,7 @@
 .epm-nav .nav-search button.clear {
   border: none;
   background-color: transparent;
-  font-size: 1.2em;
-  font-weight: bold;
-  margin: 0 0 0 -20px;
+  margin: 0 0 0 -25px;
   padding: 0;
   color: #ddd;
 }

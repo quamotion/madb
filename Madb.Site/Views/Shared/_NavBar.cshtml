@@ -3,9 +3,9 @@
 }
 <nav class="navbar navbar-default navbar-fixed-top">
 	
-	<div class="pull-left mtm mlm">
+	@*<div class="pull-left mtm mlm">
 		@(Html.Partial("_AddThisCountPartial"))
-	</div>
+	</div>*@
 
 	<div class="container">
 		<div class="pull-right mtm">
@@ -24,19 +24,9 @@
 		</div>
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" data-toggle="dropdown"><i class="mrs fa fa-book text-white"></i><span class="mrs">Documentation</span><b class="caret caret-white"></b></a>
-					<ul class="dropdown-menu">
-						<li><a href="@Url.Action("","")#home" data-scroll="click" data-scroll-offset="@(scrollTopOffset)"><i class="mrs fa fa-home"></i><span>Home</span></a></li>
-						<li class="divider"></li>
-						<li><a href="@Url.Action("","")#about" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-question-circle"></i><span>About</span></a></li>
-						<li><a href="@Url.Action("","")#nuget" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-download"></i><span>Nuget</span></a></li>
-						<li class="divider"></li>
-						<li><a href="@Url.Action("","")#license" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-certificate"></i><span>License</span></a></li>
-						<li class="divider"></li>
-						<li><a href="@Url.Action("","")#documentation" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-book"></i><span>Documentation</span></a></li>
-					</ul>
-				</li>
+				<li><a href="@Url.Action("","")#home" data-scroll="click" data-scroll-offset="@(scrollTopOffset)"><i class="mrs fa fa-home"></i><span>Home</span></a></li>
+				<li><a href="@Url.Action("","")#about" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-question-circle"></i><span>About</span></a></li>
+				<li><a href="@Url.Action("","")#nuget" data-scroll="click" data-scroll-offset="@(scrollTopOffset)" class="track"><i class="mrs fa fa-download"></i><span>Nuget</span></a></li>
 				<li class="divider-vertical"></li>
 				<li class="expandable-label hidden" data-scroll-show-low="265" data-scroll-toggle="hidden"><a href="https://madb.codeplex.com/" target="_blank"><i class="fa fa-external-link" title="Project"></i><span class="label">Project</span></a></li>
 				<li class="expandable-label hidden" data-scroll-show-low="265" data-scroll-toggle="hidden"><a href="https://madb.codeplex.com/SourceControl/latest#trunk/Managed.AndroidDebugBridge/" target="_blank"><i class="fa fa-code-fork" title="Source"></i><span class="label">Source</span></a></li>

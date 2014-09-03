@@ -164,6 +164,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="tag">The tag associated with the message.</param>
 		/// <param name="message">The message to output.</param>
+		/// <gist id="f4fa3525f899e5461d4e" />
 		public static void e ( String tag, String message ) {
 			WriteLine ( LogLevel.Error, tag, message );
 		}
@@ -174,6 +175,7 @@ namespace Managed.Adb {
 		/// <param name="tag">The tag associated with the message.</param>
 		/// <param name="format">The message to output format string.</param>
 		/// <param name="args">The values for the format message</param>
+		/// <gist id="16a731d7e4f074fca809" />
 		public static void e ( String tag, String format, params object[] args ) {
 			WriteLine ( LogLevel.Error, tag, String.Format ( format, args ) );
 		}
@@ -183,6 +185,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="tag">The tag associated with the message.</param>
 		/// <param name="exception">The exception to warn</param>
+		/// <gist id="4e0438f59a00d57af4ef"/>
 		public static void e ( String tag, Exception exception ) {
 			if ( exception != null ) {
 				e ( tag, exception.ToString ( ) );
@@ -195,6 +198,7 @@ namespace Managed.Adb {
 		/// <param name="tag">The tag associated with the message.</param>
 		/// <param name="message">The message to output.</param>
 		/// <param name="exception">The exception to warn</param>
+		/// <gist id="90b6664f4dd84da50b27" />
 		public static void e ( String tag, String message, Exception exception ) {
 			e ( tag, "{0}\n{1}", message, exception );
 		}

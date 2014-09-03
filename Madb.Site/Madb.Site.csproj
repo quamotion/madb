@@ -310,6 +310,7 @@
     <Content Include="assets\fonts\glyphicons-halflings-regular.svg">
       <DependentUpon>glyphicons-halflings-regular.eot</DependentUpon>
     </Content>
+    <Content Include="assets\swf\ZeroClipboard.swf" />
     <Content Include="Global.asax" />
     <Content Include="assets\fonts\glyphicons-halflings-regular.woff">
       <DependentUpon>glyphicons-halflings-regular.eot</DependentUpon>

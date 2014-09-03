@@ -1,14 +1,55 @@
 ﻿@import "bootswatch-variables";
 @import "endpointmvc-variables";
 
+@root-container-horizontal-padding: 60px;
+@body-vertical-padding: 40px;
+
+.root-margin() {
+	&.right {
+		margin-right: (@epm-nav-width + @epm-nav-button-width + 20) - @root-container-horizontal-padding;
+	}
+
+	&.left {
+		margin-left: (@epm-nav-width + @epm-nav-button-width + 20) - @root-container-horizontal-padding;
+	}
+}
+
 body {
-	padding-bottom: 40px;
-	padding-top: 40px;
+	padding-bottom: @body-vertical-padding;
+	padding-top: @body-vertical-padding;
 	cursor: default;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
+
+.root.container {
+	width: auto;
+	padding-right: @root-container-horizontal-padding;
+	padding-left: @root-container-horizontal-padding;
+	margin-right: auto;
+	margin-left: auto;
+	.transition(margin);
+}
+
+
+@media (min-width: 768px) {
+}
+
+@media (min-width: 992px) {
+	.root.container.epm-nav-expanded {
+		.root-margin()
+	}
+}
+
+@media (min-width: 1200px) {
+	.root.container.epm-nav-expanded {
+		.root-margin()
+	}
+}
+
+
+
 
 .icon-camalotcommon {
 	background-image: url("//camalotcommon.bit13.com/assets/images/icon-16.png");
@@ -104,7 +145,7 @@ body {
 
 .go-to-top {
 	position: fixed;
-	right: 30px;
+	left: 30px;
 	bottom: 60px;
 	z-index: 9999;
 

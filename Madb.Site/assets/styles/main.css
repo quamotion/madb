@@ -6,6 +6,33 @@
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+.root.container {
+  width: auto;
+  padding-right: 60px;
+  padding-left: 60px;
+  margin-right: auto;
+  margin-left: auto;
+  -moz-transition: margin linear 300ms;
+  -o-transition: margin linear 300ms;
+  -webkit-transition: margin linear 300ms;
+  transition: margin linear 300ms;
+}
+@media (min-width: 992px) {
+  .root.container.epm-nav-expanded.right {
+    margin-right: 310px;
+  }
+  .root.container.epm-nav-expanded.left {
+    margin-left: 310px;
+  }
+}
+@media (min-width: 1200px) {
+  .root.container.epm-nav-expanded.right {
+    margin-right: 310px;
+  }
+  .root.container.epm-nav-expanded.left {
+    margin-left: 310px;
+  }
+}
 .icon-camalotcommon {
   background-image: url("//camalotcommon.bit13.com/assets/images/icon-16.png");
   background-repeat: no-repeat;
@@ -88,7 +115,7 @@
 }
 .go-to-top {
   position: fixed;
-  right: 30px;
+  left: 30px;
   bottom: 60px;
   z-index: 9999;
 }

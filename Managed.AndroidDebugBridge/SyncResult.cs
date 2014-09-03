@@ -7,7 +7,6 @@ namespace Managed.Adb {
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <ignore>true</ignore>
 	public sealed class SyncResult {
 		/// <summary>
 		/// Initializes a new SyncResult

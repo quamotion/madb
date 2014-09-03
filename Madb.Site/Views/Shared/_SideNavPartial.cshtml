@@ -1,7 +1,7 @@
 ﻿@using Madb.Site.Models;
 @{
-	var navPosition = NavigationPositions.Left;
-	var scrollTopOffset = -50;
+	var navPosition = NavigationPositions.Right;
+	var scrollTopOffset = -70;
 }
 
 <div class="epm-nav-host @(navPosition.ToString().ToLower()) expanded">
@@ -16,7 +16,7 @@
 		<li class="no-filter nav-search man mbs pan">
 			<div class="form-group man pan">
 				<input type="search" placeholder="Search" class="search-field man" />
-				<button type="button" class="clear hidden" title="Clear">&times;</button>
+				<button type="button" class="clear fa fa-search" data-search-icon="fa-search" data-search-title="Search" data-clear-icon="fa-close" data-clear-title="Clear"></button>
 			</div>
 		</li>
 		<li class=""><a data-scroll="click" href="#home"><i class="mrs fa fa-home"></i><span>Home</span></a></li>

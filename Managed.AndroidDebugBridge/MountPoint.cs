@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 
 namespace Managed.Adb {
+	/// <summary>
+	/// Represents a mount point.
+	/// </summary>
 	public class MountPoint : ICloneable {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MountPoint"/> class.

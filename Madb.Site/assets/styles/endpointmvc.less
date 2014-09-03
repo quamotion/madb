@@ -8,7 +8,7 @@
 .epm-nav-host {
 	position: fixed;
 	top: 49px;
-	width: 50px;
+	width: @epm-nav-button-width;
 	z-index: 1036;
 
 	&.expanded {
@@ -121,7 +121,6 @@
 		left: -(@epm-nav-width + 5);
 		border-right: solid 1px @epm-nav-border;
 		.transition(left);
-
 		li {
 			> a {
 				border-right: 2px solid @navbar-default-bg;
@@ -159,7 +158,6 @@
 		right: -(@epm-nav-width + 5);
 		border-left: solid 1px @epm-nav-border;
 		.transition(right);
-
 		li {
 			> a {
 				border-left: 2px solid @navbar-default-bg;
@@ -215,13 +213,16 @@
 		margin: 0 2px 0 0;
 
 		button.clear {
+
 			border: none;
 			background-color: transparent;
-			font-size: 1.2em;
-			font-weight: bold;
-			margin: 0 0 0 -20px;
+			margin: 0 0 0 -25px;
 			padding: 0;
 			color: #ddd;
+
+			&:hover {
+
+			}
 		}
 
 		input[type="search"] {

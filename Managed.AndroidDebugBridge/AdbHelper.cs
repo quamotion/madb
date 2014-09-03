@@ -53,7 +53,7 @@ namespace Managed.Adb {
 		/// </summary>
 		private static AdbHelper _instance = null;
 		/// <summary>
-		/// Gets an instance of the <see cref="AdbHelper"/> class
+		/// Gets an instance of the AdbHelper.
 		/// </summary>
 		public static AdbHelper Instance {
 			get {
@@ -70,7 +70,7 @@ namespace Managed.Adb {
 		/// <param name="address">The address.</param>
 		/// <param name="device">The device.</param>
 		/// <param name="port">The port.</param>
-		/// <returns></returns>
+		/// <returns>The open socket</returns>
 		/// <exception cref="Managed.Adb.Exceptions.AdbException">
 		/// failed submitting request to ADB
 		/// or
@@ -102,11 +102,12 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
-		/// Kills the adb server.
+		/// Kills the running adb server.
 		/// </summary>
 		/// <param name="address">The address.</param>
-		/// <returns></returns>
+		/// <returns>0 for success; -1 for failure.</returns>
 		/// <exception cref="System.IO.IOException">failed asking to kill adb</exception>
+		/// <gist id="cbacc7b384ec7a4c27f7" />
 		public int KillAdb(IPEndPoint address) {
 			byte[] request = FormAdbRequest("host:kill");
 			using(var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
@@ -132,6 +133,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="address">The address.</param>
 		/// <exception cref="System.IO.IOException">failed asking to backup device</exception>
+		/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/backup_service.c">backup_service.c</seealso>
 		[Obsolete("This is not yet functional")]
 		public void Backup(IPEndPoint address) {
 			byte[] request = FormAdbRequest("backup:all");
@@ -162,17 +164,19 @@ namespace Managed.Adb {
 		/// Restores this instance.
 		/// </summary>
 		/// <exception cref="System.NotImplementedException"></exception>
+		/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/backup_service.c">backup_service.c</seealso>
 		[Obsolete("This is not yet functional")]
 		public void Restore() {
 			throw new NotImplementedException();
 		}
 
 		/// <summary>
-		/// Gets the adb version.
+		/// Gets the adb version of the server.
 		/// </summary>
 		/// <param name="address">The address.</param>
-		/// <returns></returns>
+		/// <returns>The version number; or -1 if failure.</returns>
 		/// <exception cref="System.IO.IOException">failed asking for adb version</exception>
+		/// <gist id="3a130af63ca1f94d0152" />
 		public int GetAdbVersion(IPEndPoint address) {
 			byte[] request = FormAdbRequest("host:version");
 			byte[] reply;
@@ -592,7 +596,8 @@ namespace Managed.Adb {
 		/// Gets the devices that are available for communication.
 		/// </summary>
 		/// <param name="address">The address.</param>
-		/// <returns></returns>
+		/// <returns>A list of devices that are connected.</returns>
+		/// <gist id="a8acf10d48370d138247" />
 		public List<Device> GetDevices(IPEndPoint address) {
 			// -l will return additional data
 			using(var socket = ExecuteRawSocketCommand(address, "host:devices-l")) {
@@ -627,7 +632,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="adbSockAddr">The adb sock addr.</param>
 		/// <param name="device">The device.</param>
-		/// <returns></returns>
+		/// <returns>Returns the RawImage.</returns>
 		/// <exception cref="Managed.Adb.Exceptions.AdbException">
 		/// failed asking for frame buffer
 		/// or

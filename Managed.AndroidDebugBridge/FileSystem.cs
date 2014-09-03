@@ -239,11 +239,16 @@ namespace Managed.Adb {
 		/// Deletes the specified path.
 		/// </summary>
 		/// <param name="path">The path.</param>
-		public void Delete ( String path ) {
+		/// <exception cref="System.ArgumentNullException">
+		/// If device is null
+		/// or
+		/// If path is null or empty.
+		/// </exception>
+		/// <gist id="adee6a11c5441da61af8" />
+		/// <exception cref="System.IO.IOException">If the command fails.</exception>
+		public void Delete(String path) {
 			Device.ThrowIfNull ( "Device" );
 			path.ThrowIfNullOrWhiteSpace ( "path" );
-
-			CommandErrorReceiver cer = new CommandErrorReceiver ( );
 			FileEntry entry = Device.FileListingService.FindFileEntry ( path );
 
 			Delete ( entry );
@@ -252,9 +257,15 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Deletes the specified path.
 		/// </summary>
-		/// <param name="path">The path.</param>
+		/// <param name="fileEntry">The file entry.</param>
+		/// <exception cref="System.IO.IOException">If the command fails.</exception>
 		public void Delete ( FileEntry fileEntry ) {
-			Device.ThrowIfNull ( "Device" );
+			/// <exception cref="System.ArgumentNullException">
+			/// If device is null
+			/// or
+			/// If path is null or empty.
+			/// </exception>
+			Device.ThrowIfNull("Device");
 			fileEntry.ThrowIfNull ( "fileEntry" );
 			if ( fileEntry.Exists ) {
 				CommandErrorReceiver cer = new CommandErrorReceiver ( );

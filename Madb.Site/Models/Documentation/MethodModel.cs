@@ -42,14 +42,6 @@ namespace Madb.Site.Models.Documentation {
 					GenericParameters != null && GenericParameters.Count > 0 ? "<{0}>".With(String.Join(", ", GenericParameters.Select(g => g.ToString()))) : ""
 				);
 			}
-			//} else {
-			//	return "{0}.{1}{3} ( {2} )".With(
-			//		ExtensionOf.ToSafeFullName(),
-			//		Name, 
-			//		String.Join(", ", Parameters.Skip(1).Select(p => p.ToString())), 
-			//		GenericParameters != null && GenericParameters.Count > 0 ? "<{0}>".With(String.Join(", ", GenericParameters.Select(g => g.ToString()))) : ""
-			//	);
-			//}
 		}
 	}
 }
