@@ -1,0 +1,89 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb", "Managed.Adb\Managed.Adb.csproj", "{65473257-E70F-410B-9269-D0C0F771EA87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb.Tests", "Managed.Adb.Tests\Managed.Adb.Tests.csproj", "{2C43B828-BE5E-47B6-93BB-A624B6B36633}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rdParty", "3rdParty", "{3F2F4DFF-41B3-45CA-AC47-E00250DCE930}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xunit", "xunit", "{E9A9E417-965C-461D-ABCA-3A32E5BF15B2}"
+	ProjectSection(SolutionItems) = preProject
+		3rdParty\xunit\xunit.dll = 3rdParty\xunit\xunit.dll
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{49EA5373-6CDB-45BE-A763-80F421B8A22E}"
+	ProjectSection(SolutionItems) = preProject
+		Build\BuildAll.msbuild = Build\BuildAll.msbuild
+		Build\madbee.nuspec = Build\madbee.nuspec
+		Build\NuGetPublish.msbuild = Build\NuGetPublish.msbuild
+		Build\publish-changelog.txt = Build\publish-changelog.txt
+		Build\SharedProperties.msbuild = Build\SharedProperties.msbuild
+		Build\WebPublish.msbuild = Build\WebPublish.msbuild
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{9AA331B1-1F41-41B7-B04A-95E8656E560A}"
+	ProjectSection(SolutionItems) = preProject
+		Shared\SharedAssemblyInfo.cs = Shared\SharedAssemblyInfo.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb.Console", "MadBee.Console\Managed.Adb.Console.csproj", "{F9A436F4-0606-4326-8607-9EA4D9E6AF18}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "msbuildtasks", "msbuildtasks", "{2A9166E3-7655-4DB8-9F7A-DB150428821F}"
+	ProjectSection(SolutionItems) = preProject
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.dll = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.dll
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.pdb = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.pdb
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.Targets = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.Targets
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.XML = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.XML
+		3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.xsd = 3rdParty\msbuildtasks\MSBuild.Deployment.Tasks.xsd
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{AA1EF3B1-0792-405E-A5F1-0CE913FC8816}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{4E89FCCE-DDF2-46CE-8E69-9975FD3A39DD}"
+	ProjectSection(SolutionItems) = preProject
+		Build.proj = Build.proj
+		.build\MSBuild.Community.Tasks.dll = .build\MSBuild.Community.Tasks.dll
+		.build\MSBuild.Community.Tasks.targets = .build\MSBuild.Community.Tasks.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ilmerge", "ilmerge", "{325AB15A-3710-4C89-9732-2F46E93036B0}"
+	ProjectSection(SolutionItems) = preProject
+		3rdParty\ilmerge\Download ILMerge from Official Microsoft Download Center.url = 3rdParty\ilmerge\Download ILMerge from Official Microsoft Download Center.url
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{65473257-E70F-410B-9269-D0C0F771EA87}.Debug|x86.ActiveCfg = Debug|x86
+		{65473257-E70F-410B-9269-D0C0F771EA87}.Debug|x86.Build.0 = Debug|x86
+		{65473257-E70F-410B-9269-D0C0F771EA87}.Release|x86.ActiveCfg = Release|x86
+		{65473257-E70F-410B-9269-D0C0F771EA87}.Release|x86.Build.0 = Release|x86
+		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Debug|x86.ActiveCfg = Debug|x86
+		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Debug|x86.Build.0 = Debug|x86
+		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|x86.ActiveCfg = Release|x86
+		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|x86.Build.0 = Release|x86
+		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Debug|x86.ActiveCfg = Debug|x86
+		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Debug|x86.Build.0 = Debug|x86
+		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Release|x86.ActiveCfg = Release|x86
+		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E9A9E417-965C-461D-ABCA-3A32E5BF15B2} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
+		{2A9166E3-7655-4DB8-9F7A-DB150428821F} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
+		{325AB15A-3710-4C89-9732-2F46E93036B0} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
+	EndGlobalSection
+EndGlobal
