@@ -16,7 +16,7 @@
     </dependencies>
 	</metadata>
   <files>
-    <file src="bin\x86\Release\Managed.Adb.dll" target="lib\net35" />
-    <file src="bin\x86\Release\Managed.Adb.pdb" target="lib\net35" />
+    <file src="bin\x86\Release\Managed.Adb.dll" target="lib\net40" />
+    <file src="bin\x86\Release\Managed.Adb.pdb" target="lib\net40" />
   </files>
 </package>

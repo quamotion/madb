@@ -14,9 +14,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MadBee.Console</RootNamespace>
     <AssemblyName>Managed.Adb.Console</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(CCNetLabel)' == '' ">

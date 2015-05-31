@@ -39,7 +39,12 @@ namespace Managed.Adb {
 		/// <summary>
 		/// The default encoding
 		/// </summary>
-		public static String DEFAULT_ENCODING = "ISO-8859-1";
+        public static String DEFAULT_ENCODING = "ISO-8859-1";
+
+        /// <summary>
+        /// The default port to use when connecting to a device over TCP/IP.
+        /// </summary>
+        private const int DEFAULT_PORT = 5555;
 
 		/// <summary>
 		/// Prevents a default instance of the <see cref="AdbHelper"/> class from being created.
@@ -977,6 +982,128 @@ namespace Managed.Adb {
 				// nothing to do...
 			}
 		}
+
+        /// <summary>
+        /// Connect to a device via TCP/IP.
+        /// </summary>
+        /// <param name="helper">
+        /// An instance of the <see cref="AdbHelper"/> class.
+        /// </param>
+        /// <param name="adbEndpoint">
+        /// The socket where the <c>adb</c> server is listening.
+        /// </param>
+        /// <param name="address">
+        /// The IP address of the remote device.
+        /// </param>
+        /// <returns>
+        /// <c>0</c> if the operation completed successfully; otherwise,
+        /// <c>-1</c>.
+        /// </returns>
+        public int Connect(IPEndPoint adbEndpoint, IPAddress address)
+        {
+            if(address == null)
+            {
+                throw new ArgumentNullException("address");
+            }
+
+            return Connect(adbEndpoint, new IPEndPoint(address, DEFAULT_PORT));
+        }
+
+        /// <summary>
+        /// Connect to a device via TCP/IP.
+        /// </summary>
+        /// <param name="helper">
+        /// An instance of the <see cref="AdbHelper"/> class.
+        /// </param>
+        /// <param name="adbEndpoint">
+        /// The socket where the <c>adb</c> server is listening.
+        /// </param>
+        /// <param name="host">
+        /// The host address of the remote device.
+        /// </param>
+        /// <returns>
+        /// <c>0</c> if the operation completed successfully; otherwise,
+        /// <c>-1</c>.
+        /// </returns>
+        public int Connect(IPEndPoint adbEndpoint, string host)
+        {
+            if(string.IsNullOrEmpty(host))
+            {
+                throw new ArgumentNullException("host");
+            }
+
+            return this.Connect(adbEndpoint, new DnsEndPoint(host, DEFAULT_PORT));
+        }
+
+        /// <summary>
+        /// Connect to a device via TCP/IP.
+        /// </summary>
+        /// <param name="helper">
+        /// An instance of the <see cref="AdbHelper"/> class.
+        /// </param>
+        /// <param name="adbEndpoint">
+        /// The socket where the <c>adb</c> server is listening.
+        /// </param>
+        /// <param name="endpoint">
+        /// The IP endpoint at which the <c>adb</c> server on the device is running.
+        /// </param>
+        /// <returns>
+        /// <c>0</c> if the operation completed successfully; otherwise,
+        /// <c>-1</c>.
+        /// </returns>
+        public int Connect(IPEndPoint adbEndpoint, IPEndPoint endpoint)
+        {
+            if(endpoint == null)
+            {
+                throw new ArgumentNullException("endpoint");
+            }
+
+            return this.Connect(adbEndpoint, new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port));
+        }
+
+        /// <summary>
+        /// Connect to a device via TCP/IP.
+        /// </summary>
+        /// <param name="helper">
+        /// An instance of the <see cref="AdbHelper"/> class.
+        /// </param>
+        /// <param name="adbEndpoint">
+        /// The socket where the <c>adb</c> server is listening.
+        /// </param>
+        /// <param name="endpoint">
+        /// The DNS endpoint at which the <c>adb</c> server on the device is running.
+        /// </param>
+        /// <returns>
+        /// <c>0</c> if the operation completed successfully; otherwise,
+        /// <c>-1</c>.
+        /// </returns>
+        public int Connect(IPEndPoint adbEndpoint, DnsEndPoint endpoint)
+        {
+            if (endpoint == null)
+            {
+                throw new ArgumentNullException("endpoint");
+            }
+
+            byte[] request = this.FormAdbRequest(string.Format("host:connect:{0}:{1}", endpoint.Host, endpoint.Port));
+
+            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
+                socket.Connect(adbEndpoint);
+                socket.Blocking = true;
+                if (!this.Write(socket, request))
+                {
+                    throw new IOException("failed submitting request to  adb");
+                }
+                var resp = this.ReadAdbResponse(socket, false);
+                if (!resp.IOSuccess || !resp.Okay)
+                {
+                    Log.e(TAG, "Got timeout or unhappy response from ADB req: " + resp.Message);
+                    socket.Close();
+                    return -1;
+                }
+                return 0;
+            }
+        }
 
 		/// <summary>
 		/// Executes a raw socket command.
