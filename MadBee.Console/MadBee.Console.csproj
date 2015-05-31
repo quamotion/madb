@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<Import Project="$(MSBuildProjectDirectory)\..\Build\SharedProperties.msbuild" Condition="Exists('$(MSBuildProjectDirectory)\..\Build\SharedProperties.msbuild') AND '$(SharedProperties)' != 'SharedProperties' " />
-	<PropertyGroup>
+  <Import Project="$(MSBuildProjectDirectory)\..\Build\SharedProperties.msbuild" Condition="Exists('$(MSBuildProjectDirectory)\..\Build\SharedProperties.msbuild') AND '$(SharedProperties)' != 'SharedProperties' " />
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <PlatformTarget>$(Platform)</PlatformTarget>
@@ -24,25 +24,6 @@
     <CCNetLabel Condition=" '$(CCNetLabel)' == '' ">0.5.0.1</CCNetLabel>
     <OutputPath Condition=" '$(OutputPath)' == '' ">..\bin\$(Configuration)\$(CCNetLabel)\$(Platform)\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>$(PlatformConstant);DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-    <Optimize>true</Optimize>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <DefineConstants>$(PlatformConstant);TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>$(PlatformConstant);DEBUG;TRACE</DefineConstants>
@@ -64,6 +45,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Managd.Adb.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -76,16 +60,16 @@
     <Compile Include="..\Shared\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-		<Compile Include="..\Shared\AssemblyVersionInfo.cs" Condition="Exists('..\Shared\AssemblyVersionInfo.cs')">
-			<Link>Properties\AssemblyVersionInfo.cs</Link>
-		</Compile>
-
-		<Compile Include="Arguments.cs" />
+    <Compile Include="..\Shared\AssemblyVersionInfo.cs" Condition="Exists('..\Shared\AssemblyVersionInfo.cs')">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="Arguments.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Managd.Adb.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Managed.AndroidDebugBridge\Managed.Adb.csproj">
