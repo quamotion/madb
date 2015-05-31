@@ -1,0 +1,14 @@
+version: 1.0.{build}.0
+assembly_info:
+  patch: true
+  file: Shared\SharedAssemblyInfo.cs
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+
+build_script:
+  - msbuild Managed.Adb.sln /p:Configuration=Release /p:Platform=x86 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+nuget:
+  project_feed: true
+  account_feed: true
+

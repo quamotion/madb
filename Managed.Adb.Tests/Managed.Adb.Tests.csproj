@@ -57,9 +57,6 @@
     <Compile Include="..\Shared\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Shared\AssemblyVersionInfo.cs" Condition="Exists('..\Shared\AssemblyVersionInfo.cs')">
-      <Link>Properties\AssemblyVersionInfo.cs</Link>
-    </Compile>
     <Compile Include="AdbHelperTests.cs" />
     <Compile Include="AndroidDebugBridgeTests.cs" />
     <Compile Include="BaseDeviceTests.cs" />
