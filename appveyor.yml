@@ -1,4 +1,9 @@
 version: 1.0.{build}.0
+
+environment:
+  NuGetApiKey:
+    secure: uNF4gY8KN67ODxKkGPBIz+5MDdf3MRtz4Vi+9McPhWYi4Z6YMQvOcTQRWZYd/N9b
+
 assembly_info:
   patch: true
   file: Shared\SharedAssemblyInfo.cs
@@ -9,7 +14,9 @@ build_script:
   - msbuild Managed.Adb.sln /p:Configuration=Release /p:Platform=x86 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 on_success:
-  - cmd: nuget pack Managed.Adb.nuspec -Version {version}
+  - cmd: nuget pack Managed.Adb.nuspec -Version %APPVEYOR_BUILD_VERSION%
+  - cmd: nuget setApiKey %NuGetApiKey%
+  - cmd: nuget push Managed.Adb.{version}.nupkg
   - ps: Push-AppveyorArtifact "Managed.Adb.$($env:APPVEYOR_BUILD_VERSION).nupkg"
 
 test:
