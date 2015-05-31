@@ -26,11 +26,13 @@ namespace Managed.Adb {
 		/// </summary>
 		BootLoader,
 		/// <summary>
-		/// 
+        /// The instance is not connected to adb or is not responding.
 		/// </summary>
 		Offline,
 		/// <summary>
-		/// 
+        /// The instance is now connected to the adb server. Note that this state does not imply that the Android system is 
+        /// fully booted and operational, since the instance connects to adb while the system is still booting. 
+        /// However, after boot-up, this is the normal operational state of an emulator/device instance.
 		/// </summary>
 		Online,
 		/// <summary>
@@ -40,7 +42,9 @@ namespace Managed.Adb {
 		/// <summary>
 		/// 
 		/// </summary>
-		Unknown
+		Unknown,
+
+        Unauthorized
 	}
 
 	/// <summary>
@@ -107,7 +111,7 @@ namespace Managed.Adb {
 		/// Device list info regex
 		/// </summary>
 		/// <workitem>21136</workitem>
-        private const string RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
+        private const string RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download|unauthorized)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
         
         /// <summary>
 		/// Tag
@@ -416,6 +420,17 @@ namespace Managed.Adb {
 			get { return State == DeviceState.Recovery; }
 		}
 
+        /// <summary>
+        /// Gets a value indicating whether this instance is unauthorized.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is unauthorized; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsUnauthorized
+        {
+            get { return State == DeviceState.Unauthorized; }
+        }
+
 		/// <summary>
 		/// Remounts the mount point.
 		/// </summary>
@@ -447,7 +462,7 @@ namespace Managed.Adb {
 		/// Refreshes the mount points.
 		/// </summary>
 		public void RefreshMountPoints() {
-			if(!IsOffline) {
+			if(IsOnline) {
 				try {
 					this.ExecuteShellCommand(MountPointReceiver.MOUNT_COMMAND, new MountPointReceiver(this));
 				} catch(AdbException) {
@@ -460,7 +475,7 @@ namespace Managed.Adb {
 		/// Refreshes the environment variables.
 		/// </summary>
 		public void RefreshEnvironmentVariables() {
-			if(!IsOffline) {
+			if(IsOnline) {
 				try {
 					this.ExecuteShellCommand(EnvironmentVariablesReceiver.ENV_COMMAND, new EnvironmentVariablesReceiver(this));
 				} catch(AdbException) {
@@ -473,7 +488,7 @@ namespace Managed.Adb {
 		/// Refreshes the properties.
 		/// </summary>
 		public void RefreshProperties() {
-			if(!IsOffline) {
+			if(IsOnline) {
 				try {
 					this.ExecuteShellCommand(GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver(this));
 				} catch(AdbException aex) {

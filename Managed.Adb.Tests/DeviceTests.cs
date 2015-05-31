@@ -34,5 +34,18 @@ namespace Managed.Adb.Tests {
             Assert.AreEqual<string>("donatello", device.DeviceProperty);
             Assert.AreEqual<DeviceState>(DeviceState.Offline, device.State);
         }
+
+        [TestMethod]
+        public void CreateFromDeviceDataUnauthorizedTest()
+        {
+            string data = "R32D102SZAE            unauthorized";
+
+            var device = Device.CreateFromAdbData(data);
+            Assert.AreEqual<string>("R32D102SZAE", device.SerialNumber);
+            Assert.AreEqual<string>("", device.Product);
+            Assert.AreEqual<string>("", device.Model);
+            Assert.AreEqual<string>("", device.DeviceProperty);
+            Assert.AreEqual<DeviceState>(DeviceState.Unauthorized, device.State);
+        }
 	}
 }
