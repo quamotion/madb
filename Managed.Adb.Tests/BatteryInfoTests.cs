@@ -1,19 +1,21 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Xunit;
 
 namespace Managed.Adb.Tests {
+    [TestClass]
 	public class BatteryInfoTests : BaseDeviceTests {
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void GetBatteryInfoTest ( ) {
 			Device device = GetFirstDevice ( );
-			Assert.NotNull ( device );
+			Assert.IsNotNull ( device );
 
 			var batteryInfo = device.GetBatteryInfo ( );
-			Assert.True ( batteryInfo.Present );
+			Assert.IsTrue ( batteryInfo.Present );
 			Console.WriteLine ( batteryInfo.ToString ( ) );
 		}
 

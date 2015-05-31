@@ -1,13 +1,15 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Xunit;
 
 namespace Managed.Adb.Tests {
+    [TestClass]
 	public class FileEntryTests : BaseDeviceTests {
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void FindEntryTest ( ) {
 			Device device = GetFirstDevice ( );
 
@@ -22,12 +24,13 @@ namespace Managed.Adb.Tests {
 		}
 
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void FindOrCreateTest( ) {
 			Device device = GetFirstDevice ( );
 			var path ="/mnt/sdcard/test/delete/";
 			FileEntry fe = FileEntry.FindOrCreate ( device, path );
-			Assert.True ( fe.Exists );
+			Assert.IsTrue ( fe.Exists );
 			device.FileSystem.Delete ( fe.FullResolvedPath );
 		}
 

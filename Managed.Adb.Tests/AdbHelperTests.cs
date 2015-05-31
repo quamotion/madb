@@ -2,65 +2,67 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Xunit;
 using System.IO;
 using Managed.Adb.IO;
 using System.Drawing.Imaging;
 using Managed.Adb.Exceptions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Managed.Adb.Tests {
+    [TestClass]
 	public class AdbHelperTests : BaseDeviceTests {
 
 
-		[Fact]
+		[TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void GetDevicesTest ( ) {
 			List<Device> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
-			Assert.True ( devices.Count >= 1 );
+			Assert.IsTrue ( devices.Count >= 1 );
 			foreach ( var item in devices ) {
 				Console.WriteLine ( "{0}\t{1}{2}", item.SerialNumber, item.State, item.IsEmulator ? " - Emulator" : String.Empty );
 			}
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void KillAdbTest ( ) {
 			var device = GetFirstDevice ( );
 			AdbHelper.Instance.KillAdb ( AndroidDebugBridge.SocketAddress );
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void DeviceGetMountPointsTest ( ) {
 			Device device = GetFirstDevice ( );
 			foreach ( var item in device.MountPoints.Keys ) {
 				Console.WriteLine ( device.MountPoints[item] );
 			}
 
-			Assert.True ( device.MountPoints.ContainsKey ( "/system" ) );
+			Assert.IsTrue ( device.MountPoints.ContainsKey ( "/system" ) );
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void DeviceRemountMountPointTest ( ) {
 			Device device = GetFirstDevice ( );
 
-			Assert.True ( device.MountPoints.ContainsKey ( "/system" ), "Device does not contain mount point /system" );
+			Assert.IsTrue ( device.MountPoints.ContainsKey ( "/system" ), "Device does not contain mount point /system" );
 			bool isReadOnly = device.MountPoints["/system"].IsReadOnly;
 
-			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-				device.RemountMountPoint ( device.MountPoints["/system"], !isReadOnly );
-			} ) );
+			device.RemountMountPoint ( device.MountPoints["/system"], !isReadOnly );
 
-			Assert.Equal<bool> ( !isReadOnly, device.MountPoints["/system"].IsReadOnly );
+			Assert.AreEqual<bool> ( !isReadOnly, device.MountPoints["/system"].IsReadOnly );
 			Console.WriteLine ( "Successfully mounted /system as {0}", !isReadOnly ? "ro" : "rw" );
 
 			// revert it back...
-			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-				device.RemountMountPoint ( device.MountPoints["/system"], isReadOnly );
-			} ) );
-			Assert.Equal<bool> ( isReadOnly, device.MountPoints["/system"].IsReadOnly );
+			device.RemountMountPoint ( device.MountPoints["/system"], isReadOnly );
+			Assert.AreEqual<bool> ( isReadOnly, device.MountPoints["/system"].IsReadOnly );
 			Console.WriteLine ( "Successfully mounted /system as {0}", isReadOnly ? "ro" : "rw" );
 
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void ExecuteRemoteCommandTest ( ) {
 
 			Device device = GetFirstDevice ( );
@@ -70,82 +72,92 @@ namespace Managed.Adb.Tests {
 			device.ExecuteShellCommand("pm list packages -f",creciever);
 
 			Console.WriteLine ( "Executing 'ls':" );
-			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-				try {
-					device.ExecuteShellCommand ( "ls -lF --color=never", creciever );
-				} catch ( UnknownOptionException ) {
-					device.ExecuteShellCommand ( "ls -l", creciever );
-				}
-			} ) );
+			try {
+				device.ExecuteShellCommand ( "ls -lF --color=never", creciever );
+			} catch ( UnknownOptionException ) {
+				device.ExecuteShellCommand ( "ls -l", creciever );
+			}
 
 
 			Console.WriteLine ( "Executing 'busybox':" );
-			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-				bool hasBB = false;
-				try {
-					device.ExecuteShellCommand ( "busybox", creciever );
-					hasBB = true;
-				} catch ( FileNotFoundException ) {
-					hasBB = false;
-				} finally {
-					Console.WriteLine ( "Busybox enabled: {0}", hasBB );
-				}
-			} ) );
+			bool hasBB = false;
+			try {
+				device.ExecuteShellCommand ( "busybox", creciever );
+				hasBB = true;
+			} catch ( FileNotFoundException ) {
+				hasBB = false;
+			} finally {
+				Console.WriteLine ( "Busybox enabled: {0}", hasBB );
+			}
 
 			Console.WriteLine ( "Executing 'unknowncommand':" );
-			Assert.Throws<FileNotFoundException> ( new Assert.ThrowsDelegate ( delegate ( ) {
+            try {
 				device.ExecuteShellCommand ( "unknowncommand", creciever );
-			} ) );
+                Assert.Fail();
+			} catch(FileNotFoundException)
+            {
+                // Expected exception
+            }
 
 			Console.WriteLine ( "Executing 'ls /system/foo'" );
-			Assert.Throws<FileNotFoundException> ( new Assert.ThrowsDelegate ( delegate ( ) {
+            try {
 				device.ExecuteShellCommand ("ls /system/foo", creciever );
-			} ) );
+                Assert.Fail();
+			} catch(FileNotFoundException)
+            {
+                // Expected exception
+            }
 
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void ExecuteRemoteRootCommandTest( ) {
 			Device device = GetFirstDevice ( );
 			ConsoleOutputReceiver creciever = new ConsoleOutputReceiver ( );
 
 			Console.WriteLine ( "Executing 'ls':" );
 			if ( device.CanSU ( ) ) {
-				Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-					try {
-						device.ExecuteRootShellCommand ( "busybox ls -lFa --color=never", creciever );
-					} catch ( UnknownOptionException ) {
-						device.ExecuteRootShellCommand ( "ls -lF", creciever );
-					}
-				} ) );
+				try {
+					device.ExecuteRootShellCommand ( "busybox ls -lFa --color=never", creciever );
+				} catch ( UnknownOptionException ) {
+					device.ExecuteRootShellCommand ( "ls -lF", creciever );
+				}
 			} else {
 				// if the device doesn't have root, then we check that it is throwing the PermissionDeniedException
-				Assert.Throws<PermissionDeniedException> ( new Assert.ThrowsDelegate(delegate ( ) {
+				try {
 					try {
 						device.ExecuteRootShellCommand ( "busybox ls -lFa --color=never", creciever );
 					} catch ( UnknownOptionException ) {
 						device.ExecuteRootShellCommand ( "ls -lF", creciever );
 					}
-				} ) );
+
+                    Assert.Fail();
+                } catch (PermissionDeniedException) {
+                    // Expected exception
+                }
+
 			}
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void GetRawImageTest ( ) {
 			Device device = GetFirstDevice ( );
 
 			RawImage rawImage = device.Screenshot;
 
-			Assert.NotNull ( rawImage );
-			Assert.Equal<int> ( 32, rawImage.Bpp );
-			Assert.Equal<int> ( 480, rawImage.Width );
-			Assert.Equal<int> ( 800, rawImage.Height );
+			Assert.IsNotNull ( rawImage );
+			Assert.AreEqual<int> ( 32, rawImage.Bpp );
+			Assert.AreEqual<int> ( 480, rawImage.Width );
+			Assert.AreEqual<int> ( 800, rawImage.Height );
 
 			rawImage.ToImage ( PixelFormat.Format32bppArgb ).Save ( @"c:\Users\Ryan\Desktop\file.png",ImageFormat.Png );
 
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void FileListingServiceTest ( ) {
 			Device device = GetFirstDevice ( );
 			device.FileListingService.ForceBusyBox = true;
@@ -155,7 +167,8 @@ namespace Managed.Adb.Tests {
 			}
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void SyncServicePullFileTest ( ) {
 			Device device = GetFirstDevice ( );
 			using ( SyncService sync = device.SyncService ) {
@@ -167,19 +180,20 @@ namespace Managed.Adb.Tests {
 				FileInfo lfi = new FileInfo ( lfile );
 				SyncResult result = sync.PullFile ( rfile, lfile, new FileSyncProgressMonitor ( ) );
 
-				Assert.True ( lfi.Exists );
-				Assert.True ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
+				Assert.IsTrue ( lfi.Exists );
+				Assert.IsTrue ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
 				lfi.Delete ( );
 
 				result = sync.PullFile ( rentry, lfile, new FileSyncProgressMonitor ( ) );
-				Assert.True ( lfi.Exists );
-				Assert.True ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
+				Assert.IsTrue ( lfi.Exists );
+				Assert.IsTrue ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
 				lfi.Delete ( );
 
 			}
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void SyncServicePushFileTest ( ) {
 			String testFile = CreateTestFile ( );
 			FileInfo localFile = new FileInfo ( testFile );
@@ -189,21 +203,20 @@ namespace Managed.Adb.Tests {
 
 			using ( SyncService sync = device.SyncService ) {
 				SyncResult result = sync.PushFile ( localFile.FullName, remoteFile, new FileSyncProgressMonitor ( ) );
-				Assert.True ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
+				Assert.IsTrue ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
 				FileEntry remoteEntry = null;
-				Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-					remoteEntry = device.FileListingService.FindFileEntry ( remoteFile );
-				} ) );
+				remoteEntry = device.FileListingService.FindFileEntry ( remoteFile );
 
 				// check the size
-				Assert.Equal<long> ( localFile.Length, remoteEntry.Size );
+				Assert.AreEqual<long> ( localFile.Length, remoteEntry.Size );
 
 				// clean up temp file on sdcard
 				device.ExecuteShellCommand ( String.Format ( "rm {0}", remoteEntry.FullEscapedPath ), new ConsoleOutputReceiver ( ) );
 			}
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void SyncServicePullFilesTest ( ) {
 			Device device = GetFirstDevice ( );
 			using ( SyncService sync = device.SyncService ) {
@@ -214,54 +227,54 @@ namespace Managed.Adb.Tests {
 					ldir.Create ( );
 				}
 				FileEntry fentry = device.FileListingService.FindFileEntry ( rpath );
-				Assert.True ( fentry.IsDirectory );
+				Assert.IsTrue ( fentry.IsDirectory );
 
 				FileEntry[] entries = device.FileListingService.GetChildren ( fentry, false, null );
 				SyncResult result = sync.Pull ( entries, ldir.FullName, new FileSyncProgressMonitor ( ) );
 
-				Assert.True ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
+				Assert.IsTrue ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
 			}
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void DeviceInstallPackageTest ( ) {
 			Device device = GetFirstDevice ( );
 			String package = Path.Combine ( Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ), "com.camalotdesigns.httpdump.apk" );
-			Assert.True ( File.Exists ( package ) );
+			Assert.IsTrue ( File.Exists ( package ) );
 
-			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-				device.InstallPackage ( package, false );
-			} ) );
+			device.InstallPackage ( package, false );
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void DeviceUninstallPackageTest ( ) {
 			Device device = GetFirstDevice ( );
-			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-				device.UninstallPackage ( "com.camalotdesigns.httpdump" );
-			} ) );
+			device.UninstallPackage ( "com.camalotdesigns.httpdump" );
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void DeviceEnvironmentVariablesTest ( ) {
 			Device device = GetFirstDevice ( );
 			foreach ( var key in device.EnvironmentVariables.Keys ) {
 				Console.WriteLine ( "{0}={1}", key, device.EnvironmentVariables[key] );
 			}
 
-			Assert.True ( device.EnvironmentVariables.Count > 0 );
-			Assert.True ( device.EnvironmentVariables.ContainsKey ( "ANDROID_ROOT" ) );
+			Assert.IsTrue ( device.EnvironmentVariables.Count > 0 );
+			Assert.IsTrue ( device.EnvironmentVariables.ContainsKey ( "ANDROID_ROOT" ) );
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void DevicePropertiesTest ( ) {
 			Device device = GetFirstDevice ( );
 			foreach ( var key in device.Properties.Keys ) {
 				Console.WriteLine ( "[{0}]: {1}", key, device.Properties[key] );
 			}
 
-			Assert.True ( device.Properties.Count > 0 );
-			Assert.True ( device.Properties.ContainsKey ( "ro.product.device" ) );
+			Assert.IsTrue ( device.Properties.Count > 0 );
+			Assert.IsTrue ( device.Properties.ContainsKey ( "ro.product.device" ) );
 		}
 
 		

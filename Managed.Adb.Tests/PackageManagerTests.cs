@@ -1,39 +1,40 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Xunit;
 
 namespace Managed.Adb.Tests {
+    [TestClass]
 	public class PackageManagerTests {
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void ExistsTest ( ) {
 			Device device = GetFirstDevice ( );
 
 			PackageManager pm = new PackageManager ( device );
-			Assert.True ( pm.Exists ( "com.android.contacts" ) );
-			Assert.False ( pm.Exists ( "foo.bar.package" ) );
+			Assert.IsTrue ( pm.Exists ( "com.android.contacts" ) );
+			Assert.IsFalse ( pm.Exists ( "foo.bar.package" ) );
 
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void RefreshPackagesTest ( ) {
 			Device device = GetFirstDevice ( );
 
 			PackageManager pm = new PackageManager ( device );
-			Assert.DoesNotThrow ( new Assert.ThrowsDelegate ( delegate ( ) {
-				pm.RefreshPackages ( );
-			} ) );
+		    pm.RefreshPackages ( );
 
-			Assert.True ( pm.Packages.ContainsKey ( "com.android.contacts" ) );
-			Assert.True ( pm.Packages.ContainsKey ( "android" ) ); // the framework
+			Assert.IsTrue ( pm.Packages.ContainsKey ( "com.android.contacts" ) );
+			Assert.IsTrue ( pm.Packages.ContainsKey ( "android" ) ); // the framework
 		}
 
 
 		private Device GetFirstDevice ( ) {
 			List<Device> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
-			Assert.True ( devices.Count >= 1 );
+			Assert.IsTrue ( devices.Count >= 1 );
 			return devices[0];
 		}
 	}

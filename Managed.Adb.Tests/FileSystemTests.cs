@@ -2,49 +2,53 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Xunit;
 using MoreLinq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Managed.Adb.Tests {
+    [TestClass]
 	public class FileSystemTests : BaseDeviceTests {
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void GetDeviceBlocksTest( ) {
 			Device d = GetFirstDevice ( );
 			IEnumerable<FileEntry> blocks = d.FileSystem.DeviceBlocks;
 			blocks.ForEach ( b => {
 				Console.WriteLine ( b.ToString ( ) );
 			} );
-			Assert.True ( blocks.Count() > 0 );
+			Assert.IsTrue ( blocks.Count() > 0 );
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void MakeDirectory( ) {
 			Device d = GetFirstDevice ( );
 			var testPath = "/mnt/sdcard/test/delete/";
 			Console.WriteLine ( "Making directory: {0}", testPath );
 			d.FileSystem.MakeDirectory ( testPath );
-			Assert.True ( d.FileSystem.Exists ( testPath ) );
+			Assert.IsTrue ( d.FileSystem.Exists ( testPath ) );
 			Console.WriteLine ( "Deleting {0}", testPath );
 			d.FileSystem.Delete(testPath);
-			Assert.True ( !d.FileSystem.Exists ( testPath ) );
+			Assert.IsTrue ( !d.FileSystem.Exists ( testPath ) );
 
 			Console.WriteLine ( "Making directory (forced): {0}", testPath );
 			d.FileSystem.MakeDirectory ( testPath,true );
-			Assert.True ( d.FileSystem.Exists ( testPath ) );
+			Assert.IsTrue ( d.FileSystem.Exists ( testPath ) );
 			Console.WriteLine ( "Deleting {0}", testPath );
 			d.FileSystem.Delete ( testPath );
-			Assert.True ( !d.FileSystem.Exists ( testPath ) );
+			Assert.IsTrue ( !d.FileSystem.Exists ( testPath ) );
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void ResolveLink ( ) {
 			Device d = GetFirstDevice ( );
 			var vendor = d.FileSystem.ResolveLink ( "/vendor" );
-			Assert.Equal ( vendor, "/system/vendor" );
+			Assert.AreEqual ( vendor, "/system/vendor" );
 			Console.WriteLine ( "/vendor -> {0}".With ( vendor ) );
 
 			var nonsymlink = d.FileSystem.ResolveLink ( "/system" );
-			Assert.Equal ( nonsymlink, "/system" );
+			Assert.AreEqual ( nonsymlink, "/system" );
 			Console.WriteLine ( "/system -> {0}".With ( nonsymlink ) );
 
 
@@ -53,7 +57,7 @@ namespace Managed.Adb.Tests {
 
 			var sdcard = d.FileSystem.ResolveLink ( "/sdcard" );
 			// depending on the version of android
-			Assert.True ( sdcard.Equals ( legacy ) || sdcard.Equals ( sdcard0 ) );
+			Assert.IsTrue ( sdcard.Equals ( legacy ) || sdcard.Equals ( sdcard0 ) );
 			Console.WriteLine ( "/sdcard -> {0}".With ( sdcard ) );
 
 		}

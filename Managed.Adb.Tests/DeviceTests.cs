@@ -1,19 +1,22 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Xunit;
 
 namespace Managed.Adb.Tests {
+    [TestClass]
 	public class DeviceTests : BaseDeviceTests {
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void CanBackupTest ( ) {
 			var device = GetFirstDevice ( );
 
-			Assert.True ( device.CanBackup ( ) );
+			Assert.IsTrue ( device.CanBackup ( ) );
 		}
 
-		[Fact]
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
 		public void BackupTest ( ) {
 			var device = GetFirstDevice ( );
 			device.Backup ( );
