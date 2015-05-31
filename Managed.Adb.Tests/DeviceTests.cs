@@ -21,5 +21,18 @@ namespace Managed.Adb.Tests {
 			var device = GetFirstDevice ( );
 			device.Backup ( );
 		}
+
+        [TestMethod]
+        public void CreateFromDeviceDataVSEmulatorTest()
+        {
+            string data = @"169.254.138.177:5555   offline product:VS Emulator Android Device - 480 x 800 model:Android_Device___480_x_800 device:donatello";
+
+            var device = Device.CreateFromAdbData(data);
+            Assert.AreEqual<string>("169.254.138.177:5555", device.SerialNumber);
+            Assert.AreEqual<string>("VS Emulator Android Device - 480 x 800", device.Product);
+            Assert.AreEqual<string>("Android_Device___480_x_800", device.Model);
+            Assert.AreEqual<string>("donatello", device.DeviceProperty);
+            Assert.AreEqual<DeviceState>(DeviceState.Offline, device.State);
+        }
 	}
 }

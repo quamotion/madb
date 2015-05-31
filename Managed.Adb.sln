@@ -7,13 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb", "Managed.Adb\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb.Tests", "Managed.Adb.Tests\Managed.Adb.Tests.csproj", "{2C43B828-BE5E-47B6-93BB-A624B6B36633}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rdParty", "3rdParty", "{3F2F4DFF-41B3-45CA-AC47-E00250DCE930}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xunit", "xunit", "{E9A9E417-965C-461D-ABCA-3A32E5BF15B2}"
-	ProjectSection(SolutionItems) = preProject
-		3rdParty\xunit\xunit.dll = 3rdParty\xunit\xunit.dll
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{9AA331B1-1F41-41B7-B04A-95E8656E560A}"
 	ProjectSection(SolutionItems) = preProject
 		Shared\SharedAssemblyInfo.cs = Shared\SharedAssemblyInfo.cs
@@ -24,13 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{AA1EF3
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{4E89FCCE-DDF2-46CE-8E69-9975FD3A39DD}"
-	ProjectSection(SolutionItems) = preProject
-		Build.proj = Build.proj
-		.build\MSBuild.Community.Tasks.dll = .build\MSBuild.Community.Tasks.dll
-		.build\MSBuild.Community.Tasks.targets = .build\MSBuild.Community.Tasks.targets
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb.Console", "Managed.Adb.Console\Managed.Adb.Console.csproj", "{F9A436F4-0606-4326-8607-9EA4D9E6AF18}"
@@ -80,8 +66,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{E9A9E417-965C-461D-ABCA-3A32E5BF15B2} = {3F2F4DFF-41B3-45CA-AC47-E00250DCE930}
 	EndGlobalSection
 EndGlobal

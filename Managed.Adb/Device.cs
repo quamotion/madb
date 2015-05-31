@@ -107,8 +107,9 @@ namespace Managed.Adb {
 		/// Device list info regex
 		/// </summary>
 		/// <workitem>21136</workitem>
-		private const String RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download)(?:\s+product:([\S]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
-		/// <summary>
+        private const string RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
+        
+        /// <summary>
 		/// Tag
 		/// </summary>
 		private const String LOG_TAG = "Device";
