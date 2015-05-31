@@ -8,6 +8,11 @@ assembly_info:
 build_script:
   - msbuild Managed.Adb.sln /p:Configuration=Release /p:Platform=x86 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
+test:
+  categories:
+    except:
+      - IntegrationTest
+
 nuget:
   project_feed: true
   account_feed: true
