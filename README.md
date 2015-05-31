@@ -1,3 +1,7 @@
+| build |
+|-------|
+| [![Build Status](https://ci.appveyor.com/api/projects/status/github/quamotion/madb)](https://ci.appveyor.com/project/qmfrederik/madb/)
+
 # madb
 This is a Managed port of the Android Debug Bridge to allow communication from .NET applications to Android devices. 
 This wraps the same methods that the ddms uses to directly communicate with ADB. 
