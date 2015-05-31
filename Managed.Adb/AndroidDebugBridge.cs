@@ -12,7 +12,12 @@ namespace Managed.Adb {
 	/// <summary>
 	/// The android debug bridge
 	/// </summary>
-	public sealed class AndroidDebugBridge {
+    public sealed class AndroidDebugBridge
+    {
+        /// <summary>
+        /// Logging tag
+        /// </summary>
+        private const string TAG = "AndroidDebugBridge";
 
 		/// <summary>
 		/// Occurs when [bridge changed].
@@ -272,7 +277,7 @@ namespace Managed.Adb {
 					return _instance;
 				} else {
 					// stop the current server
-					Console.WriteLine ( "Stopping Current Instance" );
+                    Log.i( TAG, "Stopping Current Instance" );
 					_instance.Stop ( );
 				}
 			}
@@ -326,7 +331,7 @@ namespace Managed.Adb {
 			}
 
 			if ( !File.Exists ( osLocation ) ) {
-				Console.WriteLine ( osLocation );
+                Log.e(TAG, string.Format("unable to locate adb in the specified location: {0}", osLocation) );
 				throw new FileNotFoundException ( "unable to locate adb in the specified location" );
 			}
 
@@ -594,7 +599,7 @@ namespace Managed.Adb {
 			VersionCheck = false;
 
 			if ( String.IsNullOrEmpty ( AdbOsLocation ) ) {
-				Console.WriteLine ( "AdbOsLocation is Empty" );
+                Log.w( TAG, "AdbOsLocation is Empty" );
 				return;
 			}
 

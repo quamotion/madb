@@ -7,7 +7,13 @@ namespace Managed.Adb {
 	/// <summary>
 	/// 
 	/// </summary>
-	public class ConsoleOutputReceiver : MultiLineReceiver {
+    public class ConsoleOutputReceiver : MultiLineReceiver
+    {
+        /// <summary>
+        /// Logging tag
+        /// </summary>
+        private const string TAG = "ConsoleOutputReceiver";
+
 		private static ConsoleOutputReceiver _instance = null;
 		/// <summary>
 		/// Gets the instance.
@@ -32,7 +38,7 @@ namespace Managed.Adb {
 					if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) || line.StartsWith("$") ) {
 						continue;
 					}
-					Console.WriteLine ( line );
+                    Log.d(TAG, line );
 				}
 			}
 	}

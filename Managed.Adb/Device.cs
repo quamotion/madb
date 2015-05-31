@@ -822,7 +822,6 @@ namespace Managed.Adb {
 				// workitem: 19711
 				String remoteFilePath = LinuxPath.Combine(TEMP_DIRECTORY_FOR_INSTALL, packageFileName);
 
-				Console.WriteLine(String.Format("Uploading {0} onto device '{1}'", packageFileName, SerialNumber));
 				Log.d(packageFileName, String.Format("Uploading {0} onto device '{1}'", packageFileName, SerialNumber));
 
 				SyncService sync = SyncService;

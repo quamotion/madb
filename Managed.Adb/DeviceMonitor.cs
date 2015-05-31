@@ -13,8 +13,8 @@ namespace Managed.Adb {
 	/// debuggable process information from it.
 	/// </summary>
 	public class DeviceMonitor {
-		/// <summary>
-		/// 
+        /// <summary>
+        /// Logging tag
 		/// </summary>
 		private const String TAG = "DeviceMonitor";
 
@@ -151,13 +151,11 @@ namespace Managed.Adb {
 
 						if ( MainAdbConnection == null ) {
 							ConnectionAttemptCount++;
-							Console.WriteLine ( "Connection attempts: {0}", ConnectionAttemptCount );
-							Log.e ( TAG, "Connection attempts: {0}", ConnectionAttemptCount );
+							Log.i ( TAG, "Connection attempts: {0}", ConnectionAttemptCount );
 
 							if ( ConnectionAttemptCount > 10 ) {
 								if ( Server.Start ( ) == false ) {
 									RestartAttemptCount++;
-									Console.WriteLine ( "adb restart attempts: {0}", RestartAttemptCount );
 									Log.e ( TAG, "adb restart attempts: {0}", RestartAttemptCount );
 								} else {
 									RestartAttemptCount = 0;
@@ -199,7 +197,7 @@ namespace Managed.Adb {
 						}
 					}
 				} catch ( Exception ex ) {
-					//Console.WriteLine ( ex );
+                    Log.w(TAG, ex);
 				}
 			} while ( IsRunning );
 		}
