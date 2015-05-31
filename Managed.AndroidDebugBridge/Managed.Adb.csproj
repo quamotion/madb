@@ -11,7 +11,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Managed.Adb</RootNamespace>
-    <AssemblyName>Managed.AndroidDebugBridge</AssemblyName>
+    <AssemblyName>Managed.Adb</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
@@ -57,7 +57,8 @@
     <Optimize>true</Optimize>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>..\bin\Debug\0.5.0.1\x86\Managed.Adb.xml</DocumentationFile>
+    <DocumentationFile>..\bin\Debug\x86\\Managed.Adb.xml</DocumentationFile>
+    <OutputPath>..\bin\Debug\x86\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DefineConstants>$(PlatformConstant);TRACE</DefineConstants>
@@ -67,6 +68,8 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>..\bin\x86\</OutputPath>
+    <DocumentationFile>..\bin\x86\\Managed.Adb.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath Condition=" '$(OutputPath)' == '' ">..\bin\$(Configuration)\$(CCNetLabel)\$(Platform)\</OutputPath>
