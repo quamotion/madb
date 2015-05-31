@@ -490,6 +490,7 @@ namespace Managed.Adb {
 		public void RefreshProperties() {
 			if(IsOnline) {
 				try {
+                    this.Properties.Clear();
 					this.ExecuteShellCommand(GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver(this));
 				} catch(AdbException aex) {
 					Log.w(LOG_TAG, aex);
