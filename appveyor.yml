@@ -8,6 +8,10 @@ assembly_info:
 build_script:
   - msbuild Managed.Adb.sln /p:Configuration=Release /p:Platform=x86 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
+on_success:
+  - cmd: nuget pack Managed.Adb.nuspec -Version {version}
+  - ps: Push-AppveyorArtifact "Managed.Adb.$($env:APPVEYOR_BUILD_VERSION).nupkg"
+
 test:
   categories:
     except:

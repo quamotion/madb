@@ -45,7 +45,7 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <OutputPath>..\bin\x86\</OutputPath>
+    <OutputPath>..\bin\x86\Release\</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>Managd.Adb.snk</AssemblyOriginatorKeyFile>
