@@ -74,7 +74,7 @@
     <None Include="Managd.Adb.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Managed.AndroidDebugBridge\Managed.Adb.csproj">
+    <ProjectReference Include="..\Managed.Adb\Managed.Adb.csproj">
       <Project>{65473257-E70F-410B-9269-D0C0F771EA87}</Project>
       <Name>Managed.Adb</Name>
     </ProjectReference>
