@@ -16,7 +16,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// 
 		/// </summary>
-		protected const String ENCODING = "ISO-8859-1";
+		public const String ENCODING = "ISO-8859-1";
 
 		/// <summary>
 		/// Gets or sets a value indicating whether [trim lines].
