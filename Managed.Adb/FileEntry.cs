@@ -206,7 +206,8 @@ namespace Managed.Adb {
 		/// </value>
 		public bool IsLink {
 			get {
-				return Type == FileListingService.FileTypes.Link;
+				return Type == FileListingService.FileTypes.Link
+                    || Type == FileListingService.FileTypes.DirectoryLink;
 			}
 		}
 

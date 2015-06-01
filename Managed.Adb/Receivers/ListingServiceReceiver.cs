@@ -140,19 +140,11 @@ namespace Managed.Adb {
 						// and the link name
 						info = segments[1];
 
-						// now get the path to the link
-						String[] pathSegments = info.Split ( new String[] { FileListingService.FILE_SEPARATOR }, StringSplitOptions.RemoveEmptyEntries );
-						if ( pathSegments.Length == 1 ) {
-							// the link is to something in the same directory,
-							// unless the link is ..
-							if ( String.Compare ( "..", pathSegments[0], false ) == 0 ) {
-								// set the type and we're done.
-								objectType = FileListingService.FileTypes.DirectoryLink;
-							} else {
-								// either we found the object already
-								// or we'll find it later.
-							}
-						}
+                        // Links to directories don't have any size information.
+                        if(string.IsNullOrEmpty(sizeData))
+                        {
+                            objectType = FileListingService.FileTypes.DirectoryLink;
+                        }
 					} else {
 						
 					}
@@ -176,7 +168,8 @@ namespace Managed.Adb {
 				entry.Group =  group;
 				entry.IsExecutable = isExec;
 				entry.LinkName = linkName;
-				if ( objectType == FileListingService.FileTypes.Link ) {
+				if ( objectType == FileListingService.FileTypes.Link 
+                    || objectType == FileListingService.FileTypes.DirectoryLink ) {
 					entry.Info = info;
 				}
 

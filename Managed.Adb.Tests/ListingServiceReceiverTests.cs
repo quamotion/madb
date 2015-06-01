@@ -130,12 +130,12 @@ lrwxrwxrwx root     root              2015-06-01 10:17 etc -> /system/etc";
             Assert.IsTrue(entries[3].Exists);
             Assert.AreEqual(0, entries[3].FetchTime);
             Assert.AreEqual("/system/etc", entries[3].FullEscapedPath);
-            Assert.AreEqual("/etc", entries[3].FullPath);
+            Assert.AreEqual("/etc/", entries[3].FullPath);
             Assert.AreEqual("root", entries[3].Group);
             Assert.AreEqual("-> /system/etc", entries[3].Info);
             Assert.IsFalse(entries[3].IsApplicationFileName);
             Assert.IsFalse(entries[3].IsApplicationPackage);
-            Assert.IsFalse(entries[3].IsDirectory);
+            Assert.IsTrue(entries[3].IsDirectory);
             Assert.IsFalse(entries[3].IsExecutable);
             Assert.IsTrue(entries[3].IsLink);
             Assert.IsFalse(entries[3].IsRoot);
@@ -148,7 +148,7 @@ lrwxrwxrwx root     root              2015-06-01 10:17 etc -> /system/etc";
             Assert.AreEqual("etc", entries[3].PathSegments[0]);
             Assert.AreEqual("rwxrwxrwx", entries[3].Permissions.ToString());
             Assert.AreEqual(0, entries[3].Size);
-            Assert.AreEqual(FileListingService.FileTypes.Link, entries[3].Type);
+            Assert.AreEqual(FileListingService.FileTypes.DirectoryLink, entries[3].Type);
         }
     }
 }
