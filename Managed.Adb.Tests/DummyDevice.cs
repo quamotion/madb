@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -15,12 +16,14 @@ namespace Managed.Adb.Tests
 
         public FileSystem FileSystem
         {
-            get { throw new NotImplementedException(); }
+            get;
+            set;
         }
 
         public BusyBox BusyBox
         {
-            get { throw new NotImplementedException(); }
+            get;
+            set;
         }
 
         public string SerialNumber
@@ -62,7 +65,10 @@ namespace Managed.Adb.Tests
 
         public DeviceState State
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return DeviceState.Online;
+            }
         }
 
         public Dictionary<string, string> Properties
@@ -82,7 +88,7 @@ namespace Managed.Adb.Tests
 
         public bool IsOnline
         {
-            get { throw new NotImplementedException(); }
+            get { return true; }
         }
 
         public bool IsEmulator
@@ -127,22 +133,29 @@ namespace Managed.Adb.Tests
 
         public void ExecuteShellCommand(string command, IShellOutputReceiver receiver)
         {
-            throw new NotImplementedException();
+            this.ExecuteShellCommand(command, receiver, -1);
         }
 
         public void ExecuteShellCommand(string command, IShellOutputReceiver receiver, int maxTimeToOutputResponse)
         {
-            throw new NotImplementedException();
+            this.ExecuteShellCommand(command, receiver, -1, null);
         }
 
         public void ExecuteShellCommand(string command, IShellOutputReceiver receiver, params object[] commandArgs)
         {
-            throw new NotImplementedException();
+            this.ExecuteShellCommand(command, receiver, -1, command);
         }
 
         public void ExecuteShellCommand(string command, IShellOutputReceiver receiver, int maxTimeToOutputResponse, params object[] commandArgs)
         {
-            throw new NotImplementedException();
+            if (command == "busybox")
+            {
+                throw new FileNotFoundException();
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver, params object[] commandArgs)
@@ -211,6 +224,23 @@ namespace Managed.Adb.Tests
         }
 
         public void RefreshProperties()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public void RemountMountPoint(MountPoint mnt, bool readOnly)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemountMountPoint(string mountPoint, bool readOnly)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public bool CanSU()
         {
             throw new NotImplementedException();
         }
