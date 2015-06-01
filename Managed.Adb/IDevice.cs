@@ -184,6 +184,29 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <value>The screenshot.</value>
 		RawImage Screenshot { get; }
+        
+        /// <summary>
+		/// Determines whether this instance can use the SU shell.
+		/// </summary>
+		/// <returns>
+		///   <see langword="true"/> if this instance can use the SU shell; otherwise, <see langword="false"/>.
+		/// </returns>
+        bool CanSU();
+
+		/// <summary>
+		/// Remounts the mount point.
+		/// </summary>
+		/// <param name="mnt">The mount point.</param>
+		/// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
+        void RemountMountPoint(MountPoint mnt, bool readOnly);
+        
+		/// <summary>
+		/// Remounts the mount point.
+		/// </summary>
+		/// <param name="mountPoint">the mount point</param>
+		/// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
+		/// <exception cref="IOException">Throws if the mount point does not exist.</exception>
+        void RemountMountPoint(String mountPoint, bool readOnly);
 
 		/// <summary>
 		/// Executes a shell command on the device, and sends the result to a receiver.

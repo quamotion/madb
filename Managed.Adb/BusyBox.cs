@@ -25,7 +25,7 @@ namespace Managed.Adb {
 		/// Initializes a new instance of the <see cref="BusyBox"/> class.
 		/// </summary>
 		/// <param name="device">The device.</param>
-		public BusyBox ( Device device ) {
+		public BusyBox ( IDevice device ) {
 			this.Device = device;
 			Version = new System.Version ( "0.0.0.0" );
 			Commands = new List<String> ( );
@@ -154,7 +154,7 @@ namespace Managed.Adb {
 		/// <value>
 		/// The device.
 		/// </value>
-		public Device Device { get; set; }
+		public IDevice Device { get; set; }
 		/// <summary>
 		/// Gets if busybox is available on this device.
 		/// </summary>

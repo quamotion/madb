@@ -263,7 +263,7 @@ namespace Managed.Adb {
 		/// or
 		/// connection request rejected:  + resp.Message
 		/// </exception>
-		public Socket CreatePassThroughConnection(IPEndPoint endpoint, Device device, int pid) {
+		public Socket CreatePassThroughConnection(IPEndPoint endpoint, IDevice device, int pid) {
 			Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			try {
 				socket.Connect(endpoint);
@@ -524,7 +524,7 @@ namespace Managed.Adb {
 		/// or
 		/// Device rejected command:  + resp.Message
 		/// </exception>
-		public bool CreateForward(IPEndPoint adbSockAddr, Device device, int localPort, int remotePort) {
+		public bool CreateForward(IPEndPoint adbSockAddr, IDevice device, int localPort, int remotePort) {
 
 			Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			try {
@@ -614,7 +614,7 @@ namespace Managed.Adb {
 		/// <param name="address">The address.</param>
 		/// <param name="device">The device.</param>
 		/// <exception cref="System.NotImplementedException"></exception>
-		public void ListForward(IPEndPoint address, Device device) {
+		public void ListForward(IPEndPoint address, IDevice device) {
 			throw new NotImplementedException();
 		}
 
@@ -625,7 +625,7 @@ namespace Managed.Adb {
 		/// <param name="device">The device.</param>
 		/// <param name="localPort">The local port.</param>
 		/// <returns></returns>
-		public bool RemoveForward(IPEndPoint address, Device device, int localPort) {
+		public bool RemoveForward(IPEndPoint address, IDevice device, int localPort) {
 			using(var socket = ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward:tcp:{1}".With(device.SerialNumber, localPort))) {
 				// do nothing...
 				return true;
@@ -638,7 +638,7 @@ namespace Managed.Adb {
 		/// <param name="address">The address.</param>
 		/// <param name="device">The device.</param>
 		/// <returns></returns>
-		public bool RemoveAllForward(IPEndPoint address, Device device) {
+		public bool RemoveAllForward(IPEndPoint address, IDevice device) {
 			using(var socket = ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward-all".With(device.SerialNumber))) {
 				// do nothing...
 				return true;
@@ -815,7 +815,7 @@ namespace Managed.Adb {
 		/// <remarks>
 		/// Should check if you CanSU before calling this.
 		/// </remarks>
-		public void ExecuteRemoteRootCommand(IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr) {
+		public void ExecuteRemoteRootCommand(IPEndPoint endPoint, String command, IDevice device, IShellOutputReceiver rcvr) {
 			ExecuteRemoteRootCommand(endPoint, String.Format("su -c \"{0}\"", command), device, rcvr, int.MaxValue);
 		}
 
@@ -827,7 +827,7 @@ namespace Managed.Adb {
 		/// <param name="device">The device.</param>
 		/// <param name="rcvr">The RCVR.</param>
 		/// <param name="maxTimeToOutputResponse">The max time to output response.</param>
-		public void ExecuteRemoteRootCommand(IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse) {
+		public void ExecuteRemoteRootCommand(IPEndPoint endPoint, String command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse) {
 			ExecuteRemoteCommand(endPoint, String.Format("su -c \"{0}\"", command), device, rcvr);
 		}
 
@@ -850,7 +850,7 @@ namespace Managed.Adb {
 		/// <exception cref="UnknownOptionException"></exception>
 		/// <exception cref="CommandAbortingException"></exception>
 		/// <exception cref="PermissionDeniedException"></exception>
-		public void ExecuteRemoteCommand(IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse) {
+		public void ExecuteRemoteCommand(IPEndPoint endPoint, String command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse) {
 
 			using(var socket = ExecuteRawSocketCommand(endPoint, device, "shell:{0}".With(command))) {
 				socket.ReceiveTimeout = maxTimeToOutputResponse;
@@ -951,7 +951,7 @@ namespace Managed.Adb {
 		/// <exception cref="IOException">Throws if there is a problem reading / writing to the socket</exception>
 		/// <exception cref="OperationCanceledException">Throws if the execution was canceled</exception>
 		/// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
-		public void ExecuteRemoteCommand(IPEndPoint endPoint, String command, Device device, IShellOutputReceiver rcvr) {
+		public void ExecuteRemoteCommand(IPEndPoint endPoint, String command, IDevice device, IShellOutputReceiver rcvr) {
 			ExecuteRemoteCommand(endPoint, command, device, rcvr, int.MaxValue);
 		}
 
@@ -995,7 +995,7 @@ namespace Managed.Adb {
 		/// <param name="address">The address.</param>
 		/// <param name="device">The device.</param>
 		/// <param name="rcvr">The RCVR.</param>
-		public void RunEventLogService(IPEndPoint address, Device device, LogReceiver rcvr) {
+		public void RunEventLogService(IPEndPoint address, IDevice device, LogReceiver rcvr) {
 			RunLogService(address, device, "events", rcvr);
 		}
 
@@ -1008,7 +1008,7 @@ namespace Managed.Adb {
 		/// <param name="rcvr">The RCVR.</param>
 		/// <exception cref="AdbException">failed asking for log</exception>
 		/// <exception cref="Managed.Adb.Exceptions.AdbCommandRejectedException"></exception>
-		public void RunLogService(IPEndPoint address, Device device, String logName, LogReceiver rcvr) {
+		public void RunLogService(IPEndPoint address, IDevice device, String logName, LogReceiver rcvr) {
 			using(var socket = ExecuteRawSocketCommand(address, device, "log:{0}".With(logName))) {
 				byte[] data = new byte[16384];
 				using(var ms = new MemoryStream(data)) {
@@ -1047,7 +1047,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="adbSocketAddress">The adb socket address.</param>
 		/// <param name="device">The device.</param>
-		public void Reboot(IPEndPoint adbSocketAddress, Device device) {
+		public void Reboot(IPEndPoint adbSocketAddress, IDevice device) {
 			Reboot(string.Empty, adbSocketAddress, device);
 		}
 
@@ -1057,7 +1057,7 @@ namespace Managed.Adb {
 		/// <param name="into">The into.</param>
 		/// <param name="adbSockAddr">The adb sock addr.</param>
 		/// <param name="device">The device.</param>
-		public void Reboot(String into, IPEndPoint adbSockAddr, Device device) {
+		public void Reboot(String into, IPEndPoint adbSockAddr, IDevice device) {
 			byte[] request;
 			if(string.IsNullOrEmpty(into)) {
 				request = FormAdbRequest("reboot:");
@@ -1190,7 +1190,7 @@ namespace Managed.Adb {
 		/// <exception cref="AdbException">failed to submit the command: {0}.With(command)
 		/// or
 		/// Device rejected command: {0}.With(resp.Message)</exception>
-		private Socket ExecuteRawSocketCommand(IPEndPoint address, Device device, string command) {
+		private Socket ExecuteRawSocketCommand(IPEndPoint address, IDevice device, string command) {
 			return ExecuteRawSocketCommand(address, device, FormAdbRequest(command));
 		}
 
@@ -1232,7 +1232,7 @@ namespace Managed.Adb {
 		/// failed to submit the command: {0}.With(command)
 		/// or
 		/// Device rejected command: {0}.With(resp.Message)</exception>
-		private Socket ExecuteRawSocketCommand(IPEndPoint address, Device device, byte[] command) {
+		private Socket ExecuteRawSocketCommand(IPEndPoint address, IDevice device, byte[] command) {
 			if(device != null && !device.IsOnline) {
 				throw new AdbException("Device is offline");
 			}
