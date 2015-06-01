@@ -388,7 +388,7 @@ namespace Managed.Adb {
 		/// Reads the adb response.
 		/// </summary>
 		/// <param name="socket">The socket.</param>
-		/// <param name="readDiagString">if set to <c>true</c> [read diag string].</param>
+		/// <param name="readDiagString">if set to <see langword="true"/> [read diag string].</param>
 		/// <returns></returns>
 		public AdbResponse ReadAdbResponse(Socket socket, bool readDiagString) {
 
@@ -650,7 +650,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="reply">The reply.</param>
 		/// <returns>
-		///   <c>true</c> if the specified reply is okay; otherwise, <c>false</c>.
+		///   <see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.
 		/// </returns>
 		public bool IsOkay(byte[] reply) {
 			return reply.GetString().Equals("OKAY");

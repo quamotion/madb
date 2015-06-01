@@ -14,7 +14,7 @@ namespace Managed.Adb {
 		/// <param name="block">The block.</param>
 		/// <param name="name">The name.</param>
 		/// <param name="fs">The fs.</param>
-		/// <param name="readOnly">if set to <c>true</c> [read only].</param>
+		/// <param name="readOnly">if set to <see langword="true"/> [read only].</param>
 		public MountPoint ( string block, string name, string fs, bool readOnly ) {
 			this.Block = block;
 			this.Name = name;
@@ -44,7 +44,7 @@ namespace Managed.Adb {
 		/// Gets the mount point access
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is read only; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is read only; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsReadOnly { get; private set; }
 

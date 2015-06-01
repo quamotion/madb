@@ -95,27 +95,27 @@ namespace Managed.Adb {
 		/// Gets or sets a value indicating whether this instance can execute.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance can execute; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance can execute; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool CanExecute { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this instance can write.
 		/// </summary>
-		/// <value><c>true</c> if this instance can write; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if this instance can write; otherwise, <see langword="false"/>.</value>
 		public bool CanWrite { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this instance can read.
 		/// </summary>
-		/// <value><c>true</c> if this instance can read; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if this instance can read; otherwise, <see langword="false"/>.</value>
 		public bool CanRead { get; private set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this instance can delete.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance can delete; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance can delete; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool CanDelete { get; private set; }
 

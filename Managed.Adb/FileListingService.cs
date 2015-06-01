@@ -172,7 +172,7 @@ namespace Managed.Adb {
 		/// Initializes a new instance of the <see cref="FileListingService"/> class.
 		/// </summary>
 		/// <param name="device">The device.</param>
-		/// <param name="forceBusyBox">if set to <c>true</c> [force busy box].</param>
+		/// <param name="forceBusyBox">if set to <see langword="true"/> [force busy box].</param>
 		public FileListingService ( Device device, bool forceBusyBox ) {
 			this.Device = device;
 			this.Threads = new List<Thread> ( );
@@ -215,7 +215,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets or sets a value indicating whether [force busy box].
 		/// </summary>
-		/// <value><c>true</c> if [force busy box]; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if [force busy box]; otherwise, <see langword="false"/>.</value>
 		public bool ForceBusyBox { get; set; }
 
 
@@ -223,7 +223,7 @@ namespace Managed.Adb {
 		/// Gets the children.
 		/// </summary>
 		/// <param name="entry">The entry.</param>
-		/// <param name="useCache">if set to <c>true</c> [use cache].</param>
+		/// <param name="useCache">if set to <see langword="true"/> [use cache].</param>
 		/// <param name="receiver">The receiver.</param>
 		/// <returns></returns>
 		public FileEntry[] GetChildren ( FileEntry entry, bool useCache, IListingReceiver receiver ) {

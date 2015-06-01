@@ -174,7 +174,7 @@ namespace Managed.Adb {
 		/// Initializes the <code>ddm</code> library.
 		/// <para>This must be called once <b>before</b> any call to CreateBridge.</para>
 		/// </summary>
-		/// <param name="clientSupport">if set to <c>true</c> [client support].</param>
+		/// <param name="clientSupport">if set to <see langword="true"/> [client support].</param>
 		public static void Initialize ( bool clientSupport ) {
 			ClientSupport = clientSupport;
 
@@ -231,7 +231,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether there is client support.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if there is client support; otherwise, <c>false</c>.
+		///   <see langword="true"/> if there is client support; otherwise, <see langword="false"/>.
 		/// </value>
 		public static bool ClientSupport { get; private set; }
 
@@ -404,7 +404,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Starts the debug bridge.
 		/// </summary>
-		/// <returns><c>true</c> if success.</returns>
+		/// <returns><see langword="true"/> if success.</returns>
 		public bool Start ( ) {
 			if ( String.IsNullOrEmpty(AdbOsLocation) || !VersionCheck || !StartAdb ( ) ) {
 				return false;
@@ -422,7 +422,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Kills the debug bridge, and the adb host server.
 		/// </summary>
-		/// <returns><c>true</c> if success.</returns>
+		/// <returns><see langword="true"/> if success.</returns>
 		public bool Stop ( ) {
 			// if we haven't started we return false;
 			if ( !Started ) {
@@ -446,7 +446,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Restarts adb, but not the services around it.
 		/// </summary>
-		/// <returns><c>true</c> if success.</returns>
+		/// <returns><see langword="true"/> if success.</returns>
 		public bool Restart ( ) {
 			if ( string.IsNullOrEmpty ( AdbOsLocation ) ) {
 				Log.e ( ADB, "Cannot restart adb when AndroidDebugBridge is created without the location of adb." );
@@ -505,7 +505,7 @@ namespace Managed.Adb {
 		/// IDeviceChangeListener object.
 		/// </remarks>
 		/// <returns>
-		/// 	<c>true</c> if [has initial device list]; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if [has initial device list]; otherwise, <see langword="false"/>.
 		/// </returns>
 		public bool HasInitialDeviceList ( ) {
 			if ( DeviceMonitor != null ) {
@@ -536,7 +536,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Returns whether the AndroidDebugBridge object is still connected to the adb daemon.
 		/// </summary>
-		/// <value><c>true</c> if this instance is connected; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if this instance is connected; otherwise, <see langword="false"/>.</value>
 		public bool IsConnected {
 			get {
 				//MonitorThread monitorThread = MonitorThread.Instance;
@@ -659,7 +659,7 @@ namespace Managed.Adb {
 		/// Scans a line resulting from 'adb version' for a potential version number.
 		/// </summary>
 		/// <param name="line">The line to scan.</param>
-		/// <returns><c>true</c> if a version number was found (whether it is acceptable or not).</returns>
+		/// <returns><see langword="true"/> if a version number was found (whether it is acceptable or not).</returns>
 		/// <remarks>If a version number is found, it checks the version number against what is expected
 		/// by this version of ddms.</remarks>
 		private bool ScanVersionLine ( String line ) {

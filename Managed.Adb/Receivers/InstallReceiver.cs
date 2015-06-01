@@ -53,7 +53,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether the install was a success.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if success; otherwise, <c>false</c>.
+		///   <see langword="true"/> if success; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool Success { get; private set; }
 	}

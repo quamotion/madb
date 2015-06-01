@@ -62,14 +62,14 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is monitoring.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is monitoring; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is monitoring; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsMonitoring { get; private set; }
 		/// <summary>
 		/// Gets a value indicating whether this instance is running.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is running; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsRunning { get; private set; }
 		/// <summary>
@@ -84,7 +84,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance has initial device list.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance has initial device list; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance has initial device list; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool HasInitialDeviceList { get; private set; }
 		/// <summary>

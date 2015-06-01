@@ -246,7 +246,7 @@ namespace Managed.Adb {
 		/// Determines whether this device can perform a backup.
 		/// </summary>
 		/// <returns>
-		///   <c>true</c> if this device can perform a backup; otherwise, <c>false</c>.
+		///   <see langword="true"/> if this device can perform a backup; otherwise, <see langword="false"/>.
 		/// </returns>
 		public bool CanBackup() {
 			return this.FileSystem.Exists("/system/bin/bu");
@@ -263,7 +263,7 @@ namespace Managed.Adb {
 		/// Determines whether this instance can use the SU shell.
 		/// </summary>
 		/// <returns>
-		///   <c>true</c> if this instance can use the SU shell; otherwise, <c>false</c>.
+		///   <see langword="true"/> if this instance can use the SU shell; otherwise, <see langword="false"/>.
 		/// </returns>
 		public bool CanSU() {
 			if(_canSU) {
@@ -439,7 +439,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets a value indicating whether the device is online.
 		/// </summary>
-		/// <value><c>true</c> if the device is online; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if the device is online; otherwise, <see langword="false"/>.</value>
 		public bool IsOnline {
 			get {
 				return State == DeviceState.Online;
@@ -449,7 +449,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets a value indicating whether this device is emulator.
 		/// </summary>
-		/// <value><c>true</c> if this device is emulator; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if this device is emulator; otherwise, <see langword="false"/>.</value>
 		public bool IsEmulator {
 			get {
 				return Regex.Match(SerialNumber, RE_EMULATOR_SN).Success;
@@ -459,7 +459,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets a value indicating whether this device is offline.
 		/// </summary>
-		/// <value><c>true</c> if this device is offline; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if this device is offline; otherwise, <see langword="false"/>.</value>
 		public bool IsOffline {
 			get {
 				return State == DeviceState.Offline;
@@ -470,7 +470,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this device is in boot loader mode.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this device is in boot loader mode; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this device is in boot loader mode; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsBootLoader {
 			get {
@@ -482,7 +482,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is recovery.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is recovery; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is recovery; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsRecovery {
 			get { return State == DeviceState.Recovery; }
@@ -492,7 +492,7 @@ namespace Managed.Adb {
         /// Gets a value indicating whether this instance is unauthorized.
         /// </summary>
         /// <value>
-        /// 	<c>true</c> if this instance is unauthorized; otherwise, <c>false</c>.
+        /// 	<see langword="true"/> if this instance is unauthorized; otherwise, <see langword="false"/>.
         /// </value>
         public bool IsUnauthorized
         {
@@ -503,7 +503,7 @@ namespace Managed.Adb {
 		/// Remounts the mount point.
 		/// </summary>
 		/// <param name="mnt">The mount point.</param>
-		/// <param name="readOnly">if set to <c>true</c> the mount poine will be set to read-only.</param>
+		/// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
 		public void RemountMountPoint(MountPoint mnt, bool readOnly) {
 			String command = String.Format("mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name);
 			this.ExecuteShellCommand(command, NullOutputReceiver.Instance);
@@ -514,7 +514,7 @@ namespace Managed.Adb {
 		/// Remounts the mount point.
 		/// </summary>
 		/// <param name="mountPoint">the mount point</param>
-		/// <param name="readOnly">if set to <c>true</c> the mount poine will be set to read-only.</param>
+		/// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
 		/// <exception cref="IOException">Throws if the mount point does not exist.</exception>
 		public void RemountMountPoint(String mountPoint, bool readOnly) {
 			if(MountPoints.ContainsKey(mountPoint)) {
@@ -610,7 +610,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance has clients.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance has clients; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance has clients; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool HasClients {
 			get {

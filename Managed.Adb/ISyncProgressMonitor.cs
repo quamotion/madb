@@ -22,7 +22,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Sent to query for possible cancellation.
 		/// </summary>
-		/// <returns><c>true</c> if the transfer should be stopped; otherwise, false</returns>
+		/// <returns><see langword="true"/> if the transfer should be stopped; otherwise, false</returns>
 		bool IsCanceled { get; }
 
 		/// <summary>

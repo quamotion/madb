@@ -21,8 +21,21 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets or sets a value indicating whether [trim lines].
 		/// </summary>
-		/// <value><c>true</c> if [trim lines]; otherwise, <c>false</c>.</value>
-		public bool TrimLines { get; set; }
+		/// <value><see langword="true"/> if [trim lines]; otherwise, <see langword="false"/>.</value>
+        public bool TrimLines { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the receiver parses error messages.
+        /// </summary>
+        /// <value>
+        ///     <see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbHelper"/>
+        /// will detect common error messages and throw an exception.
+        /// </remarks>
+        public bool ParsesErrors { get; private set; }
+
 		/// <summary>
 		/// Gets or sets the unfinished line.
 		/// </summary>
@@ -125,7 +138,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is canceled.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is canceled; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is canceled; otherwise, <see langword="false"/>.
 		/// </value>
 		public virtual bool IsCancelled { get; protected set; }
 

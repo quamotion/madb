@@ -72,7 +72,7 @@ namespace Managed.Adb {
 		/// <param name="parent">parent entry or null if entry is root</param>
 		/// <param name="name">name of the entry.</param>
 		/// <param name="type">entry type.</param>
-		/// <param name="isRoot">if set to <c>true</c> [is root].</param>
+		/// <param name="isRoot">if set to <see langword="true"/> [is root].</param>
 		internal FileEntry ( Device device, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
 			this.FetchTime = 0;
 			this.Parent = parent;
@@ -173,21 +173,21 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is application package.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is application package; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is application package; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsApplicationPackage { get; private set; }
 		/// <summary>
 		/// Gets a value indicating whether this instance is root.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if this instance is root; otherwise, <c>false</c>.
+		///   <see langword="true"/> if this instance is root; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsRoot { get; private set; }
 		/// <summary>
 		/// Gets a value indicating whether this instance is executable.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is executable; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is executable; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsExecutable { get; internal set; }
 		/// <summary>
@@ -202,7 +202,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is link.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if this instance is link; otherwise, <c>false</c>.
+		///   <see langword="true"/> if this instance is link; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsLink {
 			get {
@@ -216,7 +216,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this <see cref="FileEntry"/> is exists.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if exists; otherwise, <c>false</c>.
+		///   <see langword="true"/> if exists; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool Exists { get; private set; }
 
@@ -296,7 +296,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is directory.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is directory; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is directory; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsDirectory {
 			get {
@@ -308,7 +308,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is application file name.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is application file name; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is application file name; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsApplicationFileName {
 			get {
@@ -413,7 +413,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="pathBuilder">a StringBuilder used to create the path.</param>
 		/// <param name="escapePath">Whether the path need to be escaped for consumption by a shell command line.</param>
-		/// <param name="resolveLinks">if set to <c>true</c> [resolve links].</param>
+		/// <param name="resolveLinks">if set to <see langword="true"/> [resolve links].</param>
 		protected void FillPathBuilder ( StringBuilder pathBuilder, bool escapePath, bool resolveLinks ) {
 			if ( IsRoot ) {
 				return;
@@ -436,7 +436,7 @@ namespace Managed.Adb {
 		/// Fills the path builder.
 		/// </summary>
 		/// <param name="pathBuilder">The path builder.</param>
-		/// <param name="escapePath">if set to <c>true</c> [escape path].</param>
+		/// <param name="escapePath">if set to <see langword="true"/> [escape path].</param>
 		protected void FillPathBuilder ( StringBuilder pathBuilder, bool escapePath ) {
 			FillPathBuilder ( pathBuilder, escapePath, false );
 		}

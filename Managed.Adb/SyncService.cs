@@ -272,7 +272,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is open.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if this instance is open; otherwise, <c>false</c>.
+		///   <see langword="true"/> if this instance is open; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsOpen {
 			get {

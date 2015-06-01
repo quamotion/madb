@@ -63,7 +63,7 @@ namespace Managed.Adb.IO {
 		/// </summary>
 		/// <param name="partOfPath">The part of path.</param>
 		/// <returns>
-		///   <c>true</c> if this instance [can path circumvent security native] the specified part of path; otherwise, <c>false</c>.
+		///   <see langword="true"/> if this instance [can path circumvent security native] the specified part of path; otherwise, <see langword="false"/>.
 		/// </returns>
 		[MethodImpl ( MethodImplOptions.InternalCall )]
 		private static extern bool CanPathCircumventSecurityNative ( string partOfPath );
@@ -107,7 +107,7 @@ namespace Managed.Adb.IO {
 		/// <param name="array">The array.</param>
 		/// <param name="numChars">The num chars.</param>
 		/// <param name="compareTo">The compare to.</param>
-		/// <param name="ignoreCase">if set to <c>true</c> [ignore case].</param>
+		/// <param name="ignoreCase">if set to <see langword="true"/> [ignore case].</param>
 		/// <returns></returns>
 		private static unsafe bool CharArrayStartsWithOrdinal ( char* array, int numChars, string compareTo, bool ignoreCase ) {
 			if ( numChars < compareTo.Length ) {
@@ -131,7 +131,7 @@ namespace Managed.Adb.IO {
 		/// <param name="array">The array.</param>
 		/// <param name="numChars">The num chars.</param>
 		/// <param name="compareTo">The compare to.</param>
-		/// <param name="ignoreCase">if set to <c>true</c> [ignore case].</param>
+		/// <param name="ignoreCase">if set to <see langword="true"/> [ignore case].</param>
 		/// <returns></returns>
 		private static bool CharArrayStartsWithOrdinal ( char[] array, int numChars, string compareTo, bool ignoreCase ) {
 			if ( numChars < compareTo.Length ) {

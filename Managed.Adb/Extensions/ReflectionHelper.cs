@@ -151,7 +151,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="type">The type.</param>
 		/// <returns>
-		///   <c>true</c> if the specified type is nullable; otherwise, <c>false</c>.
+		///   <see langword="true"/> if the specified type is nullable; otherwise, <see langword="false"/>.
 		/// </returns>
 		public static bool IsNullable ( this Type type ) {
 			return ( type.IsGenericType && type.GetGenericTypeDefinition ( ).Equals ( typeof ( Nullable<> ) ) );

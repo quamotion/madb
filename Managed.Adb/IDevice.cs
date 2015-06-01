@@ -122,7 +122,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets a value indicating whether the device is online.
 		/// </summary>
-		/// <value><c>true</c> if the device is online; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if the device is online; otherwise, <see langword="false"/>.</value>
 		bool IsOnline { get; }
 
 
@@ -130,7 +130,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this device is emulator.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this device is emulator; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this device is emulator; otherwise, <see langword="false"/>.
 		/// </value>
 		bool IsEmulator { get; }
 
@@ -138,7 +138,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this device is offline.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this device is offline; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this device is offline; otherwise, <see langword="false"/>.
 		/// </value>
 		bool IsOffline { get; }
 
@@ -146,7 +146,7 @@ namespace Managed.Adb {
         /// Gets a value indicating whether this instance is unauthorized.
         /// </summary>
         /// <value>
-        /// 	<c>true</c> if this instance is unauthorized; otherwise, <c>false</c>.
+        /// 	<see langword="true"/> if this instance is unauthorized; otherwise, <see langword="false"/>.
         /// </value>
         bool IsUnauthorized { get; }
 
@@ -154,7 +154,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this device is in boot loader mode.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this device is in boot loader mode; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this device is in boot loader mode; otherwise, <see langword="false"/>.
 		/// </value>
 		bool IsBootLoader { get; }
 

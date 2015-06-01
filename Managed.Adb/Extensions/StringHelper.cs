@@ -149,7 +149,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="source">The source.</param>
 		/// <returns>
-		///   <c>true</c> if [is null or white space] [the specified source]; otherwise, <c>false</c>.
+		///   <see langword="true"/> if [is null or white space] [the specified source]; otherwise, <see langword="false"/>.
 		/// </returns>
 		public static bool IsNullOrWhiteSpace( this String source ) {
 			return String.IsNullOrEmpty ( source ) || String.IsNullOrEmpty ( source.Trim ( ) );
@@ -182,7 +182,7 @@ namespace Managed.Adb {
 		/// <param name="source">The source.</param>
 		/// <param name="pattern">The pattern.</param>
 		/// <returns>
-		///   <c>true</c> if the specified source is match; otherwise, <c>false</c>.
+		///   <see langword="true"/> if the specified source is match; otherwise, <see langword="false"/>.
 		/// </returns>
 		public static bool IsMatch ( this String source, String pattern ) {
 			return IsMatch ( source, pattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase );
@@ -195,7 +195,7 @@ namespace Managed.Adb {
 		/// <param name="pattern">The pattern.</param>
 		/// <param name="options">The options.</param>
 		/// <returns>
-		///   <c>true</c> if the specified source is match; otherwise, <c>false</c>.
+		///   <see langword="true"/> if the specified source is match; otherwise, <see langword="false"/>.
 		/// </returns>
 		public static bool IsMatch ( this String source, String pattern, RegexOptions options ) {
 			return Regex.IsMatch ( source, pattern, options );

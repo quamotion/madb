@@ -148,7 +148,7 @@ namespace Managed.Adb {
 		/// Gets or sets a value indicating whether this instance is DDM aware.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is DDM aware; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is DDM aware; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsDdmAware { get; set; }
 		/// <summary>

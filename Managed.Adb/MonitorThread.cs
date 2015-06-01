@@ -55,7 +55,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="MonitorThread"/> is quit.
 		/// </summary>
-		/// <value><c>true</c> if quit; otherwise, <c>false</c>.</value>
+		/// <value><see langword="true"/> if quit; otherwise, <see langword="false"/>.</value>
 		public bool Quit { get; private set; }
 		/// <summary>
 		/// Gets or sets the clients.

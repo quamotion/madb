@@ -112,7 +112,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is debugger attached.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is debugger attached; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is debugger attached; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsDebuggerAttached {
 			get {
@@ -134,7 +134,7 @@ namespace Managed.Adb {
 		/// Gets or sets a value indicating whether this instance is thread update enabled.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is thread update enabled; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is thread update enabled; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsThreadUpdateEnabled { get; set; }
 
@@ -142,7 +142,7 @@ namespace Managed.Adb {
 		/// Gets or sets a value indicating whether this instance is heap update enabled.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is heap update enabled; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is heap update enabled; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsHeapUpdateEnabled { get; set; }
 
@@ -150,7 +150,7 @@ namespace Managed.Adb {
 		/// Gets or sets a value indicating whether this instance is selected client.
 		/// </summary>
 		/// <value>
-		/// 	<c>true</c> if this instance is selected client; otherwise, <c>false</c>.
+		/// 	<see langword="true"/> if this instance is selected client; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsSelectedClient { get; set; }
 
@@ -158,7 +158,7 @@ namespace Managed.Adb {
 		/// Gets a value indicating whether this instance is valid.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if this instance is valid; otherwise, <c>false</c>.
+		///   <see langword="true"/> if this instance is valid; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IsValid { get; private set; }
 
@@ -234,7 +234,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Enables the allocation tracker.
 		/// </summary>
-		/// <param name="enable">if set to <c>true</c> [enable].</param>
+		/// <param name="enable">if set to <see langword="true"/> [enable].</param>
 		public void EnableAllocationTracker ( bool enable ) {
 			throw new NotImplementedException ( );
 		}
@@ -330,7 +330,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Closes the specified notify.
 		/// </summary>
-		/// <param name="notify">if set to <c>true</c> [notify].</param>
+		/// <param name="notify">if set to <see langword="true"/> [notify].</param>
 		public void Close ( bool notify ) {
 			throw new NotImplementedException ( );
 		}

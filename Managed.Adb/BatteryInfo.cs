@@ -70,14 +70,14 @@ namespace Managed.Adb {
 		/// Gets or sets a value indicating whether AC powered.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if AC powered; otherwise, <c>false</c>.
+		///   <see langword="true"/> if AC powered; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool ACPowered { get; set; }
 		/// <summary>
 		/// Gets or sets a value indicating whether usb powered.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if usb powered; otherwise, <c>false</c>.
+		///   <see langword="true"/> if usb powered; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool UsbPowered { get; set; }
 		/// <summary>
@@ -98,7 +98,7 @@ namespace Managed.Adb {
 		/// Gets or sets a value indicating whether a battery is present.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if present; otherwise, <c>false</c>.
+		///   <see langword="true"/> if present; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool Present { get; set; }
 		/// <summary>

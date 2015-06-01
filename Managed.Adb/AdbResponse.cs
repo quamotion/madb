@@ -20,21 +20,21 @@ namespace Managed.Adb {
 		/// Gets or sets a value indicating whether the IO communication was a success.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if successful; otherwise, <c>false</c>.
+		///   <see langword="true"/> if successful; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool IOSuccess { get; set; }
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="AdbResponse"/> is okay.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if okay; otherwise, <c>false</c>.
+		///   <see langword="true"/> if okay; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool Okay { get; set; }
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="AdbResponse"/> is timeout.
 		/// </summary>
 		/// <value>
-		///   <c>true</c> if timeout; otherwise, <c>false</c>.
+		///   <see langword="true"/> if timeout; otherwise, <see langword="false"/>.
 		/// </value>
 		public bool Timeout { get; set; }
 		/// <summary>

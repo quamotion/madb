@@ -72,7 +72,7 @@ namespace Managed.Adb {
 		/// Gets if the specified path exists on the device.
 		/// </summary>
 		/// <param name="path">the path to check</param>
-		/// <returns><c>true</c>, if the path exists; otherwise, <c>false</c></returns>
+		/// <returns><see langword="true"/>, if the path exists; otherwise, <see langword="false"/></returns>
 		/// <exception cref="IOException">If the device is not connected.</exception>
 		/// <exception cref="ArgumentNullException">If the device or path is null.</exception>
 		public bool Exists ( String path ) {
@@ -111,7 +111,7 @@ namespace Managed.Adb {
 		/// Makes the directory.
 		/// </summary>
 		/// <param name="path">The path.</param>
-		/// <param name="forceDeviceMethod">if set to <c>true</c> forces the use of the "non-busybox" method.</param>
+		/// <param name="forceDeviceMethod">if set to <see langword="true"/> forces the use of the "non-busybox" method.</param>
 		public void MakeDirectory ( String path, bool forceDeviceMethod ) {
 			Device.ThrowIfNull ( "Device" );
 			path.ThrowIfNullOrWhiteSpace ( "path" );
@@ -343,7 +343,7 @@ namespace Managed.Adb {
 		/// <param name="directory">The directory.</param>
 		/// <param name="device">The device.</param>
 		/// <param name="fileSytemType">Type of the file sytem.</param>
-		/// <param name="isReadOnly">if set to <c>true</c> is read only.</param>
+		/// <param name="isReadOnly">if set to <see langword="true"/> is read only.</param>
 		/// <param name="options">The options.</param>
 		public void Mount ( String directory, String device, String fileSytemType, bool isReadOnly, String options ) {
 			Mount ( new MountPoint ( device, directory, fileSytemType, isReadOnly ), options );
@@ -355,7 +355,7 @@ namespace Managed.Adb {
 		/// <param name="directory">The directory.</param>
 		/// <param name="device">The device.</param>
 		/// <param name="fileSytemType">Type of the file sytem.</param>
-		/// <param name="isReadOnly">if set to <c>true</c> is read only.</param>
+		/// <param name="isReadOnly">if set to <see langword="true"/> is read only.</param>
 		public void Mount ( String directory, String device, String fileSytemType, bool isReadOnly ) {
 			Mount ( new MountPoint ( device, directory, fileSytemType, isReadOnly ), String.Empty );
 		}

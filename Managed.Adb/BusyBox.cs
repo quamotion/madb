@@ -37,7 +37,7 @@ namespace Managed.Adb {
 		/// Attempts to install on the device
 		/// </summary>
 		/// <param name="busybox">The path to the busybox binary to install.</param>
-		/// <returns><c>true</c>, if successful; otherwise, <c>false</c></returns>
+		/// <returns><see langword="true"/>, if successful; otherwise, <see langword="false"/></returns>
 		public bool Install ( String busybox ) {
 			busybox.ThrowIfNullOrWhiteSpace ( "busybox" );
 
@@ -172,7 +172,7 @@ namespace Managed.Adb {
 		/// Gets if the specified command name is supported by this version of busybox
 		/// </summary>
 		/// <param name="command">The command name to check</param>
-		/// <returns><c>true</c>, if supported; otherwise, <c>false</c>.</returns>
+		/// <returns><see langword="true"/>, if supported; otherwise, <see langword="false"/>.</returns>
 		public bool Supports ( String command ) {
 			command.ThrowIfNullOrWhiteSpace ( "command" );
 
