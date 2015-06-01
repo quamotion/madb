@@ -554,6 +554,60 @@ namespace Managed.Adb {
 			return true;
 		}
 
+        /// <summary>
+        /// Forwards a remote Unix socket to a local TCP socket.
+        /// </summary>
+        /// <param name="adbSockAddr">The adb socket address.</param>
+        /// <param name="device">The device.</param>
+        /// <param name="localPort">The local port.</param>
+        /// <param name="remoteSocket">The remote Unix socket.</param>
+        /// <returns>
+        /// This method always returns <see langword="true"/>.
+        /// </returns>
+        /// <exception cref="Managed.Adb.Exceptions.AdbException">
+        /// The client failed to submit the forward command.
+        /// </exception>
+        /// <exception cref="Managed.Adb.Exceptions.AdbException">
+        /// The device rejected command. The error message will include the error message provided by the device.
+        /// </exception>
+        public static bool CreateForward(IPEndPoint adbSockAddr, IDevice device, int localPort, string remoteSocket)
+        {
+            Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
+                adbChan.Connect(adbSockAddr);
+                adbChan.Blocking = true;
+
+                // host-serial should be different based on the transport...
+                byte[] request = this.FormAdbRequest(
+                    string.Format(
+                        "host-serial:{0}:forward:tcp:{1};localabstract:{2}", // $NON-NLS-1$
+                        device.SerialNumber,
+                        localPort,
+                        remoteSocket));
+
+                if (!this.Write(adbChan, request))
+                {
+                    throw new AdbException("failed to submit the forward command.");
+                }
+
+                AdbResponse resp = this.ReadAdbResponse(adbChan, false /* readDiagString */);
+                if (!resp.IOSuccess || !resp.Okay)
+                {
+                    throw new AdbException("Device rejected command: " + resp.Message);
+                }
+            }
+            finally
+            {
+                if (adbChan != null)
+                {
+                    adbChan.Close();
+                }
+            }
+
+            return true;
+        }
+
 		/// <summary>
 		/// Lists the forward.
 		/// </summary>
