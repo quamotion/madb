@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Net;
+using System.IO;
+using Managed.Adb.Exceptions;
 
 namespace Managed.Adb {
 
@@ -69,7 +71,7 @@ namespace Managed.Adb {
 		/// <p/>
 		/// If the emulator is not running any AVD (for instance it's running from an Android source
 		/// tree build), this method will return "<code>&lt;build&gt;</code>"
-		/// @return the name of the AVD or  <code>null</code>
+		/// @return the name of the AVD or  <see langword="null"/>
 		///  if there isn't any.
 		/// </summary>
 		/// <value>The name of the avd.</value>
@@ -105,7 +107,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="name">The name of the property.</param>
 		/// <returns>
-		/// the value or <code>null</code> if the property does not exist.
+		/// the value or <see langword="null"/> if the property does not exist.
 		/// </returns>
 		String GetProperty ( String name );
 		/// <summary>
@@ -113,7 +115,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="name">The array of property names.</param>
 		/// <returns>
-		/// the value or <code>null</code> if the property does not exist.
+		/// the value or <see langword="null"/> if the property does not exist.
 		/// </returns>
 		String GetProperty ( params String[] name );
 
@@ -149,33 +151,21 @@ namespace Managed.Adb {
 		/// </value>
 		bool IsBootLoader { get; }
 
-		/**
-		 * Returns whether the {@link Device} has {@link Client}s.
-		 */
-		//bool HasClients { get; }
-
 		/// <summary>
 		/// Gets the list of clients
 		/// </summary>
 		List<IClient> Clients { get; }
 
-		/**
-		 * Returns a {@link Client} by its application name.
-		 * @param applicationName the name of the application
-		 * @return the <code>Client</code> object or <code>null</code> if no match was found.
-		 */
-		//Client GetClient(String applicationName);
-
 		/// <summary>
 		/// Returns a <see cref="SyncService"/> object to push / pull files to and from the device.
 		/// </summary>
 		/// <remarks>
-		/// <code>null</code> if the SyncService couldn't be created. This can happen if adb
+		/// <see langword="null"/> if the SyncService couldn't be created. This can happen if adb
 		/// refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
 		/// </remarks>
 		/// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
 		SyncService SyncService { get; }
-
+        
 		/// <summary>
 		/// Returns a <see cref="FileListingService"/> for this device.
 		/// </summary>
@@ -194,9 +184,9 @@ namespace Managed.Adb {
 		/// <param name="command">The command to execute</param>
 		/// <param name="receiver">The receiver object getting the result from the command.</param>
 		void ExecuteShellCommand ( String command, IShellOutputReceiver receiver );
-		/// <summary>
+		
+        /// <summary>
 		/// Executes a shell command on the device, and sends the result to a receiver.
-		/// </summary>
 		/// </summary>
 		/// <param name="command">The command to execute</param>
 		/// <param name="receiver">The receiver object getting the result from the command.</param>
@@ -252,41 +242,21 @@ namespace Managed.Adb {
 		/// <param name="receiver">The receiver object getting the result from the command.</param>
 		/// <param name="maxTimeToOutputResponse">The max time to output response.</param>
 		void ExecuteRootShellCommand ( String command, IShellOutputReceiver receiver, int maxTimeToOutputResponse );
-		/**
-		 * Runs the event log service and outputs the event log to the {@link LogReceiver}.
-		 * @param receiver the receiver to receive the event log entries.
-		 * @throws IOException
-		 */
-		//void RunEventLogService(LogReceiver receiver);
-
-		/**
-		 * Runs the log service for the given log and outputs the log to the {@link LogReceiver}.
-		 * @param logname the logname of the log to read from.
-		 * @param receiver the receiver to receive the event log entries.
-		 * @throws IOException
-		 */
-		//void RunLogService(String logname, LogReceiver receiver);
 		
 		/// <summary>
 		/// Creates a port forwarding between a local and a remote port.
 		/// </summary>
 		/// <param name="localPort">the local port to forward</param>
 		/// <param name="remotePort">the remote port.</param>
-		/// <returns><code>true</code> if success.</returns>
+		/// <returns><see langword="true"/> if success.</returns>
 		bool CreateForward(int localPort, int remotePort);
 
 		/// <summary>
 		/// Removes a port forwarding between a local and a remote port.
 		/// </summary>
 		/// <param name="localPort"> the local port to forward</param>
-		/// <returns><code>true</code> if success.</returns>
+		/// <returns><see langword="true"/> if success.</returns>
 		bool RemoveForward ( int localPort );
-
-		/**
-		 * Returns the name of the client by pid or <code>null</code> if pid is unknown
-		 * @param pid the pid of the client.
-		 */
-		//String GetClientName(int pid);
 
 		/// <summary>
 		/// Installs an Android application on device.
@@ -294,7 +264,7 @@ namespace Managed.Adb {
 		/// and removePackage steps
 		/// </summary>
 		/// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
-		/// <param name="reinstall">set to <code>true</code>if re-install of app should be performed</param>
+		/// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
 		void InstallPackage ( String packageFilePath, bool reinstall );
 
 		/// <summary>
@@ -309,7 +279,7 @@ namespace Managed.Adb {
 		/// Installs the application package that was pushed to a temporary location on the device.
 		/// </summary>
 		/// <param name="remoteFilePath">absolute file path to package file on device</param>
-		/// <param name="reinstall">set to <code>true</code> if re-install of app should be performed</param>
+		/// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
 		void InstallRemotePackage(String remoteFilePath, bool reinstall);
 
 
@@ -325,9 +295,9 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="packageName">Name of the package.</param>
 		/// <exception cref="IOException"></exception>
-		/// <exception cref="PackageInstallException"></exception>
+		/// <exception cref="PackageInstallationException"></exception>
 		void UninstallPackage(String packageName) ;
-
+        
 		/// <summary>
 		/// Refreshes the environment variables.
 		/// </summary>

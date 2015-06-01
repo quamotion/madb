@@ -85,7 +85,7 @@ namespace Managed.Adb {
 		public int DebuggerListenPort { get; private set; }
 
 		/// <summary>
-		/// Returns <code>true</code> if the client VM is DDM-aware.
+		/// Returns <see langword="true"/> if the client VM is DDM-aware.
 		/// </summary>
 		/// <remarks>Calling here is only allowed after the connection has been established.</remarks>
 		public bool IsDdmAware {

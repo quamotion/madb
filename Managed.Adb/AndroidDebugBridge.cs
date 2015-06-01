@@ -151,7 +151,7 @@ namespace Managed.Adb {
 		 * {@link #createBridge(String, boolean)}.
 		 * <p>The library can be initialized in 2 ways:
 		 * <ul>
-		 * <li>Mode 1: <var>clientSupport</var> == <code>true</code>.<br>The library monitors the
+		 * <li>Mode 1: <var>clientSupport</var> == <see langword="true"/>.<br>The library monitors the
 		 * devices and the applications running on them. It will connect to each application, as a
 		 * debugger of sort, to be able to interact with them through JDWP packets.</li>
 		 * <li>Mode 2: <var>clientSupport</var> == <code>false</code>.<br>The library only monitors

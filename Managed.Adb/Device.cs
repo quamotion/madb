@@ -18,43 +18,47 @@ namespace Managed.Adb {
 	/// </summary>
 	public enum DeviceState {
 		/// <summary>
-		/// 
+		/// The device is in recovery mode.
 		/// </summary>
 		Recovery,
+
 		/// <summary>
-		/// 
+		/// The device is in bootloader mode
 		/// </summary>
 		BootLoader,
+
 		/// <summary>
         /// The instance is not connected to adb or is not responding.
 		/// </summary>
 		Offline,
+
 		/// <summary>
         /// The instance is now connected to the adb server. Note that this state does not imply that the Android system is 
         /// fully booted and operational, since the instance connects to adb while the system is still booting. 
         /// However, after boot-up, this is the normal operational state of an emulator/device instance.
 		/// </summary>
 		Online,
+
 		/// <summary>
-		/// 
+		/// The device is in download mode.
 		/// </summary>
 		Download,
+
 		/// <summary>
-		/// 
+		/// The device state is unknown.
 		/// </summary>
 		Unknown,
 
+        /// <summary>
+        /// The device is connected to adb, but adb is not authorized for remote debugging of this device.
+        /// </summary>
         Unauthorized
 	}
 
 	/// <summary>
-	/// 
+	/// Represents an Android device.
 	/// </summary>
 	public sealed class Device : IDevice {
-		public const String MNT_EXTERNAL_STORAGE = "EXTERNAL_STORAGE";
-		public const String MNT_DATA = "ANDROID_DATA";
-		public const String MNT_ROOT = "ANDROID_ROOT";
-
 		/// <summary>
 		/// Occurs when [state changed].
 		/// </summary>
@@ -74,22 +78,22 @@ namespace Managed.Adb {
 		public const String TEMP_DIRECTORY_FOR_INSTALL = "/storage/sdcard0/tmp/";
 
 		/// <summary>
-		/// 
+		/// The name of the device property that holds the Android build version.
 		/// </summary>
 		public const String PROP_BUILD_VERSION = "ro.build.version.release";
 
 		/// <summary>
-		/// 
+		/// The name of the device property that holds the Android API level.
 		/// </summary>
 		public const String PROP_BUILD_API_LEVEL = "ro.build.version.sdk";
 
 		/// <summary>
-		/// 
+		/// The name of the device property that holds the code name for the Android API level.
 		/// </summary>
 		public const String PROP_BUILD_CODENAME = "ro.build.version.codename";
 
 		/// <summary>
-		/// 
+		/// The name of the device property that indicates whether the device is debuggable.
 		/// </summary>
 		public const String PROP_DEBUGGABLE = "ro.debuggable";
 
@@ -98,7 +102,9 @@ namespace Managed.Adb {
 		/// </summary>
 		public const String FIRST_EMULATOR_SN = "emulator-5554";
 
-		/** @deprecated Use {@link #PROP_BUILD_API_LEVEL}. */
+        /// <summary>
+        /// The name of the device property that indicates the Android API level.
+        /// </summary>
 		[Obsolete("Use PROP_BUILD_API_LEVEL")]
 		public const String PROP_BUILD_VERSION_NUMBER = PROP_BUILD_API_LEVEL;
 
@@ -114,20 +120,43 @@ namespace Managed.Adb {
         private const string RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download|unauthorized)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
         
         /// <summary>
-		/// Tag
+		/// The tag to use when logging messages.
 		/// </summary>
 		private const String LOG_TAG = "Device";
 
+        /// <summary>
+        /// The time-out when receiving battery information.
+        /// </summary>
 		private const int BATTERY_TIMEOUT = 2 * 1000; //2 seconds
+
+        /// <summary>
+        /// The time-out when receiving device properties.
+        /// </summary>
 		private const int GETPROP_TIMEOUT = 2 * 1000; //2 seconds
+
+        /// <summary>
+        /// The time-out when installing applications.
+        /// </summary>
 		private const int INSTALL_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+
 		/// <summary>
-		/// 
+		/// The name of the Android Virtual Device (emulator).
 		/// </summary>
 		private string _avdName;
-		private IPEndPoint _endpoint;
+
+        /// <summary>
+        /// Indicates whether the user can obtain su (root) privileges.
+        /// </summary>
 		private bool _canSU = false;
+
+        /// <summary>
+        /// The latest battery information.
+        /// </summary>
 		private BatteryInfo _lastBatteryInfo = null;
+
+        /// <summary>
+        /// The time at which the battery information was last obtained.
+        /// </summary>
 		private DateTime _lastBatteryCheckTime = DateTime.MinValue;
 
 		/// <summary>
@@ -270,6 +299,9 @@ namespace Managed.Adb {
 		/// </value>
 		public IPEndPoint Endpoint { get; private set; }
 
+        /// <summary>
+        /// Indicates how the device is connected to the Android Debug Bridge.
+        /// </summary>
 		public TransportType TransportType { get; private set; }
 
 
@@ -337,7 +369,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="name">The name of the property.</param>
 		/// <returns>
-		/// the value or <code>null</code> if the property does not exist.
+		/// the value or <see langword="null"/> if the property does not exist.
 		/// </returns>
 		public String GetProperty(String name) {
 			return GetProperty(new String[] { name });
@@ -561,7 +593,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <value></value>
 		/// <remarks>
-		/// 	<code>null</code> if the SyncService couldn't be created. This can happen if adb
+		/// 	<see langword="null"/> if the SyncService couldn't be created. This can happen if adb
 		/// refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
 		/// </remarks>
 		/// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
@@ -652,6 +684,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="command">The command.</param>
 		/// <param name="receiver">The receiver.</param>
+        /// <param name="timeout">The period, in milliseconds, after which the command times out.</param>
 		public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout) {
 			ExecuteRootShellCommand(command, receiver, timeout, new object[] { });
 		}
@@ -709,7 +742,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="localPort">the local port to forward</param>
 		/// <param name="remotePort">the remote port.</param>
-		/// <returns><code>true</code> if success.</returns>
+		/// <returns><see langword="true"/> if success.</returns>
 		public bool CreateForward(int localPort, int remotePort) {
 			try {
 				return AdbHelper.Instance.CreateForward(AndroidDebugBridge.SocketAddress, this, localPort, remotePort);
@@ -723,8 +756,7 @@ namespace Managed.Adb {
 		/// Removes a port forwarding between a local and a remote port.
 		/// </summary>
 		/// <param name="localPort">the local port to forward</param>
-		/// <param name="remotePort">the remote port.</param>
-		/// <returns><code>true</code> if success.</returns>
+		/// <returns><see langword="true"/> if success.</returns>
 		public bool RemoveForward(int localPort) {
 			try {
 				return AdbHelper.Instance.RemoveForward(AndroidDebugBridge.SocketAddress, this, localPort);
@@ -802,7 +834,7 @@ namespace Managed.Adb {
 		/// and removePackage steps
 		/// </summary>
 		/// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
-		/// <param name="reinstall">set to <code>true</code>if re-install of app should be performed</param>
+		/// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
 		public void InstallPackage(String packageFilePath, bool reinstall) {
 			String remoteFilePath = SyncPackageToDevice(packageFilePath);
 			InstallRemotePackage(remoteFilePath, reinstall);
@@ -848,7 +880,7 @@ namespace Managed.Adb {
 		/// Installs the application package that was pushed to a temporary location on the device.
 		/// </summary>
 		/// <param name="remoteFilePath">absolute file path to package file on device</param>
-		/// <param name="reinstall">set to <code>true</code> if re-install of app should be performed</param>
+		/// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
 		public void InstallRemotePackage(String remoteFilePath, bool reinstall) {
 			InstallReceiver receiver = new InstallReceiver();
 			FileEntry entry = FileListingService.FindFileEntry(remoteFilePath);
@@ -882,7 +914,7 @@ namespace Managed.Adb {
 		/// <param name="packageName">Name of the package.</param>
 		/// <exception cref="IOException"></exception>
 		///   
-		/// <exception cref="PackageInstallException"></exception>
+		/// <exception cref="PackageInstallationException"></exception>
 		public void UninstallPackage(String packageName) {
 			InstallReceiver receiver = new InstallReceiver();
 			ExecuteShellCommand(String.Format("pm uninstall {0}", packageName), receiver);

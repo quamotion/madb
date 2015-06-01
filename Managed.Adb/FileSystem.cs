@@ -222,7 +222,7 @@ namespace Managed.Adb {
 		/// Gets if the specified mount point is read-only
 		/// </summary>
 		/// <param name="mount"></param>
-		/// <returns><code>true</code>, if read-only; otherwise, <code>false</code></returns>
+		/// <returns><see langword="true"/>, if read-only; otherwise, <code>false</code></returns>
 		/// <exception cref="IOException">If mount point doesnt exist</exception>
 		public bool IsMountPointReadOnly ( String mount ) {
 			Device.ThrowIfNull ( "Device" );
