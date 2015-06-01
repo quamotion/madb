@@ -570,7 +570,7 @@ namespace Managed.Adb {
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
         /// The device rejected command. The error message will include the error message provided by the device.
         /// </exception>
-        public static bool CreateForward(IPEndPoint adbSockAddr, IDevice device, int localPort, string remoteSocket)
+        public bool CreateForward(IPEndPoint adbSockAddr, IDevice device, int localPort, string remoteSocket)
         {
             Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
