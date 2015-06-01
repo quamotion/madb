@@ -34,7 +34,7 @@ namespace Managed.Adb {
         /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbHelper"/>
         /// will detect common error messages and throw an exception.
         /// </remarks>
-        public bool ParsesErrors { get; private set; }
+        public virtual bool ParsesErrors { get; protected set; }
 
 		/// <summary>
 		/// Gets or sets the unfinished line.

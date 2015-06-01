@@ -71,7 +71,7 @@ namespace Managed.Adb {
         /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbHelper"/>
         /// will detect common error messages and throw an exception.
         /// </remarks>
-        public bool ParsersErrors 
+        public bool ParsesErrors 
         { 
             get
             {

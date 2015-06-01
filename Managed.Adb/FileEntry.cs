@@ -73,7 +73,7 @@ namespace Managed.Adb {
 		/// <param name="name">name of the entry.</param>
 		/// <param name="type">entry type.</param>
 		/// <param name="isRoot">if set to <see langword="true"/> [is root].</param>
-		internal FileEntry ( Device device, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
+		internal FileEntry ( IDevice device, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot ) {
 			this.FetchTime = 0;
 			this.Parent = parent;
 			this.Name = name;
@@ -90,7 +90,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="device">The device.</param>
 		/// <param name="path">The path.</param>
-		internal FileEntry ( Device device, String path ) {
+		internal FileEntry ( IDevice device, String path ) {
 			this.FetchTime = 0;
 			this.Parent = null;
 			bool isDir = path.EndsWith ( new String ( LinuxPath.DirectorySeparatorChar, 1 ) );
@@ -107,7 +107,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets the device associated with this file entry.
 		/// </summary>
-		public Device Device { get; private set; }
+		public IDevice Device { get; private set; }
 		/// <summary>
 		/// Gets the parent.
 		/// </summary>
@@ -372,7 +372,6 @@ namespace Managed.Adb {
 				return list.ToArray ( );
 			}
 		}
-
 
 		/// <summary>
 		/// Sets the internal app package status flag. This checks whether the entry is in an app

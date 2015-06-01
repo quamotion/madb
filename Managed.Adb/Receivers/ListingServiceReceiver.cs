@@ -27,6 +27,7 @@ namespace Managed.Adb {
 			Entries = entries ?? new List<FileEntry>();
 			Links = links ?? new List<String> ( );
 			CurrentChildren = Parent.Children.ToArray ( );
+            ParsesErrors = true;
 		}
 
 		/// <summary>

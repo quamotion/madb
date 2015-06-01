@@ -872,45 +872,57 @@ namespace Managed.Adb {
 							rcvr.Flush();
 							Log.w(TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count);
 						} else {
-							string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-							string sdata = data.GetString(0, count, AdbHelper.DEFAULT_ENCODING);
+                            // Attempt to detect error messages and throw an exception based on them. The caller can override
+                            // this behavior by specifying a receiver that has the ParsesErrors flag set to true; in this case,
+                            // the receiver is responsible for all error handling.
+                            if (rcvr == null || !rcvr.ParsesErrors)
+                            {
+                                string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                string sdata = data.GetString(0, count, AdbHelper.DEFAULT_ENCODING);
 
-							var sdataTrimmed = sdata.Trim();
-							if(sdataTrimmed.EndsWith(String.Format("{0}: not found", cmd[0]))) {
-								Log.w(TAG, "The remote execution returned: '{0}: not found'", cmd[0]);
-								throw new FileNotFoundException(string.Format("The remote execution returned: '{0}: not found'", cmd[0]));
-							}
+                                var sdataTrimmed = sdata.Trim();
+                                if (sdataTrimmed.EndsWith(String.Format("{0}: not found", cmd[0])))
+                                {
+                                    Log.w(TAG, "The remote execution returned: '{0}: not found'", cmd[0]);
+                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}: not found'", cmd[0]));
+                                }
 
-							if(sdataTrimmed.EndsWith("No such file or directory")) {
-								Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
-								throw new FileNotFoundException(String.Format("The remote execution returned: {0}", sdataTrimmed));
-							}
+                                if (sdataTrimmed.EndsWith("No such file or directory"))
+                                {
+                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
+                                    throw new FileNotFoundException(String.Format("The remote execution returned: {0}", sdataTrimmed));
+                                }
 
-							// for "unknown options"
-							if(sdataTrimmed.Contains("Unknown option")) {
-								Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
-								throw new UnknownOptionException(sdataTrimmed);
-							}
+                                // for "unknown options"
+                                if (sdataTrimmed.Contains("Unknown option"))
+                                {
+                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
+                                    throw new UnknownOptionException(sdataTrimmed);
+                                }
 
-							// for "aborting" commands
-							if(sdataTrimmed.IsMatch("Aborting.$")) {
-								Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
-								throw new CommandAbortingException(sdataTrimmed);
-							}
+                                // for "aborting" commands
+                                if (sdataTrimmed.IsMatch("Aborting.$"))
+                                {
+                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
+                                    throw new CommandAbortingException(sdataTrimmed);
+                                }
 
-							// for busybox applets 
-							// cmd: applet not found
-							if(sdataTrimmed.IsMatch("applet not found$") && cmd.Length > 1) {
-								Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
-								throw new FileNotFoundException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
-							}
+                                // for busybox applets 
+                                // cmd: applet not found
+                                if (sdataTrimmed.IsMatch("applet not found$") && cmd.Length > 1)
+                                {
+                                    Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
+                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
+                                }
 
-							// checks if the permission to execute the command was denied.
-							// workitem: 16822
-							if(sdataTrimmed.IsMatch("(permission|access) denied$")) {
-								Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
-								throw new PermissionDeniedException(String.Format("The remote execution returned: '{0}'", sdataTrimmed));
-							}
+                                // checks if the permission to execute the command was denied.
+                                // workitem: 16822
+                                if (sdataTrimmed.IsMatch("(permission|access) denied$"))
+                                {
+                                    Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
+                                    throw new PermissionDeniedException(String.Format("The remote execution returned: '{0}'", sdataTrimmed));
+                                }
+                            }
 
 							// Add the data to the receiver
 							if(rcvr != null) {
