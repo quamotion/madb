@@ -16,8 +16,8 @@ build_script:
 on_success:
   - cmd: nuget pack Managed.Adb.nuspec -Version %APPVEYOR_BUILD_VERSION%
   - cmd: nuget setApiKey %NuGetApiKey% > nul
-  - cmd: nuget push Managed.Adb.%APPVEYOR_BUILD_VERSION%.nupkg
-  - ps: Push-AppveyorArtifact "Managed.Adb.$($env:APPVEYOR_BUILD_VERSION).nupkg"
+  - cmd: nuget push madb.%APPVEYOR_BUILD_VERSION%.nupkg
+  - ps: Push-AppveyorArtifact "madb.$($env:APPVEYOR_BUILD_VERSION).nupkg"
 
 test:
   categories:

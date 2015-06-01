@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
 	<metadata>
-		<id>Managed.Adb</id>
+		<id>madb</id>
 		<version>$version$</version>
 		<authors>Ryan Conrad</authors>
 		<owners>Quamotion</owners>
