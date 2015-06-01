@@ -13,30 +13,49 @@ using Managed.Adb.Logs;
 
 // services that are supported by adb: https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT
 namespace Managed.Adb {
-
+    /// <summary>
+    /// Specifies the transport type used between the device and the Android Debug Bridge server.
+    /// </summary>
 	public enum TransportType {
+        /// <summary>
+        /// The device is connected through USB
+        /// </summary>
 		Usb,
+
+        /// <summary>
+        /// The device is connected through a local TCP connection.
+        /// </summary>
 		Local,
+
+        /// <summary>
+        /// The device is connected through any transport type.
+        /// </summary>
 		Any,
+
+        /// <summary>
+        /// The device is connected through the host transport type.
+        /// </summary>
 		Host
 	}
 
 	/// <summary>
 	/// The ADB Helper class
 	/// </summary>
-	/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
-	/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
-	/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso>
+	/// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
+	/// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
+	/// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso>
 	public class AdbHelper {
 		/// <summary>
 		/// Logging tag
 		/// </summary>
 		private const string TAG = "AdbHelper";
+
 		/// <summary>
 		/// The time to wait
 		/// </summary>
 		private const int WAIT_TIME = 5;
-		/// <summary>
+		
+        /// <summary>
 		/// The default encoding
 		/// </summary>
         public static String DEFAULT_ENCODING = "ISO-8859-1";
@@ -54,9 +73,10 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
-		/// 
+		/// The singleton instance of the <see cref="AdbHelper"/> class.
 		/// </summary>
 		private static AdbHelper _instance = null;
+
 		/// <summary>
 		/// Gets an instance of the AdbHelper.
 		/// </summary>
@@ -138,7 +158,7 @@ namespace Managed.Adb {
 		/// </summary>
 		/// <param name="address">The address.</param>
 		/// <exception cref="System.IO.IOException">failed asking to backup device</exception>
-		/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/backup_service.c">backup_service.c</seealso>
+		/// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/backup_service.c">backup_service.c</seealso>
 		[Obsolete("This is not yet functional")]
 		public void Backup(IPEndPoint address) {
 			byte[] request = FormAdbRequest("backup:all");
@@ -169,7 +189,7 @@ namespace Managed.Adb {
 		/// Restores this instance.
 		/// </summary>
 		/// <exception cref="System.NotImplementedException"></exception>
-		/// <seealso cref="https://github.com/android/platform_system_core/blob/master/adb/backup_service.c">backup_service.c</seealso>
+		/// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/backup_service.c">backup_service.c</seealso>
 		[Obsolete("This is not yet functional")]
 		public void Restore() {
 			throw new NotImplementedException();
@@ -433,6 +453,7 @@ namespace Managed.Adb {
 			try {
 				Read(socket, data, -1, DdmPreferences.Timeout);
 			} catch(AdbException e) {
+                Log.e(TAG, e);
 				return false;
 			}
 
@@ -986,9 +1007,6 @@ namespace Managed.Adb {
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="helper">
-        /// An instance of the <see cref="AdbHelper"/> class.
-        /// </param>
         /// <param name="adbEndpoint">
         /// The socket where the <c>adb</c> server is listening.
         /// </param>
@@ -1012,9 +1030,6 @@ namespace Managed.Adb {
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="helper">
-        /// An instance of the <see cref="AdbHelper"/> class.
-        /// </param>
         /// <param name="adbEndpoint">
         /// The socket where the <c>adb</c> server is listening.
         /// </param>
@@ -1038,9 +1053,6 @@ namespace Managed.Adb {
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="helper">
-        /// An instance of the <see cref="AdbHelper"/> class.
-        /// </param>
         /// <param name="adbEndpoint">
         /// The socket where the <c>adb</c> server is listening.
         /// </param>
@@ -1064,9 +1076,6 @@ namespace Managed.Adb {
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="helper">
-        /// An instance of the <see cref="AdbHelper"/> class.
-        /// </param>
         /// <param name="adbEndpoint">
         /// The socket where the <c>adb</c> server is listening.
         /// </param>
