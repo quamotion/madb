@@ -142,6 +142,16 @@ namespace Managed.Adb {
 		/// </value>
 		bool IsOffline { get; }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance is unauthorized.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this instance is unauthorized; otherwise, <c>false</c>.
+        /// </value>
+        bool IsUnauthorized
+        {
+            get { return State == DeviceState.Unauthorized; }
+        }
 
 		/// <summary>
 		/// Gets a value indicating whether this device is in boot loader mode.
