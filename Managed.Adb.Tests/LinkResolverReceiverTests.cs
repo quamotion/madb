@@ -99,7 +99,8 @@ drwxr-xr-x root     root              2015-05-13 01:54 system
 -rw-r--r-- root     root         7155 1970-01-01 01:00 ueventd.manta.rc
 -rw-r--r-- root     root         4464 1970-01-01 01:00 ueventd.rc
 -rw-r--r-- root     root         2107 1970-01-01 01:00 ueventd.smdk5250.rc
-lrwxrwxrwx root     root              2015-06-01 10:17 vendor -> /system/vendor";
+lrwxrwxrwx root     root              2015-06-01 10:17 vendor -> /system/vendor
+";
 
             byte[] data = Encoding.GetEncoding(MultiLineReceiver.ENCODING).GetBytes(output);
 
