@@ -759,12 +759,22 @@ namespace Managed.Adb {
 						totalRead += count;
 					}
 				} catch ( SocketException sex ) {
-					if ( sex.Message.Contains ( "connection was aborted" ) ) {
-						// ignore this?
-						return String.Empty;
-					} else {
-						throw new IOException ( String.Format ( "No Data to read: {0}", sex.Message ) );
-					}
+                    if (!IsRunning)
+                    {
+                        return String.Empty;
+                    }
+                    else
+                    {
+                        if (sex.Message.Contains("connection was aborted"))
+                        {
+                            // ignore this?
+                            return String.Empty;
+                        }
+                        else
+                        {
+                            throw new IOException(String.Format("No Data to read: {0}", sex.Message));
+                        }
+                    }
 				}
 			}
 
