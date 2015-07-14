@@ -640,11 +640,6 @@ namespace Managed.Adb {
 				return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
 			}
 
-			// files pushed have no permissions...
-			// lets check if we can get to the file...
-			if(this.Device.FileSystem.Exists(remotePath)) {
-				this.Device.FileSystem.Chmod(remotePath, "0666");
-			}
 			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
 		}
 
