@@ -37,6 +37,13 @@ namespace Managed.Adb.Tests
         }
 
         [TestMethod]
+        public void CombineCurrentDirTest()
+        {
+            var result = LinuxPath.Combine(".", "test.txt");
+            Assert.AreEqual("./test.txt", result);
+        }
+
+        [TestMethod]
         public void GetDirectoryNameTest()
         {
             String result = LinuxPath.GetDirectoryName("/system/busybox");

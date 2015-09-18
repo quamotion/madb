@@ -340,7 +340,7 @@ namespace Managed.Adb.IO {
 			sb = sb.Replace ( System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar );
 
 
-			if ( !sb.StartsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) ) {
+			if ( sb != "." && !sb.StartsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) ) {
 				sb = string.Format ( ".{0}{1}", DirectorySeparatorChar, sb );
 			}
 
