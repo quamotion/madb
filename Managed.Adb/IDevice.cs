@@ -33,7 +33,7 @@ namespace Managed.Adb {
 		/// <value>
 		/// The file system.
 		/// </value>
-		FileSystem FileSystem { get; }
+		IFileSystem FileSystem { get; }
 
 		/// <summary>
 		/// Gets the busy box.
@@ -41,7 +41,7 @@ namespace Managed.Adb {
 		/// <value>
 		/// The busy box.
 		/// </value>
-		BusyBox BusyBox { get; }
+		IBusyBox BusyBox { get; }
 
 		/// <summary>
 		/// Gets the serial number of the device.
@@ -171,12 +171,12 @@ namespace Managed.Adb {
 		/// refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
 		/// </remarks>
 		/// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
-		SyncService SyncService { get; }
+		ISyncService SyncService { get; }
         
 		/// <summary>
 		/// Returns a <see cref="FileListingService"/> for this device.
 		/// </summary>
-		FileListingService FileListingService { get; }
+		IFileListingService FileListingService { get; }
 
 
 		/// <summary>

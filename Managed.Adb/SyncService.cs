@@ -8,7 +8,7 @@ using System.Net.Sockets;
 using Managed.Adb.IO;
 
 namespace Managed.Adb {
-	public class SyncService : IDisposable {
+	public class SyncService : ISyncService, IDisposable {
         /// <summary>
         /// Logging tag
         /// </summary>
@@ -268,22 +268,15 @@ namespace Managed.Adb {
 		/// </value>
 		public Device Device { get; private set; }
 		private Socket Channel { get; set; }
-		/// <summary>
-		/// Gets a value indicating whether this instance is open.
-		/// </summary>
-		/// <value>
-		///   <see langword="true"/> if this instance is open; otherwise, <see langword="false"/>.
-		/// </value>
+
+        /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
 		public bool IsOpen {
 			get {
 				return Channel != null && Channel.Connected;
 			}
 		}
-
-		/// <summary>
-		/// Opens this connection.
-		/// </summary>
-		/// <returns></returns>
+        
+        /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
 		public bool Open ( ) {
 			if ( IsOpen ) {
 				return true;
@@ -316,12 +309,7 @@ namespace Managed.Adb {
 			return true;
 		}
 
-		/**
-		 * Closes the connection.
-		 */
-		/// <summary>
-		/// Closes this connection.
-		/// </summary>
+        /// <include file='.\ISyncService.xml' path='/SyncService/Close/*'/>
 		public void Close ( ) {
 			if ( Channel != null ) {
 				try {
@@ -377,18 +365,7 @@ namespace Managed.Adb {
 			return result;
 		}
 
-		/// <summary>
-		/// Pulls a single file.
-		/// </summary>
-		/// <param name="remote">remote the remote file</param>
-		/// <param name="localFilename">The local destination.</param>
-		/// <param name="monitor">The progress monitor. Cannot be null.</param>
-		/// <returns>
-		/// a SyncResult object with a code and an optional message.
-		/// </returns>
-		/// <exception cref="System.ArgumentNullException">monitor;Monitor cannot be null</exception>
-		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
-		/// <gist id="39fdc76b6f394b9bdf88" />
+        /// <include file='.\ISyncService.xml' path='/SyncService/PullFile/*'/>
 		public SyncResult PullFile ( FileEntry remote, String localFilename, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
@@ -403,22 +380,8 @@ namespace Managed.Adb {
 			return result;
 		}
 
-		/// <summary>
-		/// Pulls a single file.
-		/// <para>Because this method just deals with a String for the remote file instead of FileEntry,
-		/// the size of the file being pulled is unknown and the ISyncProgressMonitor will not properly
-		/// show the progress</para>
-		/// </summary>
-		/// <param name="remoteFilepath">the full path to the remote file</param>
-		/// <param name="localFilename">The local destination.</param>
-		/// <param name="monitor">The progress monitor. Cannot be null.</param>
-		/// <returns>
-		/// a SyncResult object with a code and an optional message.
-		/// </returns>
-		/// <exception cref="System.ArgumentNullException">monitor;Monitor cannot be null</exception>
-		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
-		/// <gist id="9021e6c39ee20a6e122b" />
-		public SyncResult PullFile ( String remoteFilepath, String localFilename, ISyncProgressMonitor monitor ) {
+        /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
+        public SyncResult PullFile ( String remoteFilepath, String localFilename, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
@@ -439,18 +402,8 @@ namespace Managed.Adb {
 			return result;
 		}
 
-		/// <summary>
-		/// Push several files.
-		/// </summary>
-		/// <param name="local">An array of local files to push</param>
-		/// <param name="remote">the remote FileEntry representing a directory.</param>
-		/// <param name="monitor">The progress monitor. Cannot be null.</param>
-		/// <returns>
-		/// a SyncResult object with a code and an optional message.
-		/// </returns>
-		/// <exception cref="System.ArgumentNullException">Monitor cannot be null</exception>
-		/// <gist id="380b3c149499bf31e49d" />
-		public SyncResult Push ( IEnumerable<String> local, FileEntry remote, ISyncProgressMonitor monitor ) {
+        /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
+        public SyncResult Push ( IEnumerable<String> local, FileEntry remote, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
@@ -475,18 +428,8 @@ namespace Managed.Adb {
 			return result;
 		}
 
-		/// <summary>
-		/// Push a single file.
-		/// </summary>
-		/// <param name="local">the local filepath.</param>
-		/// <param name="remote">The remote filepath.</param>
-		/// <param name="monitor">The progress monitor. Cannot be null.</param>
-		/// <returns>
-		/// a SyncResult object with a code and an optional message.
-		/// </returns>
-		/// <exception cref="System.ArgumentNullException">monitor;Monitor cannot be null</exception>
-		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
-		public SyncResult PushFile ( String local, String remote, ISyncProgressMonitor monitor ) {
+        /// <include file='.\ISyncService.xml' path='/SyncService/PushFile/*'/>
+        public SyncResult PushFile ( String local, String remote, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}

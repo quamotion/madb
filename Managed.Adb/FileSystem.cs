@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace Managed.Adb
 {
-    public class FileSystem
+    public class FileSystem : IFileSystem
     {
 
         /// <summary>

@@ -125,10 +125,14 @@
     <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="Extensions\IntegerHelper.cs" />
     <Compile Include="Extensions\ReflectionHelper.cs" />
+    <Compile Include="IBusyBox.cs" />
+    <Compile Include="IFileListingService.cs" />
+    <Compile Include="IFileSystem.cs" />
     <Compile Include="IO\BEBinaryReader.cs" />
     <Compile Include="IO\BEBinaryWriter.cs" />
     <Compile Include="IO\ByteBuffer.cs" />
     <Compile Include="IO\ByteOrder.cs" />
+    <Compile Include="ISyncService.cs" />
     <Compile Include="Logs\ILogListener.cs" />
     <Compile Include="Logs\LogEntry.cs" />
     <Compile Include="Extensions\ThrowIf.cs">
@@ -215,7 +219,11 @@
     <None Include="Managd.Adb.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="BusyBox.xml" />
+    <Content Include="FileListingService.xml" />
+    <Content Include="ISyncService.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

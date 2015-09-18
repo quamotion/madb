@@ -171,7 +171,7 @@ namespace Managed.Adb.Tests {
         [TestCategory("IntegrationTest")]
 		public void SyncServicePullFileTest ( ) {
 			Device device = GetFirstDevice ( );
-			using ( SyncService sync = device.SyncService ) {
+			using ( ISyncService sync = device.SyncService ) {
 				String rfile = "/sdcard/bootanimations/bootanimation-cm.zip";
 				FileEntry rentry = device.FileListingService.FindFileEntry ( rfile );
 

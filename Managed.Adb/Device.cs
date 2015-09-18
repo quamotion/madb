@@ -401,7 +401,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets the file system for this device.
 		/// </summary>
-        public FileSystem FileSystem
+        public IFileSystem FileSystem
         {
             get
             {
@@ -420,7 +420,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// Gets the busy box object for this device.
 		/// </summary>
-		public BusyBox BusyBox
+		public IBusyBox BusyBox
         {
             get
             {
@@ -633,9 +633,9 @@ namespace Managed.Adb {
 		/// refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
 		/// </remarks>
 		/// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
-		public SyncService SyncService {
+		public ISyncService SyncService {
 			get {
-				SyncService syncService = new SyncService(AndroidDebugBridge.SocketAddress, this);
+				ISyncService syncService = new SyncService(AndroidDebugBridge.SocketAddress, this);
 				if(syncService.Open()) {
 					return syncService;
 				}
@@ -657,7 +657,7 @@ namespace Managed.Adb {
 		/// Returns a <see cref="FileListingService"/> for this device.
 		/// </summary>
 		/// <value></value>
-		public FileListingService FileListingService {
+		public IFileListingService FileListingService {
 			get {
 				return new FileListingService(this);
 			}
@@ -893,11 +893,11 @@ namespace Managed.Adb {
 
 				Log.d(packageFileName, String.Format("Uploading {0} onto device '{1}'", packageFileName, SerialNumber));
 
-				SyncService sync = SyncService;
+				ISyncService sync = SyncService;
 				if(sync != null) {
 					String message = String.Format("Uploading file onto device '{0}'", SerialNumber);
 					Log.d(LOG_TAG, message);
-					SyncResult result = sync.PushFile(localFilePath, remoteFilePath, SyncService.NullProgressMonitor);
+					SyncResult result = sync.PushFile(localFilePath, remoteFilePath, Managed.Adb.SyncService.NullProgressMonitor);
 
 					if(result.Code != ErrorCodeHelper.RESULT_OK) {
 						throw new IOException(String.Format("Unable to upload file: {0}", result.Message));
