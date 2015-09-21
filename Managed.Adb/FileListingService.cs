@@ -12,7 +12,8 @@ namespace Managed.Adb {
 	/// <summary>
 	/// Provides Device side file listing service.
 	/// </summary>
-	public class FileListingService {
+	public class FileListingService: IFileListingService
+    {
 		/// <summary>
 		/// 
 		/// </summary>
@@ -188,15 +189,10 @@ namespace Managed.Adb {
 
 		}
 
-		/// <summary>
-		/// Gets or sets the device.
-		/// </summary>
-		/// <value>The device.</value>
-		public Device Device { get; private set; }
-		/// <summary>
-		/// Gets or sets the root.
-		/// </summary>
-		/// <value>The root.</value>
+        /// <include file='.\FileListingService.xml' path='/FileListingService/Device/*'/>
+        public Device Device { get; private set; }
+
+        /// <include file='.\FileListingService.xml' path='/FileListingService/Root/*'/>
 		public FileEntry Root {
 			get {
 				if ( Device != null ) {
@@ -212,20 +208,10 @@ namespace Managed.Adb {
 			}
 		}
 
-		/// <summary>
-		/// Gets or sets a value indicating whether [force busy box].
-		/// </summary>
-		/// <value><see langword="true"/> if [force busy box]; otherwise, <see langword="false"/>.</value>
-		public bool ForceBusyBox { get; set; }
+        /// <include file='.\FileListingService.xml' path='/FileListingService/ForceBusyBox/*'/>
+        public bool ForceBusyBox { get; set; }
 
-
-		/// <summary>
-		/// Gets the children.
-		/// </summary>
-		/// <param name="entry">The entry.</param>
-		/// <param name="useCache">if set to <see langword="true"/> [use cache].</param>
-		/// <param name="receiver">The receiver.</param>
-		/// <returns></returns>
+        /// <include file='.\FileListingService.xml' path='/FileListingService/GetChildren/*'/>
 		public FileEntry[] GetChildren ( FileEntry entry, bool useCache, IListingReceiver receiver ) {
 			// first thing we do is check the cache, and if we already have a recent
 			// enough children list, we just return that.
@@ -357,23 +343,13 @@ namespace Managed.Adb {
 
 		}
 
-		/// <summary>
-		/// Finds an entry from the path.
-		/// </summary>
-		/// <param name="path">The file path of</param>
-		/// <returns>The FileEntry</returns>
-		/// <exception cref="FileNotFoundException">Throws if unable to locate the file or directory</exception>
+        /// <include file='.\FileListingService.xml' path='/FileListingService/FindFileEntry/*'/>
 		public FileEntry FindFileEntry ( String path ) {
 			return FindFileEntry ( this.Root, path );
 		}
 
-		/// <summary>
-		/// Finds the file entry.
-		/// </summary>
-		/// <param name="parent">The parent.</param>
-		/// <param name="path">The path.</param>
-		/// <returns></returns>
-		public FileEntry FindFileEntry ( FileEntry parent, String path ) {
+        /// <include file='.\FileListingService.xml' path='/FileListingService/FindFileEntry2/*'/>
+        public FileEntry FindFileEntry ( FileEntry parent, String path ) {
 			var rpath = Device.FileSystem.ResolveLink ( path );
 			var entriesString = rpath.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
 			FileEntry current = parent;

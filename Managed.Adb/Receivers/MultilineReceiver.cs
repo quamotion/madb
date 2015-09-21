@@ -12,7 +12,7 @@ namespace Managed.Adb {
 		/// <summary>
 		/// 
 		/// </summary>
-		protected const String NEWLINE = "\r\n";
+		public const String NEWLINE = "\r\n";
 		/// <summary>
 		/// 
 		/// </summary>

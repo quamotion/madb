@@ -11,7 +11,8 @@ namespace Managed.Adb {
 	/// <summary>
 	/// A class to help with working with BusyBox
 	/// </summary>
-	public class BusyBox {
+	public class BusyBox : IBusyBox
+    {
 		/// <summary>
 		/// 
 		/// </summary>
@@ -33,12 +34,8 @@ namespace Managed.Adb {
 
 		}
 
-		/// <summary>
-		/// Attempts to install on the device
-		/// </summary>
-		/// <param name="busybox">The path to the busybox binary to install.</param>
-		/// <returns><see langword="true"/>, if successful; otherwise, <see langword="false"/></returns>
-		public bool Install ( String busybox ) {
+        /// <include file='.\BusyBox.xml' path='/BusyBox/Install/*'/>
+        public bool Install ( String busybox ) {
 			busybox.ThrowIfNullOrWhiteSpace ( "busybox" );
 
 			FileEntry bb = null;
@@ -122,58 +119,36 @@ namespace Managed.Adb {
 			}
 		}
 
-		/// <summary>
-		/// Executes a busybox command on the device
-		/// </summary>
-		/// <param name="command"></param>
-		/// <param name="receiver"></param>
-		/// <param name="commandArgs"></param>
-		public void ExecuteShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
+        /// <include file='.\BusyBox.xml' path='/BusyBox/ExecuteShellCommand/*'/>
+        public void ExecuteShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
 			command.ThrowIfNullOrWhiteSpace ( "command" );
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
 			Log.d ( "executing: {0}", cmd );
 			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
 		}
 
-		/// <summary>
-		/// Executes a busybox command on the device as root
-		/// </summary>
-		/// <param name="command">The command.</param>
-		/// <param name="receiver">The receiver.</param>
-		/// <param name="commandArgs">The command args.</param>
-		public void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
+        /// <include file='.\BusyBox.xml' path='/BusyBox/ExecuteRootShellCommand/*'/>
+        public void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
 			command.ThrowIfNullOrWhiteSpace ( "command" );
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
 			Log.d ( "executing (su): {0}", cmd );
 			AdbHelper.Instance.ExecuteRemoteRootCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
 		}
 
-		/// <summary>
-		/// Gets or sets the device.
-		/// </summary>
-		/// <value>
-		/// The device.
-		/// </value>
-		public IDevice Device { get; set; }
-		/// <summary>
-		/// Gets if busybox is available on this device.
-		/// </summary>
-		public bool Available { get; private set; }
-		/// <summary>
-		/// Gets the version of busybox
-		/// </summary>
-		public Version Version { get; internal set; }
-		/// <summary>
-		/// Gets a collection of the supported commands
-		/// </summary>
-		public List<String> Commands { get; private set; }
+        /// <include file='.\BusyBox.xml' path='/BusyBox/Device/*'/>
+        public IDevice Device { get; set; }
 
-		/// <summary>
-		/// Gets if the specified command name is supported by this version of busybox
-		/// </summary>
-		/// <param name="command">The command name to check</param>
-		/// <returns><see langword="true"/>, if supported; otherwise, <see langword="false"/>.</returns>
-		public bool Supports ( String command ) {
+        /// <include file='.\BusyBox.xml' path='/BusyBox/Available/*'/>
+		public bool Available { get; private set; }
+
+        /// <include file='.\BusyBox.xml' path='/BusyBox/Version/*'/>
+		public Version Version { get; internal set; }
+
+        /// <include file='.\BusyBox.xml' path='/BusyBox/Commands/*'/>
+        public List<String> Commands { get; private set; }
+
+        /// <include file='.\BusyBox.xml' path='/BusyBox/Supports/*'/>
+        public bool Supports ( String command ) {
 			command.ThrowIfNullOrWhiteSpace ( "command" );
 
 			if ( Available && ( Commands == null || Commands.Count == 0 ) ) {
