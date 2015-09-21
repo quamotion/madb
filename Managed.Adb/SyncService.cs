@@ -321,19 +321,8 @@ namespace Managed.Adb {
 			}
 		}
 
-		/// <summary>
-		/// Pulls file(s) or folder(s).
-		/// </summary>
-		/// <param name="entries">the remote item(s) to pull</param>
-		/// <param name="localPath">The local destination. If the entries count is &gt; 1 or if the unique entry is a
-		/// folder, this should be a folder.</param>
-		/// <param name="monitor">The progress monitor. Cannot be null.</param>
-		/// <returns>
-		/// a SyncResult object with a code and an optional message.
-		/// </returns>
-		/// <exception cref="System.ArgumentNullException">monitor;Monitor cannot be null</exception>
-		/// <gist id="c9ca09c0c0779d0a5fb8" />
-		public SyncResult Pull ( IEnumerable<FileEntry> entries, String localPath, ISyncProgressMonitor monitor ) {
+        /// <include file='.\ISyncService.xml' path='/SyncService/Pull/*'/>
+        public SyncResult Pull ( IEnumerable<FileEntry> entries, String localPath, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}

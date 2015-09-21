@@ -14,13 +14,13 @@ namespace Managed.Adb.Tests
 
         public event EventHandler<EventArgs> ClientListChanged;
 
-        public FileSystem FileSystem
+        public IFileSystem FileSystem
         {
             get;
             set;
         }
 
-        public BusyBox BusyBox
+        public IBusyBox BusyBox
         {
             get;
             set;
@@ -116,12 +116,12 @@ namespace Managed.Adb.Tests
             get { throw new NotImplementedException(); }
         }
 
-        public SyncService SyncService
+        public ISyncService SyncService
         {
             get { throw new NotImplementedException(); }
         }
 
-        public FileListingService FileListingService
+        public IFileListingService FileListingService
         {
             get { throw new NotImplementedException(); }
         }

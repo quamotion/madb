@@ -23,6 +23,7 @@ namespace Managed.Adb
         bool ForceBusyBox
         {
             get;
+            set;
         }
 
         /// <include file='.\FileListingService.xml' path='/FileListingService/GetChildren/*'/>

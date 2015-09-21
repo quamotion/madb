@@ -201,7 +201,7 @@ namespace Managed.Adb.Tests {
 			Device device = GetFirstDevice ( );
 
 
-			using ( SyncService sync = device.SyncService ) {
+			using ( ISyncService sync = device.SyncService ) {
 				SyncResult result = sync.PushFile ( localFile.FullName, remoteFile, new FileSyncProgressMonitor ( ) );
 				Assert.IsTrue ( ErrorCodeHelper.RESULT_OK == result.Code, ErrorCodeHelper.ErrorCodeToString ( result.Code ) );
 				FileEntry remoteEntry = null;
@@ -219,7 +219,7 @@ namespace Managed.Adb.Tests {
         [TestCategory("IntegrationTest")]
 		public void SyncServicePullFilesTest ( ) {
 			Device device = GetFirstDevice ( );
-			using ( SyncService sync = device.SyncService ) {
+			using ( ISyncService sync = device.SyncService ) {
 				String lpath = Path.Combine ( Environment.GetFolderPath ( Environment.SpecialFolder.DesktopDirectory ), "apps" );
 				String rpath = "/system/app/";
 				DirectoryInfo ldir = new DirectoryInfo ( lpath );

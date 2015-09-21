@@ -14,7 +14,7 @@ namespace Managed.Adb
     /// <summary>
     /// Interface containing methods for file synchronisation.
     /// </summary>
-    public interface ISyncService
+    public interface ISyncService: IDisposable
     {
         /// <include file='.\ISyncService.xml' path='/SyncService/PushFile/*'/>
         SyncResult PushFile(String local, String remote, ISyncProgressMonitor monitor);
@@ -27,6 +27,9 @@ namespace Managed.Adb
 
         /// <include file='.\ISyncService.xml' path='/SyncService/PullFile/*'/>
         SyncResult PullFile(FileEntry remote, String localFilename, ISyncProgressMonitor monitor);
+
+        /// <include file='.\ISyncService.xml' path='/SyncService/Pull/*'/>
+        SyncResult Pull(IEnumerable<FileEntry> entries, String localPath, ISyncProgressMonitor monitor);
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Close/*'/>
         void Close();
