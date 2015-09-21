@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb", "Managed.Adb\Managed.Adb.csproj", "{65473257-E70F-410B-9269-D0C0F771EA87}"
 EndProject
@@ -34,6 +34,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{65473257-E70F-410B-9269-D0C0F771EA87}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{65473257-E70F-410B-9269-D0C0F771EA87}.Debug|Any CPU.Build.0 = Debug|x86
 		{65473257-E70F-410B-9269-D0C0F771EA87}.Debug|ia64.ActiveCfg = Debug|x86
 		{65473257-E70F-410B-9269-D0C0F771EA87}.Debug|x64.ActiveCfg = Debug|x86
 		{65473257-E70F-410B-9269-D0C0F771EA87}.Debug|x86.ActiveCfg = Debug|x86
@@ -44,6 +45,7 @@ Global
 		{65473257-E70F-410B-9269-D0C0F771EA87}.Release|x86.ActiveCfg = Release|x86
 		{65473257-E70F-410B-9269-D0C0F771EA87}.Release|x86.Build.0 = Release|x86
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Debug|Any CPU.Build.0 = Debug|x86
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Debug|ia64.ActiveCfg = Debug|x86
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Debug|x64.ActiveCfg = Debug|x86
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Debug|x86.ActiveCfg = Debug|x86
@@ -54,6 +56,7 @@ Global
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|x86.ActiveCfg = Release|x86
 		{2C43B828-BE5E-47B6-93BB-A624B6B36633}.Release|x86.Build.0 = Release|x86
 		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Debug|Any CPU.Build.0 = Debug|x86
 		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Debug|ia64.ActiveCfg = Debug|x86
 		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Debug|x64.ActiveCfg = Debug|x86
 		{F9A436F4-0606-4326-8607-9EA4D9E6AF18}.Debug|x86.ActiveCfg = Debug|x86
