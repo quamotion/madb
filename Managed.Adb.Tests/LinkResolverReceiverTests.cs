@@ -102,6 +102,7 @@ drwxr-xr-x root     root              2015-05-13 01:54 system
 lrwxrwxrwx root     root              2015-06-01 10:17 vendor -> /system/vendor
 ";
 
+            output = string.Join(Environment.NewLine, output.Split(Environment.NewLine.ToCharArray()));
             byte[] data = Encoding.GetEncoding(MultiLineReceiver.ENCODING).GetBytes(output);
 
             // Storage is not a symlink -> output should be null
