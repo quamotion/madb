@@ -244,5 +244,10 @@ namespace Managed.Adb.Tests
         {
             throw new NotImplementedException();
         }
+
+        public void Reboot()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
