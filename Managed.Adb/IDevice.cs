@@ -342,5 +342,10 @@ namespace Managed.Adb {
 		/// Refreshes the properties.
 		/// </summary>
 		void RefreshProperties ( );
-	}
+
+        /// <summary>
+        /// Reboots the device.
+        /// </summary>
+        void Reboot();
+    }
 }

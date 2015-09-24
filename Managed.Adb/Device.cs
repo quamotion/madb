@@ -575,7 +575,7 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
-		/// Reboots the device in to the specified state
+		/// Reboots the device.
 		/// </summary>
 		public void Reboot() {
 			Reboot(String.Empty);
