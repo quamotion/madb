@@ -13,422 +13,422 @@ using Managed.Adb.Logs;
 using System.Net;
 
 namespace Managed.Adb {
-	/// <summary>
-	/// 
-	/// </summary>
-	public enum DeviceState {
-		/// <summary>
-		/// The device is in recovery mode.
-		/// </summary>
-		Recovery,
+    /// <summary>
+    /// 
+    /// </summary>
+    public enum DeviceState {
+        /// <summary>
+        /// The device is in recovery mode.
+        /// </summary>
+        Recovery,
 
-		/// <summary>
-		/// The device is in bootloader mode
-		/// </summary>
-		BootLoader,
+        /// <summary>
+        /// The device is in bootloader mode
+        /// </summary>
+        BootLoader,
 
-		/// <summary>
+        /// <summary>
         /// The instance is not connected to adb or is not responding.
-		/// </summary>
-		Offline,
+        /// </summary>
+        Offline,
 
-		/// <summary>
+        /// <summary>
         /// The instance is now connected to the adb server. Note that this state does not imply that the Android system is 
         /// fully booted and operational, since the instance connects to adb while the system is still booting. 
         /// However, after boot-up, this is the normal operational state of an emulator/device instance.
-		/// </summary>
-		Online,
+        /// </summary>
+        Online,
 
-		/// <summary>
-		/// The device is in download mode.
-		/// </summary>
-		Download,
+        /// <summary>
+        /// The device is in download mode.
+        /// </summary>
+        Download,
 
-		/// <summary>
-		/// The device state is unknown.
-		/// </summary>
-		Unknown,
+        /// <summary>
+        /// The device state is unknown.
+        /// </summary>
+        Unknown,
 
         /// <summary>
         /// The device is connected to adb, but adb is not authorized for remote debugging of this device.
         /// </summary>
         Unauthorized
-	}
+    }
 
-	/// <summary>
-	/// Represents an Android device.
-	/// </summary>
-	public sealed class Device : IDevice {
-		/// <summary>
-		/// Occurs when [state changed].
-		/// </summary>
-		public event EventHandler<EventArgs> StateChanged;
-		/// <summary>
-		/// Occurs when [build info changed].
-		/// </summary>
-		public event EventHandler<EventArgs> BuildInfoChanged;
-		/// <summary>
-		/// Occurs when [client list changed].
-		/// </summary>
-		public event EventHandler<EventArgs> ClientListChanged;
+    /// <summary>
+    /// Represents an Android device.
+    /// </summary>
+    public sealed class Device : IDevice {
+        /// <summary>
+        /// Occurs when [state changed].
+        /// </summary>
+        public event EventHandler<EventArgs> StateChanged;
+        /// <summary>
+        /// Occurs when [build info changed].
+        /// </summary>
+        public event EventHandler<EventArgs> BuildInfoChanged;
+        /// <summary>
+        /// Occurs when [client list changed].
+        /// </summary>
+        public event EventHandler<EventArgs> ClientListChanged;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public const String TEMP_DIRECTORY_FOR_INSTALL = "/storage/sdcard0/tmp/";
+        /// <summary>
+        /// 
+        /// </summary>
+        public const String TEMP_DIRECTORY_FOR_INSTALL = "/storage/sdcard0/tmp/";
 
-		/// <summary>
-		/// The name of the device property that holds the Android build version.
-		/// </summary>
-		public const String PROP_BUILD_VERSION = "ro.build.version.release";
+        /// <summary>
+        /// The name of the device property that holds the Android build version.
+        /// </summary>
+        public const String PROP_BUILD_VERSION = "ro.build.version.release";
 
-		/// <summary>
-		/// The name of the device property that holds the Android API level.
-		/// </summary>
-		public const String PROP_BUILD_API_LEVEL = "ro.build.version.sdk";
+        /// <summary>
+        /// The name of the device property that holds the Android API level.
+        /// </summary>
+        public const String PROP_BUILD_API_LEVEL = "ro.build.version.sdk";
 
-		/// <summary>
-		/// The name of the device property that holds the code name for the Android API level.
-		/// </summary>
-		public const String PROP_BUILD_CODENAME = "ro.build.version.codename";
+        /// <summary>
+        /// The name of the device property that holds the code name for the Android API level.
+        /// </summary>
+        public const String PROP_BUILD_CODENAME = "ro.build.version.codename";
 
-		/// <summary>
-		/// The name of the device property that indicates whether the device is debuggable.
-		/// </summary>
-		public const String PROP_DEBUGGABLE = "ro.debuggable";
+        /// <summary>
+        /// The name of the device property that indicates whether the device is debuggable.
+        /// </summary>
+        public const String PROP_DEBUGGABLE = "ro.debuggable";
 
-		/// <summary>
-		/// Serial number of the first connected emulator. 
-		/// </summary>
-		public const String FIRST_EMULATOR_SN = "emulator-5554";
+        /// <summary>
+        /// Serial number of the first connected emulator. 
+        /// </summary>
+        public const String FIRST_EMULATOR_SN = "emulator-5554";
 
         /// <summary>
         /// The name of the device property that indicates the Android API level.
         /// </summary>
-		[Obsolete("Use PROP_BUILD_API_LEVEL")]
-		public const String PROP_BUILD_VERSION_NUMBER = PROP_BUILD_API_LEVEL;
+        [Obsolete("Use PROP_BUILD_API_LEVEL")]
+        public const String PROP_BUILD_VERSION_NUMBER = PROP_BUILD_API_LEVEL;
 
-		/// <summary>
-		///  Emulator Serial Number regexp.
-		/// </summary>
-		private const String RE_EMULATOR_SN = @"emulator-(\d+)";
+        /// <summary>
+        ///  Emulator Serial Number regexp.
+        /// </summary>
+        private const String RE_EMULATOR_SN = @"emulator-(\d+)";
 
-		/// <summary>
-		/// Device list info regex
-		/// </summary>
-		/// <workitem>21136</workitem>
+        /// <summary>
+        /// Device list info regex
+        /// </summary>
+        /// <workitem>21136</workitem>
         private const string RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download|unauthorized)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
         
         /// <summary>
-		/// The tag to use when logging messages.
-		/// </summary>
-		private const String LOG_TAG = "Device";
+        /// The tag to use when logging messages.
+        /// </summary>
+        private const String LOG_TAG = "Device";
 
         /// <summary>
         /// The time-out when receiving battery information.
         /// </summary>
-		private const int BATTERY_TIMEOUT = 2 * 1000; //2 seconds
+        private const int BATTERY_TIMEOUT = 2 * 1000; //2 seconds
 
         /// <summary>
         /// The time-out when receiving device properties.
         /// </summary>
-		private const int GETPROP_TIMEOUT = 2 * 1000; //2 seconds
+        private const int GETPROP_TIMEOUT = 2 * 1000; //2 seconds
 
         /// <summary>
         /// The time-out when installing applications.
         /// </summary>
-		private const int INSTALL_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+        private const int INSTALL_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
-		/// <summary>
-		/// The name of the Android Virtual Device (emulator).
-		/// </summary>
-		private string _avdName;
+        /// <summary>
+        /// The name of the Android Virtual Device (emulator).
+        /// </summary>
+        private string _avdName;
 
         /// <summary>
         /// Indicates whether the user can obtain su (root) privileges.
         /// </summary>
-		private bool _canSU = false;
+        private bool _canSU = false;
 
         /// <summary>
         /// The latest battery information.
         /// </summary>
-		private BatteryInfo _lastBatteryInfo = null;
+        private BatteryInfo _lastBatteryInfo = null;
 
         /// <summary>
         /// The time at which the battery information was last obtained.
         /// </summary>
-		private DateTime _lastBatteryCheckTime = DateTime.MinValue;
+        private DateTime _lastBatteryCheckTime = DateTime.MinValue;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Device"/> class.
-		/// </summary>
-		/// <param name="serial">The serial.</param>
-		/// <param name="state">The state.</param>
-		/// <param name="model">The model.</param>
-		/// <param name="product">The product.</param>
-		/// <param name="device">The device.</param>
-		public Device(string serial, DeviceState state, string model, string product, string device) {
-			this.SerialNumber = serial;
-			this.State = state;
-			MountPoints = new Dictionary<String, MountPoint>();
-			Properties = new Dictionary<string, string>();
-			EnvironmentVariables = new Dictionary<string, string>();
-			Clients = new List<IClient>();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Device"/> class.
+        /// </summary>
+        /// <param name="serial">The serial.</param>
+        /// <param name="state">The state.</param>
+        /// <param name="model">The model.</param>
+        /// <param name="product">The product.</param>
+        /// <param name="device">The device.</param>
+        public Device(string serial, DeviceState state, string model, string product, string device) {
+            this.SerialNumber = serial;
+            this.State = state;
+            MountPoints = new Dictionary<String, MountPoint>();
+            Properties = new Dictionary<string, string>();
+            EnvironmentVariables = new Dictionary<string, string>();
+            Clients = new List<IClient>();
 
-			Model = model;
-			Product = product;
-			DeviceProperty = device;
+            Model = model;
+            Product = product;
+            DeviceProperty = device;
 
-			RetrieveDeviceInfo();
-		}
+            RetrieveDeviceInfo();
+        }
 
-		/// <summary>
-		/// Retrieves the device info.
-		/// </summary>
-		private void RetrieveDeviceInfo() {
-			RefreshMountPoints();
-			RefreshEnvironmentVariables();
-			RefreshProperties();
-		}
+        /// <summary>
+        /// Retrieves the device info.
+        /// </summary>
+        private void RetrieveDeviceInfo() {
+            RefreshMountPoints();
+            RefreshEnvironmentVariables();
+            RefreshProperties();
+        }
 
-		/// <summary>
-		/// Get the device state from the string value
-		/// </summary>
-		/// <param name="state">The device state string</param>
-		/// <returns></returns>
-		private static DeviceState GetStateFromString(String state) {
-			String tstate = state;
+        /// <summary>
+        /// Get the device state from the string value
+        /// </summary>
+        /// <param name="state">The device state string</param>
+        /// <returns></returns>
+        private static DeviceState GetStateFromString(String state) {
+            String tstate = state;
 
-			if(String.Compare(state, "device", false) == 0) {
-				tstate = "online";
-			}
+            if(String.Compare(state, "device", false) == 0) {
+                tstate = "online";
+            }
 
-			if(Enum.IsDefined(typeof(DeviceState), tstate)) {
-				return (DeviceState)Enum.Parse(typeof(DeviceState), tstate, true);
-			} else {
-				foreach(var fi in typeof(DeviceState).GetFields()) {
-					if(string.Compare(fi.Name, tstate, true) == 0) {
-						return (DeviceState)fi.GetValue(null);
-					}
-				}
-			}
+            if(Enum.IsDefined(typeof(DeviceState), tstate)) {
+                return (DeviceState)Enum.Parse(typeof(DeviceState), tstate, true);
+            } else {
+                foreach(var fi in typeof(DeviceState).GetFields()) {
+                    if(string.Compare(fi.Name, tstate, true) == 0) {
+                        return (DeviceState)fi.GetValue(null);
+                    }
+                }
+            }
 
-			return DeviceState.Unknown;
-		}
+            return DeviceState.Unknown;
+        }
 
 
-		/// <summary>
-		/// Create a device from Adb Device list data
-		/// </summary>
-		/// <param name="data">the line data for the device</param>
-		/// <returns></returns>
-		public static Device CreateFromAdbData(String data) {
-			Regex re = new Regex(RE_DEVICELIST_INFO, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-			Match m = re.Match(data);
-			if(m.Success) {
-				return new Device(m.Groups[1].Value, GetStateFromString(m.Groups[2].Value), m.Groups[4].Value, m.Groups[3].Value, m.Groups[5].Value );
-			} else {
-				throw new ArgumentException("Invalid device list data");
-			}
-		}
+        /// <summary>
+        /// Create a device from Adb Device list data
+        /// </summary>
+        /// <param name="data">the line data for the device</param>
+        /// <returns></returns>
+        public static Device CreateFromAdbData(String data) {
+            Regex re = new Regex(RE_DEVICELIST_INFO, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            Match m = re.Match(data);
+            if(m.Success) {
+                return new Device(m.Groups[1].Value, GetStateFromString(m.Groups[2].Value), m.Groups[4].Value, m.Groups[3].Value, m.Groups[5].Value );
+            } else {
+                throw new ArgumentException("Invalid device list data");
+            }
+        }
 
-		/// <summary>
-		/// Backups this device.
-		/// </summary>
-		public void Backup() {
-			AdbHelper.Instance.Backup(AndroidDebugBridge.SocketAddress);
-		}
+        /// <summary>
+        /// Backups this device.
+        /// </summary>
+        public void Backup() {
+            AdbHelper.Instance.Backup(AndroidDebugBridge.SocketAddress);
+        }
 
-		/// <summary>
-		/// Determines whether this instance can use the SU shell.
-		/// </summary>
-		/// <returns>
-		///   <see langword="true"/> if this instance can use the SU shell; otherwise, <see langword="false"/>.
-		/// </returns>
-		public bool CanSU() {
-			if(_canSU) {
-				return _canSU;
-			}
+        /// <summary>
+        /// Determines whether this instance can use the SU shell.
+        /// </summary>
+        /// <returns>
+        ///   <see langword="true"/> if this instance can use the SU shell; otherwise, <see langword="false"/>.
+        /// </returns>
+        public bool CanSU() {
+            if(_canSU) {
+                return _canSU;
+            }
 
-			try {
-				// workitem: 16822
-				// this now checks if permission was denied and accounts for that. 
-				// The nulloutput receiver is fine here because it doesn't need to send the output anywhere,
-				// the execute command can still handle the output with the null output receiver.
-				this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", NullOutputReceiver.Instance);
-				_canSU = true;
-			} catch(PermissionDeniedException) {
-				_canSU = false;
-			} catch(FileNotFoundException) {
-				_canSU = false;
-			}
+            try {
+                // workitem: 16822
+                // this now checks if permission was denied and accounts for that. 
+                // The nulloutput receiver is fine here because it doesn't need to send the output anywhere,
+                // the execute command can still handle the output with the null output receiver.
+                this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", NullOutputReceiver.Instance);
+                _canSU = true;
+            } catch(PermissionDeniedException) {
+                _canSU = false;
+            } catch(FileNotFoundException) {
+                _canSU = false;
+            }
 
-			return _canSU;
-		}
+            return _canSU;
+        }
 
-		/// <summary>
-		/// Gets or sets the client monitoring socket.
-		/// </summary>
-		/// <value>
-		/// The client monitoring socket.
-		/// </value>
-		public Socket ClientMonitoringSocket { get; set; }
+        /// <summary>
+        /// Gets or sets the client monitoring socket.
+        /// </summary>
+        /// <value>
+        /// The client monitoring socket.
+        /// </value>
+        public Socket ClientMonitoringSocket { get; set; }
 
-		/// <summary>
-		/// Gets the device serial number
-		/// </summary>
-		public String SerialNumber { get; private set; }
+        /// <summary>
+        /// Gets the device serial number
+        /// </summary>
+        public String SerialNumber { get; private set; }
 
-		/// <summary>
-		/// Gets the TCP endpoint defined when the transport is TCP.
-		/// </summary>
-		/// <value>
-		/// The endpoint.
-		/// </value>
-		public IPEndPoint Endpoint { get; private set; }
+        /// <summary>
+        /// Gets the TCP endpoint defined when the transport is TCP.
+        /// </summary>
+        /// <value>
+        /// The endpoint.
+        /// </value>
+        public IPEndPoint Endpoint { get; private set; }
 
         /// <summary>
         /// Indicates how the device is connected to the Android Debug Bridge.
         /// </summary>
-		public TransportType TransportType { get; private set; }
+        public TransportType TransportType { get; private set; }
 
 
-		/// <summary>
-		/// Gets or sets the Avd name.
-		/// </summary>
-		public String AvdName {
-			get { return _avdName; }
-			set {
-				if(!IsEmulator) {
-					throw new ArgumentException("Cannot set the AVD name of the device is not an emulator");
-				}
-				_avdName = value;
-			}
-		}
+        /// <summary>
+        /// Gets or sets the Avd name.
+        /// </summary>
+        public String AvdName {
+            get { return _avdName; }
+            set {
+                if(!IsEmulator) {
+                    throw new ArgumentException("Cannot set the AVD name of the device is not an emulator");
+                }
+                _avdName = value;
+            }
+        }
 
 
-		/// <summary>
-		/// Gets the product.
-		/// </summary>
-		/// <value>
-		/// The product.
-		/// </value>
-		public string Product { get; private set; }
-		/// <summary>
-		/// Gets the model.
-		/// </summary>
-		/// <value>
-		/// The model.
-		/// </value>
-		public string Model { get; private set; }
-		/// <summary>
-		/// Gets the device.
-		/// </summary>
-		/// <value>
-		/// The device identifier.
-		/// </value>
-		public string DeviceProperty { get; private set; }
+        /// <summary>
+        /// Gets the product.
+        /// </summary>
+        /// <value>
+        /// The product.
+        /// </value>
+        public string Product { get; private set; }
+        /// <summary>
+        /// Gets the model.
+        /// </summary>
+        /// <value>
+        /// The model.
+        /// </value>
+        public string Model { get; private set; }
+        /// <summary>
+        /// Gets the device.
+        /// </summary>
+        /// <value>
+        /// The device identifier.
+        /// </value>
+        public string DeviceProperty { get; private set; }
 
-		/// <summary>
-		/// Gets the device state
-		/// </summary>
-		public DeviceState State { get; internal set; }
+        /// <summary>
+        /// Gets the device state
+        /// </summary>
+        public DeviceState State { get; internal set; }
 
-		/// <summary>
-		/// Gets the device mount points.
-		/// </summary>
-		public Dictionary<String, MountPoint> MountPoints { get; set; }
+        /// <summary>
+        /// Gets the device mount points.
+        /// </summary>
+        public Dictionary<String, MountPoint> MountPoints { get; set; }
 
 
-		/// <summary>
-		/// Returns the device properties. It contains the whole output of 'getprop'
-		/// </summary>
-		/// <value>The properties.</value>
-		public Dictionary<String, String> Properties { get; private set; }
+        /// <summary>
+        /// Returns the device properties. It contains the whole output of 'getprop'
+        /// </summary>
+        /// <value>The properties.</value>
+        public Dictionary<String, String> Properties { get; private set; }
 
-		/// <summary>
-		/// Gets the environment variables.
-		/// </summary>
-		/// <value>The environment variables.</value>
-		public Dictionary<String, String> EnvironmentVariables { get; private set; }
+        /// <summary>
+        /// Gets the environment variables.
+        /// </summary>
+        /// <value>The environment variables.</value>
+        public Dictionary<String, String> EnvironmentVariables { get; private set; }
 
-		/// <summary>
-		/// Gets the property value.
-		/// </summary>
-		/// <param name="name">The name of the property.</param>
-		/// <returns>
-		/// the value or <see langword="null"/> if the property does not exist.
-		/// </returns>
-		public String GetProperty(String name) {
-			return GetProperty(new String[] { name });
-		}
+        /// <summary>
+        /// Gets the property value.
+        /// </summary>
+        /// <param name="name">The name of the property.</param>
+        /// <returns>
+        /// the value or <see langword="null"/> if the property does not exist.
+        /// </returns>
+        public String GetProperty(String name) {
+            return GetProperty(new String[] { name });
+        }
 
-		/// <summary>
-		/// Gets the first property that exists in the array of property names.
-		/// </summary>
-		/// <param name="name">The array of property names.</param>
-		/// <returns></returns>
-		public String GetProperty(params String[] name) {
-			foreach(var item in name) {
-				if(Properties.ContainsKey(item)) {
-					return Properties[item];
-				}
-			}
+        /// <summary>
+        /// Gets the first property that exists in the array of property names.
+        /// </summary>
+        /// <param name="name">The array of property names.</param>
+        /// <returns></returns>
+        public String GetProperty(params String[] name) {
+            foreach(var item in name) {
+                if(Properties.ContainsKey(item)) {
+                    return Properties[item];
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether the device is online.
-		/// </summary>
-		/// <value><see langword="true"/> if the device is online; otherwise, <see langword="false"/>.</value>
-		public bool IsOnline {
-			get {
-				return State == DeviceState.Online;
-			}
-		}
+        /// <summary>
+        /// Gets a value indicating whether the device is online.
+        /// </summary>
+        /// <value><see langword="true"/> if the device is online; otherwise, <see langword="false"/>.</value>
+        public bool IsOnline {
+            get {
+                return State == DeviceState.Online;
+            }
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether this device is emulator.
-		/// </summary>
-		/// <value><see langword="true"/> if this device is emulator; otherwise, <see langword="false"/>.</value>
-		public bool IsEmulator {
-			get {
-				return Regex.Match(SerialNumber, RE_EMULATOR_SN).Success;
-			}
-		}
+        /// <summary>
+        /// Gets a value indicating whether this device is emulator.
+        /// </summary>
+        /// <value><see langword="true"/> if this device is emulator; otherwise, <see langword="false"/>.</value>
+        public bool IsEmulator {
+            get {
+                return Regex.Match(SerialNumber, RE_EMULATOR_SN).Success;
+            }
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether this device is offline.
-		/// </summary>
-		/// <value><see langword="true"/> if this device is offline; otherwise, <see langword="false"/>.</value>
-		public bool IsOffline {
-			get {
-				return State == DeviceState.Offline;
-			}
-		}
+        /// <summary>
+        /// Gets a value indicating whether this device is offline.
+        /// </summary>
+        /// <value><see langword="true"/> if this device is offline; otherwise, <see langword="false"/>.</value>
+        public bool IsOffline {
+            get {
+                return State == DeviceState.Offline;
+            }
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether this device is in boot loader mode.
-		/// </summary>
-		/// <value>
-		/// 	<see langword="true"/> if this device is in boot loader mode; otherwise, <see langword="false"/>.
-		/// </value>
-		public bool IsBootLoader {
-			get {
-				return State == DeviceState.BootLoader;
-			}
-		}
+        /// <summary>
+        /// Gets a value indicating whether this device is in boot loader mode.
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if this device is in boot loader mode; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool IsBootLoader {
+            get {
+                return State == DeviceState.BootLoader;
+            }
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether this instance is recovery.
-		/// </summary>
-		/// <value>
-		/// 	<see langword="true"/> if this instance is recovery; otherwise, <see langword="false"/>.
-		/// </value>
-		public bool IsRecovery {
-			get { return State == DeviceState.Recovery; }
-		}
+        /// <summary>
+        /// Gets a value indicating whether this instance is recovery.
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if this instance is recovery; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool IsRecovery {
+            get { return State == DeviceState.Recovery; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is unauthorized.
@@ -441,474 +441,474 @@ namespace Managed.Adb {
             get { return State == DeviceState.Unauthorized; }
         }
 
-		/// <summary>
-		/// Remounts the mount point.
-		/// </summary>
-		/// <param name="mnt">The mount point.</param>
-		/// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
-		public void RemountMountPoint(MountPoint mnt, bool readOnly) {
-			String command = String.Format("mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name);
-			this.ExecuteShellCommand(command, NullOutputReceiver.Instance);
-			RefreshMountPoints();
-		}
+        /// <summary>
+        /// Remounts the mount point.
+        /// </summary>
+        /// <param name="mnt">The mount point.</param>
+        /// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
+        public void RemountMountPoint(MountPoint mnt, bool readOnly) {
+            String command = String.Format("mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name);
+            this.ExecuteShellCommand(command, NullOutputReceiver.Instance);
+            RefreshMountPoints();
+        }
 
-		/// <summary>
-		/// Remounts the mount point.
-		/// </summary>
-		/// <param name="mountPoint">the mount point</param>
-		/// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
-		/// <exception cref="IOException">Throws if the mount point does not exist.</exception>
-		public void RemountMountPoint(String mountPoint, bool readOnly) {
-			if(MountPoints.ContainsKey(mountPoint)) {
-				MountPoint mnt = MountPoints[mountPoint];
-				RemountMountPoint(mnt, readOnly);
-			} else {
-				throw new IOException("Invalid mount point");
-			}
-		}
+        /// <summary>
+        /// Remounts the mount point.
+        /// </summary>
+        /// <param name="mountPoint">the mount point</param>
+        /// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
+        /// <exception cref="IOException">Throws if the mount point does not exist.</exception>
+        public void RemountMountPoint(String mountPoint, bool readOnly) {
+            if(MountPoints.ContainsKey(mountPoint)) {
+                MountPoint mnt = MountPoints[mountPoint];
+                RemountMountPoint(mnt, readOnly);
+            } else {
+                throw new IOException("Invalid mount point");
+            }
+        }
 
 
-		/// <summary>
-		/// Refreshes the mount points.
-		/// </summary>
-		public void RefreshMountPoints() {
-			if(IsOnline) {
-				try {
-					this.ExecuteShellCommand(MountPointReceiver.MOUNT_COMMAND, new MountPointReceiver(this));
-				} catch(AdbException) {
+        /// <summary>
+        /// Refreshes the mount points.
+        /// </summary>
+        public void RefreshMountPoints() {
+            if(IsOnline) {
+                try {
+                    this.ExecuteShellCommand(MountPointReceiver.MOUNT_COMMAND, new MountPointReceiver(this));
+                } catch(AdbException) {
 
-				}
-			}
-		}
+                }
+            }
+        }
 
-		/// <summary>
-		/// Refreshes the environment variables.
-		/// </summary>
-		public void RefreshEnvironmentVariables() {
-			if(IsOnline) {
-				try {
-					this.ExecuteShellCommand(EnvironmentVariablesReceiver.ENV_COMMAND, new EnvironmentVariablesReceiver(this));
-				} catch(AdbException) {
+        /// <summary>
+        /// Refreshes the environment variables.
+        /// </summary>
+        public void RefreshEnvironmentVariables() {
+            if(IsOnline) {
+                try {
+                    this.ExecuteShellCommand(EnvironmentVariablesReceiver.ENV_COMMAND, new EnvironmentVariablesReceiver(this));
+                } catch(AdbException) {
 
-				}
-			}
-		}
+                }
+            }
+        }
 
-		/// <summary>
-		/// Refreshes the properties.
-		/// </summary>
-		public void RefreshProperties() {
-			if(IsOnline) {
-				try {
+        /// <summary>
+        /// Refreshes the properties.
+        /// </summary>
+        public void RefreshProperties() {
+            if(IsOnline) {
+                try {
                     this.Properties.Clear();
-					this.ExecuteShellCommand(GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver(this));
-				} catch(AdbException aex) {
-					Log.w(LOG_TAG, aex);
-				}
-			}
-		}
+                    this.ExecuteShellCommand(GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver(this));
+                } catch(AdbException aex) {
+                    Log.w(LOG_TAG, aex);
+                }
+            }
+        }
 
-		/// <summary>
-		/// Reboots the device in to the specified state
-		/// </summary>
-		/// <param name="into">The reboot state</param>
-		public void Reboot(String into) {
-			AdbHelper.Instance.Reboot(into, AndroidDebugBridge.SocketAddress, this);
-		}
+        /// <summary>
+        /// Reboots the device in to the specified state
+        /// </summary>
+        /// <param name="into">The reboot state</param>
+        public void Reboot(String into) {
+            AdbHelper.Instance.Reboot(into, AndroidDebugBridge.SocketAddress, this);
+        }
 
-		/// <summary>
-		/// Reboots the device.
-		/// </summary>
-		public void Reboot() {
-			Reboot(String.Empty);
-		}
+        /// <summary>
+        /// Reboots the device.
+        /// </summary>
+        public void Reboot() {
+            Reboot(String.Empty);
+        }
 
-		/// <summary>
-		/// Gets the battery level.
-		/// </summary>
-		/// <returns></returns>
-		public BatteryInfo GetBatteryInfo() {
-			return GetBatteryInfo(5 * 60 * 1000);
-		}
+        /// <summary>
+        /// Gets the battery level.
+        /// </summary>
+        /// <returns></returns>
+        public BatteryInfo GetBatteryInfo() {
+            return GetBatteryInfo(5 * 60 * 1000);
+        }
 
-		/// <summary>
-		/// Gets the battery level.
-		/// </summary>
-		/// <param name="freshness">The freshness.</param>
-		/// <returns></returns>
-		public BatteryInfo GetBatteryInfo(long freshness) {
-			if(_lastBatteryInfo != null
-								&& this._lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness))) {
-				return _lastBatteryInfo;
-			}
-			var receiver = new BatteryReceiver();
-			ExecuteShellCommand("dumpsys battery", receiver, BATTERY_TIMEOUT);
-			_lastBatteryInfo = receiver.BatteryInfo;
-			_lastBatteryCheckTime = DateTime.Now;
-			return _lastBatteryInfo;
-		}
+        /// <summary>
+        /// Gets the battery level.
+        /// </summary>
+        /// <param name="freshness">The freshness.</param>
+        /// <returns></returns>
+        public BatteryInfo GetBatteryInfo(long freshness) {
+            if(_lastBatteryInfo != null
+                                && this._lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness))) {
+                return _lastBatteryInfo;
+            }
+            var receiver = new BatteryReceiver();
+            ExecuteShellCommand("dumpsys battery", receiver, BATTERY_TIMEOUT);
+            _lastBatteryInfo = receiver.BatteryInfo;
+            _lastBatteryCheckTime = DateTime.Now;
+            return _lastBatteryInfo;
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether this instance has clients.
-		/// </summary>
-		/// <value>
-		/// 	<see langword="true"/> if this instance has clients; otherwise, <see langword="false"/>.
-		/// </value>
-		public bool HasClients {
-			get {
-				return Clients.Count > 0;
-			}
-		}
-
-
-		/// <summary>
-		/// Gets the list of clients
-		/// </summary>
-		public List<IClient> Clients { get; private set; }
-
-		/// <summary>
-		/// Returns a <see cref="SyncService"/> object to push / pull files to and from the device.
-		/// </summary>
-		/// <value></value>
-		/// <remarks>
-		/// 	<see langword="null"/> if the SyncService couldn't be created. This can happen if adb
-		/// refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
-		/// </remarks>
-		/// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
-		public ISyncService SyncService {
-			get {
-				ISyncService syncService = new SyncService(AndroidDebugBridge.SocketAddress, this);
-				if(syncService.Open()) {
-					return syncService;
-				}
-
-				return null;
-			}
-		}
-
-		/// <summary>
-		/// Takes a screen shot of the device and returns it as a <see cref="RawImage"/>
-		/// </summary>
-		/// <value>The screenshot.</value>
-		public RawImage Screenshot {
-			get {
-				return AdbHelper.Instance.GetFrameBuffer(AndroidDebugBridge.SocketAddress, this);
-			}
-		}
-
-		/// <summary>
-		/// Executes a shell command on the device, and sends the result to a receiver.
-		/// </summary>
-		/// <param name="command">The command to execute</param>
-		/// <param name="receiver">The receiver object getting the result from the command.</param>
-		public void ExecuteShellCommand(String command, IShellOutputReceiver receiver) {
-			ExecuteShellCommand(command, receiver, new object[] { });
-		}
-
-		/// <summary>
-		/// Executes a shell command on the device, and sends the result to a receiver.
-		/// </summary>
-		/// <param name="command">The command.</param>
-		/// <param name="receiver">The receiver.</param>
-		/// <param name="timeout">The timeout.</param>
-		public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout) {
-			ExecuteShellCommand(command, receiver, new object[] { });
-		}
+        /// <summary>
+        /// Gets a value indicating whether this instance has clients.
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if this instance has clients; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool HasClients {
+            get {
+                return Clients.Count > 0;
+            }
+        }
 
 
-		/// <summary>
-		/// Executes a shell command on the device, and sends the result to a receiver.
-		/// </summary>
-		/// <param name="command">The command.</param>
-		/// <param name="receiver">The receiver.</param>
-		/// <param name="commandArgs">The command args.</param>
-		public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs) {
-			AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver);
-		}
+        /// <summary>
+        /// Gets the list of clients
+        /// </summary>
+        public List<IClient> Clients { get; private set; }
 
-		/// <summary>
-		/// Executes a shell command on the device, and sends the result to a receiver.
-		/// </summary>
-		/// <param name="command">The command.</param>
-		/// <param name="receiver">The receiver.</param>
-		/// <param name="timeout">The timeout.</param>
-		/// <param name="commandArgs">The command args.</param>
-		public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs) {
-			AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver);
-		}
+        /// <summary>
+        /// Returns a <see cref="SyncService"/> object to push / pull files to and from the device.
+        /// </summary>
+        /// <value></value>
+        /// <remarks>
+        /// 	<see langword="null"/> if the SyncService couldn't be created. This can happen if adb
+        /// refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
+        /// </remarks>
+        /// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
+        public ISyncService SyncService {
+            get {
+                ISyncService syncService = new SyncService(AndroidDebugBridge.SocketAddress, this);
+                if(syncService.Open()) {
+                    return syncService;
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Takes a screen shot of the device and returns it as a <see cref="RawImage"/>
+        /// </summary>
+        /// <value>The screenshot.</value>
+        public RawImage Screenshot {
+            get {
+                return AdbHelper.Instance.GetFrameBuffer(AndroidDebugBridge.SocketAddress, this);
+            }
+        }
+
+        /// <summary>
+        /// Executes a shell command on the device, and sends the result to a receiver.
+        /// </summary>
+        /// <param name="command">The command to execute</param>
+        /// <param name="receiver">The receiver object getting the result from the command.</param>
+        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver) {
+            ExecuteShellCommand(command, receiver, new object[] { });
+        }
+
+        /// <summary>
+        /// Executes a shell command on the device, and sends the result to a receiver.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <param name="receiver">The receiver.</param>
+        /// <param name="timeout">The timeout.</param>
+        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout) {
+            ExecuteShellCommand(command, receiver, new object[] { });
+        }
 
 
-		/// <summary>
-		/// Executes a shell command on the device as root, and sends the result to a receiver.
-		/// </summary>
-		/// <param name="command">The command.</param>
-		/// <param name="receiver">The receiver.</param>
+        /// <summary>
+        /// Executes a shell command on the device, and sends the result to a receiver.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <param name="receiver">The receiver.</param>
+        /// <param name="commandArgs">The command args.</param>
+        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs) {
+            AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver);
+        }
+
+        /// <summary>
+        /// Executes a shell command on the device, and sends the result to a receiver.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <param name="receiver">The receiver.</param>
+        /// <param name="timeout">The timeout.</param>
+        /// <param name="commandArgs">The command args.</param>
+        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs) {
+            AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver);
+        }
+
+
+        /// <summary>
+        /// Executes a shell command on the device as root, and sends the result to a receiver.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <param name="receiver">The receiver.</param>
         /// <param name="timeout">The period, in milliseconds, after which the command times out.</param>
-		public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout) {
-			ExecuteRootShellCommand(command, receiver, timeout, new object[] { });
-		}
+        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout) {
+            ExecuteRootShellCommand(command, receiver, timeout, new object[] { });
+        }
 
-		/// <summary>
-		/// Executes a shell command on the device as root, and sends the result to a receiver.
-		/// </summary>
-		/// <param name="command">The command to execute</param>
-		/// <param name="receiver">The receiver object getting the result from the command.</param>
-		public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver) {
-			ExecuteRootShellCommand(command, receiver, int.MaxValue);
-		}
+        /// <summary>
+        /// Executes a shell command on the device as root, and sends the result to a receiver.
+        /// </summary>
+        /// <param name="command">The command to execute</param>
+        /// <param name="receiver">The receiver object getting the result from the command.</param>
+        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver) {
+            ExecuteRootShellCommand(command, receiver, int.MaxValue);
+        }
 
-		/// <summary>
-		/// Executes a root shell command on the device, and sends the result to a receiver.
-		/// </summary>
-		/// <param name="command">The command.</param>
-		/// <param name="receiver">The receiver.</param>
-		/// <param name="commandArgs">The command args.</param>
-		public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs) {
-			ExecuteRootShellCommand(command, receiver, int.MaxValue, commandArgs);
-		}
+        /// <summary>
+        /// Executes a root shell command on the device, and sends the result to a receiver.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <param name="receiver">The receiver.</param>
+        /// <param name="commandArgs">The command args.</param>
+        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs) {
+            ExecuteRootShellCommand(command, receiver, int.MaxValue, commandArgs);
+        }
 
-		/// <summary>
-		/// Executes a root shell command on the device, and sends the result to a receiver.
-		/// </summary>
-		/// <param name="command">The command.</param>
-		/// <param name="receiver">The receiver.</param>
-		/// <param name="timeout">The timeout.</param>
-		/// <param name="commandArgs">The command args.</param>
-		public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs) {
-			AdbHelper.Instance.ExecuteRemoteRootCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver, timeout);
-		}
+        /// <summary>
+        /// Executes a root shell command on the device, and sends the result to a receiver.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <param name="receiver">The receiver.</param>
+        /// <param name="timeout">The timeout.</param>
+        /// <param name="commandArgs">The command args.</param>
+        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs) {
+            AdbHelper.Instance.ExecuteRemoteRootCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver, timeout);
+        }
 
 
-		/// <summary>
-		/// Runs the event log service.
-		/// </summary>
-		/// <param name="receiver">The receiver.</param>
-		public void RunEventLogService(LogReceiver receiver) {
-			AdbHelper.Instance.RunEventLogService(AndroidDebugBridge.SocketAddress, this, receiver);
-		}
+        /// <summary>
+        /// Runs the event log service.
+        /// </summary>
+        /// <param name="receiver">The receiver.</param>
+        public void RunEventLogService(LogReceiver receiver) {
+            AdbHelper.Instance.RunEventLogService(AndroidDebugBridge.SocketAddress, this, receiver);
+        }
 
-		/// <summary>
-		/// Runs the log service.
-		/// </summary>
-		/// <param name="logname">The logname.</param>
-		/// <param name="receiver">The receiver.</param>
-		public void RunLogService(String logname, LogReceiver receiver) {
-			AdbHelper.Instance.RunLogService(AndroidDebugBridge.SocketAddress, this, logname, receiver);
-		}
+        /// <summary>
+        /// Runs the log service.
+        /// </summary>
+        /// <param name="logname">The logname.</param>
+        /// <param name="receiver">The receiver.</param>
+        public void RunLogService(String logname, LogReceiver receiver) {
+            AdbHelper.Instance.RunLogService(AndroidDebugBridge.SocketAddress, this, logname, receiver);
+        }
 
-		/// <summary>
-		/// Creates a port forwarding between a local and a remote port.
-		/// </summary>
-		/// <param name="localPort">the local port to forward</param>
-		/// <param name="remotePort">the remote port.</param>
-		/// <returns><see langword="true"/> if success.</returns>
-		public bool CreateForward(int localPort, int remotePort) {
-			try {
-				return AdbHelper.Instance.CreateForward(AndroidDebugBridge.SocketAddress, this, localPort, remotePort);
-			} catch(IOException e) {
-				Log.w("ddms", e);
-				return false;
-			}
-		}
+        /// <summary>
+        /// Creates a port forwarding between a local and a remote port.
+        /// </summary>
+        /// <param name="localPort">the local port to forward</param>
+        /// <param name="remotePort">the remote port.</param>
+        /// <returns><see langword="true"/> if success.</returns>
+        public bool CreateForward(int localPort, int remotePort) {
+            try {
+                return AdbHelper.Instance.CreateForward(AndroidDebugBridge.SocketAddress, this, localPort, remotePort);
+            } catch(IOException e) {
+                Log.w("ddms", e);
+                return false;
+            }
+        }
 
-		/// <summary>
-		/// Removes a port forwarding between a local and a remote port.
-		/// </summary>
-		/// <param name="localPort">the local port to forward</param>
-		/// <returns><see langword="true"/> if success.</returns>
-		public bool RemoveForward(int localPort) {
-			try {
-				return AdbHelper.Instance.RemoveForward(AndroidDebugBridge.SocketAddress, this, localPort);
-			} catch(IOException e) {
-				Log.w("ddms", e);
-				return false;
-			}
-		}
+        /// <summary>
+        /// Removes a port forwarding between a local and a remote port.
+        /// </summary>
+        /// <param name="localPort">the local port to forward</param>
+        /// <returns><see langword="true"/> if success.</returns>
+        public bool RemoveForward(int localPort) {
+            try {
+                return AdbHelper.Instance.RemoveForward(AndroidDebugBridge.SocketAddress, this, localPort);
+            } catch(IOException e) {
+                Log.w("ddms", e);
+                return false;
+            }
+        }
 
-		/*
-		public String GetClientName ( int pid ) {
-			lock ( ClientList ) {
-				foreach ( Client c in ClientList ) {
-					if ( c.ClientData ( ).Pid == pid ) {
-						return c.ClientData.ClientDescription;
-					}
-				}
-			}
+        /*
+        public String GetClientName ( int pid ) {
+            lock ( ClientList ) {
+                foreach ( Client c in ClientList ) {
+                    if ( c.ClientData ( ).Pid == pid ) {
+                        return c.ClientData.ClientDescription;
+                    }
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		DeviceMonitor Monitor { get; private set; }
+        DeviceMonitor Monitor { get; private set; }
 
-		void AddClient ( Client client ) {
-			lock ( ClientList ) {
-				ClientList.Add ( client );
-			}
-		}
+        void AddClient ( Client client ) {
+            lock ( ClientList ) {
+                ClientList.Add ( client );
+            }
+        }
 
-		List<Client> ClientList { get; private set; }
+        List<Client> ClientList { get; private set; }
 
-		bool HasClient ( int pid ) {
-			lock ( ClientList ) {
-				foreach ( Client client in ClientList ) {
-					if ( client.ClientData.Pid == pid ) {
-						return true;
-					}
-				}
-			}
+        bool HasClient ( int pid ) {
+            lock ( ClientList ) {
+                foreach ( Client client in ClientList ) {
+                    if ( client.ClientData.Pid == pid ) {
+                        return true;
+                    }
+                }
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		void ClearClientList ( ) {
-			lock ( ClientList ) {
-				ClientList.Clear ( );
-			}
-		}
-		
-		SocketChannel ClientMonitoringSocket { get; set; }
+        void ClearClientList ( ) {
+            lock ( ClientList ) {
+                ClientList.Clear ( );
+            }
+        }
+        
+        SocketChannel ClientMonitoringSocket { get; set; }
 
-		void RemoveClient ( Client client, bool notify ) {
-			Monitor.AddPortToAvailableList ( client.DebuggerListenPort );
-			lock ( ClientList ) {
-				ClientList.Remove ( client );
-			}
-			if ( notify ) {
-				Monitor.Server.DeviceChanged ( this, CHANGE_CLIENT_LIST );
-			}
-		}
+        void RemoveClient ( Client client, bool notify ) {
+            Monitor.AddPortToAvailableList ( client.DebuggerListenPort );
+            lock ( ClientList ) {
+                ClientList.Remove ( client );
+            }
+            if ( notify ) {
+                Monitor.Server.DeviceChanged ( this, CHANGE_CLIENT_LIST );
+            }
+        }
 
-		void Update ( int changeMask ) {
-			Monitor.Server.DeviceChanged ( this, changeMask );
-		}
+        void Update ( int changeMask ) {
+            Monitor.Server.DeviceChanged ( this, changeMask );
+        }
 
-		void Update ( Client client, int changeMask ) {
-			Monitor.Server.ClientChanged ( client, changeMask );
-		}
+        void Update ( Client client, int changeMask ) {
+            Monitor.Server.ClientChanged ( client, changeMask );
+        }
 */
 
-		/// <summary>
-		/// Installs an Android application on device.
-		/// This is a helper method that combines the syncPackageToDevice, installRemotePackage,
-		/// and removePackage steps
-		/// </summary>
-		/// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
-		/// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
-		public void InstallPackage(String packageFilePath, bool reinstall) {
-			String remoteFilePath = SyncPackageToDevice(packageFilePath);
-			InstallRemotePackage(remoteFilePath, reinstall);
-			RemoveRemotePackage(remoteFilePath);
-		}
+        /// <summary>
+        /// Installs an Android application on device.
+        /// This is a helper method that combines the syncPackageToDevice, installRemotePackage,
+        /// and removePackage steps
+        /// </summary>
+        /// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
+        /// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
+        public void InstallPackage(String packageFilePath, bool reinstall) {
+            String remoteFilePath = SyncPackageToDevice(packageFilePath);
+            InstallRemotePackage(remoteFilePath, reinstall);
+            RemoveRemotePackage(remoteFilePath);
+        }
 
-		/// <summary>
-		/// Pushes a file to device
-		/// </summary>
-		/// <param name="localFilePath">the absolute path to file on local host</param>
-		/// <returns>destination path on device for file</returns>
-		/// <exception cref="IOException">if fatal error occurred when pushing file</exception>
-		public String SyncPackageToDevice(String localFilePath) {
-			try {
-				String packageFileName = Path.GetFileName(localFilePath);
-				// only root has access to /data/local/tmp/... not sure how adb does it then...
-				// workitem: 16823
-				// workitem: 19711
-				String remoteFilePath = LinuxPath.Combine(TEMP_DIRECTORY_FOR_INSTALL, packageFileName);
+        /// <summary>
+        /// Pushes a file to device
+        /// </summary>
+        /// <param name="localFilePath">the absolute path to file on local host</param>
+        /// <returns>destination path on device for file</returns>
+        /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
+        public String SyncPackageToDevice(String localFilePath) {
+            try {
+                String packageFileName = Path.GetFileName(localFilePath);
+                // only root has access to /data/local/tmp/... not sure how adb does it then...
+                // workitem: 16823
+                // workitem: 19711
+                String remoteFilePath = LinuxPath.Combine(TEMP_DIRECTORY_FOR_INSTALL, packageFileName);
 
-				Log.d(packageFileName, String.Format("Uploading {0} onto device '{1}'", packageFileName, SerialNumber));
+                Log.d(packageFileName, String.Format("Uploading {0} onto device '{1}'", packageFileName, SerialNumber));
 
-				ISyncService sync = SyncService;
-				if(sync != null) {
-					String message = String.Format("Uploading file onto device '{0}'", SerialNumber);
-					Log.d(LOG_TAG, message);
-					SyncResult result = sync.PushFile(localFilePath, remoteFilePath, Managed.Adb.SyncService.NullProgressMonitor);
+                ISyncService sync = SyncService;
+                if(sync != null) {
+                    String message = String.Format("Uploading file onto device '{0}'", SerialNumber);
+                    Log.d(LOG_TAG, message);
+                    SyncResult result = sync.PushFile(localFilePath, remoteFilePath, Managed.Adb.SyncService.NullProgressMonitor);
 
-					if(result.Code != ErrorCodeHelper.RESULT_OK) {
-						throw new IOException(String.Format("Unable to upload file: {0}", result.Message));
-					}
-				} else {
-					throw new IOException("Unable to open sync connection!");
-				}
-				return remoteFilePath;
-			} catch(IOException e) {
-				Log.e(LOG_TAG, String.Format("Unable to open sync connection! reason: {0}", e.Message));
-				throw;
-			}
-		}
+                    if(result.Code != ErrorCodeHelper.RESULT_OK) {
+                        throw new IOException(String.Format("Unable to upload file: {0}", result.Message));
+                    }
+                } else {
+                    throw new IOException("Unable to open sync connection!");
+                }
+                return remoteFilePath;
+            } catch(IOException e) {
+                Log.e(LOG_TAG, String.Format("Unable to open sync connection! reason: {0}", e.Message));
+                throw;
+            }
+        }
 
-		/// <summary>
-		/// Installs the application package that was pushed to a temporary location on the device.
-		/// </summary>
-		/// <param name="remoteFilePath">absolute file path to package file on device</param>
-		/// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
-		public void InstallRemotePackage(String remoteFilePath, bool reinstall) {
-			InstallReceiver receiver = new InstallReceiver();
-			String cmd = String.Format("pm install {1}{0}", remoteFilePath, reinstall ? "-r " : String.Empty);
-			ExecuteShellCommand(cmd, receiver);
+        /// <summary>
+        /// Installs the application package that was pushed to a temporary location on the device.
+        /// </summary>
+        /// <param name="remoteFilePath">absolute file path to package file on device</param>
+        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        public void InstallRemotePackage(String remoteFilePath, bool reinstall) {
+            InstallReceiver receiver = new InstallReceiver();
+            String cmd = String.Format("pm install {1}{0}", remoteFilePath, reinstall ? "-r " : String.Empty);
+            ExecuteShellCommand(cmd, receiver);
 
-			if(!String.IsNullOrEmpty(receiver.ErrorMessage)) {
-				throw new PackageInstallationException(receiver.ErrorMessage);
-			}
-		}
+            if(!String.IsNullOrEmpty(receiver.ErrorMessage)) {
+                throw new PackageInstallationException(receiver.ErrorMessage);
+            }
+        }
 
 
-		/// <summary>
-		/// Remove a file from device
-		/// </summary>
-		/// <param name="remoteFilePath">path on device of file to remove</param>
-		/// <exception cref="IOException">if file removal failed</exception>
-		public void RemoveRemotePackage(String remoteFilePath) {
-			// now we delete the app we sync'ed
-			try {
-				ExecuteShellCommand("rm " + remoteFilePath, NullOutputReceiver.Instance);
-			} catch(IOException e) {
-				Log.e(LOG_TAG, String.Format("Failed to delete temporary package: {0}", e.Message));
-				throw e;
-			}
-		}
+        /// <summary>
+        /// Remove a file from device
+        /// </summary>
+        /// <param name="remoteFilePath">path on device of file to remove</param>
+        /// <exception cref="IOException">if file removal failed</exception>
+        public void RemoveRemotePackage(String remoteFilePath) {
+            // now we delete the app we sync'ed
+            try {
+                ExecuteShellCommand("rm " + remoteFilePath, NullOutputReceiver.Instance);
+            } catch(IOException e) {
+                Log.e(LOG_TAG, String.Format("Failed to delete temporary package: {0}", e.Message));
+                throw e;
+            }
+        }
 
-		/// <summary>
-		/// Uninstall an package from the device.
-		/// </summary>
-		/// <param name="packageName">Name of the package.</param>
-		/// <exception cref="IOException"></exception>
-		///   
-		/// <exception cref="PackageInstallationException"></exception>
-		public void UninstallPackage(String packageName) {
-			InstallReceiver receiver = new InstallReceiver();
-			ExecuteShellCommand(String.Format("pm uninstall {0}", packageName), receiver);
-			if(!String.IsNullOrEmpty(receiver.ErrorMessage)) {
-				throw new PackageInstallationException(receiver.ErrorMessage);
-			}
-		}
+        /// <summary>
+        /// Uninstall an package from the device.
+        /// </summary>
+        /// <param name="packageName">Name of the package.</param>
+        /// <exception cref="IOException"></exception>
+        ///   
+        /// <exception cref="PackageInstallationException"></exception>
+        public void UninstallPackage(String packageName) {
+            InstallReceiver receiver = new InstallReceiver();
+            ExecuteShellCommand(String.Format("pm uninstall {0}", packageName), receiver);
+            if(!String.IsNullOrEmpty(receiver.ErrorMessage)) {
+                throw new PackageInstallationException(receiver.ErrorMessage);
+            }
+        }
 
-		/// <summary>
-		/// Raises the <see cref="E:StateChanged"/> event.
-		/// </summary>
-		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-		internal void OnStateChanged(EventArgs e) {
-			if(this.StateChanged != null) {
-				this.StateChanged(this, e);
-			}
-		}
+        /// <summary>
+        /// Raises the <see cref="E:StateChanged"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        internal void OnStateChanged(EventArgs e) {
+            if(this.StateChanged != null) {
+                this.StateChanged(this, e);
+            }
+        }
 
-		/// <summary>
-		/// Raises the <see cref="E:BuildInfoChanged"/> event.
-		/// </summary>
-		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-		internal void OnBuildInfoChanged(EventArgs e) {
-			if(this.BuildInfoChanged != null) {
-				this.BuildInfoChanged(this, e);
-			}
-		}
+        /// <summary>
+        /// Raises the <see cref="E:BuildInfoChanged"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        internal void OnBuildInfoChanged(EventArgs e) {
+            if(this.BuildInfoChanged != null) {
+                this.BuildInfoChanged(this, e);
+            }
+        }
 
-		/// <summary>
-		/// Raises the <see cref="E:ClientListChanged"/> event.
-		/// </summary>
-		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-		internal void OnClientListChanged(EventArgs e) {
-			if(this.ClientListChanged != null) {
-				this.ClientListChanged(this, e);
-			}
-		}
-	}
+        /// <summary>
+        /// Raises the <see cref="E:ClientListChanged"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        internal void OnClientListChanged(EventArgs e) {
+            if(this.ClientListChanged != null) {
+                this.ClientListChanged(this, e);
+            }
+        }
+    }
 }
