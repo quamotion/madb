@@ -452,7 +452,6 @@ namespace Managed.Adb
         /// <returns></returns>
         public AdbResponse ReadAdbResponse(Socket socket, bool readDiagString)
         {
-
             AdbResponse resp = new AdbResponse();
 
             byte[] reply = new byte[4];
@@ -611,7 +610,6 @@ namespace Managed.Adb
         /// </exception>
         public bool CreateForward(IPEndPoint adbSockAddr, IDevice device, int localPort, int remotePort)
         {
-
             Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
@@ -828,7 +826,6 @@ namespace Managed.Adb
         /// </exception>
         public RawImage GetFrameBuffer(IPEndPoint adbSockAddr, IDevice device)
         {
-
             RawImage imageParams = new RawImage();
             byte[] request = this.FormAdbRequest("framebuffer:"); //$NON-NLS-1$
             byte[] nudge =
@@ -976,7 +973,6 @@ namespace Managed.Adb
         /// <exception cref="PermissionDeniedException"></exception>
         public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
-
             using (var socket = this.ExecuteRawSocketCommand(endPoint, device, "shell:{0}".With(command)))
             {
                 socket.ReceiveTimeout = maxTimeToOutputResponse;
@@ -988,7 +984,6 @@ namespace Managed.Adb
                     int count = -1;
                     while (count != 0)
                     {
-
                         if (rcvr != null && rcvr.IsCancelled)
                         {
                             Log.w(TAG, "execute: cancelled");

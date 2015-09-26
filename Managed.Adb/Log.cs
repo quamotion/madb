@@ -259,7 +259,6 @@ namespace Managed.Adb
         /// </remarks>
         internal static void HexDump(string tag, LogLevel.LogLevelInfo level, byte[] data, int offset, int length)
         {
-
             int kHexOffset = 6;
             int kAscOffset = 55;
             char[] line = new char[SpaceLine.Length];

@@ -11,7 +11,6 @@ namespace Managed.Adb
     /// <ignore>true</ignore>
     public class AndroidDebugBridgeEventArgs : EventArgs
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AndroidDebugBridgeEventArgs"/> class.
         /// </summary>

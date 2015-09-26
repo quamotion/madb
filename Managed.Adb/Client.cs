@@ -12,7 +12,6 @@ namespace Managed.Adb
     /// </summary>
     public class Client : IClient
     {
-
         /// <summary>
         ///
         /// </summary>

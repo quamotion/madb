@@ -7,7 +7,6 @@ namespace Managed.Adb
 {
         public class DeviceEventArgs : EventArgs
         {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceEventArgs"/> class.
         /// </summary>

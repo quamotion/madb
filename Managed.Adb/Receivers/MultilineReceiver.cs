@@ -10,7 +10,6 @@ namespace Managed.Adb
     /// </summary>
     public abstract class MultiLineReceiver : IShellOutputReceiver
     {
-
         /// <summary>
         ///
         /// </summary>

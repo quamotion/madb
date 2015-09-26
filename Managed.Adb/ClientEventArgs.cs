@@ -51,7 +51,6 @@ namespace Managed.Adb
     /// </summary>
     public class ClientEventArgs : EventArgs
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientEventArgs"/> class.
         /// </summary>

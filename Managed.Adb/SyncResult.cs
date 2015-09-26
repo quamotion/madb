@@ -17,7 +17,6 @@ namespace Managed.Adb
         /// <param name="message">The error message</param>
         public SyncResult(int code, string message)
         {
-
             this.Message = message ?? ErrorCodeHelper.ErrorCodeToString(code);
             this.Code = code;
         }

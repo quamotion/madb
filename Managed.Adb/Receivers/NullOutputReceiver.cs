@@ -10,7 +10,6 @@ namespace Managed.Adb
     /// </summary>
     public sealed class NullOutputReceiver : IShellOutputReceiver
     {
-
         /// <summary>
         /// Prevents a default instance of the <see cref="NullOutputReceiver" /> class from being created.
         /// </summary>

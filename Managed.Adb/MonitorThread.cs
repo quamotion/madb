@@ -11,7 +11,6 @@ namespace Managed.Adb
     /// </summary>
     class MonitorThread
     {
-
         /// <summary>
         ///
         /// </summary>

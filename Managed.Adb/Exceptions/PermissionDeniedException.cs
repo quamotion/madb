@@ -8,7 +8,6 @@ namespace Managed.Adb.Exceptions
 {
     public class PermissionDeniedException : Exception
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
         /// </summary>

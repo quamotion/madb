@@ -7,7 +7,6 @@ namespace Managed.Adb
 {
     public class FilePermissions
     {
-
         public FilePermissions() : this("---------")
         {
         }
@@ -58,7 +57,6 @@ namespace Managed.Adb
     /// </summary>
     public class FilePermission
     {
-
         /// <summary>
         ///
         /// </summary>

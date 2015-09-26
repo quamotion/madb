@@ -533,7 +533,6 @@ namespace Managed.Adb
                     bool result = this.SendDeviceMonitoringRequest(socket, device);
                     if (result)
                     {
-
                         /*if ( Selector == null ) {
                             StartDeviceMonitorThread ( );
                         }*/
@@ -733,7 +732,6 @@ namespace Managed.Adb
         /// <param name="monitorThread">The monitor thread.</param>
         private void OpenClient(Device device, int pid, int port, MonitorThread monitorThread)
         {
-
             Socket clientSocket;
             try
             {
@@ -760,7 +758,6 @@ namespace Managed.Adb
         /// <param name="monitorThread">The monitor thread.</param>
         private void CreateClient(Device device, int pid, Socket socket, int debuggerPort, MonitorThread monitorThread)
         {
-
             /*
              * Successfully connected to something. Create a Client object, add
              * it to the list, and initiate the JDWP handshake.

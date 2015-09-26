@@ -38,7 +38,6 @@ namespace Managed.Adb
 
     public interface IClient : IPacketConsumer
     {
-
         ClientConnectionState ConnectionState { get; }
 
         ClientChangeState ChangeState { get; }

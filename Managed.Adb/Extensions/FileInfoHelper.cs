@@ -9,7 +9,6 @@ namespace Managed.Adb
     /// <ignore>true</ignore>
     public static partial class ManagedAdbExtenstions
     {
-
         /// <summary>
         /// Determines whether the specified path is directory.
         /// </summary>

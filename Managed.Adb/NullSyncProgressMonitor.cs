@@ -10,7 +10,6 @@ namespace Managed.Adb
     /// </summary>
     public sealed class NullSyncProgressMonitor : ISyncProgressMonitor
     {
-
         /// <summary>
         /// Sent when the transfer starts
         /// </summary>

@@ -296,7 +296,6 @@ namespace Managed.Adb
         /// </remarks>
         public static AndroidDebugBridge CreateBridge(string osLocation, bool forceNewBridge)
         {
-
             if (_instance != null)
             {
                 if (!string.IsNullOrEmpty(AdbOsLocation) && string.Compare(AdbOsLocation, osLocation, true) == 0 && !forceNewBridge)

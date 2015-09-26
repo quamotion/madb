@@ -9,13 +9,11 @@ using Managed.Adb.Exceptions;
 
 namespace Managed.Adb
 {
-
     /// <summary>
     ///
     /// </summary>
     public interface IDevice
     {
-
         /// <summary>
         /// Occurs when device state changed.
         /// </summary>

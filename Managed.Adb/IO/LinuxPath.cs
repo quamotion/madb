@@ -12,7 +12,6 @@ namespace Managed.Adb.IO
     /// </summary>
     public static class LinuxPath
     {
-
         /// <summary>
         /// Pattern to escape filenames for shell command consumption.
         /// </summary>

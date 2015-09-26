@@ -8,7 +8,6 @@ namespace Managed.Adb
     /// <ignore>true</ignore>
     public static partial class ManagedAdbExtenstions
     {
-
         /// <summary>
         /// Swaps an unsigned value around, and puts the result in an array that can be sent to a device.
         /// </summary>

@@ -8,7 +8,6 @@ namespace Managed.Adb
     /// <ignore>true</ignore>
     public static partial class ManagedAdbExtenstions
     {
-
         /// <summary>
         /// Bits the shift right.
         /// </summary>

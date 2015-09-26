@@ -10,7 +10,6 @@ namespace Managed.Adb
     /// </summary>
     public class AdbResponse
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbResponse"/> class.
         /// </summary>

@@ -121,7 +121,6 @@ namespace Managed.Adb
         /// <returns>true if the code matches.</returns>
         private static bool CheckResult(byte[] result, byte[] code)
         {
-
             if (result.Length >= code.Length)
             {
                 for (int i = 0; i < code.Length; i++)
