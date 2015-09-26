@@ -15,17 +15,20 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>
         public PackageInstallationException() { }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
         public PackageInstallationException(string message) : base(message) { }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="inner">The inner.</param>
         public PackageInstallationException(string message, Exception inner) : base(message, inner) { }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>

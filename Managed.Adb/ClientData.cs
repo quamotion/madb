@@ -22,14 +22,17 @@ namespace Managed.Adb
             /// new connections. This is the default value.
             /// </summary>
             DEFAULT,
+
             /// <summary>
             /// Debugger connection status: the application's VM is paused, waiting for a debugger to connect to it before resuming.
             /// </summary>
             WAITING,
+
             /// <summary>
             /// Debugger connection status : Debugger is connected
             /// </summary>
             ATTACHED,
+
             /// <summary>
             /// Debugger connection status: The listening port for debugger connection failed to listen.
             /// No debugger will be able to connect. 
@@ -50,10 +53,12 @@ namespace Managed.Adb
                 /// @see Client#requestAllocationStatus()
                 /// </summary>
         UNKNOWN,
+
                 /// <summary>
                 /// Allocation tracking status: the {@link Client} is not tracking allocations.
                 /// </summary>
         OFF,
+
                 /// <summary>
                 /// Allocation tracking status: the {@link Client} is tracking allocations.
                 /// </summary>
@@ -73,10 +78,12 @@ namespace Managed.Adb
                 /// @see Client#requestMethodProfilingStatus()
                 /// </summary>
         UNKNOWN,
+
                 /// <summary>
                 ///  Method profiling status: the {@link Client} is not profiling method calls.
                 /// </summary>
         OFF,
+
                 /// <summary>
                 /// Method profiling status: the {@link Client} is profiling method calls.
                 /// </summary>
@@ -88,16 +95,19 @@ namespace Managed.Adb
         /// GetVmHeapInfo(int)
         /// </summary>
     public const string HEAP_MAX_SIZE_BYTES = "maxSizeInBytes"; // $NON-NLS-1$
+
         /// <summary>
         /// Name of the value representing the size of the heap, in the {@link Map} returned by
         /// {@link #getVmHeapInfo(int)}
         /// </summary>
     public const string HEAP_SIZE_BYTES = "sizeInBytes"; // $NON-NLS-1$
+
         /// <summary>
         /// Name of the value representing the number of allocated bytes of the heap, in the
         /// {@link Map} returned by {@link #getVmHeapInfo(int)}
         /// </summary>
     public const string HEAP_BYTES_ALLOCATED = "bytesAllocated"; // $NON-NLS-1$
+
         /// <summary>
         /// Name of the value representing the number of objects in the heap, in the {@link Map}
         /// returned by {@link #getVmHeapInfo(int)}
@@ -143,6 +153,7 @@ namespace Managed.Adb
         /// Gets the pid.
         /// </summary>
         public int Pid { get; private set; }
+
         /// <summary>
         /// Gets or sets the debugger interest.
         /// </summary>
@@ -150,6 +161,7 @@ namespace Managed.Adb
         /// The debugger interest.
         /// </value>
         public DebuggerStatus DebuggerInterest { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether this instance is DDM aware.
         /// </summary>
@@ -157,6 +169,7 @@ namespace Managed.Adb
         /// 	<see langword="true"/> if this instance is DDM aware; otherwise, <see langword="false"/>.
         /// </value>
         public bool IsDdmAware { get; set; }
+
         /// <summary>
         /// Gets or sets the vm identifier.
         /// </summary>
@@ -164,6 +177,7 @@ namespace Managed.Adb
         /// The vm identifier.
         /// </value>
         public string VmIdentifier { get; set; }
+
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
@@ -171,6 +185,7 @@ namespace Managed.Adb
         /// The description.
         /// </value>
         public string Description { get; set; }
+
         /// <summary>
         /// Gets or sets the debugger connection status.
         /// </summary>

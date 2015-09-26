@@ -15,10 +15,12 @@ namespace Managed.Adb
         /// 
         /// </summary>
         public const string ENV_COMMAND = "printenv";
+
         /// <summary>
         /// 
         /// </summary>
         private const string ENV_PATTERN = @"^([^=\s]+)\s*=\s*(.*)$";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EnvironmentVariablesReceiver"/> class.
         /// </summary>

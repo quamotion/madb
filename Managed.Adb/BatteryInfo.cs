@@ -21,18 +21,22 @@ namespace Managed.Adb
             /// Unknown Status
             /// </summary>
             Unknown = 1,
+
             /// <summary>
             /// Charging
             /// </summary>
             Charging = 2,
+
             /// <summary>
             /// Discharging
             /// </summary>
             Discharging = 3,
+
             /// <summary>
             /// Discharging
             /// </summary>
             NotCharging = 4,
+
             /// <summary>
             /// Battery Full
             /// </summary>
@@ -48,22 +52,27 @@ namespace Managed.Adb
             /// Unknown Health
             /// </summary>
             Unknown = 1,
+
             /// <summary>
             /// Good
             /// </summary>
             Good = 2,
+
             /// <summary>
             /// Overheating
             /// </summary>
             Overheat = 3,
+
             /// <summary>
             /// Cold
             /// </summary>
             Cold = 4,
+
             /// <summary>
             /// Over voltage
             /// </summary>
             OverVoltage = 5,
+
             /// <summary>
             /// Unspecified Failure
             /// </summary>
@@ -77,6 +86,7 @@ namespace Managed.Adb
         ///   <see langword="true"/> if AC powered; otherwise, <see langword="false"/>.
         /// </value>
         public bool ACPowered { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether usb powered.
         /// </summary>
@@ -84,6 +94,7 @@ namespace Managed.Adb
         ///   <see langword="true"/> if usb powered; otherwise, <see langword="false"/>.
         /// </value>
         public bool UsbPowered { get; set; }
+
         /// <summary>
         /// Gets or sets the status.
         /// </summary>
@@ -91,6 +102,7 @@ namespace Managed.Adb
         /// The status.
         /// </value>
         public StatusTypes Status { get; set; }
+
         /// <summary>
         /// Gets or sets the health.
         /// </summary>
@@ -98,6 +110,7 @@ namespace Managed.Adb
         /// The health.
         /// </value>
         public HealthTypes Health { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether a battery is present.
         /// </summary>
@@ -105,6 +118,7 @@ namespace Managed.Adb
         ///   <see langword="true"/> if present; otherwise, <see langword="false"/>.
         /// </value>
         public bool Present { get; set; }
+
         /// <summary>
         /// Gets or sets the level.
         /// </summary>
@@ -112,6 +126,7 @@ namespace Managed.Adb
         /// The level.
         /// </value>
         public int Level { get; set; }
+
         /// <summary>
         /// Gets or sets the scale.
         /// </summary>
@@ -119,6 +134,7 @@ namespace Managed.Adb
         /// The scale.
         /// </value>
         public int Scale { get; set; }
+
         /// <summary>
         /// Gets or sets the voltage.
         /// </summary>
@@ -126,6 +142,7 @@ namespace Managed.Adb
         /// The voltage.
         /// </value>
         public int Voltage { get; set; }
+
         /// <summary>
         /// Gets or sets the temperature.
         /// </summary>
@@ -133,6 +150,7 @@ namespace Managed.Adb
         /// The temperature.
         /// </value>
         public int Temperature { get; set; }
+
         /// <summary>
         /// Gets or sets the type.
         /// </summary>

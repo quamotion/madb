@@ -24,6 +24,7 @@ namespace Managed.Adb
         /// 
         /// </summary>
         private byte[] LengthBuffer = null;
+
         /// <summary>
         /// 
         /// </summary>
@@ -48,18 +49,22 @@ namespace Managed.Adb
         /// Gets the devices.
         /// </summary>
         public IList<Device> Devices { get; private set; }
+
         /// <summary>
         /// Gets the debugger ports.
         /// </summary>
         public IList<int> DebuggerPorts { get; private set; }
+
         /// <summary>
         /// Gets the clients to reopen.
         /// </summary>
         public Dictionary<IClient, int> ClientsToReopen { get; private set; }
+
         /// <summary>
         /// Gets the server.
         /// </summary>
         public AndroidDebugBridge Server { get; private set; }
+
         /// <summary>
         /// Gets a value indicating whether this instance is monitoring.
         /// </summary>
@@ -67,6 +72,7 @@ namespace Managed.Adb
         /// 	<see langword="true"/> if this instance is monitoring; otherwise, <see langword="false"/>.
         /// </value>
         public bool IsMonitoring { get; private set; }
+
         /// <summary>
         /// Gets a value indicating whether this instance is running.
         /// </summary>
@@ -74,14 +80,17 @@ namespace Managed.Adb
         /// 	<see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.
         /// </value>
         public bool IsRunning { get; private set; }
+
         /// <summary>
         /// Gets the connection attempt count.
         /// </summary>
         public int ConnectionAttemptCount { get; private set; }
+
         /// <summary>
         /// Gets the restart attempt count.
         /// </summary>
         public int RestartAttemptCount { get; private set; }
+
         /// <summary>
         /// Gets a value indicating whether this instance has initial device list.
         /// </summary>
@@ -89,6 +98,7 @@ namespace Managed.Adb
         /// 	<see langword="true"/> if this instance has initial device list; otherwise, <see langword="false"/>.
         /// </value>
         public bool HasInitialDeviceList { get; private set; }
+
         /// <summary>
         /// Gets or sets the main adb connection.
         /// </summary>

@@ -22,6 +22,7 @@ namespace Managed.Adb
         public IDebugPortProvider Provider { get; set; }
 
         private static DebugPortManager _instance;
+
         /// <summary>
         /// Returns an instance of the debug port manager
         /// </summary>

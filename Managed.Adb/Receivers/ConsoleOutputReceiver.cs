@@ -16,6 +16,7 @@ namespace Managed.Adb
         private const string TAG = "ConsoleOutputReceiver";
 
         private static ConsoleOutputReceiver _instance = null;
+
         /// <summary>
         /// Gets the instance.
         /// </summary>

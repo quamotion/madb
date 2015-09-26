@@ -15,6 +15,7 @@ namespace Managed.Adb
         /// 
         /// </summary>
         public const string NEWLINE = "\r\n";
+
         /// <summary>
         /// 
         /// </summary>
@@ -43,6 +44,7 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The unfinished line.</value>
         protected string UnfinishedLine { get; set; }
+
         /// <summary>
         /// Gets or sets the lines.
         /// </summary>

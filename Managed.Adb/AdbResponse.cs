@@ -26,6 +26,7 @@ namespace Managed.Adb
         ///   <see langword="true"/> if successful; otherwise, <see langword="false"/>.
         /// </value>
         public bool IOSuccess { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="AdbResponse"/> is okay.
         /// </summary>
@@ -33,6 +34,7 @@ namespace Managed.Adb
         ///   <see langword="true"/> if okay; otherwise, <see langword="false"/>.
         /// </value>
         public bool Okay { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="AdbResponse"/> is timeout.
         /// </summary>
@@ -40,6 +42,7 @@ namespace Managed.Adb
         ///   <see langword="true"/> if timeout; otherwise, <see langword="false"/>.
         /// </value>
         public bool Timeout { get; set; }
+
         /// <summary>
         /// Gets or sets the message.
         /// </summary>

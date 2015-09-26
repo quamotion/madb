@@ -25,21 +25,25 @@ namespace Managed.Adb
         /// </summary>
         /// <ignore>true</ignore>
         public event EventHandler<AndroidDebugBridgeEventArgs> BridgeChanged;
+
         /// <summary>
         /// Occurs when [device changed].
         /// </summary>
         /// <ignore>true</ignore>
         public event EventHandler<DeviceEventArgs> DeviceChanged;
+
         /// <summary>
         /// Occurs when [device connected].
         /// </summary>
         /// <ignore>true</ignore>
         public event EventHandler<DeviceEventArgs> DeviceConnected;
+
         /// <summary>
         /// Occurs when [device disconnected].
         /// </summary>
         /// <ignore>true</ignore>
         public event EventHandler<DeviceEventArgs> DeviceDisconnected;
+
         /// <summary>
         /// Occurs when [client changed].
         /// </summary>
@@ -55,6 +59,7 @@ namespace Managed.Adb
         /// 
         /// </summary>
         private const int ADB_VERSION_MICRO_MIN = 20;
+
         /// <summary>
         /// 
         /// </summary>
@@ -87,14 +92,17 @@ namespace Managed.Adb
         /// The ADB executive
         /// </summary>
         public const string ADB = "adb.exe";
+
         /// <summary>
         /// The DDMS executive
         /// </summary>
         public const string DDMS = "monitor.bat";
+
         /// <summary>
         /// The hierarchy viewer
         /// </summary>
         public const string HIERARCHYVIEWER = "hierarchyviewer.bat";
+
         /// <summary>
         /// The AAPT executive
         /// </summary>
@@ -103,16 +111,19 @@ namespace Managed.Adb
 #endif
 
         // Where to find the ADB bridge.
+
         /// <summary>
         /// The default ADB bridge port
         /// </summary>
         public const int ADB_PORT = 5037;
 
         #region statics
+
         /// <summary>
         /// 
         /// </summary>
         private static AndroidDebugBridge _instance;
+
         /// <summary>
         /// 
         /// </summary>
@@ -123,6 +134,7 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The socket address.</value>
         public static IPEndPoint SocketAddress { get; private set; }
+
         /// <summary>
         /// Gets or sets the host address.
         /// </summary>
@@ -171,6 +183,7 @@ namespace Managed.Adb
          * @see AndroidDebugBridge#createBridge(String, boolean)
          * @see DdmPreferences
          */
+
         /// <summary>
         /// Initializes the <code>ddm</code> library.
         /// <para>This must be called once <b>before</b> any call to CreateBridge.</para>
@@ -375,6 +388,7 @@ namespace Managed.Adb
         #endregion
 
         #region Event "Raisers"
+
         /// <summary>
         /// Raises the <see cref="E:BridgeChanged"/> event.
         /// </summary>
@@ -437,6 +451,7 @@ namespace Managed.Adb
         #endregion
 
         #region public methods
+
         /// <summary>
         /// Starts the debug bridge.
         /// </summary>
@@ -527,6 +542,7 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The adb location on the OS.</value>
         public static string AdbOsLocation { get; set; }
+
         /// <summary>
         /// Gets the devices.
         /// </summary>
@@ -652,6 +668,7 @@ namespace Managed.Adb
         /// Gets if the adb host has started
         /// </summary>
         private bool Started { get; set; }
+
         /// <summary>
         /// Gets the result of the version check
         /// </summary>

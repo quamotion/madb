@@ -37,26 +37,31 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The verbose log level.</value>
         public static LogLevelInfo Verbose { get; private set; }
+
         /// <summary>
         /// Gets or sets the debug log level.
         /// </summary>
         /// <value>The debug log level.</value>
         public static LogLevelInfo Debug { get; private set; }
+
         /// <summary>
         /// Gets or sets the info log level.
         /// </summary>
         /// <value>The info log level.</value>
         public static LogLevelInfo Info { get; private set; }
+
         /// <summary>
         /// Gets or sets the warn log level.
         /// </summary>
         /// <value>The warn log level.</value>
         public static LogLevelInfo Warn { get; private set; }
+
         /// <summary>
         /// Gets or sets the error log level.
         /// </summary>
         /// <value>The error log level.</value>
         public static LogLevelInfo Error { get; private set; }
+
         /// <summary>
         /// Gets or sets the assert log level.
         /// </summary>
@@ -165,11 +170,13 @@ namespace Managed.Adb
             /// </summary>
             /// <value>The priority.</value>
             public int Priority { get; set; }
+
             /// <summary>
             /// Gets or sets the value.
             /// </summary>
             /// <value>The value.</value>
             public string Value { get; set; }
+
             /// <summary>
             /// Gets or sets the letter.
             /// </summary>

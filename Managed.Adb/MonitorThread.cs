@@ -21,10 +21,12 @@ namespace Managed.Adb
             /// 
             /// </summary>
             UNKNOWN = -1,
+
             /// <summary>
             /// 
             /// </summary>
             Ready = 2,
+
             /// <summary>
             /// 
             /// </summary>
@@ -43,6 +45,7 @@ namespace Managed.Adb
         /// 
         /// </summary>
         private static MonitorThread _instance;
+
         /// <summary>
         /// Gets the instance.
         /// </summary>
@@ -65,6 +68,7 @@ namespace Managed.Adb
         /// </summary>
         /// <value><see langword="true"/> if quit; otherwise, <see langword="false"/>.</value>
         public bool Quit { get; private set; }
+
         /// <summary>
         /// Gets or sets the clients.
         /// </summary>

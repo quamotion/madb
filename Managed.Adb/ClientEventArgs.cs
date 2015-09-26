@@ -14,26 +14,32 @@ namespace Managed.Adb
         /// 
         /// </summary>
         ChangeInfo,
+
         /// <summary>
         /// 
         /// </summary>
         ChangeDebuggerStatus,
+
         /// <summary>
         /// 
         /// </summary>
         ChangeThreadMode,
+
         /// <summary>
         /// 
         /// </summary>
         ChangeThreadData,
+
         /// <summary>
         /// 
         /// </summary>
         ChangeHeapMode,
+
         /// <summary>
         /// 
         /// </summary>
         ChangeHeapData,
+
         /// <summary>
         /// 
         /// </summary>
@@ -62,6 +68,7 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The change mask.</value>
         public ClientChangeMask ChangeMask { get; private set; }
+
         /// <summary>
         /// Gets the client.
         /// </summary>

@@ -66,10 +66,12 @@ namespace Managed.Adb
         /// Occurs when [state changed].
         /// </summary>
         public event EventHandler<EventArgs> StateChanged;
+
         /// <summary>
         /// Occurs when [build info changed].
         /// </summary>
         public event EventHandler<EventArgs> BuildInfoChanged;
+
         /// <summary>
         /// Occurs when [client list changed].
         /// </summary>
@@ -339,6 +341,7 @@ namespace Managed.Adb
         /// The product.
         /// </value>
         public string Product { get; private set; }
+
         /// <summary>
         /// Gets the model.
         /// </summary>
@@ -346,6 +349,7 @@ namespace Managed.Adb
         /// The model.
         /// </value>
         public string Model { get; private set; }
+
         /// <summary>
         /// Gets the device.
         /// </summary>

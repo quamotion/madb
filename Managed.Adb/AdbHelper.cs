@@ -174,6 +174,7 @@ namespace Managed.Adb
         }
 
         //https://github.com/android/platform_system_core/blob/master/adb/backup_service.c
+
         /// <summary>
         /// Backups the specified address.
         /// </summary>
@@ -212,6 +213,7 @@ namespace Managed.Adb
         }
 
         // https://github.com/android/platform_system_core/blob/master/adb/backup_service.c
+
         /// <summary>
         /// Restores this instance.
         /// </summary>

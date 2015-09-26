@@ -32,6 +32,7 @@ namespace Managed.Adb
         /// The version.
         /// </value>
         public int Version { get; set; }
+
         /// <summary>
         /// Gets or sets the BPP.
         /// </summary>
@@ -39,6 +40,7 @@ namespace Managed.Adb
         /// The BPP.
         /// </value>
         public int Bpp { get; set; }
+
         /// <summary>
         /// Gets or sets the size.
         /// </summary>
@@ -46,6 +48,7 @@ namespace Managed.Adb
         /// The size.
         /// </value>
         public int Size { get; set; }
+
         /// <summary>
         /// Gets or sets the width.
         /// </summary>
@@ -53,6 +56,7 @@ namespace Managed.Adb
         /// The width.
         /// </value>
         public int Width { get; set; }
+
         /// <summary>
         /// Gets or sets the height.
         /// </summary>
@@ -60,6 +64,7 @@ namespace Managed.Adb
         /// The height.
         /// </value>
         public int Height { get; set; }
+
         /// <summary>
         /// Gets or sets the red.
         /// </summary>
@@ -67,6 +72,7 @@ namespace Managed.Adb
         /// The red.
         /// </value>
         public ColorData Red { get; set; }
+
         /// <summary>
         /// Gets or sets the blue.
         /// </summary>
@@ -74,6 +80,7 @@ namespace Managed.Adb
         /// The blue.
         /// </value>
         public ColorData Blue { get; set; }
+
         /// <summary>
         /// Gets or sets the green.
         /// </summary>
@@ -81,6 +88,7 @@ namespace Managed.Adb
         /// The green.
         /// </value>
         public ColorData Green { get; set; }
+
         /// <summary>
         /// Gets or sets the alpha.
         /// </summary>

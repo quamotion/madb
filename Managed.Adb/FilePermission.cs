@@ -67,14 +67,17 @@ namespace Managed.Adb
             /// 
             /// </summary>
             NoAccess = 0,
+
             /// <summary>
             /// 
             /// </summary>
             Execute = 1,
+
             /// <summary>
             /// 
             /// </summary>
             Write = 2,
+
             /// <summary>
             /// 
             /// </summary>

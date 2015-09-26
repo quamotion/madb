@@ -25,6 +25,7 @@ namespace Managed.Adb
         /// 
         /// </summary>
         private static char[] SpaceLine = new char[72];
+
         /// <summary>
         /// 
         /// </summary>
@@ -60,6 +61,7 @@ namespace Managed.Adb
             /// Log Verbose
             /// </summary>
             public const bool LOGV = true;
+
             /// <summary>
             /// Log Debug
             /// </summary>

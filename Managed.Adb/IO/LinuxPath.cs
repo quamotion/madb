@@ -22,10 +22,12 @@ namespace Managed.Adb.IO
         /// The directory separator character
         /// </summary>
         public static readonly char DirectorySeparatorChar = '/';
+
         /// <summary>
         /// The directory separator alternate character
         /// </summary>
         public static readonly char AltDirectorySeparatorChar = '/';
+
         /// <summary>
         /// Invalid characters for a file name
         /// </summary>
@@ -35,22 +37,27 @@ namespace Managed.Adb.IO
                         '\f', '\r', '\x000e', '\x000f', '\x0010', '\x0011', '\x0012', '\x0013', '\x0014', '\x0015', '\x0016', '\x0017', '\x0018', '\x0019', '\x001a', '\x001b', 
                         '\x001c', '\x001d', '\x001e', '\x001f', '*', '?', '\\', '/'
                  };
+
         /// <summary>
         /// The max length of a directory path
         /// </summary>
         internal const int MAX_DIRECTORY_PATH = 0xf8;
+
         /// <summary>
         /// the max length of a file path
         /// </summary>
         internal const int MAX_PATH = 260;
+
         /// <summary>
         /// the max length of a file path
         /// </summary>
         internal static readonly int MaxPath = 260;
+
         /// <summary>
         /// The character used to separate multiple paths
         /// </summary>
         public static readonly char PathSeparator = ';';
+
         /// <summary>
         /// Invalid characters for a file/directory path
         /// </summary>

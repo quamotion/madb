@@ -45,6 +45,7 @@ namespace Managed.Adb
         /// Gets the error message
         /// </summary>
         public string Message { get; private set; }
+
         /// <summary>
         /// Gets the error code
         /// </summary>

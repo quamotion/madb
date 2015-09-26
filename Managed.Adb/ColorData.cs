@@ -18,6 +18,7 @@ namespace Managed.Adb
         /// The length.
         /// </value>
         public int Length { get; set; }
+
         /// <summary>
         /// Gets or sets the offset.
         /// </summary>

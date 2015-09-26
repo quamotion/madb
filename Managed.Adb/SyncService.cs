@@ -33,30 +33,37 @@ namespace Managed.Adb
             /// The unknown
             /// </summary>
             UNKNOWN = 0x0000, // unknown
+
             /// <summary>
             /// The socket
             /// </summary>
             Socket = 0xc000, // type: socket
+
             /// <summary>
             /// The symbolic link
             /// </summary>
             SymbolicLink = 0xa000, // type: symbolic link
+
             /// <summary>
             /// The regular
             /// </summary>
             Regular = 0x8000, // type: regular file
+
             /// <summary>
             /// The block
             /// </summary>
             Block = 0x6000, // type: block device
+
             /// <summary>
             /// The directory
             /// </summary>
             Directory = 0x4000, // type: directory
+
             /// <summary>
             /// The character
             /// </summary>
             Character = 0x2000, // type: character device
+
             /// <summary>
             /// The fifo
             /// </summary>
@@ -241,6 +248,7 @@ namespace Managed.Adb
         /// The address.
         /// </value>
         public IPEndPoint Address { get; private set; }
+
         /// <summary>
         /// Gets the device.
         /// </summary>

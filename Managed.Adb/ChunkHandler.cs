@@ -20,6 +20,7 @@ namespace Managed.Adb
             /// 
             /// </summary>
             LittleEndian,
+
             /// <summary>
             /// 
             /// </summary>
@@ -30,6 +31,7 @@ namespace Managed.Adb
         /// 
         /// </summary>
         public const int CHUNK_HEADER_LEN = 8;   // 4-byte type, 4-byte len
+
         /// <summary>
         /// 
         /// </summary>

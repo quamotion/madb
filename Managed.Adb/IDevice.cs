@@ -20,10 +20,12 @@ namespace Managed.Adb
         /// Occurs when device state changed.
         /// </summary>
         event EventHandler<EventArgs> StateChanged;
+
         /// <summary>
         /// Occurs when build info changed.
         /// </summary>
         event EventHandler<EventArgs> BuildInfoChanged;
+
         /// <summary>
         /// Occurs when client list changed.
         /// </summary>
@@ -34,6 +36,7 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The serial number.</value>
         string SerialNumber { get; }
+
         /// <summary>
         /// Gets the TCP endpoint defined when the transport is TCP.
         /// </summary>
@@ -96,6 +99,7 @@ namespace Managed.Adb
         /// the value or <see langword="null"/> if the property does not exist.
         /// </returns>
         string GetProperty(string name);
+
         /// <summary>
         /// Gets the first property that exists in the array of property names.
         /// </summary>

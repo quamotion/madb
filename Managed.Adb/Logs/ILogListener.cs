@@ -12,6 +12,7 @@ namespace Managed.Adb.Logs
         /// </summary>
         /// <param name="entry">entry the new log entry.</param>
         void NewEntry(LogEntry entry);
+
         /// <summary>
         /// Sent when new raw data is coming from the log service.
         /// </summary>

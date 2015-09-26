@@ -16,15 +16,18 @@ namespace Managed.Adb
         void Read();
         // TODO: JdwpPacket
         /*JdwpPacket*/ object GetJdwpPacket();
+
         /// <summary>
         /// Forwards the packet to client.
         /// </summary>
         /// <param name="packet">The packet.</param>
         void ForwardPacketToClient(/*JdwpPacket*/ object packet);
+
         /// <summary>
         /// Sends the handshake.
         /// </summary>
         bool SendHandshake();
+
         /// <summary>
         /// Sends the and consume.
         /// </summary>

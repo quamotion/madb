@@ -17,6 +17,7 @@ namespace Managed.Adb
         /// The mount parsing pattern.
         /// </summary>
         private const string RE_MOUNTPOINT_PATTERN = @"^([\S]+)\s+([\S]+)\s+([\S]+)\s+(r[wo]).*$";
+
         /// <summary>
         /// The mount command
         /// </summary>
