@@ -123,8 +123,10 @@ namespace Managed.Adb
                         return false;
                     }
                 }
+
                 return true;
             }
+
             return false;
         }
 
@@ -308,6 +310,7 @@ namespace Managed.Adb
                 catch (IOException)
                 {
                 }
+
                 this.Channel = null;
             }
         }
@@ -425,6 +428,7 @@ namespace Managed.Adb
             {
                 DataBuffer = new byte[SYNC_DATA_MAX + 8];
             }
+
             byte[] bDATA = DATA.GetBytes();
             Array.Copy(bDATA, 0, DataBuffer, 0, bDATA.Length);
 
@@ -471,6 +475,7 @@ namespace Managed.Adb
                 // and advance the monitor
                 monitor.Advance(readCount);
             }
+
             // close the local file
             try
             {
@@ -541,6 +546,7 @@ namespace Managed.Adb
                 {
                     return new SyncResult(ErrorCodeHelper.RESULT_CANCELED);
                 }
+
                 // append the name of the directory/file to the remote path
                 string dest = LinuxPath.Combine(remotePath, f.Name);
                 if (f.Exists)
@@ -663,11 +669,13 @@ namespace Managed.Adb
                     {
                         break;
                     }
+
                     if (CheckResult(pullResult, DATA.GetBytes()) == false)
                     {
                         // hmm there's an error
                         return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR);
                     }
+
                     int length = pullResult.Swap32bitFromArray(4);
                     if (length > SYNC_DATA_MAX)
                     {
@@ -689,6 +697,7 @@ namespace Managed.Adb
                         Log.e(TAG, e);
                         return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR, e);
                     }
+
                     // write the content in the file
                     try
                     {
@@ -712,6 +721,7 @@ namespace Managed.Adb
                     return new SyncResult(ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e);
                 }
             }
+
             return new SyncResult(ErrorCodeHelper.RESULT_OK);
         }
 

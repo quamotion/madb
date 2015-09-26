@@ -91,6 +91,7 @@ namespace Managed.Adb
                 {
                     _instance = new AdbHelper();
                 }
+
                 return _instance;
             }
         }
@@ -123,11 +124,13 @@ namespace Managed.Adb
                 {
                     throw new AdbException("failed submitting request to ADB");
                 }
+
                 AdbResponse resp = this.ReadAdbResponse(s, false);
                 if (!resp.Okay)
                 {
                     throw new AdbException("connection request rejected");
                 }
+
                 s.Blocking = true;
             }
             catch (AdbException)
@@ -135,6 +138,7 @@ namespace Managed.Adb
                 s.Close();
                 throw;
             }
+
             return s;
         }
 
@@ -156,6 +160,7 @@ namespace Managed.Adb
                 {
                     throw new IOException("failed asking to kill adb");
                 }
+
                 var resp = this.ReadAdbResponse(socket, false);
                 if (!resp.IOSuccess || !resp.Okay)
                 {
@@ -163,6 +168,7 @@ namespace Managed.Adb
                     socket.Close();
                     return -1;
                 }
+
                 return 0;
             }
         }
@@ -186,6 +192,7 @@ namespace Managed.Adb
                 {
                     throw new IOException("failed asking to backup device");
                 }
+
                 var resp = this.ReadAdbResponse(socket, false);
                 if (!resp.IOSuccess || !resp.Okay)
                 {
@@ -415,6 +422,7 @@ namespace Managed.Adb
                     {
                         throw new AdbException("timeout");
                     }
+
                     // non-blocking spin
                     Thread.Sleep(WAIT_TIME);
                     numWaits++;
@@ -429,6 +437,7 @@ namespace Managed.Adb
                 Log.e(TAG, sex);
                 throw;
             }
+
             //}
             //}
         }
@@ -449,6 +458,7 @@ namespace Managed.Adb
             {
                 return resp;
             }
+
             resp.IOSuccess = true;
 
             if (this.IsOkay(reply))
@@ -758,6 +768,7 @@ namespace Managed.Adb
                 Log.e(TAG, uee);
                 result = "";
             }
+
             return result;
         }
 
@@ -779,6 +790,7 @@ namespace Managed.Adb
                     Log.e(TAG, "error in getting data length");
                     return null;
                 }
+
                 string lenHex = reply.GetString(Encoding.Default);
                 int len = int.Parse(lenHex, System.Globalization.NumberStyles.HexNumber);
 
@@ -852,6 +864,7 @@ namespace Managed.Adb
                     adbChan.Close();
                     return null;
                 }
+
                 BinaryReader buf;
                 int version = 0;
                 using (MemoryStream ms = new MemoryStream(reply))
@@ -1152,6 +1165,7 @@ namespace Managed.Adb
                         {
                             break;
                         }
+
                         var buffer = new byte[4 * 1024];
 
                         count = socket.Receive(buffer);
@@ -1317,6 +1331,7 @@ namespace Managed.Adb
                 {
                     throw new IOException("failed submitting request to  adb");
                 }
+
                 var resp = this.ReadAdbResponse(socket, false);
                 if (!resp.IOSuccess || !resp.Okay)
                 {
@@ -1324,6 +1339,7 @@ namespace Managed.Adb
                     socket.Close();
                     return -1;
                 }
+
                 return 0;
             }
         }
@@ -1364,6 +1380,7 @@ namespace Managed.Adb
         {
             return this.ExecuteRawSocketCommand(address, null, command);
         }
+
         /// <summary>
         /// Executes the raw socket command.
         /// </summary>
@@ -1397,6 +1414,7 @@ namespace Managed.Adb
             {
                 this.SetDevice(adbChan, device);
             }
+
             if (!this.Write(adbChan, command))
             {
                 throw new AdbException("failed to submit the command: {0}.".With(command.GetString().Trim()));
@@ -1407,6 +1425,7 @@ namespace Managed.Adb
             {
                 throw new AdbException("Device rejected command: {0}".With(resp.Message));
             }
+
             return adbChan;
         }
 

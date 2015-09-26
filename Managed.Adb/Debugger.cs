@@ -16,6 +16,7 @@ namespace Managed.Adb
             AwaitShake = 2,
             Ready = 3
         }
+
         private const int INITIAL_BUF_SIZE = 1 * 1024;
         private const int MAX_BUF_SIZE = 32 * 1024;
 
@@ -227,6 +228,7 @@ namespace Managed.Adb
                 {
                     this.ListenChannel.Close();
                 }
+
                 this.ListenChannel = null;
                 this.CloseData();
             }

@@ -181,6 +181,7 @@ namespace Managed.Adb
                                     this.RestartAttemptCount = 0;
                                 }
                             }
+
                             this.WaitBeforeContinue();
                         }
                         else
@@ -189,6 +190,7 @@ namespace Managed.Adb
                             this.ConnectionAttemptCount = 0;
                         }
                     }
+
                     if (this.MainAdbConnection != null && !this.IsMonitoring && this.MainAdbConnection.Connected)
                     {
                         this.IsMonitoring = this.SendDeviceListMonitoringRequest();
@@ -225,6 +227,7 @@ namespace Managed.Adb
                             {
                                 // we can safely ignore that one.
                             }
+
                             this.MainAdbConnection = null;
                         }
                     }
@@ -422,6 +425,7 @@ namespace Managed.Adb
                     }
                 }
             }
+
             list.Clear();
         }
 
@@ -551,6 +555,7 @@ namespace Managed.Adb
                     {
                         // we can ignore that one. It may already have been closed.
                     }
+
                     Log.d(TAG, "Connection Failure when starting to monitor device '{0}' : {1}", device, e.Message);
                 }
             }
@@ -611,6 +616,7 @@ namespace Managed.Adb
                                 {
                                     port = this.GetNextDebuggerPort();
                                 }
+
                                 Log.d("DeviceMonitor", "Reopening " + client);
                                 this.OpenClient(device, pid, port, monitorThread);
                                 device.OnClientListChanged(EventArgs.Empty);
@@ -690,6 +696,7 @@ namespace Managed.Adb
                 socket.Close();
                 throw new IOException();
             }
+
             AdbResponse resp = AdbHelper.Instance.ReadAdbResponse(socket, false /* readDiagString */);
             if (resp.IOSuccess == false)
             {
@@ -845,6 +852,7 @@ namespace Managed.Adb
                                 break;
                             }
                         }
+
                         // TODO: check if we can compact the end of the list.
                     }
                 }
@@ -872,6 +880,7 @@ namespace Managed.Adb
                     // we'll throw an exception below.
                 }
             }
+
             //throw new IOException ( "unable to read data length" );
             // we receive something we can't read. It's better to reset the connection at this point.
             return -1;

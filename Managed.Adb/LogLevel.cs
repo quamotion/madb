@@ -79,6 +79,7 @@ namespace Managed.Adb
                     return item;
                 }
             }
+
             return null;
         }
 

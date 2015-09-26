@@ -147,6 +147,7 @@ namespace Managed.Adb
                     this.Alpha.Length = 0;
                     break;
             }
+
             return true;
         }
 
@@ -249,6 +250,7 @@ namespace Managed.Adb
                 {
                     tdata = this.Swap(tdata);
                 }
+
                 Marshal.Copy(tdata, 0, bitmapdata.Scan0, this.Size);
                 bitmap.UnlockBits(bitmapdata);
                 using (Graphics g = Graphics.FromImage(image))

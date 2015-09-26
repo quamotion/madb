@@ -35,6 +35,7 @@ namespace Managed.Adb
                 {
                     _instance = new NullOutputReceiver();
                 }
+
                 return _instance;
             }
         }

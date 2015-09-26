@@ -110,6 +110,7 @@ namespace Managed.Adb
                         {
                             line = line.Trim();
                         }
+
                         this.Lines.Add(line);
 
                         // move start to after the \r\n we found

@@ -55,6 +55,7 @@ namespace Managed.Adb
                 {
                     _instance = new MonitorThread();
                 }
+
                 return _instance;
             }
         }

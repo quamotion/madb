@@ -33,6 +33,7 @@ namespace Managed.Adb
                 {
                     _instance = new DebugPortManager();
                 }
+
                 return _instance;
             }
         }

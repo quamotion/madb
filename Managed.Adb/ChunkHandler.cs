@@ -100,6 +100,7 @@ namespace Managed.Adb
                         + ": len=" + data.Length + ", reply=" + isReply
                         + ", msgId=0x" + msgId.ToString("X8"));
             }
+
             Log.w("ddms", "         client " + client + ", handler " + this);
         }
 

@@ -45,6 +45,7 @@ namespace Managed.Adb
                             string msg = m.Groups[1].Value;
                             this.ErrorMessage = string.IsNullOrEmpty(msg) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
                         }
+
                         this.Success = false;
                     }
                 }

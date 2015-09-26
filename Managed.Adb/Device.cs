@@ -327,6 +327,7 @@ namespace Managed.Adb
                 {
                     throw new ArgumentException("Cannot set the AVD name of the device is not an emulator");
                 }
+
                 this._avdName = value;
             }
         }
@@ -599,6 +600,7 @@ namespace Managed.Adb
                                 {
                 return this._lastBatteryInfo;
             }
+
             var receiver = new BatteryReceiver();
             this.ExecuteShellCommand("dumpsys battery", receiver, BATTERY_TIMEOUT);
             this._lastBatteryInfo = receiver.BatteryInfo;
@@ -914,6 +916,7 @@ namespace Managed.Adb
                 {
                     throw new IOException("Unable to open sync connection!");
                 }
+
                 return remoteFilePath;
             }
             catch (IOException e)

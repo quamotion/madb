@@ -46,6 +46,7 @@ namespace Managed.Adb
                 Log.Level = value ;
             }
         }
+
         public static int DebugPortBase { get; set; }
         public static int SelectedDebugPort
         {
@@ -64,6 +65,7 @@ namespace Managed.Adb
                 }
             }
         }
+
         public static bool InitialThreadUpdate { get; set; }
         public static bool InitialHeapUpdate { get; set; }
     }

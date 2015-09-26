@@ -208,6 +208,7 @@ namespace Managed.Adb
                 inArray[highCtr] = temp;
                 highCtr -= 1;
             }
+
             return inArray;
         }
     }

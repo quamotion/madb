@@ -222,6 +222,7 @@ namespace Managed.Adb
                 {
                     _instance = CreateBridge();
                 }
+
                 return _instance;
             }
         }
@@ -501,6 +502,7 @@ namespace Managed.Adb
                 Log.LogAndDisplay(LogLevel.Error, ADB, "Attempting to restart adb, but version check failed!");
                 return false;
             }
+
             lock (this)
             {
                 this.StopAdb();
@@ -561,6 +563,7 @@ namespace Managed.Adb
             {
                 return this.DeviceMonitor.HasInitialDeviceList;
             }
+
             return false;
         }
 
@@ -586,6 +589,7 @@ namespace Managed.Adb
                 }*/
             }
         }
+
         /// <summary>
         /// Returns whether the AndroidDebugBridge object is still connected to the adb daemon.
         /// </summary>
@@ -599,6 +603,7 @@ namespace Managed.Adb
                 {
                     return this.DeviceMonitor.IsMonitoring /* && monitorThread.State != State.TERMINATED*/;
                 }
+
                 return false;
             }
         }
@@ -615,6 +620,7 @@ namespace Managed.Adb
                 {
                     return this.DeviceMonitor.ConnectionAttemptCount;
                 }
+
                 return -1;
             }
         }
@@ -632,6 +638,7 @@ namespace Managed.Adb
                 {
                     return this.DeviceMonitor.RestartAttemptCount;
                 }
+
                 return -1;
             }
         }
@@ -691,6 +698,7 @@ namespace Managed.Adb
                         {
                             builder.AppendLine(error);
                         }
+
                         Log.LogAndDisplay(LogLevel.Error, "adb", builder.ToString());
                     }
                 }
@@ -765,9 +773,11 @@ namespace Managed.Adb
                     {
                         this.VersionCheck = true;
                     }
+
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -837,6 +847,7 @@ namespace Managed.Adb
                 Log.e(ADB, "Cannot stop adb when AndroidDebugBridge is created without the location of adb.");
                 return false;
             }
+
             int status = -1;
 
             try
@@ -889,10 +900,12 @@ namespace Managed.Adb
             {
                 throw new ArgumentNullException("errorOutput");
             }
+
             if (stdOutput == null)
             {
                 throw new ArgumentNullException("stdOutput");
             }
+
             // read the lines as they come. if null is returned, it's
             // because the process finished
             Thread t1 = new Thread(new ThreadStart(delegate
@@ -957,6 +970,7 @@ namespace Managed.Adb
                 catch (ThreadInterruptedException)
                 {
                 }
+
                 try
                 {
                     t2.Join();

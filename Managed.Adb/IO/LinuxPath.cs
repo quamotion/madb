@@ -83,6 +83,7 @@ namespace Managed.Adb.IO
             {
                 return null;
             }
+
             CheckInvalidPathChars(path);
             string str = path;
             int length = path.Length;
@@ -94,15 +95,18 @@ namespace Managed.Adb.IO
                     str = path.Substring(0, length);
                     break;
                 }
+
                 if (((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar)))
                 {
                     break;
                 }
             }
+
             if (string.IsNullOrEmpty(extension) || path.Length == 0)
             {
                 return str;
             }
+
             if (extension.Length > 0 && extension[0] != '.')
             {
                 str = str + ".";
@@ -125,11 +129,13 @@ namespace Managed.Adb.IO
             {
                 return false;
             }
+
             if (ignoreCase)
             {
                 string str = new string(array, 0, compareTo.Length);
                 return compareTo.Equals(str, StringComparison.OrdinalIgnoreCase);
             }
+
             for (int i = 0; i < compareTo.Length; i++)
             {
                 if (array[i] != compareTo[i])
@@ -137,6 +143,7 @@ namespace Managed.Adb.IO
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -154,11 +161,13 @@ namespace Managed.Adb.IO
             {
                 return false;
             }
+
             if (ignoreCase)
             {
                 string str = new string(array, 0, compareTo.Length);
                 return compareTo.Equals(str, StringComparison.OrdinalIgnoreCase);
             }
+
             for (int i = 0; i < compareTo.Length; i++)
             {
                 if (array[i] != compareTo[i])
@@ -166,6 +175,7 @@ namespace Managed.Adb.IO
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -197,6 +207,7 @@ namespace Managed.Adb.IO
             {
                 throw new ArgumentNullException((path1 == null) ? "path1" : "path2");
             }
+
             CheckInvalidPathChars(path1);
             CheckInvalidPathChars(path2);
             return CombineNoChecks(path1, path2);
@@ -215,6 +226,7 @@ namespace Managed.Adb.IO
             {
                 throw new ArgumentNullException((path1 == null) ? "path1" : ((path2 == null) ? "path2" : "path3"));
             }
+
             CheckInvalidPathChars(path1);
             CheckInvalidPathChars(path2);
             CheckInvalidPathChars(path3);
@@ -235,6 +247,7 @@ namespace Managed.Adb.IO
             {
                 throw new ArgumentNullException((path1 == null) ? "path1" : ((path2 == null) ? "path2" : ((path3 == null) ? "path3" : "path4")));
             }
+
             CheckInvalidPathChars(path1);
             CheckInvalidPathChars(path2);
             CheckInvalidPathChars(path3);
@@ -253,6 +266,7 @@ namespace Managed.Adb.IO
             {
                 throw new ArgumentNullException("paths");
             }
+
             int capacity = 0;
             int num2 = 0;
             for (int i = 0; i < paths.Length; i++)
@@ -261,6 +275,7 @@ namespace Managed.Adb.IO
                 {
                     throw new ArgumentNullException("paths");
                 }
+
                 if (paths[i].Length != 0)
                 {
                     CheckInvalidPathChars(paths[i]);
@@ -273,6 +288,7 @@ namespace Managed.Adb.IO
                     {
                         capacity += paths[i].Length;
                     }
+
                     char ch = paths[i][paths[i].Length - 1];
                     if (((ch != DirectorySeparatorChar) && (ch != AltDirectorySeparatorChar)))
                     {
@@ -280,6 +296,7 @@ namespace Managed.Adb.IO
                     }
                 }
             }
+
             StringBuilder builder = new StringBuilder(capacity);
             for (int j = num2; j < paths.Length; j++)
             {
@@ -296,10 +313,12 @@ namespace Managed.Adb.IO
                         {
                             builder.Append(DirectorySeparatorChar);
                         }
+
                             builder.Append(paths[j]);
                     }
                 }
             }
+
             return builder.ToString();
         }
 
@@ -315,14 +334,17 @@ namespace Managed.Adb.IO
             {
                 return FixupPath(path1);
             }
+
             if (path1.Length == 0)
             {
                 return FixupPath(path2);
             }
+
             if (IsPathRooted(path2))
             {
                 return FixupPath(path2);
             }
+
             char ch = path1[path1.Length - 1];
             char ch2 = path2[0];
             if (ch != DirectorySeparatorChar && ch != AltDirectorySeparatorChar &&
@@ -330,6 +352,7 @@ namespace Managed.Adb.IO
                 {
                 return (FixupPath(path1) + path2);
             }
+
             return (FixupPath(path1) + path2);
         }
 
@@ -363,6 +386,7 @@ namespace Managed.Adb.IO
                     return new string(new char[] { DirectorySeparatorChar });
                 }
             }
+
             return null;
         }
 
@@ -381,6 +405,7 @@ namespace Managed.Adb.IO
                 tpath = FixupPath(tpath);
                 return tpath.Substring(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1);
             }
+
             return null;
         }
 
@@ -420,6 +445,7 @@ namespace Managed.Adb.IO
             {
                 return null;
             }
+
             CheckInvalidPathChars(path);
             int length = path.Length;
             int startIndex = length;
@@ -432,13 +458,16 @@ namespace Managed.Adb.IO
                     {
                         return path.Substring(startIndex, length - startIndex);
                     }
+
                     return string.Empty;
                 }
+
                 if (((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar)))
                 {
                     break;
                 }
             }
+
             return string.Empty;
         }
 
@@ -463,6 +492,7 @@ namespace Managed.Adb.IO
                     }
                 }
             }
+
             return path;
         }
 
@@ -478,11 +508,13 @@ namespace Managed.Adb.IO
             {
                 return null;
             }
+
             int length = path.LastIndexOf('.');
             if (length == -1)
             {
                 return path;
             }
+
             return path.Substring(0, length);
         }
 
@@ -511,6 +543,7 @@ namespace Managed.Adb.IO
             {
                 return null;
             }
+
             path = FixupPath(path);
             return path.Substring(0, GetRootLength(path));
         }
@@ -537,8 +570,10 @@ namespace Managed.Adb.IO
                         num++;
                     }
                 }
+
                 return num;
             }
+
             if ((length >= 2))
             {
                 num = 2;
@@ -547,6 +582,7 @@ namespace Managed.Adb.IO
                     num++;
                 }
             }
+
             return num;
         }
 
@@ -573,12 +609,14 @@ namespace Managed.Adb.IO
                     {
                         return (length != (path.Length - 1));
                     }
+
                     if (((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar)))
                     {
                         break;
                     }
                 }
             }
+
             return false;
         }
 
@@ -594,26 +632,31 @@ namespace Managed.Adb.IO
             {
                 throw new ArgumentNullException((path1 == null) ? "path1" : "path2");
             }
+
             CheckInvalidPathChars(path1);
             CheckInvalidPathChars(path2);
             if (path2.Length == 0)
             {
                 throw new ArgumentException("Path can not empty", "path2");
             }
+
             if (IsPathRooted(path2))
             {
                 throw new ArgumentException("Path is already rooted", "path2");
             }
+
             int length = path1.Length;
             if (length == 0)
             {
                 return path2;
             }
+
             char ch = path1[length - 1];
             if (((ch != DirectorySeparatorChar) && (ch != AltDirectorySeparatorChar)))
             {
                 return (path1 + DirectorySeparatorChar + path2);
             }
+
             return (path1 + path2);
         }
 
@@ -623,6 +666,7 @@ namespace Managed.Adb.IO
             {
                 return (c == AltDirectorySeparatorChar);
             }
+
             return true;
         }
 
@@ -643,6 +687,7 @@ namespace Managed.Adb.IO
                     return true;
                 }
             }
+
             return false;
         }
 

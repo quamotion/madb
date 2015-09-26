@@ -30,9 +30,11 @@ namespace Managed.Adb
                 {
                     _instance = new ConsoleOutputReceiver();
                 }
+
                 return _instance;
             }
         }
+
         /// <summary>
         /// Processes the new lines.
         /// </summary>
@@ -45,6 +47,7 @@ namespace Managed.Adb
                     {
                         continue;
                     }
+
                     Log.d(TAG, line);
                 }
             }

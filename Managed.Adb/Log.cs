@@ -64,7 +64,8 @@ namespace Managed.Adb
             /// Log Debug
             /// </summary>
             public const bool LOGD = true;
-        };
+        }
+;
 
         /// <summary>
         /// Outputs a Verbose level message.

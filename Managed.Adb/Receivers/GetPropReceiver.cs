@@ -49,6 +49,7 @@ namespace Managed.Adb
                 {
                     continue;
                 }
+
                 var m = line.Match(GETPROP_PATTERN, RegexOptions.Compiled);
                 if (m.Success)
                 {
