@@ -131,25 +131,19 @@
     </Compile>
     <Compile Include="AdbHelper.cs" />
     <Compile Include="AdbResponse.cs" />
-    <Compile Include="AllocationInfo.cs" />
     <Compile Include="AndroidDebugBridge.cs" />
     <Compile Include="AndroidDebugBridgeEventArgs.cs" />
     <Compile Include="BatteryInfo.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ClientData.cs" />
     <Compile Include="ColorData.cs" />
-    <Compile Include="Exceptions\AdbCommandRejectedException.cs" />
     <Compile Include="Exceptions\CommandAbortingException.cs" />
+    <Compile Include="Exceptions\PackageInstallationException.cs" />
     <Compile Include="Exceptions\ShellCommandUnresponsiveException.cs" />
     <Compile Include="Exceptions\UnknownOptionException.cs" />
     <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="Extensions\IntegerHelper.cs" />
-    <Compile Include="Extensions\ReflectionHelper.cs" />
     <Compile Include="IBusyBox.cs" />
-    <Compile Include="IO\BEBinaryReader.cs" />
-    <Compile Include="IO\BEBinaryWriter.cs" />
-    <Compile Include="IO\ByteBuffer.cs" />
-    <Compile Include="IO\ByteOrder.cs" />
     <Compile Include="ISyncService.cs" />
     <Compile Include="Logs\ILogListener.cs" />
     <Compile Include="Logs\LogEntry.cs" />
@@ -158,7 +152,6 @@
     </Compile>
     <Compile Include="RawImage.cs" />
     <Compile Include="Receivers\BatteryReceiver.cs" />
-    <Compile Include="Receivers\CommandResultReceiver.cs" />
     <Compile Include="Receivers\ConsoleOutputReceiver.cs" />
     <Compile Include="DdmPreferences.cs" />
     <Compile Include="DebugPortManager.cs" />
@@ -166,10 +159,8 @@
     <Compile Include="Receivers\EnvironmentVariablesReceiver.cs" />
     <Compile Include="Exceptions\AdbException.cs" />
     <Compile Include="Exceptions\DeviceNotFoundException.cs" />
-    <Compile Include="Exceptions\PackageInstallationException.cs" />
     <Compile Include="Exceptions\PermissionDeniedException.cs" />
     <Compile Include="Extensions\ArrayHelper.cs" />
-    <Compile Include="Exceptions\BadPacketException.cs" />
     <Compile Include="ChunkHandler.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -180,7 +171,6 @@
     <Compile Include="DeviceEventArgs.cs" />
     <Compile Include="ErrorCodeHelper.cs" />
     <Compile Include="Extensions\FileInfoHelper.cs" />
-    <Compile Include="Extensions\PathHelper.cs" />
     <Compile Include="Extensions\StringHelper.cs" />
     <Compile Include="FilePermission.cs" />
     <Compile Include="Receivers\GetPropReceiver.cs" />
@@ -190,7 +180,6 @@
     <Compile Include="ILogOutput.cs" />
     <Compile Include="Receivers\InstallReceiver.cs" />
     <Compile Include="IO\LinuxPath.cs" />
-    <Compile Include="IO\Rgb565.cs" />
     <Compile Include="IPacketConsumer.cs" />
     <Compile Include="Receivers\IShellOutputReceiver.cs" />
     <Compile Include="ISyncProgressMonitor.cs" />
