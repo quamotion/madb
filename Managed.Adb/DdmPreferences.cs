@@ -58,9 +58,9 @@ namespace Managed.Adb
                 _selectedDebugPort = value;
 
                 MonitorThread monitorThread = MonitorThread.Instance;
-                if (monitorThread != null )
+                if (monitorThread != null)
                 {
-                    monitorThread.SetDebugSelectedPort(value );
+                    monitorThread.SetDebugSelectedPort(value);
                 }
             }
         }

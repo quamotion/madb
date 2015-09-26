@@ -17,7 +17,7 @@ namespace Managed.Adb
         /// <param name="name">The name.</param>
         /// <param name="fs">The fs.</param>
         /// <param name="readOnly">if set to <see langword="true"/> [read only].</param>
-        public MountPoint(string block, string name, string fs, bool readOnly )
+        public MountPoint(string block, string name, string fs, bool readOnly)
         {
             this.Block = block;
             this.Name = name;
@@ -59,7 +59,7 @@ namespace Managed.Adb
         /// </returns>
         public override string ToString()
         {
-            return string.Format("{0}\t{1}\t{2}\t{3}", this.Block, this.Name, this.FileSystem, this.IsReadOnly ? "ro" : "rw" );
+            return string.Format("{0}\t{1}\t{2}\t{3}", this.Block, this.Name, this.FileSystem, this.IsReadOnly ? "ro" : "rw");
         }
 
         /// <summary>

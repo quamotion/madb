@@ -13,7 +13,7 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
         /// </summary>
         public PermissionDeniedException()
-            : base("Permission to access the specified resource was denied." )
+            : base("Permission to access the specified resource was denied.")
             {
         }
 
@@ -21,8 +21,8 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public PermissionDeniedException(string message )
-            : base(message )
+        public PermissionDeniedException(string message)
+            : base(message)
             {
 
         }
@@ -42,8 +42,8 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public PermissionDeniedException(string message, Exception innerException )
-            : base(message, innerException )
+        public PermissionDeniedException(string message, Exception innerException)
+            : base(message, innerException)
             {
 
         }

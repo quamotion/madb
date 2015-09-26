@@ -14,7 +14,7 @@ namespace Managed.Adb
         /// Sent when the transfer starts
         /// </summary>
         /// <param name="totalWork">the total amount of work.</param>
-        void Start(long totalWork );
+        void Start(long totalWork);
 
         /// <summary>
         /// Sent when the transfer is finished or interrupted.
@@ -31,12 +31,12 @@ namespace Managed.Adb
         /// Sent when a sub task is started.
         /// </summary>
         /// <param name="destination">the destination.</param>
-        void StartSubTask(string source, string destination );
+        void StartSubTask(string source, string destination);
 
         /// <summary>
         /// Sent when some progress have been made.
         /// </summary>
         /// <param name="work">the amount of work done.</param>
-        void Advance(long work );
+        void Advance(long work);
     }
 }

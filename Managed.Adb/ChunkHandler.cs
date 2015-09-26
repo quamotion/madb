@@ -54,13 +54,13 @@ namespace Managed.Adb
          * activity.  Because there's a fair chance we'll want to send a
          * message to the client, this method can throw an IOException.
          */
-        public abstract void ClientReady(IClient client );
+        public abstract void ClientReady(IClient client);
 
         /**
          * Client has gone away.  Can be used to clean up any resources
          * associated with this client connection.
          */
-        public abstract void ClientDisconnected(IClient client );
+        public abstract void ClientDisconnected(IClient client);
 
         /**
          * Handle an incoming chunk.  The data, of chunk type "type", begins
@@ -74,16 +74,16 @@ namespace Managed.Adb
          * The handler may not modify the contents of "data".
          */
         public abstract void HandleChunk(IClient client, int type,
-                byte[] data, bool isReply, int msgId );
+                byte[] data, bool isReply, int msgId);
 
         /**
          * Handle chunks not recognized by handlers.  The handleChunk() method
          * in sub-classes should call this if the chunk type isn't recognized.
          */
         protected void handleUnknownChunk(IClient client, int type,
-                MemoryStream data, bool isReply, int msgId )
+                MemoryStream data, bool isReply, int msgId)
                 {
-            if (type == CHUNK_FAIL )
+            if (type == CHUNK_FAIL)
             {
                 int errorCode, msgLen;
                 string msg;
@@ -91,16 +91,16 @@ namespace Managed.Adb
                 errorCode = data.ReadByte();
                 msgLen = data.ReadByte();
 
-                msg = GetString(data, msgLen );
-                Log.w("ddms", "WARNING: failure code=" + errorCode + " msg=" + msg );
+                msg = GetString(data, msgLen);
+                Log.w("ddms", "WARNING: failure code=" + errorCode + " msg=" + msg);
             }
             else
             {
-                Log.w("ddms", "WARNING: received unknown chunk " + name(type )
+                Log.w("ddms", "WARNING: received unknown chunk " + name(type)
                         + ": len=" + data.Length + ", reply=" + isReply
-                        + ", msgId=0x" + msgId.ToString("X8" ) );
+                        + ", msgId=0x" + msgId.ToString("X8"));
             }
-            Log.w("ddms", "         client " + client + ", handler " + this );
+            Log.w("ddms", "         client " + client + ", handler " + this);
         }
 
 
@@ -110,37 +110,37 @@ namespace Managed.Adb
          * This is here because multiple chunk handlers can make use of it,
          * and there's nowhere better to put it.
          */
-        static string GetString(MemoryStream buf, int len )
+        static string GetString(MemoryStream buf, int len)
         {
             char[] data = new char[len];
-            for (int i = 0; i < len; i++ )
+            for (int i = 0; i < len; i++)
                 data[i] = (char)buf.ReadByte();
-            return new string(data );
+            return new string(data);
         }
 
         /**
          * Utility function to copy a String into a ByteBuffer.
          */
-        static void PutString(MemoryStream buf, string str )
+        static void PutString(MemoryStream buf, string str)
         {
-            byte[] data = Encoding.Default.GetBytes(str );
-            buf.Write(data, 0, data.Length );
+            byte[] data = Encoding.Default.GetBytes(str);
+            buf.Write(data, 0, data.Length);
         }
 
         /**
          * Convert a 4-character string to a 32-bit type.
          */
-        static int type(string typeName )
+        static int type(string typeName)
         {
             int val = 0;
 
-            if (typeName.Length != 4 )
+            if (typeName.Length != 4)
             {
-                Log.e("ddms", "Type name must be 4 letter long" );
-                throw new ArgumentException("Type name must be 4 letter long" );
+                Log.e("ddms", "Type name must be 4 letter long");
+                throw new ArgumentException("Type name must be 4 letter long");
             }
 
-            for (int i = 0; i < 4; i++ )
+            for (int i = 0; i < 4; i++)
             {
                 val <<= 8;
                 val |= (byte)typeName[i];
@@ -152,16 +152,16 @@ namespace Managed.Adb
         /**
          * Convert an integer type to a 4-character string.
          */
-        static string name(int type )
+        static string name(int type)
         {
             char[] ascii = new char[4];
 
-            ascii[0] = (char)((type >> 24 ) & 0xff );
-            ascii[1] = (char)((type >> 16 ) & 0xff );
-            ascii[2] = (char)((type >> 8 ) & 0xff );
-            ascii[3] = (char)(type & 0xff );
+            ascii[0] = (char)((type >> 24) & 0xff);
+            ascii[1] = (char)((type >> 16) & 0xff);
+            ascii[2] = (char)((type >> 8) & 0xff);
+            ascii[3] = (char)(type & 0xff);
 
-            return new string(ascii );
+            return new string(ascii);
         }
 
         /**
@@ -171,7 +171,7 @@ namespace Managed.Adb
          *
          * "maxChunkLen" indicates the size of the chunk contents only.
          */
-        static BinaryReader allocBuffer(int maxChunkLen )
+        static BinaryReader allocBuffer(int maxChunkLen)
         {
             /*
             using ( MemoryStream ms = new MemoryStream(JdwpPacket.JDWP_HEADER_LEN + 8 +maxChunkLen) ) {
@@ -187,7 +187,7 @@ namespace Managed.Adb
          * Return the slice of the JDWP packet buffer that holds just the
          * chunk data.
          */
-        static BinaryReader GetChunkDataBuf(MemoryStream jdwpBuf )
+        static BinaryReader GetChunkDataBuf(MemoryStream jdwpBuf)
         {
             /* EndianBinaryReader ebr = null;
 
@@ -213,7 +213,7 @@ namespace Managed.Adb
          * Pass in the byte buffer returned by JdwpPacket.getPayload().
          */
         // TODO: JdwpPacket
-        static void finishChunkPacket(/*JdwpPacket*/ Object packet, int type, int chunkLen )
+        static void finishChunkPacket(/*JdwpPacket*/ Object packet, int type, int chunkLen)
         {
             /*ByteBuffer buf = packet.getPayload();
 
@@ -231,7 +231,7 @@ namespace Managed.Adb
          * @param appName
          * @return
          */
-        protected static IClient checkDebuggerPortForAppName(IClient client, string appName )
+        protected static IClient checkDebuggerPortForAppName(IClient client, string appName)
         {
             /*IDebugPortProvider provider = DebugPortManager.getProvider ( );
             if ( provider != null ) {

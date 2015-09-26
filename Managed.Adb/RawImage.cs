@@ -104,11 +104,11 @@ namespace Managed.Adb
          * @param buf the buffer to read from.
          * @return true if success
          */
-        public bool ReadHeader(int version, BinaryReader buf )
+        public bool ReadHeader(int version, BinaryReader buf)
         {
             this.Version = version;
             // https://github.com/android/platform_system_core/blob/master/adb/framebuffer_service.c
-            switch (version )
+            switch (version)
             {
                 case 1: /* RGBA_8888 */
                 case 2: /* RGBX_8888 */
@@ -155,9 +155,9 @@ namespace Managed.Adb
          * @param version the version of the protocol
          * @return the number of int that makes up the header.
          */
-        public static int GetHeaderSize(int version )
+        public static int GetHeaderSize(int version)
         {
-            switch (version )
+            switch (version)
             {
                 case 16: // compatibility mode
                     return 3; // size, width, height
@@ -200,13 +200,13 @@ namespace Managed.Adb
             int byteCount = this.Bpp >> 3; // bpp is in bits, we want bytes to match our array
             int w = this.Width;
             int h = this.Height;
-            for (int y = 0; y < h; y++ )
+            for (int y = 0; y < h; y++)
             {
-                for (int x = 0; x < w; x++ )
+                for (int x = 0; x < w; x++)
                 {
-                    Array.Copy(this.Data, (y * w + x ) * byteCount,
-                        rotated.Data, ((w - x - 1 ) * h + y ) * byteCount,
-                                        byteCount );
+                    Array.Copy(this.Data, (y * w + x) * byteCount,
+                        rotated.Data, ((w - x - 1) * h + y) * byteCount,
+                                        byteCount);
                 }
             }
 
@@ -226,7 +226,7 @@ namespace Managed.Adb
                 this.Red.Offset, this.Red.Length,
                 this.Green.Offset, this.Green.Length,
                 this.Blue.Offset, this.Blue.Length,
-                this.Alpha.Offset, this.Alpha.Length, this.Size );
+                this.Alpha.Offset, this.Alpha.Length, this.Size);
         }
 
 
@@ -236,31 +236,31 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="format">The format.</param>
         /// <returns></returns>
-        public Image ToImage(PixelFormat format )
+        public Image ToImage(PixelFormat format)
         {
             Bitmap bitmap = null;
             Bitmap image = null;
             BitmapData bitmapdata = null;
             try
             {
-                bitmap = new Bitmap(this.Width, this.Height, format );
-                bitmapdata = bitmap.LockBits(new Rectangle(0, 0, this.Width, this.Height ), ImageLockMode.WriteOnly, format );
-                image = new Bitmap(this.Width, this.Height, format );
+                bitmap = new Bitmap(this.Width, this.Height, format);
+                bitmapdata = bitmap.LockBits(new Rectangle(0, 0, this.Width, this.Height), ImageLockMode.WriteOnly, format);
+                image = new Bitmap(this.Width, this.Height, format);
                 var tdata = this.Data;
-                if (this.Bpp == 32 )
+                if (this.Bpp == 32)
                 {
-                    tdata = this.Swap(tdata );
+                    tdata = this.Swap(tdata);
                 }
-                Marshal.Copy(tdata, 0, bitmapdata.Scan0, this.Size );
-                bitmap.UnlockBits(bitmapdata );
-                using (Graphics g = Graphics.FromImage(image ) )
+                Marshal.Copy(tdata, 0, bitmapdata.Scan0, this.Size);
+                bitmap.UnlockBits(bitmapdata);
+                using (Graphics g = Graphics.FromImage(image))
                 {
-                    g.DrawImage(bitmap, new Point(0, 0 ) );
+                    g.DrawImage(bitmap, new Point(0, 0));
                     return image;
                 }
 
             }
-            catch (Exception )
+            catch (Exception)
             {
                 throw;
             }
@@ -272,16 +272,16 @@ namespace Managed.Adb
         /// <returns></returns>
         public Image ToImage()
         {
-            return this.ToImage(this.Bpp == 32 ? PixelFormat.Format32bppArgb : PixelFormat.Format16bppRgb565 );
+            return this.ToImage(this.Bpp == 32 ? PixelFormat.Format32bppArgb : PixelFormat.Format16bppRgb565);
         }
 
-        private byte[] Swap(byte[] b )
+        private byte[] Swap(byte[] b)
         {
             var clone = new List<byte>();
             b.IntReverseForRawImage(bitem =>
             {
-                clone.AddRange(bitem );
-            } );
+                clone.AddRange(bitem);
+            });
             return clone.ToArray();
         }
 

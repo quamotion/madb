@@ -15,7 +15,7 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="UnknownOptionException"/> class.
         /// </summary>
         public UnknownOptionException()
-            : base("Unknown option." )
+            : base("Unknown option.")
             {
         }
 
@@ -23,8 +23,8 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="UnknownOptionException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public UnknownOptionException(string message )
-            : base(message )
+        public UnknownOptionException(string message)
+            : base(message)
             {
 
         }
@@ -34,8 +34,8 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
-        public UnknownOptionException(SerializationInfo serializationInfo, StreamingContext context )
-            : base(serializationInfo, context )
+        public UnknownOptionException(SerializationInfo serializationInfo, StreamingContext context)
+            : base(serializationInfo, context)
             {
 
         }
@@ -45,8 +45,8 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public UnknownOptionException(string message, Exception innerException )
-            : base(message, innerException )
+        public UnknownOptionException(string message, Exception innerException)
+            : base(message, innerException)
             {
 
         }

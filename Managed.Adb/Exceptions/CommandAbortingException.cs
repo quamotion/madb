@@ -15,7 +15,7 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
         /// </summary>
         public CommandAbortingException()
-            : base("Permission to access the specified resource was denied." )
+            : base("Permission to access the specified resource was denied.")
             {
         }
 
@@ -23,8 +23,8 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public CommandAbortingException(string message )
-            : base(message )
+        public CommandAbortingException(string message)
+            : base(message)
             {
 
         }
@@ -44,8 +44,8 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public CommandAbortingException(string message, Exception innerException )
-            : base(message, innerException )
+        public CommandAbortingException(string message, Exception innerException)
+            : base(message, innerException)
             {
 
         }

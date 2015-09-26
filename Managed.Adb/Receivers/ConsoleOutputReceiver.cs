@@ -26,7 +26,7 @@ namespace Managed.Adb
         {
             get
             {
-                if (_instance == null )
+                if (_instance == null)
                 {
                     _instance = new ConsoleOutputReceiver();
                 }
@@ -37,15 +37,15 @@ namespace Managed.Adb
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-            protected override void ProcessNewLines(string[] lines )
+            protected override void ProcessNewLines(string[] lines)
             {
-                foreach (var line in lines )
+                foreach (var line in lines)
                 {
-                    if (string.IsNullOrEmpty(line ) || line.StartsWith("#" ) || line.StartsWith("$") )
+                    if (string.IsNullOrEmpty(line) || line.StartsWith("#") || line.StartsWith("$"))
                     {
                         continue;
                     }
-                    Log.d(TAG, line );
+                    Log.d(TAG, line);
                 }
             }
     }

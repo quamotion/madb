@@ -26,25 +26,25 @@ namespace Managed.Adb
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines(string[] lines )
+        protected override void ProcessNewLines(string[] lines)
         {
-            foreach (string line in lines )
+            foreach (string line in lines)
             {
-                if (line.Length > 0 )
+                if (line.Length > 0)
                 {
-                    if (line.StartsWith(SUCCESS_OUTPUT ) )
+                    if (line.StartsWith(SUCCESS_OUTPUT))
                     {
                         this.ErrorMessage = null;
                         this.Success = true;
                     }
                     else
                     {
-                        var m = line.Match(FAILURE_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase );
+                        var m = line.Match(FAILURE_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                         this.ErrorMessage = UNKNOWN_ERROR;
-                        if (m.Success )
+                        if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            this.ErrorMessage = string.IsNullOrEmpty(msg ) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
+                            this.ErrorMessage = string.IsNullOrEmpty(msg) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
                         }
                         this.Success = false;
                     }

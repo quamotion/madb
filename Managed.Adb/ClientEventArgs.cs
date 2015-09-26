@@ -51,7 +51,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="client">The client.</param>
         /// <param name="changeMask">The change mask.</param>
-        public ClientEventArgs(IClient client, ClientChangeMask changeMask )
+        public ClientEventArgs(IClient client, ClientChangeMask changeMask)
         {
             this.Client = client;
             this.ChangeMask = changeMask;

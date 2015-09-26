@@ -131,7 +131,7 @@ namespace Managed.Adb
         /// Initializes a new instance of the <see cref="ClientData"/> class.
         /// </summary>
         /// <param name="pid">The pid.</param>
-        public ClientData(int pid )
+        public ClientData(int pid)
         {
             this.Pid = pid;
 

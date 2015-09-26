@@ -151,7 +151,7 @@ namespace Managed.Adb
         {
             get
             {
-                return (this.Level * 100 ) / this.Scale;
+                return (this.Level * 100) / this.Scale;
             }
         }
 
@@ -165,12 +165,12 @@ namespace Managed.Adb
         {
             var sb = new StringBuilder();
 
-            this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.IgnoreCase ).ForEach(p =>
+            this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.IgnoreCase).ForEach(p =>
             {
                 var n = p.Name;
-                var v = p.GetValue(this, null );
-                sb.AppendLine(string.Format("{0}:{1}", n, v ) );
-            } );
+                var v = p.GetValue(this, null);
+                sb.AppendLine(string.Format("{0}:{1}", n, v));
+            });
 
             return sb.ToString();
         }

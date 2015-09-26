@@ -51,7 +51,7 @@ namespace Managed.Adb
         {
             get
             {
-                if (_instance == null )
+                if (_instance == null)
                 {
                     _instance = new MonitorThread();
                 }
@@ -74,12 +74,12 @@ namespace Managed.Adb
         /// Sets the debug selected port.
         /// </summary>
         /// <param name="value">The value.</param>
-        internal void SetDebugSelectedPort(int value )
+        internal void SetDebugSelectedPort(int value)
         {
             //throw new NotImplementedException ( );
         }
 
-        public void DropClient(IClient client, bool notify )
+        public void DropClient(IClient client, bool notify)
         {
 
         }

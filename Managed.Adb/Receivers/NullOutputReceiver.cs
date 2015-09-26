@@ -31,7 +31,7 @@ namespace Managed.Adb
         {
             get
             {
-                if (_instance == null )
+                if (_instance == null)
                 {
                     _instance = new NullOutputReceiver();
                 }
@@ -45,7 +45,7 @@ namespace Managed.Adb
         /// <param name="data">The data.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="length">The length.</param>
-        public void AddOutput(byte[] data, int offset, int length )
+        public void AddOutput(byte[] data, int offset, int length)
         {
             // do nothing
         }

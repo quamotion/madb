@@ -20,7 +20,7 @@ namespace Managed.Adb
         /// Forwards the packet to client.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        void ForwardPacketToClient(/*JdwpPacket*/ Object packet );
+        void ForwardPacketToClient(/*JdwpPacket*/ Object packet);
         /// <summary>
         /// Sends the handshake.
         /// </summary>
@@ -29,6 +29,6 @@ namespace Managed.Adb
         /// Sends the and consume.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        void SendAndConsume(/*JdwpPacket*/ Object packet );
+        void SendAndConsume(/*JdwpPacket*/ Object packet);
     }
 }

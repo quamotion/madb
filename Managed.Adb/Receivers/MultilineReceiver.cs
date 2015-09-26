@@ -63,26 +63,26 @@ namespace Managed.Adb
         /// <param name="data">The data.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="length">The length.</param>
-        public void AddOutput(byte[] data, int offset, int length )
+        public void AddOutput(byte[] data, int offset, int length)
         {
-            if (!this.IsCancelled )
+            if (!this.IsCancelled)
             {
                 string s = null;
                 try
                 {
-                    s = Encoding.GetEncoding(ENCODING ).GetString(data, offset, length ); //$NON-NLS-1$
+                    s = Encoding.GetEncoding(ENCODING).GetString(data, offset, length); //$NON-NLS-1$
                 }
-                catch (DecoderFallbackException )
+                catch (DecoderFallbackException)
                 {
                     // normal encoding didn't work, try the default one
-                    s = Encoding.Default.GetString(data, offset, length );
+                    s = Encoding.Default.GetString(data, offset, length);
                 }
 
                 // ok we've got a string
-                if (!string.IsNullOrEmpty(s ) )
+                if (!string.IsNullOrEmpty(s))
                 {
                     // if we had an unfinished line we add it.
-                    if (!string.IsNullOrEmpty(this.UnfinishedLine ) )
+                    if (!string.IsNullOrEmpty(this.UnfinishedLine))
                     {
                         s = this.UnfinishedLine + s;
                         this.UnfinishedLine = null;
@@ -93,29 +93,29 @@ namespace Managed.Adb
                     int start = 0;
                     do
                     {
-                        int index = s.IndexOf(NEWLINE, start ); //$NON-NLS-1$
+                        int index = s.IndexOf(NEWLINE, start); //$NON-NLS-1$
 
                         // if \r\n was not found, this is an unfinished line
                         // and we store it to be processed for the next packet
-                        if (index == -1 )
+                        if (index == -1)
                         {
-                            this.UnfinishedLine = s.Substring(start );
+                            this.UnfinishedLine = s.Substring(start);
                             break;
                         }
 
                         // so we found a \r\n;
                         // extract the line
-                        string line = s.Substring(start, index - start );
-                        if (this.TrimLines )
+                        string line = s.Substring(start, index - start);
+                        if (this.TrimLines)
                         {
                             line = line.Trim();
                         }
-                        this.Lines.Add(line );
+                        this.Lines.Add(line);
 
                         // move start to after the \r\n we found
                         start = index + 2;
                     }
-                    while (true );
+                    while (true);
                 }
             }
         }
@@ -125,20 +125,20 @@ namespace Managed.Adb
         /// </summary>
         public void Flush()
         {
-            if (!this.IsCancelled && this.Lines.Count > 0 )
+            if (!this.IsCancelled && this.Lines.Count > 0)
             {
                 // at this point we've split all the lines.
                 // make the array
                 string[] lines = this.Lines.ToArray();
 
                 // send it for final processing
-                this.ProcessNewLines(lines );
+                this.ProcessNewLines(lines);
                 this.Lines.Clear();
             }
 
-            if (!this.IsCancelled && !string.IsNullOrEmpty(this.UnfinishedLine ) )
+            if (!this.IsCancelled && !string.IsNullOrEmpty(this.UnfinishedLine))
             {
-                this.ProcessNewLines(new string[] { this.UnfinishedLine } );
+                this.ProcessNewLines(new string[] { this.UnfinishedLine });
             }
 
             this.Done();
@@ -164,7 +164,7 @@ namespace Managed.Adb
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected abstract void ProcessNewLines(string[] lines );
+        protected abstract void ProcessNewLines(string[] lines);
     }
 
 }

@@ -24,12 +24,12 @@ namespace Managed.Adb
             Error = new LogLevelInfo { Priority = 6, Value = "error", Letter = 'E' };
             Assert = new LogLevelInfo { Priority = 7, Value = "assert", Letter = 'A' };
 
-            Levels.Add(Verbose.Value, Verbose );
-            Levels.Add(Debug.Value, Debug );
-            Levels.Add(Info.Value, Info );
-            Levels.Add(Warn.Value, Warn );
-            Levels.Add(Error.Value, Error );
-            Levels.Add(Assert.Value, Assert );
+            Levels.Add(Verbose.Value, Verbose);
+            Levels.Add(Debug.Value, Debug);
+            Levels.Add(Info.Value, Info);
+            Levels.Add(Warn.Value, Warn);
+            Levels.Add(Error.Value, Error);
+            Levels.Add(Assert.Value, Assert);
 
         }
 
@@ -70,12 +70,12 @@ namespace Managed.Adb
         /// <value>The levels.</value>
         public static Dictionary<string, LogLevelInfo> Levels { get; private set; }
 
-        public static LogLevelInfo GetByString(string value )
+        public static LogLevelInfo GetByString(string value)
         {
 
-            foreach (LogLevelInfo item in Values )
+            foreach (LogLevelInfo item in Values)
             {
-                if (string.Compare(item.Value, value, true ) == 0 )
+                if (string.Compare(item.Value, value, true) == 0)
                 {
                     return item;
                 }
@@ -88,9 +88,9 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="letter">The letter.</param>
         /// <returns></returns>
-        public static LogLevelInfo GetByLetter(string letter )
+        public static LogLevelInfo GetByLetter(string letter)
         {
-            return GetByLetter(letter[0] );
+            return GetByLetter(letter[0]);
         }
 
         /// <summary>
@@ -98,11 +98,11 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="letter">The letter.</param>
         /// <returns></returns>
-        public static LogLevelInfo GetByLetter(char letter )
+        public static LogLevelInfo GetByLetter(char letter)
         {
-            foreach (LogLevelInfo item in Values )
+            foreach (LogLevelInfo item in Values)
             {
-                if (item.Letter == letter )
+                if (item.Letter == letter)
                 {
                     return item;
                 }
@@ -154,7 +154,7 @@ namespace Managed.Adb
             /// <param name="priority">The priority.</param>
             /// <param name="value">The value.</param>
             /// <param name="letter">The letter.</param>
-            public LogLevelInfo(int priority, string value, Char letter )
+            public LogLevelInfo(int priority, string value, Char letter)
             {
                 this.Priority = priority;
                 this.Value = value;

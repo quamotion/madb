@@ -12,7 +12,7 @@ namespace Managed.Adb
         /// Initializes a new instance of the <see cref="DeviceEventArgs"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        public DeviceEventArgs(IDevice device )
+        public DeviceEventArgs(IDevice device)
         {
             this.Device = device;
         }

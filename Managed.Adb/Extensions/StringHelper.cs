@@ -15,14 +15,14 @@ namespace Managed.Adb
         /// <param name="s">The string.</param>
         /// <param name="args">The arguments.</param>
         /// <returns>The newly formatted string.</returns>
-        public static string With(this string s, params object[] args )
+        public static string With(this string s, params object[] args)
         {
-            return string.Format(s, args );
+            return string.Format(s, args);
         }
 
-        public static string ToArgumentSafe(this string s )
+        public static string ToArgumentSafe(this string s)
         {
-            return "{0}{1}{0}".With(s.Contains(" " ) ? "\"" : string.Empty, s );
+            return "{0}{1}{0}".With(s.Contains(" ") ? "\"" : string.Empty, s);
         }
 
 
@@ -31,20 +31,9 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="str">The string.</param>
         /// <returns></returns>
-        public static byte[] GetBytes(this string str )
+        public static byte[] GetBytes(this string str)
         {
-            return GetBytes(str, Encoding.Default );
-        }
-
-        /// <summary>
-        /// Gets the bytes from a string.
-        /// </summary>
-        /// <param name="str">The string.</param>
-        /// <param name="encoding">The encoding.</param>
-        /// <returns></returns>
-        public static byte[] GetBytes(this string str, Encoding encoding )
-        {
-            return encoding.GetBytes(str );
+            return GetBytes(str, Encoding.Default);
         }
 
         /// <summary>
@@ -53,11 +42,22 @@ namespace Managed.Adb
         /// <param name="str">The string.</param>
         /// <param name="encoding">The encoding.</param>
         /// <returns></returns>
-        public static byte[] GetBytes(this string str, string encoding )
+        public static byte[] GetBytes(this string str, Encoding encoding)
         {
-            Encoding enc = Encoding.GetEncoding(encoding );
+            return encoding.GetBytes(str);
+        }
 
-            return GetBytes(str, enc );
+        /// <summary>
+        /// Gets the bytes from a string.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <param name="encoding">The encoding.</param>
+        /// <returns></returns>
+        public static byte[] GetBytes(this string str, string encoding)
+        {
+            Encoding enc = Encoding.GetEncoding(encoding);
+
+            return GetBytes(str, enc);
         }
 
         /// <summary>
@@ -65,10 +65,10 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="b">The b.</param>
         /// <returns></returns>
-        public static string ToHex(this byte b )
+        public static string ToHex(this byte b)
         {
-            StringBuilder hex = new StringBuilder(2 );
-            hex.AppendFormat("{0:x2}", b );
+            StringBuilder hex = new StringBuilder(2);
+            hex.AppendFormat("{0:x2}", b);
             return hex.ToString();
         }
 
@@ -77,12 +77,12 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="byteArray">The byte array.</param>
         /// <returns></returns>
-        public static string ToHex(this byte[] byteArray )
+        public static string ToHex(this byte[] byteArray)
         {
-            StringBuilder hex = new StringBuilder(byteArray.Length * 2 );
-            foreach (byte b in byteArray )
+            StringBuilder hex = new StringBuilder(byteArray.Length * 2);
+            foreach (byte b in byteArray)
             {
-                hex.AppendFormat("{0} ", b.ToHex() );
+                hex.AppendFormat("{0} ", b.ToHex());
             }
             return hex.ToString().Trim();
 
@@ -93,9 +93,9 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="bytes">The bytes.</param>
         /// <returns></returns>
-        public static string GetString(this byte[] bytes )
+        public static string GetString(this byte[] bytes)
         {
-            return GetString(bytes, Encoding.Default );
+            return GetString(bytes, Encoding.Default);
         }
 
         /// <summary>
@@ -104,9 +104,9 @@ namespace Managed.Adb
         /// <param name="bytes">The bytes.</param>
         /// <param name="encoding">The encoding.</param>
         /// <returns></returns>
-        public static string GetString(this byte[] bytes, Encoding encoding )
+        public static string GetString(this byte[] bytes, Encoding encoding)
         {
-            return encoding.GetString(bytes, 0, bytes.Length );
+            return encoding.GetString(bytes, 0, bytes.Length);
         }
 
         /// <summary>
@@ -115,10 +115,10 @@ namespace Managed.Adb
         /// <param name="bytes">The bytes.</param>
         /// <param name="encoding">The encoding.</param>
         /// <returns></returns>
-        public static string GetString(this byte[] bytes, string encoding )
+        public static string GetString(this byte[] bytes, string encoding)
         {
-            Encoding enc = Encoding.GetEncoding(encoding );
-            return GetString(bytes, enc );
+            Encoding enc = Encoding.GetEncoding(encoding);
+            return GetString(bytes, enc);
         }
 
         /// <summary>
@@ -128,22 +128,9 @@ namespace Managed.Adb
         /// <param name="index">The index.</param>
         /// <param name="count">The count.</param>
         /// <returns></returns>
-        public static string GetString(this byte[] bytes, int index, int count )
+        public static string GetString(this byte[] bytes, int index, int count)
         {
-            return GetString(bytes, index, count, Encoding.Default );
-        }
-
-        /// <summary>
-        /// Gets the string from a byte array.
-        /// </summary>
-        /// <param name="bytes">The bytes.</param>
-        /// <param name="index">The index.</param>
-        /// <param name="count">The count.</param>
-        /// <param name="encoding">The encoding.</param>
-        /// <returns></returns>
-        public static string GetString(this byte[] bytes, int index, int count, Encoding encoding )
-        {
-            return encoding.GetString(bytes, index, count );
+            return GetString(bytes, index, count, Encoding.Default);
         }
 
         /// <summary>
@@ -154,10 +141,23 @@ namespace Managed.Adb
         /// <param name="count">The count.</param>
         /// <param name="encoding">The encoding.</param>
         /// <returns></returns>
-        public static string GetString(this byte[] bytes, int index, int count, string encoding )
+        public static string GetString(this byte[] bytes, int index, int count, Encoding encoding)
         {
-            Encoding enc = Encoding.GetEncoding(encoding );
-            return GetString(bytes, index, count, enc );
+            return encoding.GetString(bytes, index, count);
+        }
+
+        /// <summary>
+        /// Gets the string from a byte array.
+        /// </summary>
+        /// <param name="bytes">The bytes.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="count">The count.</param>
+        /// <param name="encoding">The encoding.</param>
+        /// <returns></returns>
+        public static string GetString(this byte[] bytes, int index, int count, string encoding)
+        {
+            Encoding enc = Encoding.GetEncoding(encoding);
+            return GetString(bytes, index, count, enc);
         }
 
         /// <summary>
@@ -167,9 +167,9 @@ namespace Managed.Adb
         /// <returns>
         ///   <see langword="true"/> if [is null or white space] [the specified source]; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool IsNullOrWhiteSpace(this string source )
+        public static bool IsNullOrWhiteSpace(this string source)
         {
-            return string.IsNullOrEmpty(source ) || string.IsNullOrEmpty(source.Trim() );
+            return string.IsNullOrEmpty(source) || string.IsNullOrEmpty(source.Trim());
         }
 
         /// <summary>
@@ -178,9 +178,9 @@ namespace Managed.Adb
         /// <param name="source">The source.</param>
         /// <param name="pattern">The pattern.</param>
         /// <returns></returns>
-        public static Match Match(this string source, string pattern )
+        public static Match Match(this string source, string pattern)
         {
-            return Match(source, pattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase );
+            return Match(source, pattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
         }
 
         /// <summary>
@@ -190,9 +190,9 @@ namespace Managed.Adb
         /// <param name="pattern">The pattern.</param>
         /// <param name="options">The options.</param>
         /// <returns></returns>
-        public static Match Match(this string source, string pattern, RegexOptions options )
+        public static Match Match(this string source, string pattern, RegexOptions options)
         {
-            return Regex.Match(source, pattern, options );
+            return Regex.Match(source, pattern, options);
         }
 
         /// <summary>
@@ -203,9 +203,9 @@ namespace Managed.Adb
         /// <returns>
         ///   <see langword="true"/> if the specified source is match; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool IsMatch(this string source, string pattern )
+        public static bool IsMatch(this string source, string pattern)
         {
-            return IsMatch(source, pattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase );
+            return IsMatch(source, pattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
         }
 
         /// <summary>
@@ -217,9 +217,9 @@ namespace Managed.Adb
         /// <returns>
         ///   <see langword="true"/> if the specified source is match; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool IsMatch(this string source, string pattern, RegexOptions options )
+        public static bool IsMatch(this string source, string pattern, RegexOptions options)
         {
-            return Regex.IsMatch(source, pattern, options );
+            return Regex.IsMatch(source, pattern, options);
         }
     }
 }

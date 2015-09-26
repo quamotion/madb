@@ -37,11 +37,11 @@ namespace Managed.Adb
         /// <param name="device">The device.</param>
         /// <param name="channel">The channel.</param>
         /// <param name="pid">The pid.</param>
-        public Client(Device device, Socket channel, int pid )
+        public Client(Device device, Socket channel, int pid)
         {
             this.Device = device;
             this.Channel = channel;
-            this.ClientData = new ClientData(pid );
+            this.ClientData = new ClientData(pid);
 
             this.IsThreadUpdateEnabled = DdmPreferences.InitialThreadUpdate;
             this.IsHeapUpdateEnabled = DdmPreferences.InitialHeapUpdate;
@@ -95,7 +95,7 @@ namespace Managed.Adb
         {
             get
             {
-                switch (this.ConnectionState )
+                switch (this.ConnectionState)
                 {
                     case ClientConnectionState.Init:
                     case ClientConnectionState.NotJDWP:
@@ -108,7 +108,7 @@ namespace Managed.Adb
                     case ClientConnectionState.Ready:
                         return true;
                     default:
-                        Log.e("ddm", "wtf are we doing in here? You shouldn't see this." );
+                        Log.e("ddm", "wtf are we doing in here? You shouldn't see this.");
                         return false;
                 }
             }
@@ -232,7 +232,7 @@ namespace Managed.Adb
         /// Requests the thread stack trace.
         /// </summary>
         /// <param name="threadID">The thread ID.</param>
-        public void RequestThreadStackTrace(int threadID )
+        public void RequestThreadStackTrace(int threadID)
         {
             throw new NotImplementedException();
         }
@@ -250,7 +250,7 @@ namespace Managed.Adb
         /// Enables the allocation tracker.
         /// </summary>
         /// <param name="enable">if set to <see langword="true"/> [enable].</param>
-        public void EnableAllocationTracker(bool enable )
+        public void EnableAllocationTracker(bool enable)
         {
             throw new NotImplementedException();
         }
@@ -283,7 +283,7 @@ namespace Managed.Adb
         /// Registers the specified selector.
         /// </summary>
         /// <param name="selector">The selector.</param>
-        public void Register(object selector )
+        public void Register(object selector)
         {
             throw new NotImplementedException();
         }
@@ -292,7 +292,7 @@ namespace Managed.Adb
         /// Listens for debugger.
         /// </summary>
         /// <param name="listenPort">The listen port.</param>
-        public void ListenForDebugger(int listenPort )
+        public void ListenForDebugger(int listenPort)
         {
             throw new NotImplementedException();
         }
@@ -302,7 +302,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="packet">The packet.</param>
         /// <param name="replyHandler">The reply handler.</param>
-        public void SendAndConsume(object packet, ChunkHandler replyHandler )
+        public void SendAndConsume(object packet, ChunkHandler replyHandler)
         {
             throw new NotImplementedException();
         }
@@ -312,7 +312,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="id">The id.</param>
         /// <param name="handler">The handler.</param>
-        public void AddRequestId(int id, ChunkHandler handler )
+        public void AddRequestId(int id, ChunkHandler handler)
         {
             throw new NotImplementedException();
         }
@@ -321,7 +321,7 @@ namespace Managed.Adb
         /// Removes the request id.
         /// </summary>
         /// <param name="id">The id.</param>
-        public void RemoveRequestId(int id )
+        public void RemoveRequestId(int id)
         {
             throw new NotImplementedException();
         }
@@ -331,7 +331,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="id">The id.</param>
         /// <returns></returns>
-        public ChunkHandler IsResponseToUs(int id )
+        public ChunkHandler IsResponseToUs(int id)
         {
             throw new NotImplementedException();
         }
@@ -340,7 +340,7 @@ namespace Managed.Adb
         /// Packets the failed.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        public void PacketFailed(object packet )
+        public void PacketFailed(object packet)
         {
             throw new NotImplementedException();
         }
@@ -358,7 +358,7 @@ namespace Managed.Adb
         /// Closes the specified notify.
         /// </summary>
         /// <param name="notify">if set to <see langword="true"/> [notify].</param>
-        public void Close(bool notify )
+        public void Close(bool notify)
         {
             throw new NotImplementedException();
         }
@@ -367,7 +367,7 @@ namespace Managed.Adb
         /// Updates the specified change mask.
         /// </summary>
         /// <param name="changeMask">The change mask.</param>
-        public void Update(ClientChangeMask changeMask )
+        public void Update(ClientChangeMask changeMask)
         {
             throw new NotImplementedException();
         }
@@ -393,7 +393,7 @@ namespace Managed.Adb
         /// Forwards the packet to client.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        public void ForwardPacketToClient(object packet )
+        public void ForwardPacketToClient(object packet)
         {
             throw new NotImplementedException();
         }
@@ -411,7 +411,7 @@ namespace Managed.Adb
         /// Sends the and consume.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        public void SendAndConsume(object packet )
+        public void SendAndConsume(object packet)
         {
             throw new NotImplementedException();
         }
@@ -425,7 +425,7 @@ namespace Managed.Adb
         /// </returns>
         public override string ToString()
         {
-            return string.Format("[Client pid: {0}]", this.ClientData.Pid );
+            return string.Format("[Client pid: {0}]", this.ClientData.Pid);
         }
     }
 }

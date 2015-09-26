@@ -13,24 +13,24 @@ namespace Managed.Adb
             
         }
 
-        public FilePermissions(string permissions )
+        public FilePermissions(string permissions)
         {
-            if (permissions.Length > 9 )
+            if (permissions.Length > 9)
             {
-                permissions = permissions.Substring(1,9 );
+                permissions = permissions.Substring(1,9);
             }
 
-            if (permissions.Length < 9 )
+            if (permissions.Length < 9)
             {
-                throw new ArgumentException(string.Format("Invalid permissions string: {0}",permissions) );
+                throw new ArgumentException(string.Format("Invalid permissions string: {0}",permissions));
             }
 
-            this.User = new FilePermission(permissions.Substring(0, 3 ) );
-            this.Group = new FilePermission(permissions.Substring(3, 3 ) );
-            this.Other = new FilePermission(permissions.Substring(6, 3 ) );
+            this.User = new FilePermission(permissions.Substring(0, 3));
+            this.Group = new FilePermission(permissions.Substring(3, 3));
+            this.Other = new FilePermission(permissions.Substring(6, 3));
         }
 
-        public FilePermissions(FilePermission user, FilePermission group, FilePermission other )
+        public FilePermissions(FilePermission user, FilePermission group, FilePermission other)
         {
             this.User = user;
             this.Group = group;
@@ -44,12 +44,12 @@ namespace Managed.Adb
 
         public override string ToString()
         {
-            return string.Format("{0}{1}{2}", this.User.ToString(), this.Group.ToString(), this.Other.ToString() );
+            return string.Format("{0}{1}{2}", this.User.ToString(), this.Group.ToString(), this.Other.ToString());
         }
 
         public string ToChmod()
         {
-            return string.Format("{0}{1}{2}", (int)this.User.ToChmod(), (int)this.Group.ToChmod(), (int)this.Other.ToChmod() );
+            return string.Format("{0}{1}{2}", (int)this.User.ToChmod(), (int)this.Group.ToChmod(), (int)this.Other.ToChmod());
         }
     }
 
@@ -87,7 +87,7 @@ namespace Managed.Adb
         /// Initializes a new instance of the <see cref="Permission"/> class.
         /// </summary>
         public FilePermission()
-            : this("---" )
+            : this("---")
             {
 
         }
@@ -96,12 +96,12 @@ namespace Managed.Adb
         /// Initializes a new instance of the <see cref="Permission"/> class.
         /// </summary>
         /// <param name="linuxPermissions">The linux permissions.</param>
-        public FilePermission(string linuxPermissions )
+        public FilePermission(string linuxPermissions)
         {
-            this.CanRead = string.Compare(linuxPermissions.Substring(0, 1 ), "r", false ) == 0;
-            this.CanWrite = string.Compare(linuxPermissions.Substring(1, 1 ), "w", false ) == 0;
-            this.CanExecute = string.Compare(linuxPermissions.Substring(2, 1 ), "x", false ) == 0 || string.Compare(linuxPermissions.Substring(2, 1 ), "t", false ) == 0;
-            this.CanDelete = this.CanWrite && string.Compare(linuxPermissions.Substring(2, 1 ), "t", false ) != 0;
+            this.CanRead = string.Compare(linuxPermissions.Substring(0, 1), "r", false) == 0;
+            this.CanWrite = string.Compare(linuxPermissions.Substring(1, 1), "w", false) == 0;
+            this.CanExecute = string.Compare(linuxPermissions.Substring(2, 1), "x", false) == 0 || string.Compare(linuxPermissions.Substring(2, 1), "t", false) == 0;
+            this.CanDelete = this.CanWrite && string.Compare(linuxPermissions.Substring(2, 1), "t", false) != 0;
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Managed.Adb
         public string ToString()
         {
             StringBuilder perm = new StringBuilder();
-            return perm.AppendFormat("{0}", this.CanRead ? "r" : "-" ).AppendFormat("{0}", this.CanWrite ? "w" : "-" ).AppendFormat("{0}", this.CanExecute ? this.CanDelete ? "x" : "t" : "-" ).ToString();
+            return perm.AppendFormat("{0}", this.CanRead ? "r" : "-").AppendFormat("{0}", this.CanWrite ? "w" : "-").AppendFormat("{0}", this.CanExecute ? this.CanDelete ? "x" : "t" : "-").ToString();
         }
 
         /// <summary>
@@ -145,17 +145,17 @@ namespace Managed.Adb
         public Modes ToChmod()
         {
             Modes val = Modes.NoAccess;
-            if (this.CanRead )
+            if (this.CanRead)
             {
                 val |= Modes.Read;
             }
 
-            if (this.CanWrite )
+            if (this.CanWrite)
             {
                 val |= Modes.Write;
             }
 
-            if (this.CanExecute )
+            if (this.CanExecute)
             {
                 val |= Modes.Execute;
             }

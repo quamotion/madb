@@ -240,7 +240,7 @@ namespace Managed.Adb
             Match m = re.Match(data);
             if (m.Success)
             {
-                return new Device(m.Groups[1].Value, GetStateFromString(m.Groups[2].Value), m.Groups[4].Value, m.Groups[3].Value, m.Groups[5].Value );
+                return new Device(m.Groups[1].Value, GetStateFromString(m.Groups[2].Value), m.Groups[4].Value, m.Groups[3].Value, m.Groups[5].Value);
             }
             else
             {
