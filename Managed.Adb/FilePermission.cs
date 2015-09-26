@@ -37,7 +37,9 @@ namespace Managed.Adb
         } 
 
         public FilePermission User { get; set; }
+
         public FilePermission Group { get; set; }
+
         public FilePermission Other { get; set; }
 
         public override string ToString()

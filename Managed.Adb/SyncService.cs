@@ -110,6 +110,7 @@ namespace Managed.Adb
         /// The null progress monitor.
         /// </value>
         public static NullSyncProgressMonitor NullProgressMonitor { get; private set; }
+
         private static byte[] DataBuffer { get; set; }
 
         /// <summary>
@@ -256,6 +257,7 @@ namespace Managed.Adb
         /// The device.
         /// </value>
         public Device Device { get; private set; }
+
         private Socket Channel { get; set; }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>

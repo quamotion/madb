@@ -38,11 +38,17 @@ namespace Managed.Adb
         }
 
         public BinaryReader ReadBuffer { get; set; }
+
         public BinaryWriter PreDataBuffer { get; set; }
+
         public Socket ListenChannel { get; set; }
+
         public Socket Channel { get; set; }
+
         public IClient Client { get; set; }
+
         public int ListenPort { get; set; }
+
         public ConnectionStates ConnectionState { get; set; }
 
         public bool IsDebuggerAttached { get; private set; }

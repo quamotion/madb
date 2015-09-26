@@ -35,7 +35,9 @@ namespace Managed.Adb
         bool IsOpen {get; }
 
         SyncResult DoPush(IEnumerable<FileSystemInfo> files, string remotePath, ISyncProgressMonitor monitor);
+
         SyncResult DoPullFile(string remotePath, string localPath, ISyncProgressMonitor monitor);
+
         long GetTotalLocalFileSize(IEnumerable<FileSystemInfo> fsis);
     }
 }

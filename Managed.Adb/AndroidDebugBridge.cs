@@ -597,6 +597,7 @@ namespace Managed.Adb
                 }*/
                 return null;
             }
+
             set
             {
                 /*MonitorThread monitorThread = MonitorThread.Instance;

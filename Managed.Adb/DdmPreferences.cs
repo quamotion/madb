@@ -34,12 +34,14 @@ namespace Managed.Adb
         }
 
         public static int Timeout { get; set; }
+
         public static LogLevel.LogLevelInfo LogLevel
         {
             get
             {
                 return _logLevel;
             }
+
             set
             {
                 _logLevel = value;
@@ -48,12 +50,14 @@ namespace Managed.Adb
         }
 
         public static int DebugPortBase { get; set; }
+
         public static int SelectedDebugPort
         {
             get
             {
                 return _selectedDebugPort;
             }
+
             set
             {
                 _selectedDebugPort = value;
@@ -67,6 +71,7 @@ namespace Managed.Adb
         }
 
         public static bool InitialThreadUpdate { get; set; }
+
         public static bool InitialHeapUpdate { get; set; }
     }
 }

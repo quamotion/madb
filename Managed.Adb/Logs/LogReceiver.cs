@@ -8,6 +8,7 @@ namespace Managed.Adb.Logs
     public class LogReceiver
     {
         private const int ENTRY_HEADER_SIZE = 20; // 2*2 + 4*4; see LogEntry.
+
         public LogReceiver(ILogListener listener)
         {
             this.EntryDataOffset = 0;
@@ -17,11 +18,15 @@ namespace Managed.Adb.Logs
         }
 
         private int EntryDataOffset { get; set; }
+
         private int EntryHeaderOffset { get; set; }
+
         private byte[] EntryHeaderBuffer { get; set; }
 
         private LogEntry CurrentEntry { get; set; }
+
         private ILogListener Listener { get; set; }
+
         public bool IsCancelled { get; private set; }
 
         public void Cancel()

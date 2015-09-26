@@ -323,6 +323,7 @@ namespace Managed.Adb
         public string AvdName
         {
             get { return this._avdName; }
+
             set
             {
                 if (!this.IsEmulator)

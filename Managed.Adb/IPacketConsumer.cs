@@ -14,6 +14,7 @@ namespace Managed.Adb
         /// Reads this instance.
         /// </summary>
         void Read();
+
         // TODO: JdwpPacket
         /*JdwpPacket*/ object GetJdwpPacket();
 
