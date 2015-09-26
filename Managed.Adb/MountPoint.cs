@@ -55,7 +55,7 @@ namespace Managed.Adb
         /// Returns a string representation of the mount point.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String"/> that represents this instance.
+        /// A <see cref="string"/> that represents this instance.
         /// </returns>
         public override string ToString()
         {

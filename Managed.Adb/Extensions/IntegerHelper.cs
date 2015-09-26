@@ -15,9 +15,9 @@ namespace Managed.Adb
         /// <param name="value">The value.</param>
         /// <param name="bits">The bits.</param>
         /// <returns></returns>
-        public static Int32 BitShiftRight(this Int32 value, int bits)
+        public static int BitShiftRight(this int value, int bits)
         {
-            return (Int32)((UInt32)value >> bits);
+            return (int)((uint)value >> bits);
         }
 
         /// <summary>
@@ -26,9 +26,9 @@ namespace Managed.Adb
         /// <param name="value">The value.</param>
         /// <param name="bits">The bits.</param>
         /// <returns></returns>
-        public static Int16 BitShiftRight(this Int16 value, int bits)
+        public static short BitShiftRight(this short value, int bits)
         {
-            return (Int16)((UInt16)value >> bits);
+            return (short)((ushort)value >> bits);
         }
 
         /// <summary>
@@ -37,9 +37,9 @@ namespace Managed.Adb
         /// <param name="value">The value.</param>
         /// <param name="bits">The bits.</param>
         /// <returns></returns>
-        public static Int64 BitShiftRight(this Int64 value, int bits)
+        public static long BitShiftRight(this long value, int bits)
         {
-            return (Int64)((UInt64)value >> bits);
+            return (long)((ulong)value >> bits);
         }
 
         /// <summary>

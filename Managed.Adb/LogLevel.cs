@@ -154,7 +154,7 @@ namespace Managed.Adb
             /// <param name="priority">The priority.</param>
             /// <param name="value">The value.</param>
             /// <param name="letter">The letter.</param>
-            public LogLevelInfo(int priority, string value, Char letter)
+            public LogLevelInfo(int priority, string value, char letter)
             {
                 this.Priority = priority;
                 this.Value = value;
@@ -175,7 +175,7 @@ namespace Managed.Adb
             /// Gets or sets the letter.
             /// </summary>
             /// <value>The letter.</value>
-            public Char Letter { get; set; }
+            public char Letter { get; set; }
         }
     }
 }

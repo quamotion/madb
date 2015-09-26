@@ -68,15 +68,15 @@ namespace Managed.Adb
         void RequestAllocationDetails();
         void Kill();
         // TODO: Define Selector
-        void Register(/*Selector*/ Object selector);
+        void Register(/*Selector*/ object selector);
         void ListenForDebugger(int listenPort);
         // TODO: JdwpPacket
-        void SendAndConsume(/*JdwpPacket*/ Object packet, ChunkHandler replyHandler);
+        void SendAndConsume(/*JdwpPacket*/ object packet, ChunkHandler replyHandler);
         void AddRequestId(int id, ChunkHandler handler);
         void RemoveRequestId(int id);
         ChunkHandler IsResponseToUs(int id);
         // TODO: JdwpPacket
-        void PacketFailed(/*JdwpPacket*/ Object packet);
+        void PacketFailed(/*JdwpPacket*/ object packet);
         bool DdmSeen();
         void Close(bool notify);
         void Update(ClientChangeMask changeMask);

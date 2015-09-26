@@ -73,7 +73,7 @@ namespace Managed.Adb
             if ( count < 0 ) throw new IOException ( "read failed" );*/
         }
 
-        public /*JdwpPacket*/ Object GetJdwpPacket()
+        public /*JdwpPacket*/ object GetJdwpPacket()
         {
             throw new NotImplementedException();
 
@@ -118,7 +118,7 @@ namespace Managed.Adb
         }
 
         // TODO: JdwpPacket
-        public void ForwardPacketToClient(/*JdwpPacket*/ Object packet)
+        public void ForwardPacketToClient(/*JdwpPacket*/ object packet)
         {
             this.Client.SendAndConsume(packet);
         }
@@ -147,7 +147,7 @@ namespace Managed.Adb
         }
 
         //TODO: JdwpPacket
-        public void SendAndConsume(/*JdwpPacket*/ Object packet)
+        public void SendAndConsume(/*JdwpPacket*/ object packet)
         {
             if (this.Channel == null)
             {

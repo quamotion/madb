@@ -49,7 +49,7 @@ namespace Managed.Adb
                 {
                     try
                     {
-                        this.BatteryInfo.Level = Int32.Parse(match.Groups[1].Value);
+                        this.BatteryInfo.Level = int.Parse(match.Groups[1].Value);
                     }
                     catch (FormatException)
                     {
@@ -62,7 +62,7 @@ namespace Managed.Adb
                 {
                     try
                     {
-                        this.BatteryInfo.Scale = Int32.Parse(match.Groups[1].Value);
+                        this.BatteryInfo.Scale = int.Parse(match.Groups[1].Value);
                     }
                     catch (FormatException)
                     {
@@ -93,7 +93,7 @@ namespace Managed.Adb
                 {
                     try
                     {
-                        var i = Int32.Parse(match.Groups[1].Value);
+                        var i = int.Parse(match.Groups[1].Value);
                         this.BatteryInfo.Status = i.ToEnum<BatteryInfo.StatusTypes>();
                     }
                     catch (FormatException)
@@ -107,7 +107,7 @@ namespace Managed.Adb
                 {
                     try
                     {
-                        var i = Int32.Parse(match.Groups[1].Value);
+                        var i = int.Parse(match.Groups[1].Value);
                         this.BatteryInfo.Health = i.ToEnum<BatteryInfo.HealthTypes>();
                     }
                     catch (FormatException)
@@ -121,7 +121,7 @@ namespace Managed.Adb
                 {
                     try
                     {
-                        this.BatteryInfo.Voltage = Int32.Parse(match.Groups[1].Value);
+                        this.BatteryInfo.Voltage = int.Parse(match.Groups[1].Value);
                     }
                     catch (FormatException)
                     {
@@ -140,7 +140,7 @@ namespace Managed.Adb
                 {
                     try
                     {
-                        this.BatteryInfo.Temperature = Int32.Parse(match.Groups[1].Value);
+                        this.BatteryInfo.Temperature = int.Parse(match.Groups[1].Value);
                     }
                     catch (FormatException)
                     {

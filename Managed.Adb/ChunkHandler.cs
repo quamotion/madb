@@ -213,7 +213,7 @@ namespace Managed.Adb
          * Pass in the byte buffer returned by JdwpPacket.getPayload().
          */
         // TODO: JdwpPacket
-        static void finishChunkPacket(/*JdwpPacket*/ Object packet, int type, int chunkLen)
+        static void finishChunkPacket(/*JdwpPacket*/ object packet, int type, int chunkLen)
         {
             /*ByteBuffer buf = packet.getPayload();
 
