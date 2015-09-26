@@ -229,8 +229,6 @@ namespace Managed.Adb
                 this.Alpha.Offset, this.Alpha.Length, this.Size);
         }
 
-
-
         /// <summary>
         /// Converts this raw image to an Image
         /// </summary>
@@ -284,7 +282,6 @@ namespace Managed.Adb
             });
             return clone.ToArray();
         }
-
 
     }
 }

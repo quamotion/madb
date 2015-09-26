@@ -25,7 +25,6 @@ namespace Managed.Adb
             return "{0}{1}{0}".With(s.Contains(" ") ? "\"" : string.Empty, s);
         }
 
-
         /// <summary>
         /// Gets the bytes from a string.
         /// </summary>

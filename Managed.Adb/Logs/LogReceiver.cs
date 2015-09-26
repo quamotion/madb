@@ -84,7 +84,6 @@ namespace Managed.Adb.Logs
                     }
                 }
 
-
                 // at this point, we have an entry, and offset/length have been updated to skip
                 // the entry header.
                 if (length >= this.CurrentEntry.Length - this.EntryDataOffset)
@@ -124,7 +123,6 @@ namespace Managed.Adb.Logs
                 }
             }
         }
-
 
         private LogEntry CreateEntry(byte[] data, int offset)
         {

@@ -26,7 +26,6 @@ namespace Managed.Adb
 
         private const RegexOptions REOPTIONS = RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace;
 
-
         /// <summary>
         /// Gets or sets the battery info.
         /// </summary>

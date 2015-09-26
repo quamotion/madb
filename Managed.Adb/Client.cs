@@ -13,7 +13,6 @@ namespace Managed.Adb
     public class Client : IClient
     {
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -415,7 +414,6 @@ namespace Managed.Adb
         {
             throw new NotImplementedException();
         }
-
 
         /// <summary>
         /// Returns a <see cref="string"/> that represents this instance.

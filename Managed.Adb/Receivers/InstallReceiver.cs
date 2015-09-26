@@ -20,7 +20,6 @@ namespace Managed.Adb
         /// </summary>
         private const string FAILURE_PATTERN = @"Failure(?:\s+\[(.*)\])?";
 
-
         private const string UNKNOWN_ERROR = "An unknown error occurred.";
         /// <summary>
         /// Processes the new lines.

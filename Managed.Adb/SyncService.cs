@@ -128,8 +128,6 @@ namespace Managed.Adb
             return false;
         }
 
-
-
         /// <summary>
         /// Create a command with a code and an int values
         /// </summary>
@@ -591,7 +589,6 @@ namespace Managed.Adb
             {
                 throw new ArgumentNullException("monitor", "Monitor cannot be null");
             }
-
 
             byte[] msg = null;
             byte[] pullResult = new byte[8];

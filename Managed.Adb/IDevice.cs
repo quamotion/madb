@@ -111,7 +111,6 @@ namespace Managed.Adb
         /// <value><see langword="true"/> if the device is online; otherwise, <see langword="false"/>.</value>
         bool IsOnline { get; }
 
-
         /// <summary>
         /// Gets a value indicating whether this device is emulator.
         /// </summary>
@@ -158,7 +157,6 @@ namespace Managed.Adb
         /// </remarks>
         /// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
         ISyncService SyncService { get; }
-
 
         /// <summary>
         /// Takes a screen shot of the device and returns it as a <see cref="RawImage"/>
@@ -220,7 +218,6 @@ namespace Managed.Adb
         /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
         /// <param name="commandArgs">The command args.</param>
         void ExecuteShellCommand(string command, IShellOutputReceiver receiver, int maxTimeToOutputResponse, params object[] commandArgs);
-
 
         /// <summary>
         /// Executes a shell command on the device as root, and sends the result to a receiver.
@@ -292,7 +289,6 @@ namespace Managed.Adb
         /// <param name="remoteFilePath">absolute file path to package file on device</param>
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
         void InstallRemotePackage(string remoteFilePath, bool reinstall);
-
 
         /// <summary>
         /// Remove a file from device

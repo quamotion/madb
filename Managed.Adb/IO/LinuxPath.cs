@@ -5,7 +5,6 @@ using System.Text;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
-
 namespace Managed.Adb.IO
 {
     /// <summary>
@@ -335,8 +334,6 @@ namespace Managed.Adb.IO
             return (FixupPath(path1) + path2);
         }
 
-
-
         /// <summary>Returns the directory information for the specified path string.</summary>
         /// <returns>A <see cref="T:System.String"></see> containing directory information for path, or null if path denotes a root directory, is the empty string (""), or is null. Returns <see cref="F:System.String.Empty"></see> if path does not contain directory information.</returns>
         /// <param name="path">The path of a file or directory. </param>
@@ -397,7 +394,6 @@ namespace Managed.Adb.IO
         {
             string sb = path;
             sb = sb.Replace(System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar);
-
 
             if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar })))
             {
@@ -490,7 +486,6 @@ namespace Managed.Adb.IO
             }
             return path.Substring(0, length);
         }
-
 
         /// <summary>Gets an array containing the characters that are not allowed in file names.</summary>
         /// <returns>An array containing the characters that are not allowed in file names.</returns>
@@ -681,7 +676,6 @@ namespace Managed.Adb.IO
                 return path;
             }
         }
-
 
     }
 }

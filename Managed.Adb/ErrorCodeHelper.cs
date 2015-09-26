@@ -38,7 +38,6 @@ namespace Managed.Adb
     /** Result code for receiving too much data from the remove device at once */
     public const int RESULT_BUFFER_OVERRUN = 14;
 
-
         public static string ErrorCodeToString(int code)
         {
             switch (code)

@@ -36,7 +36,6 @@ namespace Managed.Adb
             Log.d("ddms", this.ToString());
         }
 
-
         public BinaryReader ReadBuffer { get; set; }
         public BinaryWriter PreDataBuffer { get; set; }
         public Socket ListenChannel { get; set; }
@@ -46,7 +45,6 @@ namespace Managed.Adb
         public ConnectionStates ConnectionState { get; set; }
 
         public bool IsDebuggerAttached { get; private set; }
-
 
         public void Read()
         {

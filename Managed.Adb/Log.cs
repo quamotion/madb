@@ -224,7 +224,6 @@ namespace Managed.Adb
             e(tag, "{0}\n{1}", message, exception);
         }
 
-
         /// <summary>
         /// Outputs a log message and attempts to display it in a dialog.
         /// </summary>
@@ -242,7 +241,6 @@ namespace Managed.Adb
                 WriteLine(logLevel, tag, message);
             }
         }
-
 
         /// <summary>
         /// Dump the entire contents of a byte array with DEBUG priority.
@@ -326,7 +324,6 @@ namespace Managed.Adb
             }
 
         }
-
 
         /// <summary>
         /// Dump the entire contents of a byte array with DEBUG priority.

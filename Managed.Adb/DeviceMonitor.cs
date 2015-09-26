@@ -29,7 +29,6 @@ namespace Managed.Adb
         /// </summary>
         private byte[] LengthBuffer2 = null;
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
         /// </summary>

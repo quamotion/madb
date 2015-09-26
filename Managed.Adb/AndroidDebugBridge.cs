@@ -60,7 +60,6 @@ namespace Managed.Adb
         /// </summary>
         private const int ADB_VERSION_MICRO_MAX = -1;
 
-
         /// <summary>
         /// The regex pattern for getting the adb version
         /// </summary>
@@ -103,13 +102,11 @@ namespace Managed.Adb
 
 #endif
 
-
         // Where to find the ADB bridge.
         /// <summary>
         /// The default ADB bridge port
         /// </summary>
         public const int ADB_PORT = 5037;
-
 
         #region statics
         /// <summary>
@@ -214,7 +211,6 @@ namespace Managed.Adb
             }*/
         }
 
-
         /// <summary>
         /// Gets an instance of <see cref="AndroidDebugBridge"/>.
         /// </summary>
@@ -246,8 +242,6 @@ namespace Managed.Adb
         ///   <see langword="true"/> if there is client support; otherwise, <see langword="false"/>.
         /// </value>
         public static bool ClientSupport { get; private set; }
-
-
 
         /// <summary>
         /// Creates a {@link AndroidDebugBridge} that is not linked to any particular executable.

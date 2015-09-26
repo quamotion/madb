@@ -103,7 +103,6 @@ namespace Managed.Adb
             Log.w("ddms", "         client " + client + ", handler " + this);
         }
 
-
         /**
          * Utility function to copy a String out of a ByteBuffer.
          *

@@ -228,7 +228,6 @@ namespace Managed.Adb
             return DeviceState.Unknown;
         }
 
-
         /// <summary>
         /// Create a device from Adb Device list data
         /// </summary>
@@ -316,7 +315,6 @@ namespace Managed.Adb
         /// </summary>
         public TransportType TransportType { get; private set; }
 
-
         /// <summary>
         /// Gets or sets the Avd name.
         /// </summary>
@@ -332,7 +330,6 @@ namespace Managed.Adb
                 this._avdName = value;
             }
         }
-
 
         /// <summary>
         /// Gets the product.
@@ -365,7 +362,6 @@ namespace Managed.Adb
         /// Gets the device mount points.
         /// </summary>
         public Dictionary<string, MountPoint> MountPoints { get; set; }
-
 
         /// <summary>
         /// Returns the device properties. It contains the whole output of 'getprop'
@@ -512,7 +508,6 @@ namespace Managed.Adb
             }
         }
 
-
         /// <summary>
         /// Refreshes the mount points.
         /// </summary>
@@ -627,7 +622,6 @@ namespace Managed.Adb
             }
         }
 
-
         /// <summary>
         /// Gets the list of clients
         /// </summary>
@@ -689,7 +683,6 @@ namespace Managed.Adb
             this.ExecuteShellCommand(command, receiver, new object[] { });
         }
 
-
         /// <summary>
         /// Executes a shell command on the device, and sends the result to a receiver.
         /// </summary>
@@ -712,7 +705,6 @@ namespace Managed.Adb
         {
             AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver);
         }
-
 
         /// <summary>
         /// Executes a shell command on the device as root, and sends the result to a receiver.
@@ -757,7 +749,6 @@ namespace Managed.Adb
         {
             AdbHelper.Instance.ExecuteRemoteRootCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver, timeout);
         }
-
 
         /// <summary>
         /// Runs the event log service.
@@ -950,7 +941,6 @@ namespace Managed.Adb
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
         }
-
 
         /// <summary>
         /// Remove a file from device

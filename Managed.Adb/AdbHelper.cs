@@ -168,7 +168,6 @@ namespace Managed.Adb
             }
         }
 
-
         //https://github.com/android/platform_system_core/blob/master/adb/backup_service.c
         /// <summary>
         /// Backups the specified address.
@@ -613,7 +612,6 @@ namespace Managed.Adb
                 adbChan.Blocking = true;
 
                 // host-serial should be different based on the transport...
-
 
                 byte[] request = this.FormAdbRequest(string.Format("host-serial:{0}:forward:tcp:{1};tcp:{2}", //$NON-NLS-1$
                                 device.SerialNumber, localPort, remotePort));
@@ -1084,7 +1082,6 @@ namespace Managed.Adb
         {
             this.ExecuteRemoteCommand(endPoint, command, device, rcvr, int.MaxValue);
         }
-
 
         /// <summary>
         /// Sets the device.

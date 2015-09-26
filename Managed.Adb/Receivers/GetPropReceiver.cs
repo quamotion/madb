@@ -32,7 +32,6 @@ namespace Managed.Adb
         /// <value>The device.</value>
         public Device Device { get; set; }
 
-
         /// <summary>
         /// Processes the new lines.
         /// </summary>

@@ -26,6 +26,5 @@ namespace Managed.Adb
         /// </value>
         public int Offset { get; set; }
 
-        
     }
 }

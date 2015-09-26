@@ -41,7 +41,6 @@ namespace Managed.Adb
         public FilePermission Group { get; set; }
         public FilePermission Other { get; set; }
 
-
         public override string ToString()
         {
             return string.Format("{0}{1}{2}", this.User.ToString(), this.Group.ToString(), this.Other.ToString());

@@ -43,7 +43,6 @@ namespace Managed.Adb
                  (value & 0x00FF000000000000UL) >> 40 | (value & 0xFF00000000000000UL) >> 56;
         }
 
-
         /// <summary>
         /// Ints the reverse for raw image.
         /// </summary>
