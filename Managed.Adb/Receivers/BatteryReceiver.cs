@@ -8,7 +8,7 @@ using MoreLinq;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class BatteryReceiver : MultiLineReceiver
     {
@@ -33,7 +33,7 @@ namespace Managed.Adb
         /// The battery info.
         /// </value>
         public BatteryInfo BatteryInfo { get; private set; }
-        
+
         /// <summary>
         /// Processes the new lines.
         /// </summary>

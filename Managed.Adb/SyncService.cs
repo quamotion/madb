@@ -268,7 +268,7 @@ namespace Managed.Adb
                 return this.Channel != null && this.Channel.Connected;
             }
         }
-        
+
         /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
         public bool Open()
         {

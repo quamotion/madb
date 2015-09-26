@@ -21,12 +21,12 @@ namespace Managed.Adb
         private const string TAG = "DeviceMonitor";
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private byte[] LengthBuffer = null;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private byte[] LengthBuffer2 = null;
 

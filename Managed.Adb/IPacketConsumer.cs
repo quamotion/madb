@@ -6,7 +6,7 @@ using System.Text;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public interface IPacketConsumer
     {

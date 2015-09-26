@@ -6,7 +6,7 @@ using System.Text;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public sealed class NullOutputReceiver : IShellOutputReceiver
     {
@@ -80,8 +80,8 @@ namespace Managed.Adb
         /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbHelper"/>
         /// will detect common error messages and throw an exception.
         /// </remarks>
-        public bool ParsesErrors 
-        { 
+        public bool ParsesErrors
+        {
             get
             {
                 return false;

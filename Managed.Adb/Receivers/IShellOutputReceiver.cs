@@ -6,7 +6,7 @@ using System.Text;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public interface IShellOutputReceiver
     {
@@ -19,7 +19,7 @@ namespace Managed.Adb
         void AddOutput(byte[] data, int offset, int length);
 
         /// <summary>
-        /// Flushes the output. 
+        /// Flushes the output.
         /// </summary>
         /// <remarks>This should always be called at the end of the "process" in order to indicate that the data is ready to be processed further if needed.</remarks>
         void Flush();

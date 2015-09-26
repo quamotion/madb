@@ -6,7 +6,7 @@ using System.Text;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public static class LogLevel
     {
@@ -141,7 +141,7 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public class LogLevelInfo
         {

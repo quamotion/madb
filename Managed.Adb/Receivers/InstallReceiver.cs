@@ -7,17 +7,17 @@ using System.Text.RegularExpressions;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class InstallReceiver : MultiLineReceiver
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const string SUCCESS_OUTPUT = "Success";
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const string FAILURE_PATTERN = @"Failure(?:\s+\[(.*)\])?";
 

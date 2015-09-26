@@ -7,17 +7,17 @@ using System.Text.RegularExpressions;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public sealed class EnvironmentVariablesReceiver : MultiLineReceiver
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public const string ENV_COMMAND = "printenv";
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const string ENV_PATTERN = @"^([^=\s]+)\s*=\s*(.*)$";
 

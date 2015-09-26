@@ -7,38 +7,38 @@ using System.IO;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public abstract class ChunkHandler
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public enum ByteOrder
         {
             /// <summary>
-            /// 
+            ///
             /// </summary>
             LittleEndian,
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             BigEndian
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public const int CHUNK_HEADER_LEN = 8;   // 4-byte type, 4-byte len
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public const ByteOrder CHUNK_ORDER = ByteOrder.BigEndian;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public const int CHUNK_FAIL = -1;
 

@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public sealed class GetPropReceiver : MultiLineReceiver
     {

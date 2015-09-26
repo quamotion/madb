@@ -15,7 +15,7 @@ using System.Net;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public enum DeviceState
     {
@@ -35,8 +35,8 @@ namespace Managed.Adb
         Offline,
 
         /// <summary>
-        /// The instance is now connected to the adb server. Note that this state does not imply that the Android system is 
-        /// fully booted and operational, since the instance connects to adb while the system is still booting. 
+        /// The instance is now connected to the adb server. Note that this state does not imply that the Android system is
+        /// fully booted and operational, since the instance connects to adb while the system is still booting.
         /// However, after boot-up, this is the normal operational state of an emulator/device instance.
         /// </summary>
         Online,
@@ -78,7 +78,7 @@ namespace Managed.Adb
         public event EventHandler<EventArgs> ClientListChanged;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public const string TEMP_DIRECTORY_FOR_INSTALL = "/storage/sdcard0/tmp/";
 
@@ -103,7 +103,7 @@ namespace Managed.Adb
         public const string PROP_DEBUGGABLE = "ro.debuggable";
 
         /// <summary>
-        /// Serial number of the first connected emulator. 
+        /// Serial number of the first connected emulator.
         /// </summary>
         public const string FIRST_EMULATOR_SN = "emulator-5554";
 
@@ -123,7 +123,7 @@ namespace Managed.Adb
         /// </summary>
         /// <workitem>21136</workitem>
         private const string RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download|unauthorized)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
-        
+
         /// <summary>
         /// The tag to use when logging messages.
         /// </summary>
@@ -273,7 +273,7 @@ namespace Managed.Adb
             try
             {
                 // workitem: 16822
-                // this now checks if permission was denied and accounts for that. 
+                // this now checks if permission was denied and accounts for that.
                 // The nulloutput receiver is fine here because it doesn't need to send the output anywhere,
                 // the execute command can still handle the output with the null output receiver.
                 this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", NullOutputReceiver.Instance);
@@ -851,7 +851,7 @@ namespace Managed.Adb
                 ClientList.Clear ( );
             }
         }
-        
+
         SocketChannel ClientMonitoringSocket { get; set; }
 
         void RemoveClient ( Client client, bool notify ) {
@@ -972,7 +972,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="packageName">Name of the package.</param>
         /// <exception cref="IOException"></exception>
-        ///   
+        ///
         /// <exception cref="PackageInstallationException"></exception>
         public void UninstallPackage(string packageName)
         {

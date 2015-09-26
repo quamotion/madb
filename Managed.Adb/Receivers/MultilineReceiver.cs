@@ -6,18 +6,18 @@ using System.Text;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public abstract class MultiLineReceiver : IShellOutputReceiver
     {
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public const string NEWLINE = "\r\n";
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public const string ENCODING = "ISO-8859-1";
 

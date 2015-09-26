@@ -14,22 +14,22 @@ namespace Managed.Adb
     {
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const int SERVER_PROTOCOL_VERSION = 1;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const int INITIAL_BUF_SIZE = 2 * 1024;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const int MAX_BUF_SIZE = 200 * 1024 * 1024;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const int WRITE_BUF_SIZE = 256;
 

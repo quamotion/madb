@@ -11,7 +11,7 @@ namespace Managed.Adb
 {
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public interface IDevice
     {
@@ -167,7 +167,7 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The screenshot.</value>
         RawImage Screenshot { get; }
-        
+
         /// <summary>
         /// Determines whether this instance can use the SU shell.
         /// </summary>
@@ -182,7 +182,7 @@ namespace Managed.Adb
         /// <param name="mnt">The mount point.</param>
         /// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
         void RemountMountPoint(MountPoint mnt, bool readOnly);
-        
+
         /// <summary>
         /// Remounts the mount point.
         /// </summary>
@@ -197,7 +197,7 @@ namespace Managed.Adb
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
         void ExecuteShellCommand(string command, IShellOutputReceiver receiver);
-        
+
         /// <summary>
         /// Executes a shell command on the device, and sends the result to a receiver.
         /// </summary>
@@ -254,7 +254,7 @@ namespace Managed.Adb
         /// <param name="receiver">The receiver object getting the result from the command.</param>
         /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
         void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver, int maxTimeToOutputResponse);
-        
+
         /// <summary>
         /// Creates a port forwarding between a local and a remote port.
         /// </summary>
@@ -286,7 +286,7 @@ namespace Managed.Adb
         /// <returns>destination path on device for file</returns>
         /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
         string SyncPackageToDevice(string localFilePath);
- 
+
         /// <summary>
         /// Installs the application package that was pushed to a temporary location on the device.
         /// </summary>
@@ -308,7 +308,7 @@ namespace Managed.Adb
         /// <exception cref="IOException"></exception>
         /// <exception cref="PackageInstallationException"></exception>
         void UninstallPackage(string packageName);
-        
+
         /// <summary>
         /// Refreshes the environment variables.
         /// </summary>

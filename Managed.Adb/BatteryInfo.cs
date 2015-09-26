@@ -8,7 +8,7 @@ using MoreLinq;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class BatteryInfo
     {

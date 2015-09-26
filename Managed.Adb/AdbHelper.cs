@@ -57,7 +57,7 @@ namespace Managed.Adb
         /// The time to wait
         /// </summary>
         private const int WAIT_TIME = 5;
-        
+
         /// <summary>
         /// The default encoding
         /// </summary>
@@ -543,8 +543,8 @@ namespace Managed.Adb
         /// <param name="length">The length.</param>
         /// <param name="timeout">The timeout.</param>
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// EOF 
-        /// or 
+        /// EOF
+        /// or
         /// No Data to read: exception.Message
         /// </exception>
         public void Read(Socket socket, byte[] data, int length, int timeout)
@@ -1039,7 +1039,7 @@ namespace Managed.Adb
                                     throw new CommandAbortingException(sdataTrimmed);
                                 }
 
-                                // for busybox applets 
+                                // for busybox applets
                                 // cmd: applet not found
                                 if (sdataTrimmed.IsMatch("applet not found$") && cmd.Length > 1)
                                 {
@@ -1432,7 +1432,7 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="device">The device.</param>
         /// <returns></returns>

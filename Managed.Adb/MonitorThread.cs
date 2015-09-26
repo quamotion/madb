@@ -7,28 +7,28 @@ using System.Threading;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     class MonitorThread
     {
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public enum ThreadState
         {
             /// <summary>
-            /// 
+            ///
             /// </summary>
             UNKNOWN = -1,
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             Ready = 2,
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             Disconnected = 3,
         }
@@ -42,7 +42,7 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private static MonitorThread _instance;
 

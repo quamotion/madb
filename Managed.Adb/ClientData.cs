@@ -6,12 +6,12 @@ using System.Text;
 namespace Managed.Adb
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class ClientData
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const string PRE_INITIALIZED = "<pre-initialized>";
 
@@ -35,13 +35,13 @@ namespace Managed.Adb
 
             /// <summary>
             /// Debugger connection status: The listening port for debugger connection failed to listen.
-            /// No debugger will be able to connect. 
+            /// No debugger will be able to connect.
             /// </summary>
             ERROR
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public enum AllocationTrackingStatus
         {
@@ -66,7 +66,7 @@ namespace Managed.Adb
     }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
     public enum MethodProfilingStatus
     {

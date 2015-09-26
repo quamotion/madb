@@ -56,12 +56,12 @@ namespace Managed.Adb
          */
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const int ADB_VERSION_MICRO_MIN = 20;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private const int ADB_VERSION_MICRO_MAX = -1;
 
@@ -120,12 +120,12 @@ namespace Managed.Adb
         #region statics
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private static AndroidDebugBridge _instance;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private static bool _clientSupport;
 
@@ -747,13 +747,13 @@ namespace Managed.Adb
                 if (!versionFound)
                 {
                     // if we get here, we failed to parse the output.
-                    Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to parse the output of 'adb version'"); 
+                    Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to parse the output of 'adb version'");
                 }
             }
             catch (IOException e)
             {
-                Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to get the adb version: " + e.Message); 
-            } 
+                Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to get the adb version: " + e.Message);
+            }
         }
 
         /// <summary>
@@ -783,7 +783,7 @@ namespace Managed.Adb
                     }
                     else if (ADB_VERSION_MICRO_MAX != -1 && microVersion > ADB_VERSION_MICRO_MAX)
                     {
-                        string message = string.Format("Required maximum version of adb: {0}.{1}.{2}. Current version is {0}.{1}.{3}", 
+                        string message = string.Format("Required maximum version of adb: {0}.{1}.{2}. Current version is {0}.{1}.{3}",
                                         majorVersion, minorVersion, ADB_VERSION_MICRO_MAX, microVersion);
                         Log.LogAndDisplay(LogLevel.Error, ADB, message);
                     }
@@ -807,7 +807,7 @@ namespace Managed.Adb
         {
             if (string.IsNullOrEmpty(AdbOsLocation))
             {
-                Log.e(ADB, "Cannot start adb when AndroidDebugBridge is created without the location of adb."); 
+                Log.e(ADB, "Cannot start adb when AndroidDebugBridge is created without the location of adb.");
                 return false;
             }
 
@@ -895,11 +895,11 @@ namespace Managed.Adb
 
             if (status != 0)
             {
-                Log.w(DDMS, "'adb kill-server' failed -- run manually if necessary"); 
+                Log.w(DDMS, "'adb kill-server' failed -- run manually if necessary");
                 return false;
             }
 
-            Log.d(DDMS, "'adb kill-server' succeeded"); 
+            Log.d(DDMS, "'adb kill-server' succeeded");
             return true;
         }
 

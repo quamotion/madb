@@ -34,7 +34,7 @@ namespace Managed.Adb
             this.User = user;
             this.Group = group;
             this.Other = other;
-        } 
+        }
 
         public FilePermission User { get; set; }
 
@@ -54,34 +54,34 @@ namespace Managed.Adb
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class FilePermission
     {
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Flags]
         public enum Modes
         {
             /// <summary>
-            /// 
+            ///
             /// </summary>
             NoAccess = 0,
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             Execute = 1,
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             Write = 2,
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             Read = 4
         }
