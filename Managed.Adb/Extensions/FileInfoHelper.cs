@@ -17,7 +17,7 @@ namespace Managed.Adb
         /// <returns>
         ///   <see langword="true"/> if the specified path is directory; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool IsDirectory ( String path )
+        public static bool IsDirectory (string path )
         {
             return File.Exists ( path ) && ( File.GetAttributes ( path ) & FileAttributes.Directory ) == FileAttributes.Directory;
         }
@@ -41,7 +41,7 @@ namespace Managed.Adb
         /// <returns>
         ///   <see langword="true"/> if the specified path is file; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool IsFile ( String path )
+        public static bool IsFile (string path )
         {
             return File.Exists ( path ) && !IsDirectory ( path );
         }
@@ -63,7 +63,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public static FileSystemInfo GetFileSystemInfo ( this String path )
+        public static FileSystemInfo GetFileSystemInfo ( this string path )
         {
             if ( IsDirectory ( path ) )
             {

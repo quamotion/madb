@@ -33,7 +33,7 @@ namespace Managed.Adb
         /// Gets the serial number of the device.
         /// </summary>
         /// <value>The serial number.</value>
-        String SerialNumber { get; }
+        string SerialNumber { get; }
         /// <summary>
         /// Gets the TCP endpoint defined when the transport is TCP.
         /// </summary>
@@ -61,19 +61,19 @@ namespace Managed.Adb
         ///  if there isn't any.
         /// </summary>
         /// <value>The name of the avd.</value>
-        String AvdName { get; set; }
+        string AvdName { get; set; }
 
         /// <summary>
         /// Gets the environment variables.
         /// </summary>
         /// <value>The environment variables.</value>
-        Dictionary<String, String> EnvironmentVariables { get; }
+        Dictionary<string, string> EnvironmentVariables { get; }
 
         /// <summary>
         /// Gets the mount points.
         /// </summary>
         /// <value>The mount points.</value>
-        Dictionary<String, MountPoint> MountPoints { get; }
+        Dictionary<string, MountPoint> MountPoints { get; }
 
         /// <summary>
         /// Gets the state.
@@ -86,7 +86,7 @@ namespace Managed.Adb
         /// Returns the device properties. It contains the whole output of 'getprop'
         /// </summary>
         /// <value>The properties.</value>
-        Dictionary<String, String> Properties { get; }
+        Dictionary<string, string> Properties { get; }
 
         /// <summary>
         /// Gets the property value.
@@ -95,7 +95,7 @@ namespace Managed.Adb
         /// <returns>
         /// the value or <see langword="null"/> if the property does not exist.
         /// </returns>
-        String GetProperty ( String name );
+        string GetProperty (string name );
         /// <summary>
         /// Gets the first property that exists in the array of property names.
         /// </summary>
@@ -103,7 +103,7 @@ namespace Managed.Adb
         /// <returns>
         /// the value or <see langword="null"/> if the property does not exist.
         /// </returns>
-        String GetProperty ( params String[] name );
+        string GetProperty ( params string[] name );
 
         /// <summary>
         /// Gets a value indicating whether the device is online.
@@ -187,14 +187,14 @@ namespace Managed.Adb
         /// <param name="mountPoint">the mount point</param>
         /// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
         /// <exception cref="IOException">Throws if the mount point does not exist.</exception>
-        void RemountMountPoint(String mountPoint, bool readOnly);
+        void RemountMountPoint(string mountPoint, bool readOnly);
 
         /// <summary>
         /// Executes a shell command on the device, and sends the result to a receiver.
         /// </summary>
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
-        void ExecuteShellCommand ( String command, IShellOutputReceiver receiver );
+        void ExecuteShellCommand (string command, IShellOutputReceiver receiver );
         
         /// <summary>
         /// Executes a shell command on the device, and sends the result to a receiver.
@@ -202,7 +202,7 @@ namespace Managed.Adb
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
         /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
-        void ExecuteShellCommand ( String command, IShellOutputReceiver receiver, int maxTimeToOutputResponse );
+        void ExecuteShellCommand (string command, IShellOutputReceiver receiver, int maxTimeToOutputResponse );
 
         /// <summary>
         /// Executes a shell command on the device, and sends the result to a receiver.
@@ -210,7 +210,7 @@ namespace Managed.Adb
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
         /// <param name="commandArgs">The command args.</param>
-        void ExecuteShellCommand ( String command, IShellOutputReceiver receiver, params object[] commandArgs );
+        void ExecuteShellCommand (string command, IShellOutputReceiver receiver, params object[] commandArgs );
 
         /// <summary>
         /// Executes a shell command on the device, and sends the result to a receiver.
@@ -219,7 +219,7 @@ namespace Managed.Adb
         /// <param name="receiver">The receiver object getting the result from the command.</param>
         /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
         /// <param name="commandArgs">The command args.</param>
-        void ExecuteShellCommand ( String command, IShellOutputReceiver receiver, int maxTimeToOutputResponse, params object[] commandArgs );
+        void ExecuteShellCommand (string command, IShellOutputReceiver receiver, int maxTimeToOutputResponse, params object[] commandArgs );
 
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Managed.Adb
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
         /// <param name="commandArgs">The command args.</param>
-        void ExecuteRootShellCommand ( String command, IShellOutputReceiver receiver, params object[] commandArgs );
+        void ExecuteRootShellCommand (string command, IShellOutputReceiver receiver, params object[] commandArgs );
 
         /// <summary>
         /// Executes a shell command on the device as root, and sends the result to a receiver.
@@ -237,14 +237,14 @@ namespace Managed.Adb
         /// <param name="receiver">The receiver object getting the result from the command.</param>
         /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
         /// <param name="commandArgs">The command args.</param>
-        void ExecuteRootShellCommand ( String command, IShellOutputReceiver receiver, int maxTimeToOutputResponse, params object[] commandArgs );
+        void ExecuteRootShellCommand (string command, IShellOutputReceiver receiver, int maxTimeToOutputResponse, params object[] commandArgs );
 
         /// <summary>
         /// Executes a shell command on the device as root, and sends the result to a receiver.
         /// </summary>
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
-        void ExecuteRootShellCommand ( String command, IShellOutputReceiver receiver );
+        void ExecuteRootShellCommand (string command, IShellOutputReceiver receiver );
 
         /// <summary>
         /// Executes a shell command on the device as root, and sends the result to a receiver.
@@ -252,7 +252,7 @@ namespace Managed.Adb
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
         /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
-        void ExecuteRootShellCommand ( String command, IShellOutputReceiver receiver, int maxTimeToOutputResponse );
+        void ExecuteRootShellCommand (string command, IShellOutputReceiver receiver, int maxTimeToOutputResponse );
         
         /// <summary>
         /// Creates a port forwarding between a local and a remote port.
@@ -276,7 +276,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
         /// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
-        void InstallPackage ( String packageFilePath, bool reinstall );
+        void InstallPackage (string packageFilePath, bool reinstall );
 
         /// <summary>
         /// Pushes a file to device
@@ -284,14 +284,14 @@ namespace Managed.Adb
         /// <param name="localFilePath">the absolute path to file on local host</param>
         /// <returns>destination path on device for file</returns>
         /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
-        String SyncPackageToDevice ( String localFilePath );
+        string SyncPackageToDevice (string localFilePath );
  
         /// <summary>
         /// Installs the application package that was pushed to a temporary location on the device.
         /// </summary>
         /// <param name="remoteFilePath">absolute file path to package file on device</param>
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
-        void InstallRemotePackage(String remoteFilePath, bool reinstall);
+        void InstallRemotePackage(string remoteFilePath, bool reinstall);
 
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="remoteFilePath">path on device of file to remove</param>
         /// <exception cref="IOException">if file removal failed</exception>
-        void RemoveRemotePackage(String remoteFilePath);
+        void RemoveRemotePackage(string remoteFilePath);
 
         /// <summary>
         /// Uninstall an package from the device.
@@ -307,7 +307,7 @@ namespace Managed.Adb
         /// <param name="packageName">Name of the package.</param>
         /// <exception cref="IOException"></exception>
         /// <exception cref="PackageInstallationException"></exception>
-        void UninstallPackage(String packageName) ;
+        void UninstallPackage(string packageName) ;
         
         /// <summary>
         /// Refreshes the environment variables.

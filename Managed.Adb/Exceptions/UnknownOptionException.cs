@@ -23,7 +23,7 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="UnknownOptionException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public UnknownOptionException ( String message )
+        public UnknownOptionException (string message )
             : base ( message )
             {
 
@@ -45,7 +45,7 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public UnknownOptionException ( String message, Exception innerException )
+        public UnknownOptionException (string message, Exception innerException )
             : base ( message, innerException )
             {
 

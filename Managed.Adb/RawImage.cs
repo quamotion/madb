@@ -221,7 +221,7 @@ namespace Managed.Adb
         /// </returns>
         public override string ToString ( )
         {
-            return String.Format ( "height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\ns: {11}",
+            return string.Format ( "height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\ns: {11}",
                 this.Height, this.Width, this.Bpp,
                 this.Red.Offset, this.Red.Length,
                 this.Green.Offset, this.Green.Length,

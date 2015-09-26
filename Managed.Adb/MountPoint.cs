@@ -29,19 +29,19 @@ namespace Managed.Adb
         /// Gets the mount point block
         /// </summary>
         /// <value>The block.</value>
-        public String Block { get; private set; }
+        public string Block { get; private set; }
 
         /// <summary>
         /// Gets the mount point name
         /// </summary>
         /// <value>The name.</value>
-        public String Name { get; private set; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// Gets the mount point file system
         /// </summary>
         /// <value>The file system.</value>
-        public String FileSystem { get; private set; }
+        public string FileSystem { get; private set; }
 
         /// <summary>
         /// Gets the mount point access

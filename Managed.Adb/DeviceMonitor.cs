@@ -18,7 +18,7 @@ namespace Managed.Adb
         /// <summary>
         /// Logging tag
         /// </summary>
-        private const String TAG = "DeviceMonitor";
+        private const string TAG = "DeviceMonitor";
 
         /// <summary>
         /// 
@@ -290,9 +290,9 @@ namespace Managed.Adb
             if ( length > 0 )
             {
                 byte[] buffer = new byte[length];
-                String result = this.Read ( this.MainAdbConnection, buffer );
+                string result = this.Read ( this.MainAdbConnection, buffer );
 
-                String[] devices = result.Split ( new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries );
+                string[] devices = result.Split ( new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries );
                 devices.ForEach ( d =>
                 {
                     try
@@ -342,7 +342,7 @@ namespace Managed.Adb
                         {
                             Device newDevice = list[dd];
                             // see if it matches in id and serial number.
-                            if ( String.Compare ( newDevice.SerialNumber, device.SerialNumber, true ) == 0 )
+                            if (string.Compare ( newDevice.SerialNumber, device.SerialNumber, true ) == 0 )
                             {
                                 foundMatch = true;
 
@@ -862,7 +862,7 @@ namespace Managed.Adb
         /// <returns>the length, or 0 (zero) if no data is available from the socket.</returns>
         private int ReadLength( Socket socket, byte[] buffer )
         {
-            String msg = this.Read ( socket, buffer );
+            string msg = this.Read ( socket, buffer );
             if ( msg != null )
             {
                 try
@@ -886,7 +886,7 @@ namespace Managed.Adb
         /// <param name="socket">The socket.</param>
         /// <param name="data">The data.</param>
         /// <returns></returns>
-        private String Read( Socket socket, byte[] data )
+        private string Read( Socket socket, byte[] data )
         {
             int count = -1;
             int totalRead = 0;
@@ -918,18 +918,18 @@ namespace Managed.Adb
                 {
                     if (!this.IsRunning)
                     {
-                        return String.Empty;
+                        return string.Empty;
                     }
                     else
                     {
                         if (sex.Message.Contains("connection was aborted"))
                         {
                             // ignore this?
-                            return String.Empty;
+                            return string.Empty;
                         }
                         else
                         {
-                            throw new IOException(String.Format("No Data to read: {0}", sex.Message));
+                            throw new IOException(string.Format("No Data to read: {0}", sex.Message));
                         }
                     }
                 }

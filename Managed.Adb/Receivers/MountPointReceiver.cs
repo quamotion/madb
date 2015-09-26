@@ -16,11 +16,11 @@ namespace Managed.Adb
         /// <summary>
         /// The mount parsing pattern.
         /// </summary>
-        private const String RE_MOUNTPOINT_PATTERN = @"^([\S]+)\s+([\S]+)\s+([\S]+)\s+(r[wo]).*$";
+        private const string RE_MOUNTPOINT_PATTERN = @"^([\S]+)\s+([\S]+)\s+([\S]+)\s+(r[wo]).*$";
         /// <summary>
         /// The mount command
         /// </summary>
-        public const String MOUNT_COMMAND = "cat /proc/mounts";
+        public const string MOUNT_COMMAND = "cat /proc/mounts";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MountPointReceiver"/> class.
@@ -45,12 +45,12 @@ namespace Managed.Adb
                 var m = line.Match ( RE_MOUNTPOINT_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace );
                 if ( m.Success )
                 {
-                    String block = m.Groups[1].Value.Trim ( ).Replace ( "//", "/" );
-                    String name = m.Groups[2].Value.Trim ( );
-                    String fs = m.Groups[3].Value.Trim ( );
-                    bool ro = String.Compare ( "ro", m.Groups[4].Value.Trim ( ), false ) == 0;
+                    string block = m.Groups[1].Value.Trim ( ).Replace ( "//", "/" );
+                    string name = m.Groups[2].Value.Trim ( );
+                    string fs = m.Groups[3].Value.Trim ( );
+                    bool ro = string.Compare ( "ro", m.Groups[4].Value.Trim ( ), false ) == 0;
                     MountPoint mnt = new MountPoint ( block, name, fs, ro );
-                    String key = name.Substring ( 1 );
+                    string key = name.Substring ( 1 );
                     // currently does not support multiple mounts to the same location...
                     if ( !this.Device.MountPoints.ContainsKey ( name ) )
                     {

@@ -14,21 +14,21 @@ namespace Managed.Adb
         /// <summary>
         /// 
         /// </summary>
-        private const String SUCCESS_OUTPUT = "Success";
+        private const string SUCCESS_OUTPUT = "Success";
         /// <summary>
         /// 
         /// </summary>
-        private const String FAILURE_PATTERN = @"Failure(?:\s+\[(.*)\])?";
+        private const string FAILURE_PATTERN = @"Failure(?:\s+\[(.*)\])?";
 
 
-        private const String UNKNOWN_ERROR = "An unknown error occurred.";
+        private const string UNKNOWN_ERROR = "An unknown error occurred.";
         /// <summary>
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
         protected override void ProcessNewLines ( string[] lines )
         {
-            foreach ( String line in lines )
+            foreach (string line in lines )
             {
                 if ( line.Length > 0 )
                 {
@@ -44,7 +44,7 @@ namespace Managed.Adb
                         if ( m.Success )
                         {
                             string msg = m.Groups[1].Value;
-                            this.ErrorMessage = String.IsNullOrEmpty ( msg ) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
+                            this.ErrorMessage = string.IsNullOrEmpty ( msg ) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
                         }
                         this.Success = false;
                     }
@@ -56,7 +56,7 @@ namespace Managed.Adb
         /// Gets the error message if the install was unsuccessful.
         /// </summary>
         /// <value>The error message.</value>
-        public String ErrorMessage { get; private set; }
+        public string ErrorMessage { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the install was a success.

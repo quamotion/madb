@@ -61,7 +61,7 @@ namespace Managed.Adb
         /// <summary>
         /// The default encoding
         /// </summary>
-        public static String DEFAULT_ENCODING = "ISO-8859-1";
+        public static string DEFAULT_ENCODING = "ISO-8859-1";
 
         /// <summary>
         /// The default port to use when connecting to a device over TCP/IP.
@@ -254,7 +254,7 @@ namespace Managed.Adb
                     return -1;
                 }
 
-                String lenHex = reply.GetString(AdbHelper.DEFAULT_ENCODING);
+                string lenHex = reply.GetString(AdbHelper.DEFAULT_ENCODING);
                 int len = int.Parse(lenHex, System.Globalization.NumberStyles.HexNumber);
 
                 // the protocol version.
@@ -267,7 +267,7 @@ namespace Managed.Adb
                     return -1;
                 }
 
-                String sReply = reply.GetString(AdbHelper.DEFAULT_ENCODING);
+                string sReply = reply.GetString(AdbHelper.DEFAULT_ENCODING);
                 return int.Parse(sReply, System.Globalization.NumberStyles.HexNumber);
 
             }
@@ -331,9 +331,9 @@ namespace Managed.Adb
         /// <param name="address">The address.</param>
         /// <param name="port">The port.</param>
         /// <returns></returns>
-        public byte[] CreateAdbForwardRequest(String address, int port)
+        public byte[] CreateAdbForwardRequest(string address, int port)
         {
-            String request;
+            string request;
 
             if(address == null)
                 request = "tcp:" + port;
@@ -347,9 +347,9 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="req">The req.</param>
         /// <returns></returns>
-        public byte[] FormAdbRequest(String req)
+        public byte[] FormAdbRequest(string req)
         {
-            String resultStr = String.Format("{0}{1}\n", req.Length.ToString("X4"), req);
+            string resultStr = string.Format("{0}{1}\n", req.Length.ToString("X4"), req);
             byte[] result;
             try
             {
@@ -361,7 +361,7 @@ namespace Managed.Adb
                 return null;
             }
 
-            System.Diagnostics.Debug.Assert(result.Length == req.Length + 5, String.Format("result: {1}{0}\nreq: {3}{2}", result.Length, result.GetString(AdbHelper.DEFAULT_ENCODING), req.Length, req));
+            System.Diagnostics.Debug.Assert(result.Length == req.Length + 5, string.Format("result: {1}{0}\nreq: {3}{2}", result.Length, result.GetString(AdbHelper.DEFAULT_ENCODING), req.Length, req));
             return result;
         }
 
@@ -476,7 +476,7 @@ namespace Managed.Adb
                     break;
                 }
 
-                String lenStr = this.ReplyToString(lenBuf);
+                string lenStr = this.ReplyToString(lenBuf);
 
                 int len;
                 try
@@ -573,7 +573,7 @@ namespace Managed.Adb
                 }
                 catch(SocketException sex)
                 {
-                    throw new AdbException(String.Format("No Data to read: {0}", sex.Message));
+                    throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
                 }
             }
 
@@ -586,7 +586,7 @@ namespace Managed.Adb
         /// <returns></returns>
         private byte[] CreateJdwpForwardRequest(int pid)
         {
-            String req = String.Format("jdwp:{0}", pid);
+            string req = string.Format("jdwp:{0}", pid);
             return this.FormAdbRequest(req);
         }
 
@@ -615,7 +615,7 @@ namespace Managed.Adb
                 // host-serial should be different based on the transport...
 
 
-                byte[] request = this.FormAdbRequest(String.Format("host-serial:{0}:forward:tcp:{1};tcp:{2}", //$NON-NLS-1$
+                byte[] request = this.FormAdbRequest(string.Format("host-serial:{0}:forward:tcp:{1};tcp:{2}", //$NON-NLS-1$
                                 device.SerialNumber, localPort, remotePort));
 
                 if(!this.Write(adbChan, request))
@@ -753,9 +753,9 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="reply">The reply.</param>
         /// <returns></returns>
-        public String ReplyToString(byte[] reply)
+        public string ReplyToString(byte[] reply)
         {
-            String result;
+            string result;
             try
             {
                 result = Encoding.Default.GetString(reply);
@@ -786,7 +786,7 @@ namespace Managed.Adb
                     Log.e(TAG, "error in getting data length");
                     return null;
                 }
-                String lenHex = reply.GetString(Encoding.Default);
+                string lenHex = reply.GetString(Encoding.Default);
                 int len = int.Parse(lenHex, System.Globalization.NumberStyles.HexNumber);
 
                 reply = new byte[len];
@@ -797,7 +797,7 @@ namespace Managed.Adb
                 }
 
                 List<Device> s = new List<Device>();
-                String[] data = reply.GetString(Encoding.Default).Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] data = reply.GetString(Encoding.Default).Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                 data.ForEach(item =>
                 {
                     var device = Device.CreateFromAdbData(item);
@@ -929,9 +929,9 @@ namespace Managed.Adb
         /// <remarks>
         /// Should check if you CanSU before calling this.
         /// </remarks>
-        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, String command, IDevice device, IShellOutputReceiver rcvr)
+        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr)
         {
-            this.ExecuteRemoteRootCommand(endPoint, String.Format("su -c \"{0}\"", command), device, rcvr, int.MaxValue);
+            this.ExecuteRemoteRootCommand(endPoint, string.Format("su -c \"{0}\"", command), device, rcvr, int.MaxValue);
         }
 
         /// <summary>
@@ -942,9 +942,9 @@ namespace Managed.Adb
         /// <param name="device">The device.</param>
         /// <param name="rcvr">The RCVR.</param>
         /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
-        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, String command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
+        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
-            this.ExecuteRemoteCommand(endPoint, String.Format("su -c \"{0}\"", command), device, rcvr);
+            this.ExecuteRemoteCommand(endPoint, string.Format("su -c \"{0}\"", command), device, rcvr);
         }
 
         /// <summary>
@@ -966,7 +966,7 @@ namespace Managed.Adb
         /// <exception cref="UnknownOptionException"></exception>
         /// <exception cref="CommandAbortingException"></exception>
         /// <exception cref="PermissionDeniedException"></exception>
-        public void ExecuteRemoteCommand(IPEndPoint endPoint, String command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
+        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
 
             using(var socket = this.ExecuteRawSocketCommand(endPoint, device, "shell:{0}".With(command)))
@@ -1005,7 +1005,7 @@ namespace Managed.Adb
                                 string sdata = data.GetString(0, count, AdbHelper.DEFAULT_ENCODING);
 
                                 var sdataTrimmed = sdata.Trim();
-                                if (sdataTrimmed.EndsWith(String.Format("{0}: not found", cmd[0])))
+                                if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))
                                 {
                                     Log.w(TAG, "The remote execution returned: '{0}: not found'", cmd[0]);
                                     throw new FileNotFoundException(string.Format("The remote execution returned: '{0}: not found'", cmd[0]));
@@ -1014,7 +1014,7 @@ namespace Managed.Adb
                                 if (sdataTrimmed.EndsWith("No such file or directory"))
                                 {
                                     Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new FileNotFoundException(String.Format("The remote execution returned: {0}", sdataTrimmed));
+                                    throw new FileNotFoundException(string.Format("The remote execution returned: {0}", sdataTrimmed));
                                 }
 
                                 // for "unknown options"
@@ -1044,7 +1044,7 @@ namespace Managed.Adb
                                 if (sdataTrimmed.IsMatch("(permission|access) denied$"))
                                 {
                                     Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
-                                    throw new PermissionDeniedException(String.Format("The remote execution returned: '{0}'", sdataTrimmed));
+                                    throw new PermissionDeniedException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
                                 }
                             }
 
@@ -1080,7 +1080,7 @@ namespace Managed.Adb
         /// <exception cref="IOException">Throws if there is a problem reading / writing to the socket</exception>
         /// <exception cref="OperationCanceledException">Throws if the execution was canceled</exception>
         /// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
-        public void ExecuteRemoteCommand(IPEndPoint endPoint, String command, IDevice device, IShellOutputReceiver rcvr)
+        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr)
         {
             this.ExecuteRemoteCommand(endPoint, command, device, rcvr, int.MaxValue);
         }
@@ -1103,7 +1103,7 @@ namespace Managed.Adb
             // to a specific device
             if(device != null)
             {
-                String msg = "host:transport:" + device.SerialNumber;
+                string msg = "host:transport:" + device.SerialNumber;
                 byte[] device_query = this.FormAdbRequest(msg);
 
                 if(!this.Write(adbChan, device_query))
@@ -1114,7 +1114,7 @@ namespace Managed.Adb
                 AdbResponse resp = this.ReadAdbResponse(adbChan, false /* readDiagString */);
                 if(!resp.Okay)
                 {
-                    if(String.Compare("device not found", resp.Message, true) == 0)
+                    if(string.Compare("device not found", resp.Message, true) == 0)
                     {
                         throw new DeviceNotFoundException(device.SerialNumber);
                     }
@@ -1146,7 +1146,7 @@ namespace Managed.Adb
         /// <param name="rcvr">The RCVR.</param>
         /// <exception cref="AdbException">failed asking for log</exception>
         /// <exception cref="Managed.Adb.Exceptions.AdbCommandRejectedException"></exception>
-        public void RunLogService(IPEndPoint address, IDevice device, String logName, LogReceiver rcvr)
+        public void RunLogService(IPEndPoint address, IDevice device, string logName, LogReceiver rcvr)
         {
             using(var socket = this.ExecuteRawSocketCommand(address, device, "log:{0}".With(logName)))
             {
@@ -1210,7 +1210,7 @@ namespace Managed.Adb
         /// <param name="into">The into.</param>
         /// <param name="adbSockAddr">The adb sock addr.</param>
         /// <param name="device">The device.</param>
-        public void Reboot(String into, IPEndPoint adbSockAddr, IDevice device)
+        public void Reboot(string into, IPEndPoint adbSockAddr, IDevice device)
         {
             byte[] request;
             if(string.IsNullOrEmpty(into))

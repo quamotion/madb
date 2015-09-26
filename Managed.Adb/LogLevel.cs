@@ -68,14 +68,14 @@ namespace Managed.Adb
         /// Gets or sets the levels.
         /// </summary>
         /// <value>The levels.</value>
-        public static Dictionary<String, LogLevelInfo> Levels { get; private set; }
+        public static Dictionary<string, LogLevelInfo> Levels { get; private set; }
 
-        public static LogLevelInfo GetByString ( String value )
+        public static LogLevelInfo GetByString (string value )
         {
 
             foreach ( LogLevelInfo item in Values )
             {
-                if ( String.Compare ( item.Value, value, true ) == 0 )
+                if (string.Compare ( item.Value, value, true ) == 0 )
                 {
                     return item;
                 }
@@ -88,7 +88,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="letter">The letter.</param>
         /// <returns></returns>
-        public static LogLevelInfo GetByLetter ( String letter )
+        public static LogLevelInfo GetByLetter (string letter )
         {
             return GetByLetter ( letter[0] );
         }
@@ -154,7 +154,7 @@ namespace Managed.Adb
             /// <param name="priority">The priority.</param>
             /// <param name="value">The value.</param>
             /// <param name="letter">The letter.</param>
-            public LogLevelInfo ( int priority, String value, Char letter )
+            public LogLevelInfo ( int priority, string value, Char letter )
             {
                 this.Priority = priority;
                 this.Value = value;
@@ -170,7 +170,7 @@ namespace Managed.Adb
             /// Gets or sets the value.
             /// </summary>
             /// <value>The value.</value>
-            public String Value { get; set; }
+            public string Value { get; set; }
             /// <summary>
             /// Gets or sets the letter.
             /// </summary>

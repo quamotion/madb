@@ -13,7 +13,7 @@ namespace Managed.Adb
         /// <summary>
         /// 
         /// </summary>
-        private const String PRE_INITIALIZED = "<pre-initialized>";
+        private const string PRE_INITIALIZED = "<pre-initialized>";
 
         public enum DebuggerStatus
         {
@@ -87,45 +87,45 @@ namespace Managed.Adb
         /// Name of the value representing the max size of the heap, in the Map returned by
         /// GetVmHeapInfo(int)
         /// </summary>
-    public const String HEAP_MAX_SIZE_BYTES = "maxSizeInBytes"; // $NON-NLS-1$
+    public const string HEAP_MAX_SIZE_BYTES = "maxSizeInBytes"; // $NON-NLS-1$
         /// <summary>
         /// Name of the value representing the size of the heap, in the {@link Map} returned by
         /// {@link #getVmHeapInfo(int)}
         /// </summary>
-    public const String HEAP_SIZE_BYTES = "sizeInBytes"; // $NON-NLS-1$
+    public const string HEAP_SIZE_BYTES = "sizeInBytes"; // $NON-NLS-1$
         /// <summary>
         /// Name of the value representing the number of allocated bytes of the heap, in the
         /// {@link Map} returned by {@link #getVmHeapInfo(int)}
         /// </summary>
-    public const String HEAP_BYTES_ALLOCATED = "bytesAllocated"; // $NON-NLS-1$
+    public const string HEAP_BYTES_ALLOCATED = "bytesAllocated"; // $NON-NLS-1$
         /// <summary>
         /// Name of the value representing the number of objects in the heap, in the {@link Map}
         /// returned by {@link #getVmHeapInfo(int)}
         /// </summary>
-    public const String HEAP_OBJECTS_ALLOCATED = "objectsAllocated"; // $NON-NLS-1$
+    public const string HEAP_OBJECTS_ALLOCATED = "objectsAllocated"; // $NON-NLS-1$
 
         /// <summary>
         /// String for feature enabling starting/stopping method profiling
         /// @see #hasFeature(String)
         /// </summary>
-    public const String FEATURE_PROFILING = "method-trace-profiling"; // $NON-NLS-1$
+    public const string FEATURE_PROFILING = "method-trace-profiling"; // $NON-NLS-1$
 
         /// <summary>
         /// String for feature enabling direct streaming of method profiling data
         /// @see #hasFeature(String)
         /// </summary>
-    public const String FEATURE_PROFILING_STREAMING = "method-trace-profiling-streaming"; // $NON-NLS-1$
+    public const string FEATURE_PROFILING_STREAMING = "method-trace-profiling-streaming"; // $NON-NLS-1$
 
         /// <summary>
         /// String for feature allowing to dump hprof files
         /// @see #hasFeature(String)
         /// </summary>
-    public const String FEATURE_HPROF = "hprof-heap-dump"; // $NON-NLS-1$
+    public const string FEATURE_HPROF = "hprof-heap-dump"; // $NON-NLS-1$
 
         /// <summary>
         /// String for feature allowing direct streaming of hprof dumps
         /// @see #hasFeature(String)		/// </summary>
-    public const String FEATURE_HPROF_STREAMING = "hprof-heap-dump-streaming"; // $NON-NLS-1$
+    public const string FEATURE_HPROF_STREAMING = "hprof-heap-dump-streaming"; // $NON-NLS-1$
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientData"/> class.
@@ -163,14 +163,14 @@ namespace Managed.Adb
         /// <value>
         /// The vm identifier.
         /// </value>
-        public String VmIdentifier { get; set; }
+        public string VmIdentifier { get; set; }
         /// <summary>
         /// Gets or sets the description.
         /// </summary>
         /// <value>
         /// The description.
         /// </value>
-        public String Description { get; set; }
+        public string Description { get; set; }
         /// <summary>
         /// Gets or sets the debugger connection status.
         /// </summary>

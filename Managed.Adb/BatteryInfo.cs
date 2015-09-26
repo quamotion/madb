@@ -139,7 +139,7 @@ namespace Managed.Adb
         /// <value>
         /// The type.
         /// </value>
-        public String Type { get; set; }
+        public string Type { get; set; }
 
         /// <summary>
         /// Gets the calculated battery level.
@@ -169,7 +169,7 @@ namespace Managed.Adb
             {
                 var n = p.Name;
                 var v = p.GetValue ( this, null );
-                sb.AppendLine ( String.Format ( "{0}:{1}", n, v ) );
+                sb.AppendLine (string.Format ( "{0}:{1}", n, v ) );
             } );
 
             return sb.ToString ( );

@@ -16,15 +16,15 @@ namespace Managed.Adb
         /// </summary>
         private const string TAG = "SyncService";
 
-        private const String OKAY = "OKAY";
-        private const String FAIL = "FAIL";
-        private const String STAT = "STAT";
-        private const String RECV = "RECV";
-        private const String DATA = "DATA";
-        private const String DONE = "DONE";
-        private const String SEND = "SEND";
-        private const String LIST = "LIST";
-        private const String DENT = "DENT";
+        private const string OKAY = "OKAY";
+        private const string FAIL = "FAIL";
+        private const string STAT = "STAT";
+        private const string RECV = "RECV";
+        private const string DATA = "DATA";
+        private const string DONE = "DONE";
+        private const string SEND = "SEND";
+        private const string LIST = "LIST";
+        private const string DENT = "DENT";
 
         [Flags]
         public enum FileMode
@@ -136,7 +136,7 @@ namespace Managed.Adb
         /// <param name="command">the 4 byte command (STAT, RECV, ...).</param>
         /// <param name="value"></param>
         /// <returns>the byte[] to send to the device through adb</returns>
-        private static byte[] CreateRequest ( String command, int value )
+        private static byte[] CreateRequest (string command, int value )
         {
             return CreateRequest ( Encoding.Default.GetBytes ( command ), value );
         }
@@ -163,7 +163,7 @@ namespace Managed.Adb
         /// <param name="command">the 4 byte command (STAT, RECV, ...).</param>
         /// <param name="path">The path, as a byte array, of the remote file on which to execute the command</param>
         /// <returns>the byte[] to send to the device through adb</returns>
-        private static byte[] CreateFileRequest ( String command, String path )
+        private static byte[] CreateFileRequest (string command, string path )
         {
             return CreateFileRequest ( Encoding.Default.GetBytes ( command ), Encoding.Default.GetBytes ( path ) );
         }
@@ -185,14 +185,14 @@ namespace Managed.Adb
             return array;
         }
 
-        private static byte[] CreateSendFileRequest ( String command, String path, FileMode mode )
+        private static byte[] CreateSendFileRequest (string command, string path, FileMode mode )
         {
             return CreateSendFileRequest ( Encoding.Default.GetBytes ( command ), Encoding.Default.GetBytes ( path ), mode );
         }
 
         private static byte[] CreateSendFileRequest ( byte[] command, byte[] path, FileMode mode )
         {
-            String modeString = String.Format ( ",{0}", ( (int)mode & 0777 ) );
+            string modeString = string.Format ( ",{0}", ( (int)mode & 0777 ) );
             byte[] modeContent = null;
             try
             {
@@ -317,7 +317,7 @@ namespace Managed.Adb
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
-        public SyncResult PullFile ( String remoteFilepath, String localFilename, ISyncProgressMonitor monitor )
+        public SyncResult PullFile (string remoteFilepath, string localFilename, ISyncProgressMonitor monitor )
         {
             if ( monitor == null )
             {
@@ -334,7 +334,7 @@ namespace Managed.Adb
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/PushFile/*'/>
-        public SyncResult PushFile ( String local, String remote, ISyncProgressMonitor monitor )
+        public SyncResult PushFile (string local, string remote, ISyncProgressMonitor monitor )
         {
             if ( monitor == null )
             {
@@ -509,7 +509,7 @@ namespace Managed.Adb
                         AdbHelper.Instance.Read ( this.Channel, DataBuffer, len, timeOut );
 
                         // output the result?
-                        String message = DataBuffer.GetString ( 0, len );
+                        string message = DataBuffer.GetString ( 0, len );
                         Log.e ( "ddms", "transfer error: " + message );
                         return new SyncResult ( ErrorCodeHelper.RESULT_UNKNOWN_ERROR, message );
                     }
@@ -546,7 +546,7 @@ namespace Managed.Adb
                     return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
                 }
                 // append the name of the directory/file to the remote path
-                String dest = LinuxPath.Combine ( remotePath, f.Name );
+                string dest = LinuxPath.Combine ( remotePath, f.Name );
                 if ( f.Exists )
                 {
                     if ( f.IsDirectory ( ) )
@@ -753,7 +753,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="path">the remote file</param>
         /// <returns>the mode if all went well; otherwise, FileMode.UNKNOWN</returns>
-        private FileMode ReadMode ( String path )
+        private FileMode ReadMode (string path )
         {
             try
             {

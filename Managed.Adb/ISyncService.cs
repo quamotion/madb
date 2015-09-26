@@ -20,10 +20,10 @@ namespace Managed.Adb
         Device Device { get; }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/PushFile/*'/>
-        SyncResult PushFile(String local, String remote, ISyncProgressMonitor monitor);
+        SyncResult PushFile(string local, string remote, ISyncProgressMonitor monitor);
 
         /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
-        SyncResult PullFile(String remoteFilepath, String localFilename, ISyncProgressMonitor monitor);
+        SyncResult PullFile(string remoteFilepath, string localFilename, ISyncProgressMonitor monitor);
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Close/*'/>
         void Close();

@@ -14,8 +14,8 @@ namespace Managed.Adb
         /// <summary>
         /// The getprop command
         /// </summary>
-        public const String GETPROP_COMMAND = "getprop";
-        private const String GETPROP_PATTERN = "^\\[([^]]+)\\]\\:\\s*\\[(.*)\\]$";
+        public const string GETPROP_COMMAND = "getprop";
+        private const string GETPROP_PATTERN = "^\\[([^]]+)\\]\\:\\s*\\[(.*)\\]$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GetPropReceiver"/> class.
@@ -44,17 +44,17 @@ namespace Managed.Adb
             // date in the 2nd line. There seems to be an empty line
             // after all that.
 
-            foreach ( String line in lines )
+            foreach (string line in lines )
             {
-                if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) || line.StartsWith("$") )
+                if (string.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) || line.StartsWith("$") )
                 {
                     continue;
                 }
                 var m = line.Match ( GETPROP_PATTERN, RegexOptions.Compiled );
                 if ( m.Success )
                 {
-                    String label = m.Groups[1].Value.Trim ( );
-                    String value = m.Groups[2].Value.Trim ( );
+                    string label = m.Groups[1].Value.Trim ( );
+                    string value = m.Groups[2].Value.Trim ( );
 
                     if ( label.Length > 0 )
                     {

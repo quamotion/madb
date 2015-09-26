@@ -23,7 +23,7 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public CommandAbortingException( String message )
+        public CommandAbortingException(string message )
             : base ( message )
             {
 
@@ -44,7 +44,7 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public CommandAbortingException ( String message, Exception innerException )
+        public CommandAbortingException (string message, Exception innerException )
             : base ( message, innerException )
             {
 

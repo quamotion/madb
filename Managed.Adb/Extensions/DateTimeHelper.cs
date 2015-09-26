@@ -63,7 +63,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="dateString">The date string.</param>
         /// <returns></returns>
-        public static DateTime ToDateTimeFromString ( this String dateString )
+        public static DateTime ToDateTimeFromString ( this string dateString )
         {
             return DateTime.Parse ( dateString );
         }
@@ -74,7 +74,7 @@ namespace Managed.Adb
         /// <param name="dateString">The date string.</param>
         /// <param name="format">The format.</param>
         /// <returns></returns>
-        public static DateTime ToDateTimeFromString ( this String dateString, IFormatProvider format )
+        public static DateTime ToDateTimeFromString ( this string dateString, IFormatProvider format )
         {
             return DateTime.Parse ( dateString, format );
         }
@@ -86,7 +86,7 @@ namespace Managed.Adb
         /// <param name="format">The format.</param>
         /// <param name="styles">The styles.</param>
         /// <returns></returns>
-        public static DateTime ToDateTimeFromString ( this String dateString, IFormatProvider format, DateTimeStyles styles )
+        public static DateTime ToDateTimeFromString ( this string dateString, IFormatProvider format, DateTimeStyles styles )
         {
             return DateTime.Parse ( dateString, format, styles );
         }

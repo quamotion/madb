@@ -33,17 +33,17 @@ namespace Managed.Adb
             }
         }
 
-        public static void ThrowIfNullOrEmpty ( this String argument, Expression<Func<String, string>> func )
+        public static void ThrowIfNullOrEmpty ( this string argument, Expression<Func<string, string>> func )
         {
-            if ( String.IsNullOrEmpty(argument) )
+            if (string.IsNullOrEmpty(argument) )
             {
                 ThrowException ( s => new ArgumentNullException ( s ), func );
             }
         }
 
-        public static void ThrowIfNullOrWhiteSpace ( this String argument, Expression<Func<String, string>> func )
+        public static void ThrowIfNullOrWhiteSpace ( this string argument, Expression<Func<string, string>> func )
         {
-            if ( String.IsNullOrEmpty ( argument ) || String.IsNullOrEmpty(argument.Trim()) )
+            if (string.IsNullOrEmpty ( argument ) || string.IsNullOrEmpty(argument.Trim()) )
             {
                 ThrowException ( s => new ArgumentNullException ( s ), func );
             }
@@ -66,17 +66,17 @@ namespace Managed.Adb
             }
         }
 
-        public static void ThrowIfNullOrEmpty ( this String argument, string name )
+        public static void ThrowIfNullOrEmpty ( this string argument, string name )
         {
-            if ( String.IsNullOrEmpty(argument) )
+            if (string.IsNullOrEmpty(argument) )
             {
                 throw new ArgumentNullException ( name );
             }
         }
 
-        public static void ThrowIfNullOrWhiteSpace ( this String argument, string name )
+        public static void ThrowIfNullOrWhiteSpace ( this string argument, string name )
         {
-            if ( String.IsNullOrEmpty ( argument ) || String.IsNullOrEmpty ( argument.Trim ( ) ) )
+            if (string.IsNullOrEmpty ( argument ) || string.IsNullOrEmpty ( argument.Trim ( ) ) )
             {
                 throw new ArgumentNullException ( name );
             }

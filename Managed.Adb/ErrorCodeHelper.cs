@@ -39,7 +39,7 @@ namespace Managed.Adb
     public const int RESULT_BUFFER_OVERRUN = 14;
 
 
-        public static String ErrorCodeToString ( int code )
+        public static string ErrorCodeToString ( int code )
         {
             switch ( code )
             {

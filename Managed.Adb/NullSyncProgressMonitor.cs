@@ -43,7 +43,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="source"></param>
         /// <param name="destination">the destination.</param>
-        public void StartSubTask ( String source, String destination )
+        public void StartSubTask (string source, string destination )
         {
         }
 

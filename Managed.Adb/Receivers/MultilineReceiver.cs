@@ -14,11 +14,11 @@ namespace Managed.Adb
         /// <summary>
         /// 
         /// </summary>
-        public const String NEWLINE = "\r\n";
+        public const string NEWLINE = "\r\n";
         /// <summary>
         /// 
         /// </summary>
-        public const String ENCODING = "ISO-8859-1";
+        public const string ENCODING = "ISO-8859-1";
 
         /// <summary>
         /// Gets or sets a value indicating whether [trim lines].
@@ -42,19 +42,19 @@ namespace Managed.Adb
         /// Gets or sets the unfinished line.
         /// </summary>
         /// <value>The unfinished line.</value>
-        protected String UnfinishedLine { get; set; }
+        protected string UnfinishedLine { get; set; }
         /// <summary>
         /// Gets or sets the lines.
         /// </summary>
         /// <value>The lines.</value>
-        protected ICollection<String> Lines { get; set; }
+        protected ICollection<string> Lines { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
         /// </summary>
         public MultiLineReceiver( )
         {
-            this.Lines = new List<String> ( );
+            this.Lines = new List<string> ( );
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Managed.Adb
         {
             if ( !this.IsCancelled )
             {
-                String s = null;
+                string s = null;
                 try
                 {
                     s = Encoding.GetEncoding ( ENCODING ).GetString ( data, offset, length ); //$NON-NLS-1$
@@ -79,10 +79,10 @@ namespace Managed.Adb
                 }
 
                 // ok we've got a string
-                if ( !String.IsNullOrEmpty ( s ) )
+                if ( !string.IsNullOrEmpty ( s ) )
                 {
                     // if we had an unfinished line we add it.
-                    if ( !String.IsNullOrEmpty ( this.UnfinishedLine ) )
+                    if ( !string.IsNullOrEmpty ( this.UnfinishedLine ) )
                     {
                         s = this.UnfinishedLine + s;
                         this.UnfinishedLine = null;
@@ -105,7 +105,7 @@ namespace Managed.Adb
 
                         // so we found a \r\n;
                         // extract the line
-                        String line = s.Substring ( start, index - start );
+                        string line = s.Substring ( start, index - start );
                         if ( this.TrimLines )
                         {
                             line = line.Trim ( );
@@ -129,16 +129,16 @@ namespace Managed.Adb
             {
                 // at this point we've split all the lines.
                 // make the array
-                String[] lines = this.Lines.ToArray ( );
+                string[] lines = this.Lines.ToArray ( );
 
                 // send it for final processing
                 this.ProcessNewLines ( lines );
                 this.Lines.Clear ( );
             }
 
-            if ( !this.IsCancelled && !String.IsNullOrEmpty ( this.UnfinishedLine ) )
+            if ( !this.IsCancelled && !string.IsNullOrEmpty ( this.UnfinishedLine ) )
             {
-                this.ProcessNewLines ( new String[] { this.UnfinishedLine } );
+                this.ProcessNewLines ( new string[] { this.UnfinishedLine } );
             }
 
             this.Done ( );
@@ -164,7 +164,7 @@ namespace Managed.Adb
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected abstract void ProcessNewLines( String[] lines );
+        protected abstract void ProcessNewLines(string[] lines );
     }
 
 }

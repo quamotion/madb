@@ -17,7 +17,7 @@ namespace Managed.Adb.IO
         /// <summary>
         /// Pattern to escape filenames for shell command consumption.
         /// </summary>
-        private const String ESCAPEPATTERN = "([\\\\()*+?\"'#/\\s])";
+        private const string ESCAPEPATTERN = "([\\\\()*+?\"'#/\\s])";
 
         /// <summary>
         /// The directory separator character
@@ -100,7 +100,7 @@ namespace Managed.Adb.IO
                     break;
                 }
             }
-            if ( String.IsNullOrEmpty ( extension ) || path.Length == 0 )
+            if (string.IsNullOrEmpty ( extension ) || path.Length == 0 )
             {
                 return str;
             }
@@ -248,7 +248,7 @@ namespace Managed.Adb.IO
         /// </summary>
         /// <param name="paths">The paths.</param>
         /// <returns></returns>
-        public static String Combine ( params String[] paths )
+        public static string Combine ( params string[] paths )
         {
             if ( paths == null )
             {
@@ -343,17 +343,17 @@ namespace Managed.Adb.IO
         /// <exception cref="T:System.ArgumentException">The path parameter contains invalid characters, is empty, or contains only white spaces, or contains a wildcard character. </exception>
         /// <exception cref="T:System.IO.PathTooLongException">The path parameter is longer than the system-defined maximum length.</exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetDirectoryName ( String path )
+        public static string GetDirectoryName (string path )
         {
             if ( path != null )
             {
                 CheckInvalidPathChars ( path );
                 //path = FixupPath ( path );
 
-                String tpath = path;
+                string tpath = path;
                 if ( tpath.Length > 1 )
                 {
-                    if ( tpath.EndsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) )
+                    if ( tpath.EndsWith ( new string( new char[] { DirectorySeparatorChar } ) ) )
                     {
                         return tpath.Substring ( 0, tpath.Length );
                     }
@@ -364,7 +364,7 @@ namespace Managed.Adb.IO
                 }
                 else if ( tpath.Length == 1 )
                 {
-                    return new String ( new char[] { DirectorySeparatorChar } );
+                    return new string( new char[] { DirectorySeparatorChar } );
                 }
             }
             return null;
@@ -399,12 +399,12 @@ namespace Managed.Adb.IO
             sb = sb.Replace ( System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar );
 
 
-            if ( sb != "." && !sb.StartsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) )
+            if ( sb != "." && !sb.StartsWith ( new string( new char[] { DirectorySeparatorChar } ) ) )
             {
                 sb = string.Format ( ".{0}{1}", DirectorySeparatorChar, sb );
             }
 
-            if ( !sb.EndsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) )
+            if ( !sb.EndsWith ( new string( new char[] { DirectorySeparatorChar } ) ) )
             {
                 sb = string.Format ( "{0}{1}", sb, DirectorySeparatorChar );
             }
@@ -566,7 +566,7 @@ namespace Managed.Adb.IO
             if ( path != null )
             {
                 CheckInvalidPathChars ( path );
-                if ( path.EndsWith ( new String ( new char[] { DirectorySeparatorChar } ) ) || path.EndsWith ( new String ( new char[] { AltDirectorySeparatorChar } ) ) )
+                if ( path.EndsWith ( new string( new char[] { DirectorySeparatorChar } ) ) || path.EndsWith ( new string( new char[] { AltDirectorySeparatorChar } ) ) )
                 {
                     return false;
                 }
@@ -657,7 +657,7 @@ namespace Managed.Adb.IO
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public static String Escape( String path )
+        public static string Escape(string path )
         {
             return new Regex ( ESCAPEPATTERN ).Replace ( path, new MatchEvaluator ( delegate ( Match m )
             {
@@ -670,11 +670,11 @@ namespace Managed.Adb.IO
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public static String Quote( String path )
+        public static string Quote(string path )
         {
             if ( path.Contains ( " " ) )
             {
-                return String.Format ( "\"{0}\"", path );
+                return string.Format ( "\"{0}\"", path );
             }
             else
             {

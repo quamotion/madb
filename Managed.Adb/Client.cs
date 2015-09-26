@@ -423,9 +423,9 @@ namespace Managed.Adb
         /// <returns>
         /// A <see cref="System.String"/> that represents this instance.
         /// </returns>
-        public override String ToString ( )
+        public override string ToString ( )
         {
-            return String.Format ( "[Client pid: {0}]", this.ClientData.Pid );
+            return string.Format ( "[Client pid: {0}]", this.ClientData.Pid );
         }
     }
 }

@@ -78,43 +78,43 @@ namespace Managed.Adb
         /// <summary>
         /// 
         /// </summary>
-        public const String TEMP_DIRECTORY_FOR_INSTALL = "/storage/sdcard0/tmp/";
+        public const string TEMP_DIRECTORY_FOR_INSTALL = "/storage/sdcard0/tmp/";
 
         /// <summary>
         /// The name of the device property that holds the Android build version.
         /// </summary>
-        public const String PROP_BUILD_VERSION = "ro.build.version.release";
+        public const string PROP_BUILD_VERSION = "ro.build.version.release";
 
         /// <summary>
         /// The name of the device property that holds the Android API level.
         /// </summary>
-        public const String PROP_BUILD_API_LEVEL = "ro.build.version.sdk";
+        public const string PROP_BUILD_API_LEVEL = "ro.build.version.sdk";
 
         /// <summary>
         /// The name of the device property that holds the code name for the Android API level.
         /// </summary>
-        public const String PROP_BUILD_CODENAME = "ro.build.version.codename";
+        public const string PROP_BUILD_CODENAME = "ro.build.version.codename";
 
         /// <summary>
         /// The name of the device property that indicates whether the device is debuggable.
         /// </summary>
-        public const String PROP_DEBUGGABLE = "ro.debuggable";
+        public const string PROP_DEBUGGABLE = "ro.debuggable";
 
         /// <summary>
         /// Serial number of the first connected emulator. 
         /// </summary>
-        public const String FIRST_EMULATOR_SN = "emulator-5554";
+        public const string FIRST_EMULATOR_SN = "emulator-5554";
 
         /// <summary>
         /// The name of the device property that indicates the Android API level.
         /// </summary>
         [Obsolete("Use PROP_BUILD_API_LEVEL")]
-        public const String PROP_BUILD_VERSION_NUMBER = PROP_BUILD_API_LEVEL;
+        public const string PROP_BUILD_VERSION_NUMBER = PROP_BUILD_API_LEVEL;
 
         /// <summary>
         ///  Emulator Serial Number regexp.
         /// </summary>
-        private const String RE_EMULATOR_SN = @"emulator-(\d+)";
+        private const string RE_EMULATOR_SN = @"emulator-(\d+)";
 
         /// <summary>
         /// Device list info regex
@@ -125,7 +125,7 @@ namespace Managed.Adb
         /// <summary>
         /// The tag to use when logging messages.
         /// </summary>
-        private const String LOG_TAG = "Device";
+        private const string LOG_TAG = "Device";
 
         /// <summary>
         /// The time-out when receiving battery information.
@@ -174,7 +174,7 @@ namespace Managed.Adb
         {
             this.SerialNumber = serial;
             this.State = state;
-            this.MountPoints = new Dictionary<String, MountPoint>();
+            this.MountPoints = new Dictionary<string, MountPoint>();
             this.Properties = new Dictionary<string, string>();
             this.EnvironmentVariables = new Dictionary<string, string>();
             this.Clients = new List<IClient>();
@@ -201,11 +201,11 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="state">The device state string</param>
         /// <returns></returns>
-        private static DeviceState GetStateFromString(String state)
+        private static DeviceState GetStateFromString(string state)
         {
-            String tstate = state;
+            string tstate = state;
 
-            if(String.Compare(state, "device", false) == 0)
+            if(string.Compare(state, "device", false) == 0)
             {
                 tstate = "online";
             }
@@ -234,7 +234,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="data">the line data for the device</param>
         /// <returns></returns>
-        public static Device CreateFromAdbData(String data)
+        public static Device CreateFromAdbData(string data)
         {
             Regex re = new Regex(RE_DEVICELIST_INFO, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Match m = re.Match(data);
@@ -301,7 +301,7 @@ namespace Managed.Adb
         /// <summary>
         /// Gets the device serial number
         /// </summary>
-        public String SerialNumber { get; private set; }
+        public string SerialNumber { get; private set; }
 
         /// <summary>
         /// Gets the TCP endpoint defined when the transport is TCP.
@@ -320,7 +320,7 @@ namespace Managed.Adb
         /// <summary>
         /// Gets or sets the Avd name.
         /// </summary>
-        public String AvdName
+        public string AvdName
         {
             get { return this._avdName; }
             set
@@ -364,20 +364,20 @@ namespace Managed.Adb
         /// <summary>
         /// Gets the device mount points.
         /// </summary>
-        public Dictionary<String, MountPoint> MountPoints { get; set; }
+        public Dictionary<string, MountPoint> MountPoints { get; set; }
 
 
         /// <summary>
         /// Returns the device properties. It contains the whole output of 'getprop'
         /// </summary>
         /// <value>The properties.</value>
-        public Dictionary<String, String> Properties { get; private set; }
+        public Dictionary<string, string> Properties { get; private set; }
 
         /// <summary>
         /// Gets the environment variables.
         /// </summary>
         /// <value>The environment variables.</value>
-        public Dictionary<String, String> EnvironmentVariables { get; private set; }
+        public Dictionary<string, string> EnvironmentVariables { get; private set; }
 
         /// <summary>
         /// Gets the property value.
@@ -386,9 +386,9 @@ namespace Managed.Adb
         /// <returns>
         /// the value or <see langword="null"/> if the property does not exist.
         /// </returns>
-        public String GetProperty(String name)
+        public string GetProperty(string name)
         {
-            return this.GetProperty(new String[] { name });
+            return this.GetProperty(new string[] { name });
         }
 
         /// <summary>
@@ -396,7 +396,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="name">The array of property names.</param>
         /// <returns></returns>
-        public String GetProperty(params String[] name)
+        public string GetProperty(params string[] name)
         {
             foreach(var item in name)
             {
@@ -488,7 +488,7 @@ namespace Managed.Adb
         /// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
         public void RemountMountPoint(MountPoint mnt, bool readOnly)
         {
-            String command = String.Format("mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name);
+            string command = string.Format("mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name);
             this.ExecuteShellCommand(command, NullOutputReceiver.Instance);
             this.RefreshMountPoints();
         }
@@ -499,7 +499,7 @@ namespace Managed.Adb
         /// <param name="mountPoint">the mount point</param>
         /// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
         /// <exception cref="IOException">Throws if the mount point does not exist.</exception>
-        public void RemountMountPoint(String mountPoint, bool readOnly)
+        public void RemountMountPoint(string mountPoint, bool readOnly)
         {
             if(this.MountPoints.ContainsKey(mountPoint))
             {
@@ -572,7 +572,7 @@ namespace Managed.Adb
         /// Reboots the device in to the specified state
         /// </summary>
         /// <param name="into">The reboot state</param>
-        public void Reboot(String into)
+        public void Reboot(string into)
         {
             AdbHelper.Instance.Reboot(into, AndroidDebugBridge.SocketAddress, this);
         }
@@ -582,7 +582,7 @@ namespace Managed.Adb
         /// </summary>
         public void Reboot()
         {
-            this.Reboot(String.Empty);
+            this.Reboot(string.Empty);
         }
 
         /// <summary>
@@ -673,7 +673,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
-        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver)
+        public void ExecuteShellCommand(string command, IShellOutputReceiver receiver)
         {
             this.ExecuteShellCommand(command, receiver, new object[] { });
         }
@@ -684,7 +684,7 @@ namespace Managed.Adb
         /// <param name="command">The command.</param>
         /// <param name="receiver">The receiver.</param>
         /// <param name="timeout">The timeout.</param>
-        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout)
+        public void ExecuteShellCommand(string command, IShellOutputReceiver receiver, int timeout)
         {
             this.ExecuteShellCommand(command, receiver, new object[] { });
         }
@@ -696,7 +696,7 @@ namespace Managed.Adb
         /// <param name="command">The command.</param>
         /// <param name="receiver">The receiver.</param>
         /// <param name="commandArgs">The command args.</param>
-        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs)
+        public void ExecuteShellCommand(string command, IShellOutputReceiver receiver, params object[] commandArgs)
         {
             AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver);
         }
@@ -708,7 +708,7 @@ namespace Managed.Adb
         /// <param name="receiver">The receiver.</param>
         /// <param name="timeout">The timeout.</param>
         /// <param name="commandArgs">The command args.</param>
-        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
+        public void ExecuteShellCommand(string command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
         {
             AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver);
         }
@@ -720,7 +720,7 @@ namespace Managed.Adb
         /// <param name="command">The command.</param>
         /// <param name="receiver">The receiver.</param>
         /// <param name="timeout">The period, in milliseconds, after which the command times out.</param>
-        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout)
+        public void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver, int timeout)
         {
             this.ExecuteRootShellCommand(command, receiver, timeout, new object[] { });
         }
@@ -730,7 +730,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
-        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver)
+        public void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver)
         {
             this.ExecuteRootShellCommand(command, receiver, int.MaxValue);
         }
@@ -741,7 +741,7 @@ namespace Managed.Adb
         /// <param name="command">The command.</param>
         /// <param name="receiver">The receiver.</param>
         /// <param name="commandArgs">The command args.</param>
-        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs)
+        public void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver, params object[] commandArgs)
         {
             this.ExecuteRootShellCommand(command, receiver, int.MaxValue, commandArgs);
         }
@@ -753,7 +753,7 @@ namespace Managed.Adb
         /// <param name="receiver">The receiver.</param>
         /// <param name="timeout">The timeout.</param>
         /// <param name="commandArgs">The command args.</param>
-        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
+        public void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
         {
             AdbHelper.Instance.ExecuteRemoteRootCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver, timeout);
         }
@@ -773,7 +773,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="logname">The logname.</param>
         /// <param name="receiver">The receiver.</param>
-        public void RunLogService(String logname, LogReceiver receiver)
+        public void RunLogService(string logname, LogReceiver receiver)
         {
             AdbHelper.Instance.RunLogService(AndroidDebugBridge.SocketAddress, this, logname, receiver);
         }
@@ -884,9 +884,9 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
         /// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
-        public void InstallPackage(String packageFilePath, bool reinstall)
+        public void InstallPackage(string packageFilePath, bool reinstall)
         {
-            String remoteFilePath = this.SyncPackageToDevice(packageFilePath);
+            string remoteFilePath = this.SyncPackageToDevice(packageFilePath);
             this.InstallRemotePackage(remoteFilePath, reinstall);
             this.RemoveRemotePackage(remoteFilePath);
         }
@@ -897,28 +897,28 @@ namespace Managed.Adb
         /// <param name="localFilePath">the absolute path to file on local host</param>
         /// <returns>destination path on device for file</returns>
         /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
-        public String SyncPackageToDevice(String localFilePath)
+        public string SyncPackageToDevice(string localFilePath)
         {
             try
             {
-                String packageFileName = Path.GetFileName(localFilePath);
+                string packageFileName = Path.GetFileName(localFilePath);
                 // only root has access to /data/local/tmp/... not sure how adb does it then...
                 // workitem: 16823
                 // workitem: 19711
-                String remoteFilePath = LinuxPath.Combine(TEMP_DIRECTORY_FOR_INSTALL, packageFileName);
+                string remoteFilePath = LinuxPath.Combine(TEMP_DIRECTORY_FOR_INSTALL, packageFileName);
 
-                Log.d(packageFileName, String.Format("Uploading {0} onto device '{1}'", packageFileName, this.SerialNumber));
+                Log.d(packageFileName, string.Format("Uploading {0} onto device '{1}'", packageFileName, this.SerialNumber));
 
                 ISyncService sync = this.SyncService;
                 if(sync != null)
                 {
-                    String message = String.Format("Uploading file onto device '{0}'", this.SerialNumber);
+                    string message = string.Format("Uploading file onto device '{0}'", this.SerialNumber);
                     Log.d(LOG_TAG, message);
                     SyncResult result = sync.PushFile(localFilePath, remoteFilePath, Managed.Adb.SyncService.NullProgressMonitor);
 
                     if(result.Code != ErrorCodeHelper.RESULT_OK)
                     {
-                        throw new IOException(String.Format("Unable to upload file: {0}", result.Message));
+                        throw new IOException(string.Format("Unable to upload file: {0}", result.Message));
                     }
                 }
                 else
@@ -929,7 +929,7 @@ namespace Managed.Adb
             }
             catch(IOException e)
             {
-                Log.e(LOG_TAG, String.Format("Unable to open sync connection! reason: {0}", e.Message));
+                Log.e(LOG_TAG, string.Format("Unable to open sync connection! reason: {0}", e.Message));
                 throw;
             }
         }
@@ -939,13 +939,13 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="remoteFilePath">absolute file path to package file on device</param>
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
-        public void InstallRemotePackage(String remoteFilePath, bool reinstall)
+        public void InstallRemotePackage(string remoteFilePath, bool reinstall)
         {
             InstallReceiver receiver = new InstallReceiver();
-            String cmd = String.Format("pm install {1}{0}", remoteFilePath, reinstall ? "-r " : String.Empty);
+            string cmd = string.Format("pm install {1}{0}", remoteFilePath, reinstall ? "-r " : string.Empty);
             this.ExecuteShellCommand(cmd, receiver);
 
-            if(!String.IsNullOrEmpty(receiver.ErrorMessage))
+            if(!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
@@ -957,7 +957,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="remoteFilePath">path on device of file to remove</param>
         /// <exception cref="IOException">if file removal failed</exception>
-        public void RemoveRemotePackage(String remoteFilePath)
+        public void RemoveRemotePackage(string remoteFilePath)
         {
             // now we delete the app we sync'ed
             try
@@ -966,7 +966,7 @@ namespace Managed.Adb
             }
             catch(IOException e)
             {
-                Log.e(LOG_TAG, String.Format("Failed to delete temporary package: {0}", e.Message));
+                Log.e(LOG_TAG, string.Format("Failed to delete temporary package: {0}", e.Message));
                 throw e;
             }
         }
@@ -978,11 +978,11 @@ namespace Managed.Adb
         /// <exception cref="IOException"></exception>
         ///   
         /// <exception cref="PackageInstallationException"></exception>
-        public void UninstallPackage(String packageName)
+        public void UninstallPackage(string packageName)
         {
             InstallReceiver receiver = new InstallReceiver();
-            this.ExecuteShellCommand(String.Format("pm uninstall {0}", packageName), receiver);
-            if(!String.IsNullOrEmpty(receiver.ErrorMessage))
+            this.ExecuteShellCommand(string.Format("pm uninstall {0}", packageName), receiver);
+            if(!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
