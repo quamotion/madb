@@ -205,20 +205,20 @@ namespace Managed.Adb
         {
             string tstate = state;
 
-            if(string.Compare(state, "device", false) == 0)
+            if (string.Compare(state, "device", false) == 0)
             {
                 tstate = "online";
             }
 
-            if(Enum.IsDefined(typeof(DeviceState), tstate))
+            if (Enum.IsDefined(typeof(DeviceState), tstate))
             {
                 return (DeviceState)Enum.Parse(typeof(DeviceState), tstate, true);
             }
             else
             {
-                foreach(var fi in typeof(DeviceState).GetFields())
+                foreach (var fi in typeof(DeviceState).GetFields())
                 {
-                    if(string.Compare(fi.Name, tstate, true) == 0)
+                    if (string.Compare(fi.Name, tstate, true) == 0)
                     {
                         return (DeviceState)fi.GetValue(null);
                     }
@@ -238,7 +238,7 @@ namespace Managed.Adb
         {
             Regex re = new Regex(RE_DEVICELIST_INFO, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Match m = re.Match(data);
-            if(m.Success)
+            if (m.Success)
             {
                 return new Device(m.Groups[1].Value, GetStateFromString(m.Groups[2].Value), m.Groups[4].Value, m.Groups[3].Value, m.Groups[5].Value );
             }
@@ -264,7 +264,7 @@ namespace Managed.Adb
         /// </returns>
         public bool CanSU()
         {
-            if(this._canSU)
+            if (this._canSU)
             {
                 return this._canSU;
             }
@@ -278,11 +278,11 @@ namespace Managed.Adb
                 this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", NullOutputReceiver.Instance);
                 this._canSU = true;
             }
-            catch(PermissionDeniedException)
+            catch (PermissionDeniedException)
             {
                 this._canSU = false;
             }
-            catch(FileNotFoundException)
+            catch (FileNotFoundException)
             {
                 this._canSU = false;
             }
@@ -325,7 +325,7 @@ namespace Managed.Adb
             get { return this._avdName; }
             set
             {
-                if(!this.IsEmulator)
+                if (!this.IsEmulator)
                 {
                     throw new ArgumentException("Cannot set the AVD name of the device is not an emulator");
                 }
@@ -398,9 +398,9 @@ namespace Managed.Adb
         /// <returns></returns>
         public string GetProperty(params string[] name)
         {
-            foreach(var item in name)
+            foreach (var item in name)
             {
-                if(this.Properties.ContainsKey(item))
+                if (this.Properties.ContainsKey(item))
                 {
                     return this.Properties[item];
                 }
@@ -501,7 +501,7 @@ namespace Managed.Adb
         /// <exception cref="IOException">Throws if the mount point does not exist.</exception>
         public void RemountMountPoint(string mountPoint, bool readOnly)
         {
-            if(this.MountPoints.ContainsKey(mountPoint))
+            if (this.MountPoints.ContainsKey(mountPoint))
             {
                 MountPoint mnt = this.MountPoints[mountPoint];
                 this.RemountMountPoint(mnt, readOnly);
@@ -518,13 +518,13 @@ namespace Managed.Adb
         /// </summary>
         public void RefreshMountPoints()
         {
-            if(this.IsOnline)
+            if (this.IsOnline)
             {
                 try
                 {
                     this.ExecuteShellCommand(MountPointReceiver.MOUNT_COMMAND, new MountPointReceiver(this));
                 }
-                catch(AdbException)
+                catch (AdbException)
                 {
 
                 }
@@ -536,13 +536,13 @@ namespace Managed.Adb
         /// </summary>
         public void RefreshEnvironmentVariables()
         {
-            if(this.IsOnline)
+            if (this.IsOnline)
             {
                 try
                 {
                     this.ExecuteShellCommand(EnvironmentVariablesReceiver.ENV_COMMAND, new EnvironmentVariablesReceiver(this));
                 }
-                catch(AdbException)
+                catch (AdbException)
                 {
 
                 }
@@ -554,14 +554,14 @@ namespace Managed.Adb
         /// </summary>
         public void RefreshProperties()
         {
-            if(this.IsOnline)
+            if (this.IsOnline)
             {
                 try
                 {
                     this.Properties.Clear();
                     this.ExecuteShellCommand(GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver(this));
                 }
-                catch(AdbException aex)
+                catch (AdbException aex)
                 {
                     Log.w(LOG_TAG, aex);
                 }
@@ -601,7 +601,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public BatteryInfo GetBatteryInfo(long freshness)
         {
-            if(this._lastBatteryInfo != null
+            if (this._lastBatteryInfo != null
                                 && this._lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness)))
                                 {
                 return this._lastBatteryInfo;
@@ -647,7 +647,7 @@ namespace Managed.Adb
             get
             {
                 ISyncService syncService = new SyncService(AndroidDebugBridge.SocketAddress, this);
-                if(syncService.Open())
+                if (syncService.Open())
                 {
                     return syncService;
                 }
@@ -790,7 +790,7 @@ namespace Managed.Adb
             {
                 return AdbHelper.Instance.CreateForward(AndroidDebugBridge.SocketAddress, this, localPort, remotePort);
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 Log.w("ddms", e);
                 return false;
@@ -808,7 +808,7 @@ namespace Managed.Adb
             {
                 return AdbHelper.Instance.RemoveForward(AndroidDebugBridge.SocketAddress, this, localPort);
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 Log.w("ddms", e);
                 return false;
@@ -910,13 +910,13 @@ namespace Managed.Adb
                 Log.d(packageFileName, string.Format("Uploading {0} onto device '{1}'", packageFileName, this.SerialNumber));
 
                 ISyncService sync = this.SyncService;
-                if(sync != null)
+                if (sync != null)
                 {
                     string message = string.Format("Uploading file onto device '{0}'", this.SerialNumber);
                     Log.d(LOG_TAG, message);
                     SyncResult result = sync.PushFile(localFilePath, remoteFilePath, Managed.Adb.SyncService.NullProgressMonitor);
 
-                    if(result.Code != ErrorCodeHelper.RESULT_OK)
+                    if (result.Code != ErrorCodeHelper.RESULT_OK)
                     {
                         throw new IOException(string.Format("Unable to upload file: {0}", result.Message));
                     }
@@ -927,7 +927,7 @@ namespace Managed.Adb
                 }
                 return remoteFilePath;
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 Log.e(LOG_TAG, string.Format("Unable to open sync connection! reason: {0}", e.Message));
                 throw;
@@ -945,7 +945,7 @@ namespace Managed.Adb
             string cmd = string.Format("pm install {1}{0}", remoteFilePath, reinstall ? "-r " : string.Empty);
             this.ExecuteShellCommand(cmd, receiver);
 
-            if(!string.IsNullOrEmpty(receiver.ErrorMessage))
+            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
@@ -964,7 +964,7 @@ namespace Managed.Adb
             {
                 this.ExecuteShellCommand("rm " + remoteFilePath, NullOutputReceiver.Instance);
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 Log.e(LOG_TAG, string.Format("Failed to delete temporary package: {0}", e.Message));
                 throw e;
@@ -982,7 +982,7 @@ namespace Managed.Adb
         {
             InstallReceiver receiver = new InstallReceiver();
             this.ExecuteShellCommand(string.Format("pm uninstall {0}", packageName), receiver);
-            if(!string.IsNullOrEmpty(receiver.ErrorMessage))
+            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
@@ -994,7 +994,7 @@ namespace Managed.Adb
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         internal void OnStateChanged(EventArgs e)
         {
-            if(this.StateChanged != null)
+            if (this.StateChanged != null)
             {
                 this.StateChanged(this, e);
             }
@@ -1006,7 +1006,7 @@ namespace Managed.Adb
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         internal void OnBuildInfoChanged(EventArgs e)
         {
-            if(this.BuildInfoChanged != null)
+            if (this.BuildInfoChanged != null)
             {
                 this.BuildInfoChanged(this, e);
             }
@@ -1018,7 +1018,7 @@ namespace Managed.Adb
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         internal void OnClientListChanged(EventArgs e)
         {
-            if(this.ClientListChanged != null)
+            if (this.ClientListChanged != null)
             {
                 this.ClientListChanged(this, e);
             }

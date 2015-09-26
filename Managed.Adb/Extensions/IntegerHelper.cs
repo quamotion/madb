@@ -61,7 +61,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public static T ToEnum<T> ( this uint value )
         {
-            return (T)Enum.ToObject ( typeof ( T ), value );
+            return (T)Enum.ToObject ( typeof( T ), value );
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public static T ToEnum<T> ( this short value )
         {
-            return (T)Enum.ToObject ( typeof ( T ), value );
+            return (T)Enum.ToObject ( typeof( T ), value );
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public static T ToEnum<T> ( this ushort value )
         {
-            return (T)Enum.ToObject ( typeof ( T ), value );
+            return (T)Enum.ToObject ( typeof( T ), value );
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public static T ToEnum<T> ( this long value )
         {
-            return (T)Enum.ToObject ( typeof ( T ), value );
+            return (T)Enum.ToObject ( typeof( T ), value );
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public static T ToEnum<T> ( this ulong value )
         {
-            return (T)Enum.ToObject ( typeof ( T ), value );
+            return (T)Enum.ToObject ( typeof( T ), value );
         }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public static T ToEnum<T> ( this byte value )
         {
-            return (T)Enum.ToObject ( typeof ( T ), value );
+            return (T)Enum.ToObject ( typeof( T ), value );
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public static T ToEnum<T> ( this sbyte value )
         {
-            return (T)Enum.ToObject ( typeof ( T ), value );
+            return (T)Enum.ToObject ( typeof( T ), value );
         }
 
         /*// reverse byte order (16-bit)

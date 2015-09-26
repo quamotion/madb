@@ -88,7 +88,7 @@ namespace Managed.Adb
         {
             get
             {
-                if(_instance == null)
+                if (_instance == null)
                 {
                     _instance = new AdbHelper();
                 }
@@ -120,18 +120,18 @@ namespace Managed.Adb
                 this.SetDevice(s, device);
 
                 byte[] req = this.CreateAdbForwardRequest(null, port);
-                if(!this.Write(s, req))
+                if (!this.Write(s, req))
                 {
                     throw new AdbException("failed submitting request to ADB");
                 }
                 AdbResponse resp = this.ReadAdbResponse(s, false);
-                if(!resp.Okay)
+                if (!resp.Okay)
                 {
                     throw new AdbException("connection request rejected");
                 }
                 s.Blocking = true;
             }
-            catch(AdbException)
+            catch (AdbException)
             {
                 s.Close();
                 throw;
@@ -149,16 +149,16 @@ namespace Managed.Adb
         public int KillAdb(IPEndPoint address)
         {
             byte[] request = this.FormAdbRequest("host:kill");
-            using(var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
                 socket.Connect(address);
                 socket.Blocking = true;
-                if(!this.Write(socket, request))
+                if (!this.Write(socket, request))
                 {
                     throw new IOException("failed asking to kill adb");
                 }
                 var resp = this.ReadAdbResponse(socket, false);
-                if(!resp.IOSuccess || !resp.Okay)
+                if (!resp.IOSuccess || !resp.Okay)
                 {
                     Log.e(TAG, "Got timeout or unhappy response from ADB req: " + resp.Message);
                     socket.Close();
@@ -180,16 +180,16 @@ namespace Managed.Adb
         public void Backup(IPEndPoint address)
         {
             byte[] request = this.FormAdbRequest("backup:all");
-            using(var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
                 socket.Connect(address);
                 socket.Blocking = true;
-                if(!this.Write(socket, request))
+                if (!this.Write(socket, request))
                 {
                     throw new IOException("failed asking to backup device");
                 }
                 var resp = this.ReadAdbResponse(socket, false);
-                if(!resp.IOSuccess || !resp.Okay)
+                if (!resp.IOSuccess || !resp.Okay)
                 {
                     Log.e(TAG, "Got timeout or unhappy response from ADB req: " + resp.Message);
                     socket.Close();
@@ -198,7 +198,7 @@ namespace Managed.Adb
 
                 var data = new byte[6000];
                 int count = -1;
-                while(count != 0)
+                while (count != 0)
                 {
                     count = socket.Receive(data);
                     Console.Write("received: {0}", count);
@@ -234,11 +234,11 @@ namespace Managed.Adb
             {
                 adbChan.Connect(address);
                 adbChan.Blocking = true;
-                if(!this.Write(adbChan, request))
+                if (!this.Write(adbChan, request))
                     throw new IOException("failed asking for adb version");
 
                 AdbResponse resp = this.ReadAdbResponse(adbChan, false /* readDiagString */);
-                if(!resp.IOSuccess || !resp.Okay)
+                if (!resp.IOSuccess || !resp.Okay)
                 {
                     Log.e(TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message);
                     adbChan.Close();
@@ -246,7 +246,7 @@ namespace Managed.Adb
                 }
 
                 reply = new byte[4];
-                if(!this.Read(adbChan, reply))
+                if (!this.Read(adbChan, reply))
                 {
                     Log.e(TAG, "error in getting data length");
 
@@ -259,7 +259,7 @@ namespace Managed.Adb
 
                 // the protocol version.
                 reply = new byte[len];
-                if(!this.Read(adbChan, reply))
+                if (!this.Read(adbChan, reply))
                 {
                     Log.e(TAG, "did not get the version info");
 
@@ -271,7 +271,7 @@ namespace Managed.Adb
                 return int.Parse(sReply, System.Globalization.NumberStyles.HexNumber);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.e(TAG, ex);
                 throw;
@@ -308,15 +308,15 @@ namespace Managed.Adb
                 byte[] req = this.CreateJdwpForwardRequest(pid);
                 // Log.hexDump(req);
 
-                if(!this.Write(socket, req))
+                if (!this.Write(socket, req))
                     throw new AdbException("failed submitting request to ADB"); //$NON-NLS-1$
 
                 AdbResponse resp = this.ReadAdbResponse(socket, false /* readDiagString */);
-                if(!resp.Okay)
+                if (!resp.Okay)
                     throw new AdbException("connection request rejected: " + resp.Message); //$NON-NLS-1$
 
             }
-            catch(AdbException ioe)
+            catch (AdbException ioe)
             {
                 socket.Close();
                 throw ioe;
@@ -335,7 +335,7 @@ namespace Managed.Adb
         {
             string request;
 
-            if(address == null)
+            if (address == null)
                 request = "tcp:" + port;
             else
                 request = "tcp:" + port + ":" + address;
@@ -355,7 +355,7 @@ namespace Managed.Adb
             {
                 result = resultStr.GetBytes(AdbHelper.DEFAULT_ENCODING);
             }
-            catch(EncoderFallbackException efe)
+            catch (EncoderFallbackException efe)
             {
                 Log.e(TAG, efe);
                 return null;
@@ -377,7 +377,7 @@ namespace Managed.Adb
             {
                 this.Write(socket, data, -1, DdmPreferences.Timeout);
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 Log.e(TAG, e);
                 return false;
@@ -408,14 +408,14 @@ namespace Managed.Adb
             try
             {
                 count = socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
-                if(count < 0)
+                if (count < 0)
                 {
                     throw new AdbException("channel EOF");
                 }
-                else if(count == 0)
+                else if (count == 0)
                 {
                     // TODO: need more accurate timeout?
-                    if(timeout != 0 && numWaits * WAIT_TIME > timeout)
+                    if (timeout != 0 && numWaits * WAIT_TIME > timeout)
                     {
                         throw new AdbException("timeout");
                     }
@@ -428,7 +428,7 @@ namespace Managed.Adb
                     numWaits = 0;
                 }
             }
-            catch(SocketException sex)
+            catch (SocketException sex)
             {
                 Log.e(TAG, sex);
                 throw;
@@ -449,13 +449,13 @@ namespace Managed.Adb
             AdbResponse resp = new AdbResponse();
 
             byte[] reply = new byte[4];
-            if(!this.Read(socket, reply))
+            if (!this.Read(socket, reply))
             {
                 return resp;
             }
             resp.IOSuccess = true;
 
-            if(this.IsOkay(reply))
+            if (this.IsOkay(reply))
             {
                 resp.Okay = true;
             }
@@ -466,11 +466,11 @@ namespace Managed.Adb
             }
 
             // not a loop -- use "while" so we can use "break"
-            while(readDiagString)
+            while (readDiagString)
             {
                 // length string is in next 4 bytes
                 byte[] lenBuf = new byte[4];
-                if(!this.Read(socket, lenBuf))
+                if (!this.Read(socket, lenBuf))
                 {
                     Log.w(TAG, "Expected diagnostic string not found");
                     break;
@@ -484,7 +484,7 @@ namespace Managed.Adb
                     len = int.Parse(lenStr, System.Globalization.NumberStyles.HexNumber);
 
                 }
-                catch(FormatException)
+                catch (FormatException)
                 {
                     Log.e(TAG, "Expected digits, got '{0}' : {1} {2} {3} {4}", lenBuf[0], lenBuf[1], lenBuf[2], lenBuf[3]);
                     Log.e(TAG, "reply was {0}", this.ReplyToString(reply));
@@ -492,7 +492,7 @@ namespace Managed.Adb
                 }
 
                 byte[] msg = new byte[len];
-                if(!this.Read(socket, msg))
+                if (!this.Read(socket, msg))
                 {
                     Log.e(TAG, "Failed reading diagnostic string, len={0}", len);
                     break;
@@ -519,7 +519,7 @@ namespace Managed.Adb
             {
                 this.Read(socket, data, -1, DdmPreferences.Timeout);
             }
-            catch(AdbException e)
+            catch (AdbException e)
             {
                 Log.e(TAG, e);
                 return false;
@@ -546,7 +546,7 @@ namespace Managed.Adb
             int count = -1;
             int totalRead = 0;
 
-            while(count != 0 && totalRead < expLen)
+            while (count != 0 && totalRead < expLen)
             {
                 try
                 {
@@ -556,12 +556,12 @@ namespace Managed.Adb
                     byte[] buffer = new byte[buflen];
                     socket.ReceiveBufferSize = expLen;
                     count = socket.Receive(buffer, buflen, SocketFlags.None);
-                    if(count < 0)
+                    if (count < 0)
                     {
                         Log.e(TAG, "read: channel EOF");
                         throw new AdbException("EOF");
                     }
-                    else if(count == 0)
+                    else if (count == 0)
                     {
                         Log.i(TAG, "DONE with Read");
                     }
@@ -571,7 +571,7 @@ namespace Managed.Adb
                         totalRead += count;
                     }
                 }
-                catch(SocketException sex)
+                catch (SocketException sex)
                 {
                     throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
                 }
@@ -618,20 +618,20 @@ namespace Managed.Adb
                 byte[] request = this.FormAdbRequest(string.Format("host-serial:{0}:forward:tcp:{1};tcp:{2}", //$NON-NLS-1$
                                 device.SerialNumber, localPort, remotePort));
 
-                if(!this.Write(adbChan, request))
+                if (!this.Write(adbChan, request))
                 {
                     throw new AdbException("failed to submit the forward command.");
                 }
 
                 AdbResponse resp = this.ReadAdbResponse(adbChan, false /* readDiagString */);
-                if(!resp.IOSuccess || !resp.Okay)
+                if (!resp.IOSuccess || !resp.Okay)
                 {
                     throw new AdbException("Device rejected command: " + resp.Message);
                 }
             }
             finally
             {
-                if(adbChan != null)
+                if (adbChan != null)
                 {
                     adbChan.Close();
                 }
@@ -714,7 +714,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public bool RemoveForward(IPEndPoint address, IDevice device, int localPort)
         {
-            using(var socket = this.ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward:tcp:{1}".With(device.SerialNumber, localPort)))
+            using (var socket = this.ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward:tcp:{1}".With(device.SerialNumber, localPort)))
             {
                 // do nothing...
                 return true;
@@ -729,7 +729,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public bool RemoveAllForward(IPEndPoint address, IDevice device)
         {
-            using(var socket = this.ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward-all".With(device.SerialNumber)))
+            using (var socket = this.ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward-all".With(device.SerialNumber)))
             {
                 // do nothing...
                 return true;
@@ -760,7 +760,7 @@ namespace Managed.Adb
             {
                 result = Encoding.Default.GetString(reply);
             }
-            catch(DecoderFallbackException uee)
+            catch (DecoderFallbackException uee)
             {
                 Log.e(TAG, uee);
                 result = "";
@@ -777,11 +777,11 @@ namespace Managed.Adb
         public List<Device> GetDevices(IPEndPoint address)
         {
             // -l will return additional data
-            using(var socket = this.ExecuteRawSocketCommand(address, "host:devices-l"))
+            using (var socket = this.ExecuteRawSocketCommand(address, "host:devices-l"))
             {
                 byte[] reply = new byte[4];
 
-                if(!this.Read(socket, reply))
+                if (!this.Read(socket, reply))
                 {
                     Log.e(TAG, "error in getting data length");
                     return null;
@@ -790,7 +790,7 @@ namespace Managed.Adb
                 int len = int.Parse(lenHex, System.Globalization.NumberStyles.HexNumber);
 
                 reply = new byte[len];
-                if(!this.Read(socket, reply))
+                if (!this.Read(socket, reply))
                 {
                     Log.e(TAG, "error in getting data");
                     return null;
@@ -839,11 +839,11 @@ namespace Managed.Adb
                 // if the device is not -1, then we first tell adb we're looking to talk
                 // to a specific device
                 this.SetDevice(adbChan, device);
-                if(!this.Write(adbChan, request))
+                if (!this.Write(adbChan, request))
                     throw new AdbException("failed asking for frame buffer");
 
                 AdbResponse resp = this.ReadAdbResponse(adbChan, false /* readDiagString */);
-                if(!resp.IOSuccess || !resp.Okay)
+                if (!resp.IOSuccess || !resp.Okay)
                 {
                     Log.w(TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message);
                     adbChan.Close();
@@ -852,7 +852,7 @@ namespace Managed.Adb
 
                 // first the protocol version.
                 reply = new byte[4];
-                if(!this.Read(adbChan, reply))
+                if (!this.Read(adbChan, reply))
                 {
                     Log.w(TAG, "got partial reply from ADB fb:");
 
@@ -861,7 +861,7 @@ namespace Managed.Adb
                 }
                 BinaryReader buf;
                 int version = 0;
-                using(MemoryStream ms = new MemoryStream(reply))
+                using (MemoryStream ms = new MemoryStream(reply))
                 {
                     buf = new BinaryReader(ms);
                     version = buf.ReadInt16();
@@ -871,7 +871,7 @@ namespace Managed.Adb
                 int headerSize = RawImage.GetHeaderSize(version);
                 // read the header
                 reply = new byte[headerSize * 4];
-                if(!this.Read(adbChan, reply))
+                if (!this.Read(adbChan, reply))
                 {
                     Log.w(TAG, "got partial reply from ADB fb:");
 
@@ -879,12 +879,12 @@ namespace Managed.Adb
                     return null;
                 }
 
-                using(MemoryStream ms = new MemoryStream(reply))
+                using (MemoryStream ms = new MemoryStream(reply))
                 {
                     buf = new BinaryReader(ms);
 
                     // fill the RawImage with the header
-                    if(imageParams.ReadHeader(version, buf) == false)
+                    if (imageParams.ReadHeader(version, buf) == false)
                     {
                         Log.w(TAG, "Unsupported protocol: " + version);
                         return null;
@@ -895,11 +895,11 @@ namespace Managed.Adb
                                 + imageParams.Size + ", width=" + imageParams.Width
                                 + ", height=" + imageParams.Height);
 
-                if(!this.Write(adbChan, nudge))
+                if (!this.Write(adbChan, nudge))
                     throw new AdbException("failed nudging");
 
                 reply = new byte[imageParams.Size];
-                if(!this.Read(adbChan, reply))
+                if (!this.Read(adbChan, reply))
                 {
                     Log.w(TAG, "got truncated reply from ADB fb data");
                     adbChan.Close();
@@ -910,7 +910,7 @@ namespace Managed.Adb
             }
             finally
             {
-                if(adbChan != null)
+                if (adbChan != null)
                 {
                     adbChan.Close();
                 }
@@ -969,7 +969,7 @@ namespace Managed.Adb
         public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
 
-            using(var socket = this.ExecuteRawSocketCommand(endPoint, device, "shell:{0}".With(command)))
+            using (var socket = this.ExecuteRawSocketCommand(endPoint, device, "shell:{0}".With(command)))
             {
                 socket.ReceiveTimeout = maxTimeToOutputResponse;
                 socket.SendTimeout = maxTimeToOutputResponse;
@@ -978,17 +978,17 @@ namespace Managed.Adb
                 {
                     byte[] data = new byte[16384];
                     int count = -1;
-                    while(count != 0)
+                    while (count != 0)
                     {
 
-                        if(rcvr != null && rcvr.IsCancelled)
+                        if (rcvr != null && rcvr.IsCancelled)
                         {
                             Log.w(TAG, "execute: cancelled");
                             throw new OperationCanceledException();
                         }
 
                         count = socket.Receive(data);
-                        if(count == 0)
+                        if (count == 0)
                         {
                             // we're at the end, we flush the output
                             rcvr.Flush();
@@ -1049,7 +1049,7 @@ namespace Managed.Adb
                             }
 
                             // Add the data to the receiver
-                            if(rcvr != null)
+                            if (rcvr != null)
                             {
                                 rcvr.AddOutput(data, 0, count);
                             }
@@ -1057,7 +1057,7 @@ namespace Managed.Adb
                         }
                     }
                 }
-                catch(SocketException)
+                catch (SocketException)
                 {
                     throw new ShellCommandUnresponsiveException();
                 }
@@ -1101,20 +1101,20 @@ namespace Managed.Adb
         {
             // if the device is not null, then we first tell adb we're looking to talk
             // to a specific device
-            if(device != null)
+            if (device != null)
             {
                 string msg = "host:transport:" + device.SerialNumber;
                 byte[] device_query = this.FormAdbRequest(msg);
 
-                if(!this.Write(adbChan, device_query))
+                if (!this.Write(adbChan, device_query))
                 {
                     throw new AdbException("failed submitting device (" + device + ") request to ADB");
                 }
 
                 AdbResponse resp = this.ReadAdbResponse(adbChan, false /* readDiagString */);
-                if(!resp.Okay)
+                if (!resp.Okay)
                 {
-                    if(string.Compare("device not found", resp.Message, true) == 0)
+                    if (string.Compare("device not found", resp.Message, true) == 0)
                     {
                         throw new DeviceNotFoundException(device.SerialNumber);
                     }
@@ -1148,34 +1148,34 @@ namespace Managed.Adb
         /// <exception cref="Managed.Adb.Exceptions.AdbCommandRejectedException"></exception>
         public void RunLogService(IPEndPoint address, IDevice device, string logName, LogReceiver rcvr)
         {
-            using(var socket = this.ExecuteRawSocketCommand(address, device, "log:{0}".With(logName)))
+            using (var socket = this.ExecuteRawSocketCommand(address, device, "log:{0}".With(logName)))
             {
                 byte[] data = new byte[16384];
-                using(var ms = new MemoryStream(data))
+                using (var ms = new MemoryStream(data))
                 {
                     int offset = 0;
 
-                    while(true)
+                    while (true)
                     {
                         int count;
-                        if(rcvr != null && rcvr.IsCancelled)
+                        if (rcvr != null && rcvr.IsCancelled)
                         {
                             break;
                         }
                         var buffer = new byte[4 * 1024];
 
                         count = socket.Receive(buffer);
-                        if(count < 0)
+                        if (count < 0)
                         {
                             break;
                         }
-                        else if(count == 0)
+                        else if (count == 0)
                         {
                             try
                             {
                                 Thread.Sleep(WAIT_TIME * 5);
                             }
-                            catch(ThreadInterruptedException)
+                            catch (ThreadInterruptedException)
                             {
                             }
                         }
@@ -1183,7 +1183,7 @@ namespace Managed.Adb
                         {
                             ms.Write(buffer, offset, count);
                             offset += count;
-                            if(rcvr != null)
+                            if (rcvr != null)
                             {
                                 var d = ms.ToArray();
                                 rcvr.ParseNewData(d, 0, d.Length);
@@ -1213,7 +1213,7 @@ namespace Managed.Adb
         public void Reboot(string into, IPEndPoint adbSockAddr, IDevice device)
         {
             byte[] request;
-            if(string.IsNullOrEmpty(into))
+            if (string.IsNullOrEmpty(into))
             {
                 request = this.FormAdbRequest("reboot:");
             }
@@ -1222,7 +1222,7 @@ namespace Managed.Adb
                 request = this.FormAdbRequest("reboot:" + into);
             }
 
-            using(this.ExecuteRawSocketCommand(adbSockAddr, device, request))
+            using (this.ExecuteRawSocketCommand(adbSockAddr, device, request))
             {
                 // nothing to do...
             }
@@ -1243,7 +1243,7 @@ namespace Managed.Adb
         /// </returns>
         public int Connect(IPEndPoint adbEndpoint, IPAddress address)
         {
-            if(address == null)
+            if (address == null)
             {
                 throw new ArgumentNullException("address");
             }
@@ -1266,7 +1266,7 @@ namespace Managed.Adb
         /// </returns>
         public int Connect(IPEndPoint adbEndpoint, string host)
         {
-            if(string.IsNullOrEmpty(host))
+            if (string.IsNullOrEmpty(host))
             {
                 throw new ArgumentNullException("host");
             }
@@ -1289,7 +1289,7 @@ namespace Managed.Adb
         /// </returns>
         public int Connect(IPEndPoint adbEndpoint, IPEndPoint endpoint)
         {
-            if(endpoint == null)
+            if (endpoint == null)
             {
                 throw new ArgumentNullException("endpoint");
             }
@@ -1395,7 +1395,7 @@ namespace Managed.Adb
         /// Device rejected command: {0}.With(resp.Message)</exception>
         private Socket ExecuteRawSocketCommand(IPEndPoint address, IDevice device, byte[] command)
         {
-            if(device != null && !device.IsOnline)
+            if (device != null && !device.IsOnline)
             {
                 throw new AdbException("Device is offline");
             }
@@ -1403,17 +1403,17 @@ namespace Managed.Adb
             Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             adbChan.Connect(address);
             adbChan.Blocking = true;
-            if(device != null)
+            if (device != null)
             {
                 this.SetDevice(adbChan, device);
             }
-            if(!this.Write(adbChan, command))
+            if (!this.Write(adbChan, command))
             {
                 throw new AdbException("failed to submit the command: {0}.".With(command.GetString().Trim()));
             }
 
             AdbResponse resp = this.ReadAdbResponse(adbChan, false /* readDiagString */);
-            if(!resp.IOSuccess || !resp.Okay)
+            if (!resp.IOSuccess || !resp.Okay)
             {
                 throw new AdbException("Device rejected command: {0}".With(resp.Message));
             }
@@ -1427,7 +1427,7 @@ namespace Managed.Adb
         /// <returns></returns>
         private string HostPrefixFromDevice(IDevice device)
         {
-            switch(device.TransportType)
+            switch (device.TransportType)
             {
                 case TransportType.Host:
                     return "host-serial";
