@@ -6,7 +6,6 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using Managed.Adb.Conversion;
 
 namespace Managed.Adb {
 	/// <summary>
