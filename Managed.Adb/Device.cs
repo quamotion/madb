@@ -521,7 +521,6 @@ namespace Managed.Adb
                 }
                 catch (AdbException)
                 {
-
                 }
             }
         }
@@ -539,7 +538,6 @@ namespace Managed.Adb
                 }
                 catch (AdbException)
                 {
-
                 }
             }
         }

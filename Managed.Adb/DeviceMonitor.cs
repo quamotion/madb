@@ -668,10 +668,8 @@ namespace Managed.Adb
                 {
                     if (!this.IsRunning)
                     {
-
                     }
                 }
-
             }
             while (this.IsRunning);
         }

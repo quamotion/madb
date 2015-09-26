@@ -143,7 +143,6 @@ namespace Managed.Adb
             }
             catch (ArgumentOutOfRangeException)
             {
-
             }
         }
 
@@ -724,7 +723,6 @@ namespace Managed.Adb
                     // if we get here, we failed to parse the output.
                     Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to parse the output of 'adb version'"); 
                 }
-
             }
             catch (IOException e)
             {

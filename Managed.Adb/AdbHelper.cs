@@ -73,7 +73,6 @@ namespace Managed.Adb
         /// </summary>
         private AdbHelper()
         {
-
         }
 
         /// <summary>
@@ -268,7 +267,6 @@ namespace Managed.Adb
 
                 string sReply = reply.GetString(AdbHelper.DEFAULT_ENCODING);
                 return int.Parse(sReply, System.Globalization.NumberStyles.HexNumber);
-
             }
             catch (Exception ex)
             {
@@ -313,7 +311,6 @@ namespace Managed.Adb
                 AdbResponse resp = this.ReadAdbResponse(socket, false /* readDiagString */);
                 if (!resp.Okay)
                     throw new AdbException("connection request rejected: " + resp.Message); //$NON-NLS-1$
-
             }
             catch (AdbException ioe)
             {
@@ -481,7 +478,6 @@ namespace Managed.Adb
                 try
                 {
                     len = int.Parse(lenStr, System.Globalization.NumberStyles.HexNumber);
-
                 }
                 catch (FormatException)
                 {
@@ -575,7 +571,6 @@ namespace Managed.Adb
                     throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
                 }
             }
-
         }
 
         /// <summary>
@@ -1051,7 +1046,6 @@ namespace Managed.Adb
                             {
                                 rcvr.AddOutput(data, 0, count);
                             }
-
                         }
                     }
                 }
@@ -1064,7 +1058,6 @@ namespace Managed.Adb
                     rcvr.Flush();
                 }
             }
-
         }
 
         /// <summary>

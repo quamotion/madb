@@ -26,6 +26,5 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The bridge.</value>
         public AndroidDebugBridge Bridge { get; private set; }
-
     }
 }

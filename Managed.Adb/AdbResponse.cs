@@ -48,5 +48,4 @@ namespace Managed.Adb
         /// </value>
         public string Message { get; set; }
     }
-
 }

@@ -218,7 +218,6 @@ namespace Managed.Adb
         public SyncService(Device device)
             : this(AndroidDebugBridge.SocketAddress, device)
             {
-
         }
 
         /// <summary>
@@ -308,7 +307,6 @@ namespace Managed.Adb
                 }
                 catch (IOException)
                 {
-                    
                 }
                 this.Channel = null;
             }

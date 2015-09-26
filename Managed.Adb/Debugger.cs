@@ -211,7 +211,6 @@ namespace Managed.Adb
                     /*ClientData cd = Client.ClientData;
                     cd.DebuggerConnectionStatus = DebuggerStatus.Default;*/
                     this.Client.Update(ClientChangeMask.ChangeDebuggerStatus);
-
                 }
             }
             catch (IOException ioe)

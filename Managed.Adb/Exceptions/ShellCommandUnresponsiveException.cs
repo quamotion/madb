@@ -9,7 +9,6 @@ namespace Managed.Adb.Exceptions
     {
         public ShellCommandUnresponsiveException() : base("The shell command has become unresponsive")
         {
-
         }
     }
 }

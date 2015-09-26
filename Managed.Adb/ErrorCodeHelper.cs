@@ -75,7 +75,6 @@ namespace Managed.Adb
                 default:
                     return "Unknown error code.";
             }
-
         }
     }
 }

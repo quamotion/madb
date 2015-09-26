@@ -74,6 +74,5 @@ namespace Managed.Adb
                 return new FileInfo(path);
             }
         }
-
     }
 }

@@ -67,6 +67,5 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The client.</value>
         public IClient Client { get; private set; }
-
     }
 }

@@ -14,7 +14,6 @@ namespace Managed.Adb
 
         public DebugPortManager()
         {
-
         }
 
         /// <summary>

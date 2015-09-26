@@ -42,5 +42,4 @@ namespace Managed.Adb
         /// </remarks>
         bool ParsesErrors { get; }
     }
-
 }

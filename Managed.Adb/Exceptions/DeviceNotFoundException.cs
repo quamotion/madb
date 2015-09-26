@@ -15,7 +15,6 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         public DeviceNotFoundException() : base("The device was not found.")
         {
-                
         }
 
         /// <summary>
@@ -25,7 +24,6 @@ namespace Managed.Adb.Exceptions
         public DeviceNotFoundException(string device)
             : base("The device '" + device + "' was not found.")
             {
-
         }
     }
 }

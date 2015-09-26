@@ -30,7 +30,6 @@ namespace Managed.Adb
         public SyncResult(int code, Exception ex)
             : this(code, ex.Message)
             {
-
         }
 
         /// <summary>
@@ -40,7 +39,6 @@ namespace Managed.Adb
         public SyncResult(int code)
             : this(code, (string)null)
             {
-
         }
 
         /// <summary>

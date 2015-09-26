@@ -87,5 +87,4 @@ namespace Managed.Adb
             }
         }
     }
-
 }

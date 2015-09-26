@@ -22,6 +22,5 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The device.</value>
         public IDevice Device { get; private set; }
-
     }
 }

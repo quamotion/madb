@@ -49,7 +49,6 @@ namespace Managed.Adb
         /// </summary>
         private Log()
         {
-
         }
 
         /// <summary>
@@ -322,7 +321,6 @@ namespace Managed.Adb
                 offset += count;
                 baseAddr += count;
             }
-
         }
 
         /// <summary>

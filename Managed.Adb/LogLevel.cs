@@ -30,7 +30,6 @@ namespace Managed.Adb
             Levels.Add(Warn.Value, Warn);
             Levels.Add(Error.Value, Error);
             Levels.Add(Assert.Value, Assert);
-
         }
 
         /// <summary>
@@ -145,7 +144,6 @@ namespace Managed.Adb
             /// </summary>
             public LogLevelInfo()
             {
-
             }
 
             /// <summary>

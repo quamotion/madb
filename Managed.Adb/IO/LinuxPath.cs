@@ -301,7 +301,6 @@ namespace Managed.Adb.IO
                 }
             }
             return builder.ToString();
-
         }
 
         /// <summary>
@@ -676,6 +675,5 @@ namespace Managed.Adb.IO
                 return path;
             }
         }
-
     }
 }

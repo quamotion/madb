@@ -256,7 +256,6 @@ namespace Managed.Adb
                     g.DrawImage(bitmap, new Point(0, 0));
                     return image;
                 }
-
             }
             catch (Exception)
             {
@@ -282,6 +281,5 @@ namespace Managed.Adb
             });
             return clone.ToArray();
         }
-
     }
 }

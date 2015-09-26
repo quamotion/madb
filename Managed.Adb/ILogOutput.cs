@@ -25,5 +25,4 @@ namespace Managed.Adb
         /// <param name="message">The message.</param>
         void WriteAndPromptLog(LogLevel.LogLevelInfo logLevel, string tag, string message);
     }
-
 }

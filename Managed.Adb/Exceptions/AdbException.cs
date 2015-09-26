@@ -17,7 +17,6 @@ namespace Managed.Adb.Exceptions
         public AdbException()
             : base("An error occurred with ADB")
             {
-
         }
 
         /// <summary>
@@ -27,7 +26,6 @@ namespace Managed.Adb.Exceptions
         public AdbException(string message)
             : base(message)
             {
-
         }
 
         /// <summary>
@@ -37,7 +35,6 @@ namespace Managed.Adb.Exceptions
         /// <param name="context">The context.</param>
         public AdbException(SerializationInfo serializationInfo,StreamingContext context) : base(serializationInfo,context)
         {
-
         }
 
         /// <summary>
@@ -48,7 +45,6 @@ namespace Managed.Adb.Exceptions
         public AdbException(string message, Exception innerException)
             : base(message, innerException)
             {
-
         }
     }
 }

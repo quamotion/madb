@@ -26,7 +26,6 @@ namespace Managed.Adb.Exceptions
         public CommandAbortingException(string message)
             : base(message)
             {
-
         }
 
         /// <summary>
@@ -36,7 +35,6 @@ namespace Managed.Adb.Exceptions
         /// <param name="context">The context.</param>
         public CommandAbortingException(SerializationInfo serializationInfo,StreamingContext context) : base(serializationInfo,context)
         {
-
         }
 
         /// <summary>
@@ -47,7 +45,6 @@ namespace Managed.Adb.Exceptions
         public CommandAbortingException(string message, Exception innerException)
             : base(message, innerException)
             {
-
         }
     }
 }

@@ -81,7 +81,6 @@ namespace Managed.Adb
 
         public void DropClient(IClient client, bool notify)
         {
-
         }
     }
 }

@@ -84,7 +84,6 @@ namespace Managed.Adb
                 hex.AppendFormat("{0} ", b.ToHex());
             }
             return hex.ToString().Trim();
-
         }
 
         /// <summary>

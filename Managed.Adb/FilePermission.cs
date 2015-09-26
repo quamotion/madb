@@ -10,7 +10,6 @@ namespace Managed.Adb
 
         public FilePermissions() : this("---------")
         {
-            
         }
 
         public FilePermissions(string permissions)
@@ -88,7 +87,6 @@ namespace Managed.Adb
         public FilePermission()
             : this("---")
             {
-
         }
 
         /// <summary>
@@ -161,6 +159,5 @@ namespace Managed.Adb
             int ival = (int)val;
             return val;
         }
-
     }
 }

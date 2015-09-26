@@ -26,7 +26,6 @@ namespace Managed.Adb.Exceptions
         public UnknownOptionException(string message)
             : base(message)
             {
-
         }
 
         /// <summary>
@@ -37,7 +36,6 @@ namespace Managed.Adb.Exceptions
         public UnknownOptionException(SerializationInfo serializationInfo, StreamingContext context)
             : base(serializationInfo, context)
             {
-
         }
 
         /// <summary>
@@ -48,7 +46,6 @@ namespace Managed.Adb.Exceptions
         public UnknownOptionException(string message, Exception innerException)
             : base(message, innerException)
             {
-
         }
     }
 }

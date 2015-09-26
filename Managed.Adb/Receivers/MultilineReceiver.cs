@@ -166,5 +166,4 @@ namespace Managed.Adb
         /// <param name="lines">The lines.</param>
         protected abstract void ProcessNewLines(string[] lines);
     }
-
 }
