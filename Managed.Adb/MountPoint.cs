@@ -55,7 +55,7 @@ namespace Managed.Adb {
         /// A <see cref="System.String"/> that represents this instance.
         /// </returns>
         public override string ToString ( ) {
-            return string.Format ( "{0}\t{1}\t{2}\t{3}", Block, Name, FileSystem, IsReadOnly ? "ro" : "rw" );
+            return string.Format ( "{0}\t{1}\t{2}\t{3}", this.Block, this.Name, this.FileSystem, this.IsReadOnly ? "ro" : "rw" );
         }
 
         /// <summary>

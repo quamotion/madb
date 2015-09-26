@@ -145,7 +145,7 @@ namespace Managed.Adb {
         /// </value>
         public int CalculatedLevel {
             get {
-                return ( Level * 100 ) / Scale;
+                return ( this.Level * 100 ) / this.Scale;
             }
         }
 

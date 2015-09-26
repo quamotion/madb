@@ -38,12 +38,12 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="lines">The lines.</param>
         protected override void ProcessNewLines ( string[] lines ) {
-            BatteryInfo = new BatteryInfo ( );
+            this.BatteryInfo = new BatteryInfo ( );
             foreach ( var line in lines ) {
                 var match = line.Match( BATTERY_LEVEL, REOPTIONS );
                 if ( match.Success ) {
                     try {
-                        BatteryInfo.Level = Int32.Parse ( match.Groups[1].Value );
+                        this.BatteryInfo.Level = Int32.Parse ( match.Groups[1].Value );
                     } catch ( FormatException ) {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
@@ -52,7 +52,7 @@ namespace Managed.Adb {
                 match = line.Match ( SCALE, REOPTIONS );
                 if ( match.Success ) {
                     try {
-                        BatteryInfo.Scale = Int32.Parse ( match.Groups[1].Value );
+                        this.BatteryInfo.Scale = Int32.Parse ( match.Groups[1].Value );
                     } catch ( FormatException ) {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
@@ -60,24 +60,24 @@ namespace Managed.Adb {
 
                 match = line.Match ( AC_POWER, REOPTIONS );
                 if ( match.Success ) {
-                    BatteryInfo.ACPowered = String.Compare ( match.Groups[1].Value, bool.TrueString, true ) == 0;
+                    this.BatteryInfo.ACPowered = String.Compare ( match.Groups[1].Value, bool.TrueString, true ) == 0;
                 }
 
                 match = line.Match ( USB_POWER, REOPTIONS );
                 if ( match.Success ) {
-                    BatteryInfo.UsbPowered = String.Compare ( match.Groups[1].Value, bool.TrueString, true ) == 0;
+                    this.BatteryInfo.UsbPowered = String.Compare ( match.Groups[1].Value, bool.TrueString, true ) == 0;
                 }
 
                 match = line.Match ( PRESENT, REOPTIONS );
                 if ( match.Success ) {
-                    BatteryInfo.Present = String.Compare ( match.Groups[1].Value, bool.TrueString, true ) == 0;
+                    this.BatteryInfo.Present = String.Compare ( match.Groups[1].Value, bool.TrueString, true ) == 0;
                 }
 
                 match = line.Match ( STATUS, REOPTIONS );
                 if ( match.Success ) {
                     try {
                         var i = Int32.Parse ( match.Groups[1].Value );
-                        BatteryInfo.Status = i.ToEnum<BatteryInfo.StatusTypes> ( );
+                        this.BatteryInfo.Status = i.ToEnum<BatteryInfo.StatusTypes> ( );
                     } catch ( FormatException ) {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
@@ -87,7 +87,7 @@ namespace Managed.Adb {
                 if ( match.Success ) {
                     try {
                         var i = Int32.Parse ( match.Groups[1].Value );
-                        BatteryInfo.Health = i.ToEnum<BatteryInfo.HealthTypes> ( );
+                        this.BatteryInfo.Health = i.ToEnum<BatteryInfo.HealthTypes> ( );
                     } catch ( FormatException ) {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
@@ -96,7 +96,7 @@ namespace Managed.Adb {
                 match = line.Match ( VOLTAGE, REOPTIONS );
                 if ( match.Success ) {
                     try {
-                        BatteryInfo.Voltage = Int32.Parse ( match.Groups[1].Value );
+                        this.BatteryInfo.Voltage = Int32.Parse ( match.Groups[1].Value );
                     } catch ( FormatException ) {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
@@ -104,13 +104,13 @@ namespace Managed.Adb {
 
                 match = line.Match ( TYPE, REOPTIONS );
                 if ( match.Success ) {
-                    BatteryInfo.Type = match.Groups[1].Value;
+                    this.BatteryInfo.Type = match.Groups[1].Value;
                 }
 
                 match = line.Match ( TEMP, REOPTIONS );
                 if ( match.Success ) {
                     try {
-                        BatteryInfo.Temperature = Int32.Parse ( match.Groups[1].Value );
+                        this.BatteryInfo.Temperature = Int32.Parse ( match.Groups[1].Value );
                     } catch ( FormatException ) {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }

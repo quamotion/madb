@@ -51,7 +51,7 @@ namespace Managed.Adb {
         /// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
         /// </summary>
         public MultiLineReceiver( ) {
-            Lines = new List<String> ( );
+            this.Lines = new List<String> ( );
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Managed.Adb {
         /// <param name="offset">The offset.</param>
         /// <param name="length">The length.</param>
         public void AddOutput( byte[] data, int offset, int length ) {
-            if ( !IsCancelled ) {
+            if ( !this.IsCancelled ) {
                 String s = null;
                 try {
                     s = Encoding.GetEncoding ( ENCODING ).GetString ( data, offset, length ); //$NON-NLS-1$
@@ -73,9 +73,9 @@ namespace Managed.Adb {
                 // ok we've got a string
                 if ( !String.IsNullOrEmpty ( s ) ) {
                     // if we had an unfinished line we add it.
-                    if ( !String.IsNullOrEmpty ( UnfinishedLine ) ) {
-                        s = UnfinishedLine + s;
-                        UnfinishedLine = null;
+                    if ( !String.IsNullOrEmpty ( this.UnfinishedLine ) ) {
+                        s = this.UnfinishedLine + s;
+                        this.UnfinishedLine = null;
                     }
 
                     // now we split the lines
@@ -87,17 +87,17 @@ namespace Managed.Adb {
                         // if \r\n was not found, this is an unfinished line
                         // and we store it to be processed for the next packet
                         if ( index == -1 ) {
-                            UnfinishedLine = s.Substring ( start );
+                            this.UnfinishedLine = s.Substring ( start );
                             break;
                         }
 
                         // so we found a \r\n;
                         // extract the line
                         String line = s.Substring ( start, index - start );
-                        if ( TrimLines ) {
+                        if ( this.TrimLines ) {
                             line = line.Trim ( );
                         }
-                        Lines.Add ( line );
+                        this.Lines.Add ( line );
 
                         // move start to after the \r\n we found
                         start = index + 2;
@@ -110,21 +110,21 @@ namespace Managed.Adb {
         /// Flushes the output.
         /// </summary>
         public void Flush( ) {
-            if (!IsCancelled && Lines.Count > 0 ) {
+            if (!this.IsCancelled && this.Lines.Count > 0 ) {
                 // at this point we've split all the lines.
                 // make the array
-                String[] lines = Lines.ToArray ( );
+                String[] lines = this.Lines.ToArray ( );
 
                 // send it for final processing
-                ProcessNewLines ( lines );
-                Lines.Clear ( );
+                this.ProcessNewLines ( lines );
+                this.Lines.Clear ( );
             }
 
-            if ( !IsCancelled && !String.IsNullOrEmpty ( UnfinishedLine ) ) {
-                ProcessNewLines ( new String[] { UnfinishedLine } );
+            if ( !this.IsCancelled && !String.IsNullOrEmpty ( this.UnfinishedLine ) ) {
+                this.ProcessNewLines ( new String[] { this.UnfinishedLine } );
             }
 
-            Done ( );
+            this.Done ( );
         }
 
         /// <summary>

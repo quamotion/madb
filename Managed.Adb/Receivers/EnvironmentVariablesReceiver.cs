@@ -22,7 +22,7 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="device">The device.</param>
         public EnvironmentVariablesReceiver ( Device device ) {
-            Device = device;
+            this.Device = device;
         }
 
         /// <summary>
@@ -47,10 +47,10 @@ namespace Managed.Adb {
                     String value = m.Groups[2].Value.Trim ( );
 
                     if ( label.Length > 0 ) {
-                        if ( Device.EnvironmentVariables.ContainsKey ( label ) ) {
-                            Device.EnvironmentVariables[label] = value;
+                        if ( this.Device.EnvironmentVariables.ContainsKey ( label ) ) {
+                            this.Device.EnvironmentVariables[label] = value;
                         } else {
-                            Device.EnvironmentVariables.Add ( label, value );
+                            this.Device.EnvironmentVariables.Add ( label, value );
                         }
                     }
                 }

@@ -337,7 +337,7 @@ namespace Managed.Adb {
 
             AdbOsLocation = osLocation;
 
-            CheckAdbVersion ( );
+            this.CheckAdbVersion ( );
         }
 
         /// <summary>
@@ -406,15 +406,15 @@ namespace Managed.Adb {
         /// </summary>
         /// <returns><see langword="true"/> if success.</returns>
         public bool Start ( ) {
-            if ( String.IsNullOrEmpty(AdbOsLocation) || !VersionCheck || !StartAdb ( ) ) {
+            if ( String.IsNullOrEmpty(AdbOsLocation) || !this.VersionCheck || !this.StartAdb ( ) ) {
                 return false;
             }
 
-            Started = true;
+            this.Started = true;
 
             // now that the bridge is connected, we start the underlying services.
-            DeviceMonitor = new DeviceMonitor ( this );
-            DeviceMonitor.Start ( );
+            this.DeviceMonitor = new DeviceMonitor ( this );
+            this.DeviceMonitor.Start ( );
 
             return true;
         }
@@ -425,21 +425,21 @@ namespace Managed.Adb {
         /// <returns><see langword="true"/> if success.</returns>
         public bool Stop ( ) {
             // if we haven't started we return false;
-            if ( !Started ) {
+            if ( !this.Started ) {
                 return false;
             }
 
             // kill the monitoring services
-            if ( DeviceMonitor != null ) {
-                DeviceMonitor.Stop ( );
-                DeviceMonitor = null;
+            if ( this.DeviceMonitor != null ) {
+                this.DeviceMonitor.Stop ( );
+                this.DeviceMonitor = null;
             }
 
-            if ( !StopAdb ( ) ) {
+            if ( !this.StopAdb ( ) ) {
                 return false;
             }
 
-            Started = false;
+            this.Started = false;
             return true;
         }
 
@@ -453,18 +453,18 @@ namespace Managed.Adb {
                 return false;
             }
 
-            if ( !VersionCheck ) {
+            if ( !this.VersionCheck ) {
                 Log.LogAndDisplay ( LogLevel.Error, ADB, "Attempting to restart adb, but version check failed!" );
                 return false;
             }
             lock ( this ) {
-                StopAdb ( );
+                this.StopAdb ( );
 
-                bool restart = StartAdb ( );
+                bool restart = this.StartAdb ( );
 
-                if ( restart && DeviceMonitor == null ) {
-                    DeviceMonitor = new DeviceMonitor ( this );
-                    DeviceMonitor.Start ( );
+                if ( restart && this.DeviceMonitor == null ) {
+                    this.DeviceMonitor = new DeviceMonitor ( this );
+                    this.DeviceMonitor.Start ( );
                 }
 
                 return restart;
@@ -508,8 +508,8 @@ namespace Managed.Adb {
         /// 	<see langword="true"/> if [has initial device list]; otherwise, <see langword="false"/>.
         /// </returns>
         public bool HasInitialDeviceList ( ) {
-            if ( DeviceMonitor != null ) {
-                return DeviceMonitor.HasInitialDeviceList;
+            if ( this.DeviceMonitor != null ) {
+                return this.DeviceMonitor.HasInitialDeviceList;
             }
             return false;
         }
@@ -540,8 +540,8 @@ namespace Managed.Adb {
         public bool IsConnected {
             get {
                 //MonitorThread monitorThread = MonitorThread.Instance;
-                if ( DeviceMonitor != null /* && monitorThread != null */ ) {
-                    return DeviceMonitor.IsMonitoring /* && monitorThread.State != State.TERMINATED*/;
+                if ( this.DeviceMonitor != null /* && monitorThread != null */ ) {
+                    return this.DeviceMonitor.IsMonitoring /* && monitorThread.State != State.TERMINATED*/;
                 }
                 return false;
             }
@@ -553,8 +553,8 @@ namespace Managed.Adb {
         /// <value>The connection attempt count.</value>
         public int ConnectionAttemptCount {
             get {
-                if ( DeviceMonitor != null ) {
-                    return DeviceMonitor.ConnectionAttemptCount;
+                if ( this.DeviceMonitor != null ) {
+                    return this.DeviceMonitor.ConnectionAttemptCount;
                 }
                 return -1;
             }
@@ -567,8 +567,8 @@ namespace Managed.Adb {
         /// <value>The restart attempt count.</value>
         public int RestartAttemptCount {
             get {
-                if ( DeviceMonitor != null ) {
-                    return DeviceMonitor.RestartAttemptCount;
+                if ( this.DeviceMonitor != null ) {
+                    return this.DeviceMonitor.RestartAttemptCount;
                 }
                 return -1;
             }
@@ -596,7 +596,7 @@ namespace Managed.Adb {
         /// </summary>
         private void CheckAdbVersion ( ) {
             // default is bad check
-            VersionCheck = false;
+            this.VersionCheck = false;
 
             if ( String.IsNullOrEmpty ( AdbOsLocation ) ) {
                 Log.w( TAG, "AdbOsLocation is Empty" );
@@ -616,7 +616,7 @@ namespace Managed.Adb {
                 List<String> errorOutput = new List<String> ( );
                 List<String> stdOutput = new List<String> ( );
                 using ( Process proc = Process.Start ( psi ) ) {
-                    int status = GrabProcessOutput ( proc, errorOutput, stdOutput, true /* waitForReaders */);
+                    int status = this.GrabProcessOutput ( proc, errorOutput, stdOutput, true /* waitForReaders */);
                     if ( status != 0 ) {
                         StringBuilder builder = new StringBuilder ( "'adb version' failed!" );
                         builder.AppendLine ( string.Empty );
@@ -630,7 +630,7 @@ namespace Managed.Adb {
                 // check both stdout and stderr
                 bool versionFound = false;
                 foreach ( String line in stdOutput ) {
-                    versionFound = ScanVersionLine ( line );
+                    versionFound = this.ScanVersionLine ( line );
                     if ( versionFound ) {
                         break;
                     }
@@ -638,7 +638,7 @@ namespace Managed.Adb {
 
                 if ( !versionFound ) {
                     foreach ( String line in errorOutput ) {
-                        versionFound = ScanVersionLine ( line );
+                        versionFound = this.ScanVersionLine ( line );
                         if ( versionFound ) {
                             break;
                         }
@@ -680,7 +680,7 @@ namespace Managed.Adb {
                                         majorVersion, minorVersion, ADB_VERSION_MICRO_MAX, microVersion );
                         Log.LogAndDisplay ( LogLevel.Error, ADB, message );
                     } else {
-                        VersionCheck = true;
+                        this.VersionCheck = true;
                     }
                     return true;
                 }
@@ -713,7 +713,7 @@ namespace Managed.Adb {
                 using ( Process proc = Process.Start ( psi ) ) {
                     List<String> errorOutput = new List<String> ( );
                     List<String> stdOutput = new List<String> ( );
-                    status = GrabProcessOutput ( proc, errorOutput, stdOutput, false /* waitForReaders */);
+                    status = this.GrabProcessOutput ( proc, errorOutput, stdOutput, false /* waitForReaders */);
                 }
             } catch ( IOException ioe ) {
                 Log.d ( DDMS, "Unable to run 'adb': {0}", ioe.Message );

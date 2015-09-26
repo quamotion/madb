@@ -23,12 +23,12 @@ namespace Managed.Adb {
             this.ListenPort = listenPort;
 
             IPEndPoint endPoint = new IPEndPoint ( IPAddress.Loopback, listenPort );
-            ListenChannel = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
-            ListenChannel.Blocking = false;
-            ListenChannel.ExclusiveAddressUse = false;
-            ListenChannel.Bind ( endPoint );
+            this.ListenChannel = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+            this.ListenChannel.Blocking = false;
+            this.ListenChannel.ExclusiveAddressUse = false;
+            this.ListenChannel.Bind ( endPoint );
 
-            ConnectionState = ConnectionStates.NotConnected;
+            this.ConnectionState = ConnectionStates.NotConnected;
             Log.d ( "ddms", this.ToString ( ) );
         }
 
@@ -113,7 +113,7 @@ namespace Managed.Adb {
 
         // TODO: JdwpPacket
         public void ForwardPacketToClient ( /*JdwpPacket*/ Object packet ) {
-            Client.SendAndConsume ( packet );
+            this.Client.SendAndConsume ( packet );
         }
 
         public bool SendHandshake ( ) {
@@ -140,7 +140,7 @@ namespace Managed.Adb {
 
         //TODO: JdwpPacket
         public void SendAndConsume ( /*JdwpPacket*/ Object packet ) {
-            if ( Channel == null ) {
+            if ( this.Channel == null ) {
                 /*
                  * Buffer this up so we can send it to the debugger when it
                  * finally does connect.  This is essential because the VM_START
@@ -159,23 +159,23 @@ namespace Managed.Adb {
         //      public voidr RegisterListener
 
         public Socket Accept ( ) {
-            return Accept ( ListenChannel );
+            return this.Accept ( this.ListenChannel );
         }
 
         public Socket Accept ( Socket listenChan ) {
             lock ( listenChan ) {
                 if ( listenChan != null ) {
                     Socket newChan = listenChan.Accept ( );
-                    if ( Channel != null ) {
-                        Log.w ( "ddms", "debugger already talking to " + Client.ToString ( ) + " on " + ListenPort.ToString ( ) );
+                    if ( this.Channel != null ) {
+                        Log.w ( "ddms", "debugger already talking to " + this.Client.ToString ( ) + " on " + this.ListenPort.ToString ( ) );
                         newChan.Close ( );
                         return null;
                     }
 
-                    Channel = newChan;
-                    Channel.Blocking = false;
-                    ConnectionState = ConnectionStates.AwaitShake;
-                    return Channel;
+                    this.Channel = newChan;
+                    this.Channel.Blocking = false;
+                    this.ConnectionState = ConnectionStates.AwaitShake;
+                    return this.Channel;
                 }
 
                 return null;
@@ -184,15 +184,15 @@ namespace Managed.Adb {
 
         public void CloseData ( ) {
             try {
-                if ( Channel != null ) {
-                    Channel.Close ( );
-                    Channel = null;
-                    ConnectionState = ConnectionStates.NotConnected;
+                if ( this.Channel != null ) {
+                    this.Channel.Close ( );
+                    this.Channel = null;
+                    this.ConnectionState = ConnectionStates.NotConnected;
 
                     //TODO: ClientData
                     /*ClientData cd = Client.ClientData;
                     cd.DebuggerConnectionStatus = DebuggerStatus.Default;*/
-                    Client.Update ( ClientChangeMask.ChangeDebuggerStatus );
+                    this.Client.Update ( ClientChangeMask.ChangeDebuggerStatus );
 
                 }
             } catch ( IOException ioe ) {
@@ -202,11 +202,11 @@ namespace Managed.Adb {
 
         public void Close ( ) {
             try {
-                if ( ListenChannel != null ) {
-                    ListenChannel.Close ( );
+                if ( this.ListenChannel != null ) {
+                    this.ListenChannel.Close ( );
                 }
-                ListenChannel = null;
-                CloseData ( );
+                this.ListenChannel = null;
+                this.CloseData ( );
             } catch ( IOException ioe ) {
                 Log.w ( "ddms", ioe );
             }
@@ -214,8 +214,8 @@ namespace Managed.Adb {
 
         public override string ToString ( ) {
             // mChannel != null means we have connection, ST_READY means it's going
-            return "[Debugger " + ListenPort + "-->" + Client.ClientData/*.Pid*/
-                            + ( ( ConnectionState != ConnectionStates.Ready ) ? " inactive]" : " active]" );
+            return "[Debugger " + this.ListenPort + "-->" + this.Client.ClientData/*.Pid*/
+                            + ( ( this.ConnectionState != ConnectionStates.Ready ) ? " inactive]" : " active]" );
         }
     }
 }

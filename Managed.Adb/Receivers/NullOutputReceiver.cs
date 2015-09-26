@@ -13,7 +13,7 @@ namespace Managed.Adb {
         /// Prevents a default instance of the <see cref="NullOutputReceiver" /> class from being created.
         /// </summary>
         private NullOutputReceiver ( ) {
-            IsCancelled = false;
+            this.IsCancelled = false;
         }
 
         private static NullOutputReceiver _instance = null;

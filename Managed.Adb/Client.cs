@@ -40,9 +40,9 @@ namespace Managed.Adb {
             this.Channel = channel;
             this.ClientData = new ClientData ( pid );
 
-            IsThreadUpdateEnabled = DdmPreferences.InitialThreadUpdate;
-            IsHeapUpdateEnabled = DdmPreferences.InitialHeapUpdate;
-            ConnectionState = ClientConnectionState.Init;
+            this.IsThreadUpdateEnabled = DdmPreferences.InitialThreadUpdate;
+            this.IsHeapUpdateEnabled = DdmPreferences.InitialHeapUpdate;
+            this.ConnectionState = ClientConnectionState.Init;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Managed.Adb {
         /// <remarks>Calling here is only allowed after the connection has been established.</remarks>
         public bool IsDdmAware {
             get {
-                switch ( ConnectionState ) {
+                switch ( this.ConnectionState ) {
                     case ClientConnectionState.Init:
                     case ClientConnectionState.NotJDWP:
                     case ClientConnectionState.AwaitShake:
@@ -116,7 +116,7 @@ namespace Managed.Adb {
         /// </value>
         public bool IsDebuggerAttached {
             get {
-                return Debugger != null && Debugger.IsDebuggerAttached;
+                return this.Debugger != null && this.Debugger.IsDebuggerAttached;
             }
         }
 
@@ -390,7 +390,7 @@ namespace Managed.Adb {
         /// A <see cref="System.String"/> that represents this instance.
         /// </returns>
         public override String ToString ( ) {
-            return String.Format ( "[Client pid: {0}]", ClientData.Pid );
+            return String.Format ( "[Client pid: {0}]", this.ClientData.Pid );
         }
     }
 }

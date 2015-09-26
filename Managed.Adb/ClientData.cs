@@ -129,7 +129,7 @@ namespace Managed.Adb {
         public ClientData ( int pid ) {
             this.Pid = pid;
 
-            DebuggerInterest = DebuggerStatus.DEFAULT;
+            this.DebuggerInterest = DebuggerStatus.DEFAULT;
             //ThreadMap = new Dictionary<Integer, ThreadInfo> ( );
         }
 

@@ -139,9 +139,9 @@ namespace Managed.Adb {
             /// <param name="value">The value.</param>
             /// <param name="letter">The letter.</param>
             public LogLevelInfo ( int priority, String value, Char letter ) {
-                Priority = priority;
-                Value = value;
-                Letter = letter;
+                this.Priority = priority;
+                this.Value = value;
+                this.Letter = letter;
             }
 
             /// <summary>

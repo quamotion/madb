@@ -211,9 +211,9 @@ namespace Managed.Adb {
         /// <param name="address">The address.</param>
         /// <param name="device">The device.</param>
         public SyncService ( IPEndPoint address, Device device ) {
-            Address = address;
-            Device = device;
-            Open ( );
+            this.Address = address;
+            this.Device = device;
+            this.Open ( );
         }
 
         /// <summary>
@@ -235,37 +235,37 @@ namespace Managed.Adb {
         /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
         public bool IsOpen {
             get {
-                return Channel != null && Channel.Connected;
+                return this.Channel != null && this.Channel.Connected;
             }
         }
         
         /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
         public bool Open ( ) {
-            if ( IsOpen ) {
+            if ( this.IsOpen ) {
                 return true;
             }
 
             try {
-                Channel = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
-                Channel.Connect ( this.Address );
-                Channel.Blocking = true;
+                this.Channel = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+                this.Channel.Connect ( this.Address );
+                this.Channel.Blocking = true;
 
                 // target a specific device
-                AdbHelper.Instance.SetDevice ( Channel, Device );
+                AdbHelper.Instance.SetDevice ( this.Channel, this.Device );
 
                 byte[] request = AdbHelper.Instance.FormAdbRequest ( "sync:" );
-                AdbHelper.Instance.Write ( Channel, request, -1, DdmPreferences.Timeout );
+                AdbHelper.Instance.Write ( this.Channel, request, -1, DdmPreferences.Timeout );
 
-                AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( Channel, false /* readDiagString */);
+                AdbResponse resp = AdbHelper.Instance.ReadAdbResponse ( this.Channel, false /* readDiagString */);
 
                 if ( !resp.IOSuccess || !resp.Okay ) {
                     Log.w ( "ddms:syncservice", "Got timeout or unhappy response from ADB sync req: {0}", resp.Message );
-                    Channel.Close ( );
-                    Channel = null;
+                    this.Channel.Close ( );
+                    this.Channel = null;
                     return false;
                 }
             } catch ( IOException ) {
-                Close ( );
+                this.Close ( );
                 throw;
             }
 
@@ -274,13 +274,13 @@ namespace Managed.Adb {
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Close/*'/>
         public void Close ( ) {
-            if ( Channel != null ) {
+            if ( this.Channel != null ) {
                 try {
-                    Channel.Close ( );
+                    this.Channel.Close ( );
                 } catch ( IOException ) {
                     
                 }
-                Channel = null;
+                this.Channel = null;
             }
         }
 
@@ -293,7 +293,7 @@ namespace Managed.Adb {
             long totalWork = 0;
             monitor.Start ( totalWork );
 
-            SyncResult result = DoPullFile ( remoteFilepath, localFilename, monitor );
+            SyncResult result = this.DoPullFile ( remoteFilepath, localFilename, monitor );
 
             monitor.Stop ( );
             return result;
@@ -315,7 +315,7 @@ namespace Managed.Adb {
             }
 
             monitor.Start ( f.Length );
-            SyncResult result = DoPushFile ( local, remote, monitor );
+            SyncResult result = this.DoPushFile ( local, remote, monitor );
             monitor.Stop ( );
 
             return result;
@@ -368,7 +368,7 @@ namespace Managed.Adb {
             // and send it. We use a custom try/catch block to make the difference between
             // file and network IO exceptions.
             try {
-                AdbHelper.Instance.Write ( Channel, msg, -1, timeOut );
+                AdbHelper.Instance.Write ( this.Channel, msg, -1, timeOut );
             } catch ( IOException e ) {
                 return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
             }
@@ -407,7 +407,7 @@ namespace Managed.Adb {
 
                 // now write it
                 try {
-                    AdbHelper.Instance.Write ( Channel, DataBuffer, readCount + 8, timeOut );
+                    AdbHelper.Instance.Write ( this.Channel, DataBuffer, readCount + 8, timeOut );
                 } catch ( IOException e ) {
                     return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
                 }
@@ -428,19 +428,19 @@ namespace Managed.Adb {
                 msg = CreateRequest ( DONE, (int)time );
 
                 // and send it.
-                AdbHelper.Instance.Write ( Channel, msg, -1, timeOut );
+                AdbHelper.Instance.Write ( this.Channel, msg, -1, timeOut );
 
                 // read the result, in a byte array containing 2 ints
                 // (id, size)
                 byte[] result = new byte[8];
-                AdbHelper.Instance.Read ( Channel, result, -1 /* full length */, timeOut );
+                AdbHelper.Instance.Read ( this.Channel, result, -1 /* full length */, timeOut );
 
                 if ( !CheckResult ( result, OKAY.GetBytes ( ) ) ) {
                     if ( CheckResult ( result, FAIL.GetBytes ( ) ) ) {
                         // read some error message...
                         int len = result.Swap32bitFromArray ( 4 );
 
-                        AdbHelper.Instance.Read ( Channel, DataBuffer, len, timeOut );
+                        AdbHelper.Instance.Read ( this.Channel, DataBuffer, len, timeOut );
 
                         // output the result?
                         String message = DataBuffer.GetString ( 0, len );
@@ -478,7 +478,7 @@ namespace Managed.Adb {
                     if ( f.IsDirectory ( ) ) {
                         DirectoryInfo fsiDir = f as DirectoryInfo;
                         monitor.StartSubTask ( f.FullName, dest );
-                        SyncResult result = DoPush ( fsiDir.GetFileSystemInfos ( ), dest, monitor );
+                        SyncResult result = this.DoPush ( fsiDir.GetFileSystemInfos ( ), dest, monitor );
 
                         if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
                             return result;
@@ -487,7 +487,7 @@ namespace Managed.Adb {
                         monitor.Advance ( 1 );
                     } else if ( f.IsFile ( ) ) {
                         monitor.StartSubTask ( f.FullName, dest );
-                        SyncResult result = DoPushFile ( f.FullName, dest, monitor );
+                        SyncResult result = this.DoPushFile ( f.FullName, dest, monitor );
                         if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
                             return result;
                         }
@@ -528,11 +528,11 @@ namespace Managed.Adb {
                 msg = CreateFileRequest ( RECV.GetBytes ( ), remotePathContent );
 
                 // and send it.
-                AdbHelper.Instance.Write ( Channel, msg, -1, timeOut );
+                AdbHelper.Instance.Write ( this.Channel, msg, -1, timeOut );
 
                 // read the result, in a byte array containing 2 ints
                 // (id, size)
-                AdbHelper.Instance.Read ( Channel, pullResult, -1, timeOut );
+                AdbHelper.Instance.Read ( this.Channel, pullResult, -1, timeOut );
 
                 // check we have the proper data back
                 if ( CheckResult ( pullResult, DATA.GetBytes ( ) ) == false &&
@@ -586,10 +586,10 @@ namespace Managed.Adb {
 
                     try {
                         // now read the length we received
-                        AdbHelper.Instance.Read ( Channel, data, length, timeOut );
+                        AdbHelper.Instance.Read ( this.Channel, data, length, timeOut );
 
                         // get the header for the next packet.
-                        AdbHelper.Instance.Read ( Channel, pullResult, -1, timeOut );
+                        AdbHelper.Instance.Read ( this.Channel, pullResult, -1, timeOut );
                     } catch ( IOException e ) {
                         Log.e ( TAG, e );
                         return new SyncResult ( ErrorCodeHelper.RESULT_CONNECTION_ERROR, e );
@@ -626,7 +626,7 @@ namespace Managed.Adb {
             foreach ( FileSystemInfo fsi in fsis ) {
                 if ( fsi.Exists ) {
                     if ( fsi is DirectoryInfo ) {
-                        return GetTotalLocalFileSize ( ( fsi as DirectoryInfo ).GetFileSystemInfos ( ) ) + 1;
+                        return this.GetTotalLocalFileSize ( ( fsi as DirectoryInfo ).GetFileSystemInfos ( ) ) + 1;
                     } else if ( fsi is FileInfo ) {
                         count += ( fsi as FileInfo ).Length;
                     }
@@ -646,12 +646,12 @@ namespace Managed.Adb {
                 // create the stat request message.
                 byte[] msg = CreateFileRequest ( STAT, path );
 
-                AdbHelper.Instance.Write ( Channel, msg, -1 /* full length */, DdmPreferences.Timeout );
+                AdbHelper.Instance.Write ( this.Channel, msg, -1 /* full length */, DdmPreferences.Timeout );
 
                 // read the result, in a byte array containing 4 ints
                 // (id, mode, size, time)
                 byte[] statResult = new byte[16];
-                AdbHelper.Instance.Read ( Channel, statResult, -1 /* full length */, DdmPreferences.Timeout );
+                AdbHelper.Instance.Read ( this.Channel, statResult, -1 /* full length */, DdmPreferences.Timeout );
 
                 // check we have the proper data back
                 if ( CheckResult ( statResult, Encoding.Default.GetBytes ( STAT ) ) == false ) {

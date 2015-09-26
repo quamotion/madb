@@ -25,7 +25,7 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="device">The device.</param>
         public MountPointReceiver ( Device device ) {
-            Device = device;
+            this.Device = device;
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Managed.Adb {
         /// <param name="lines">The lines.</param>
         /// <workitem id="16001">Bug w/ MountPointReceiver.cs/ProcessNewLines()</workitem>
         protected override void ProcessNewLines ( string[] lines ) {
-            Device.MountPoints.Clear ( );
+            this.Device.MountPoints.Clear ( );
 
             lines.ForEach ( line => {
                 var m = line.Match ( RE_MOUNTPOINT_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace );
@@ -46,8 +46,8 @@ namespace Managed.Adb {
                     MountPoint mnt = new MountPoint ( block, name, fs, ro );
                     String key = name.Substring ( 1 );
                     // currently does not support multiple mounts to the same location...
-                    if ( !Device.MountPoints.ContainsKey ( name ) ) {
-                        Device.MountPoints.Add ( name, mnt );
+                    if ( !this.Device.MountPoints.ContainsKey ( name ) ) {
+                        this.Device.MountPoints.Add ( name, mnt );
                     }
                 }
             } );

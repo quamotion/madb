@@ -233,9 +233,9 @@ namespace Managed.Adb {
                 bitmap = new Bitmap ( this.Width, this.Height, format );
                 bitmapdata = bitmap.LockBits ( new Rectangle ( 0, 0, this.Width, this.Height ), ImageLockMode.WriteOnly, format );
                 image = new Bitmap ( this.Width, this.Height, format );
-                var tdata = Data;
-                if ( Bpp == 32 ) {
-                    tdata = Swap ( tdata );
+                var tdata = this.Data;
+                if ( this.Bpp == 32 ) {
+                    tdata = this.Swap ( tdata );
                 }
                 Marshal.Copy ( tdata, 0, bitmapdata.Scan0, this.Size );
                 bitmap.UnlockBits ( bitmapdata );
@@ -254,7 +254,7 @@ namespace Managed.Adb {
         /// </summary>
         /// <returns></returns>
         public Image ToImage ( ) {
-            return ToImage ( this.Bpp == 32 ? PixelFormat.Format32bppArgb : PixelFormat.Format16bppRgb565 );
+            return this.ToImage ( this.Bpp == 32 ? PixelFormat.Format32bppArgb : PixelFormat.Format16bppRgb565 );
         }
 
         private byte[] Swap ( byte[] b ) {

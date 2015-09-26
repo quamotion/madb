@@ -32,7 +32,7 @@ namespace Managed.Adb {
         /// Initializes a new instance of the <see cref="MonitorThread"/> class.
         /// </summary>
         private MonitorThread ( ) {
-            Clients = new List<IClient> ( );
+            this.Clients = new List<IClient> ( );
         }
 
         /// <summary>

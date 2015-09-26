@@ -28,16 +28,16 @@ namespace Managed.Adb {
             foreach ( String line in lines ) {
                 if ( line.Length > 0 ) {
                     if ( line.StartsWith ( SUCCESS_OUTPUT ) ) {
-                        ErrorMessage = null;
-                        Success = true;
+                        this.ErrorMessage = null;
+                        this.Success = true;
                     } else {
                         var m = line.Match ( FAILURE_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase );
-                        ErrorMessage = UNKNOWN_ERROR;
+                        this.ErrorMessage = UNKNOWN_ERROR;
                         if ( m.Success ) {
                             string msg = m.Groups[1].Value;
-                            ErrorMessage = String.IsNullOrEmpty ( msg ) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
+                            this.ErrorMessage = String.IsNullOrEmpty ( msg ) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
                         }
-                        Success = false;
+                        this.Success = false;
                     }
                 }
             }

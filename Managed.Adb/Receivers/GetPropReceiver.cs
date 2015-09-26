@@ -50,7 +50,7 @@ namespace Managed.Adb {
                     String value = m.Groups[2].Value.Trim ( );
 
                     if ( label.Length > 0 ) {
-                        Device.Properties.Add ( label, value );
+                        this.Device.Properties.Add ( label, value );
                     }
                 }
             }

@@ -19,15 +19,15 @@ namespace Managed.Adb {
                 throw new ArgumentException ( String.Format("Invalid permissions string: {0}",permissions) );
             }
 
-            User = new FilePermission ( permissions.Substring ( 0, 3 ) );
-            Group = new FilePermission ( permissions.Substring ( 3, 3 ) );
-            Other = new FilePermission ( permissions.Substring ( 6, 3 ) );
+            this.User = new FilePermission ( permissions.Substring ( 0, 3 ) );
+            this.Group = new FilePermission ( permissions.Substring ( 3, 3 ) );
+            this.Other = new FilePermission ( permissions.Substring ( 6, 3 ) );
         }
 
         public FilePermissions ( FilePermission user, FilePermission group, FilePermission other ) {
-            User = user;
-            Group = group;
-            Other = other;
+            this.User = user;
+            this.Group = group;
+            this.Other = other;
         } 
 
         public FilePermission User { get; set; }
@@ -36,11 +36,11 @@ namespace Managed.Adb {
 
 
         public override string ToString ( ) {
-            return String.Format ( "{0}{1}{2}", User.ToString ( ), Group.ToString ( ), Other.ToString ( ) );
+            return String.Format ( "{0}{1}{2}", this.User.ToString ( ), this.Group.ToString ( ), this.Other.ToString ( ) );
         }
 
         public String ToChmod ( ) {
-            return String.Format ( "{0}{1}{2}", (int)User.ToChmod ( ), (int)Group.ToChmod ( ), (int)Other.ToChmod ( ) );
+            return String.Format ( "{0}{1}{2}", (int)this.User.ToChmod ( ), (int)this.Group.ToChmod ( ), (int)this.Other.ToChmod ( ) );
         }
     }
 
@@ -121,7 +121,7 @@ namespace Managed.Adb {
 
         public String ToString ( ) {
             StringBuilder perm = new StringBuilder ( );
-            return perm.AppendFormat ( "{0}", CanRead ? "r" : "-" ).AppendFormat ( "{0}", CanWrite ? "w" : "-" ).AppendFormat ( "{0}", CanExecute ? CanDelete ? "x" : "t" : "-" ).ToString ( );
+            return perm.AppendFormat ( "{0}", this.CanRead ? "r" : "-" ).AppendFormat ( "{0}", this.CanWrite ? "w" : "-" ).AppendFormat ( "{0}", this.CanExecute ? this.CanDelete ? "x" : "t" : "-" ).ToString ( );
         }
 
         /// <summary>
@@ -130,15 +130,15 @@ namespace Managed.Adb {
         /// <returns></returns>
         public Modes ToChmod ( ) {
             Modes val = Modes.NoAccess;
-            if ( CanRead ) {
+            if ( this.CanRead ) {
                 val |= Modes.Read;
             }
 
-            if ( CanWrite ) {
+            if ( this.CanWrite ) {
                 val |= Modes.Write;
             }
 
-            if ( CanExecute ) {
+            if ( this.CanExecute ) {
                 val |= Modes.Execute;
             }
             int ival = (int)val;
