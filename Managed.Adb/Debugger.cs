@@ -21,19 +21,19 @@ namespace Managed.Adb
 
         private const int PRE_DATA_BUF_SIZE = 256;
 
-        public Debugger ( IClient client, int listenPort )
+        public Debugger(IClient client, int listenPort )
         {
             this.Client = client;
             this.ListenPort = listenPort;
 
-            IPEndPoint endPoint = new IPEndPoint ( IPAddress.Loopback, listenPort );
-            this.ListenChannel = new Socket ( AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Loopback, listenPort );
+            this.ListenChannel = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
             this.ListenChannel.Blocking = false;
             this.ListenChannel.ExclusiveAddressUse = false;
-            this.ListenChannel.Bind ( endPoint );
+            this.ListenChannel.Bind(endPoint );
 
             this.ConnectionState = ConnectionStates.NotConnected;
-            Log.d ( "ddms", this.ToString ( ) );
+            Log.d("ddms", this.ToString() );
         }
 
 
@@ -48,9 +48,9 @@ namespace Managed.Adb
         public bool IsDebuggerAttached { get; private set; }
 
 
-        public void Read ( )
+        public void Read()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
             int count;
 
             /*if ( mReadBuffer.position ( ) == mReadBuffer.capacity ( ) ) {
@@ -73,9 +73,9 @@ namespace Managed.Adb
             if ( count < 0 ) throw new IOException ( "read failed" );*/
         }
 
-        public /*JdwpPacket*/ Object GetJdwpPacket ( )
+        public /*JdwpPacket*/ Object GetJdwpPacket()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
 
             /*if (mConnState == ST_AWAIT_SHAKE) {
             int result;
@@ -118,14 +118,14 @@ namespace Managed.Adb
         }
 
         // TODO: JdwpPacket
-        public void ForwardPacketToClient ( /*JdwpPacket*/ Object packet )
+        public void ForwardPacketToClient(/*JdwpPacket*/ Object packet )
         {
-            this.Client.SendAndConsume ( packet );
+            this.Client.SendAndConsume(packet );
         }
 
-        public bool SendHandshake ( )
+        public bool SendHandshake()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
             /*ByteBuffer tempBuffer = ByteBuffer.allocate ( JdwpPacket.HANDSHAKE_LEN );
             JdwpPacket.PutHandshake ( tempBuffer );
             int expectedLength = tempBuffer.position ( );
@@ -147,9 +147,9 @@ namespace Managed.Adb
         }
 
         //TODO: JdwpPacket
-        public void SendAndConsume ( /*JdwpPacket*/ Object packet )
+        public void SendAndConsume(/*JdwpPacket*/ Object packet )
         {
-            if ( this.Channel == null )
+            if (this.Channel == null )
             {
                 /*
                  * Buffer this up so we can send it to the debugger when it
@@ -170,22 +170,22 @@ namespace Managed.Adb
 
         //      public voidr RegisterListener
 
-        public Socket Accept ( )
+        public Socket Accept()
         {
-            return this.Accept ( this.ListenChannel );
+            return this.Accept(this.ListenChannel );
         }
 
-        public Socket Accept ( Socket listenChan )
+        public Socket Accept(Socket listenChan )
         {
-            lock ( listenChan )
+            lock (listenChan )
             {
-                if ( listenChan != null )
+                if (listenChan != null )
                 {
-                    Socket newChan = listenChan.Accept ( );
-                    if ( this.Channel != null )
+                    Socket newChan = listenChan.Accept();
+                    if (this.Channel != null )
                     {
-                        Log.w ( "ddms", "debugger already talking to " + this.Client.ToString ( ) + " on " + this.ListenPort.ToString ( ) );
-                        newChan.Close ( );
+                        Log.w("ddms", "debugger already talking to " + this.Client.ToString() + " on " + this.ListenPort.ToString() );
+                        newChan.Close();
                         return null;
                     }
 
@@ -199,51 +199,51 @@ namespace Managed.Adb
             }
         }
 
-        public void CloseData ( )
+        public void CloseData()
         {
             try
             {
-                if ( this.Channel != null )
+                if (this.Channel != null )
                 {
-                    this.Channel.Close ( );
+                    this.Channel.Close();
                     this.Channel = null;
                     this.ConnectionState = ConnectionStates.NotConnected;
 
                     //TODO: ClientData
                     /*ClientData cd = Client.ClientData;
                     cd.DebuggerConnectionStatus = DebuggerStatus.Default;*/
-                    this.Client.Update ( ClientChangeMask.ChangeDebuggerStatus );
+                    this.Client.Update(ClientChangeMask.ChangeDebuggerStatus );
 
                 }
             }
-            catch ( IOException ioe )
+            catch (IOException ioe )
             {
-                Log.w ( "ddms", ioe );
+                Log.w("ddms", ioe );
             }
         }
 
-        public void Close ( )
+        public void Close()
         {
             try
             {
-                if ( this.ListenChannel != null )
+                if (this.ListenChannel != null )
                 {
-                    this.ListenChannel.Close ( );
+                    this.ListenChannel.Close();
                 }
                 this.ListenChannel = null;
-                this.CloseData ( );
+                this.CloseData();
             }
-            catch ( IOException ioe )
+            catch (IOException ioe )
             {
-                Log.w ( "ddms", ioe );
+                Log.w("ddms", ioe );
             }
         }
 
-        public override string ToString ( )
+        public override string ToString()
         {
             // mChannel != null means we have connection, ST_READY means it's going
             return "[Debugger " + this.ListenPort + "-->" + this.Client.ClientData/*.Pid*/
-                            + ( ( this.ConnectionState != ConnectionStates.Ready ) ? " inactive]" : " active]" );
+                            + ((this.ConnectionState != ConnectionStates.Ready ) ? " inactive]" : " active]" );
         }
     }
 }

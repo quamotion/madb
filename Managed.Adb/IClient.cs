@@ -56,29 +56,29 @@ namespace Managed.Adb
         bool IsSelectedClient { get; set; }
         bool IsValid { get; }
 
-        void ExecuteGarbageCollector ( );
-        void DumpHprof ( );
-        void ToggleMethodProfiling ( );
-        void RequestMethodProfilingStatus ( );
-        void RequestThreadUpdate ( );
-        void RequestThreadStackTrace ( int threadID );
-        bool RequestNativeHeapInformation ( );
-        void EnableAllocationTracker ( bool enable );
-        void RequestAllocationStatus ( );
-        void RequestAllocationDetails ( );
-        void Kill ( );
+        void ExecuteGarbageCollector();
+        void DumpHprof();
+        void ToggleMethodProfiling();
+        void RequestMethodProfilingStatus();
+        void RequestThreadUpdate();
+        void RequestThreadStackTrace(int threadID );
+        bool RequestNativeHeapInformation();
+        void EnableAllocationTracker(bool enable );
+        void RequestAllocationStatus();
+        void RequestAllocationDetails();
+        void Kill();
         // TODO: Define Selector
-        void Register ( /*Selector*/ Object selector );
-        void ListenForDebugger ( int listenPort );
+        void Register(/*Selector*/ Object selector );
+        void ListenForDebugger(int listenPort );
         // TODO: JdwpPacket
-        void SendAndConsume ( /*JdwpPacket*/ Object packet, ChunkHandler replyHandler );
-        void AddRequestId ( int id, ChunkHandler handler );
-        void RemoveRequestId ( int id );
-        ChunkHandler IsResponseToUs ( int id );
+        void SendAndConsume(/*JdwpPacket*/ Object packet, ChunkHandler replyHandler );
+        void AddRequestId(int id, ChunkHandler handler );
+        void RemoveRequestId(int id );
+        ChunkHandler IsResponseToUs(int id );
         // TODO: JdwpPacket
-        void PacketFailed ( /*JdwpPacket*/ Object packet );
-        bool DdmSeen ( );
-        void Close ( bool notify );
-        void Update ( ClientChangeMask changeMask );
+        void PacketFailed(/*JdwpPacket*/ Object packet );
+        bool DdmSeen();
+        void Close(bool notify );
+        void Update(ClientChangeMask changeMask );
     }
 }

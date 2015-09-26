@@ -17,9 +17,9 @@ namespace Managed.Adb
         /// <returns>
         ///   <see langword="true"/> if the specified path is directory; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool IsDirectory (string path )
+        public static bool IsDirectory(string path )
         {
-            return File.Exists ( path ) && ( File.GetAttributes ( path ) & FileAttributes.Directory ) == FileAttributes.Directory;
+            return File.Exists(path ) && (File.GetAttributes(path ) & FileAttributes.Directory ) == FileAttributes.Directory;
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Managed.Adb
         /// <returns>
         ///   <see langword="true"/> if the specified fsi is directory; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool IsDirectory ( this FileSystemInfo fsi )
+        public static bool IsDirectory(this FileSystemInfo fsi )
         {
             return (fsi.Attributes & FileAttributes.Directory) == FileAttributes.Directory;
         }
@@ -41,9 +41,9 @@ namespace Managed.Adb
         /// <returns>
         ///   <see langword="true"/> if the specified path is file; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool IsFile (string path )
+        public static bool IsFile(string path )
         {
-            return File.Exists ( path ) && !IsDirectory ( path );
+            return File.Exists(path ) && !IsDirectory(path );
         }
 
         /// <summary>
@@ -53,9 +53,9 @@ namespace Managed.Adb
         /// <returns>
         ///   <see langword="true"/> if the specified fsi is file; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool IsFile ( this FileSystemInfo fsi )
+        public static bool IsFile(this FileSystemInfo fsi )
         {
-            return fsi is FileInfo && !IsDirectory ( fsi.FullName );
+            return fsi is FileInfo && !IsDirectory(fsi.FullName );
         }
 
         /// <summary>
@@ -63,15 +63,15 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public static FileSystemInfo GetFileSystemInfo ( this string path )
+        public static FileSystemInfo GetFileSystemInfo(this string path )
         {
-            if ( IsDirectory ( path ) )
+            if (IsDirectory(path ) )
             {
-                return new DirectoryInfo ( path );
+                return new DirectoryInfo(path );
             }
             else
             {
-                return new FileInfo ( path );
+                return new FileInfo(path );
             }
         }
 

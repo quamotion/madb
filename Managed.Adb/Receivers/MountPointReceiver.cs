@@ -26,7 +26,7 @@ namespace Managed.Adb
         /// Initializes a new instance of the <see cref="MountPointReceiver"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        public MountPointReceiver ( Device device )
+        public MountPointReceiver(Device device )
         {
             this.Device = device;
         }
@@ -36,25 +36,25 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="lines">The lines.</param>
         /// <workitem id="16001">Bug w/ MountPointReceiver.cs/ProcessNewLines()</workitem>
-        protected override void ProcessNewLines ( string[] lines )
+        protected override void ProcessNewLines(string[] lines )
         {
-            this.Device.MountPoints.Clear ( );
+            this.Device.MountPoints.Clear();
 
-            lines.ForEach ( line =>
+            lines.ForEach(line =>
             {
-                var m = line.Match ( RE_MOUNTPOINT_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace );
-                if ( m.Success )
+                var m = line.Match(RE_MOUNTPOINT_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace );
+                if (m.Success )
                 {
-                    string block = m.Groups[1].Value.Trim ( ).Replace ( "//", "/" );
-                    string name = m.Groups[2].Value.Trim ( );
-                    string fs = m.Groups[3].Value.Trim ( );
-                    bool ro = string.Compare ( "ro", m.Groups[4].Value.Trim ( ), false ) == 0;
-                    MountPoint mnt = new MountPoint ( block, name, fs, ro );
-                    string key = name.Substring ( 1 );
+                    string block = m.Groups[1].Value.Trim().Replace("//", "/" );
+                    string name = m.Groups[2].Value.Trim();
+                    string fs = m.Groups[3].Value.Trim();
+                    bool ro = string.Compare("ro", m.Groups[4].Value.Trim(), false ) == 0;
+                    MountPoint mnt = new MountPoint(block, name, fs, ro );
+                    string key = name.Substring(1 );
                     // currently does not support multiple mounts to the same location...
-                    if ( !this.Device.MountPoints.ContainsKey ( name ) )
+                    if (!this.Device.MountPoints.ContainsKey(name ) )
                     {
-                        this.Device.MountPoints.Add ( name, mnt );
+                        this.Device.MountPoints.Add(name, mnt );
                     }
                 }
             } );
@@ -79,10 +79,10 @@ namespace Managed.Adb
         /// <summary>
         /// Finishes the receiver
         /// </summary>
-        protected override void Done ( )
+        protected override void Done()
         {
-            this.Device.OnBuildInfoChanged ( EventArgs.Empty );
-            base.Done ( );
+            this.Device.OnBuildInfoChanged(EventArgs.Empty );
+            base.Done();
         }
 
         /// <summary>

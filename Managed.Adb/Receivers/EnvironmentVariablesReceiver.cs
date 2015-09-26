@@ -23,7 +23,7 @@ namespace Managed.Adb
         /// Initializes a new instance of the <see cref="EnvironmentVariablesReceiver"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        public EnvironmentVariablesReceiver ( Device device )
+        public EnvironmentVariablesReceiver(Device device )
         {
             this.Device = device;
         }
@@ -38,30 +38,30 @@ namespace Managed.Adb
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines ( string[] lines )
+        protected override void ProcessNewLines(string[] lines )
         {
             foreach (string line in lines )
             {
-                if (string.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) )
+                if (string.IsNullOrEmpty(line ) || line.StartsWith("#" ) )
                 {
                     continue;
                 }
 
-                Match m = Regex.Match ( line, ENV_PATTERN );
-                if ( m.Success )
+                Match m = Regex.Match(line, ENV_PATTERN );
+                if (m.Success )
                 {
-                    string label = m.Groups[1].Value.Trim ( );
-                    string value = m.Groups[2].Value.Trim ( );
+                    string label = m.Groups[1].Value.Trim();
+                    string value = m.Groups[2].Value.Trim();
 
-                    if ( label.Length > 0 )
+                    if (label.Length > 0 )
                     {
-                        if ( this.Device.EnvironmentVariables.ContainsKey ( label ) )
+                        if (this.Device.EnvironmentVariables.ContainsKey(label ) )
                         {
                             this.Device.EnvironmentVariables[label] = value;
                         }
                         else
                         {
-                            this.Device.EnvironmentVariables.Add ( label, value );
+                            this.Device.EnvironmentVariables.Add(label, value );
                         }
                     }
                 }
@@ -72,10 +72,10 @@ namespace Managed.Adb
         /// <summary>
         /// Finishes the receiver
         /// </summary>
-        protected override void Done ( )
+        protected override void Done()
         {
-            this.Device.OnBuildInfoChanged ( EventArgs.Empty );
-            base.Done ( );
+            this.Device.OnBuildInfoChanged(EventArgs.Empty );
+            base.Done();
         }
     }
 }

@@ -12,8 +12,8 @@ namespace Managed.Adb.Exceptions
         /// <summary>
         /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
         /// </summary>
-        public PermissionDeniedException( )
-            : base ( "Permission to access the specified resource was denied." )
+        public PermissionDeniedException()
+            : base("Permission to access the specified resource was denied." )
             {
         }
 
@@ -22,7 +22,7 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         public PermissionDeniedException(string message )
-            : base ( message )
+            : base(message )
             {
 
         }
@@ -32,7 +32,7 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
-        public PermissionDeniedException( SerializationInfo serializationInfo,StreamingContext context) : base(serializationInfo,context)
+        public PermissionDeniedException(SerializationInfo serializationInfo,StreamingContext context) : base(serializationInfo,context)
         {
 
         }
@@ -43,7 +43,7 @@ namespace Managed.Adb.Exceptions
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
         public PermissionDeniedException(string message, Exception innerException )
-            : base ( message, innerException )
+            : base(message, innerException )
             {
 
         }

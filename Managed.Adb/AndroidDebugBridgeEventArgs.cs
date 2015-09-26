@@ -16,7 +16,7 @@ namespace Managed.Adb
         /// Initializes a new instance of the <see cref="AndroidDebugBridgeEventArgs"/> class.
         /// </summary>
         /// <param name="bridge">The bridge.</param>
-        public AndroidDebugBridgeEventArgs ( AndroidDebugBridge bridge )
+        public AndroidDebugBridgeEventArgs(AndroidDebugBridge bridge )
         {
             this.Bridge = bridge;
         }

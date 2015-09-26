@@ -34,9 +34,9 @@ namespace Managed.Adb
         /// <summary>
         /// Initializes a new instance of the <see cref="MonitorThread"/> class.
         /// </summary>
-        private MonitorThread ( )
+        private MonitorThread()
         {
-            this.Clients = new List<IClient> ( );
+            this.Clients = new List<IClient>();
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace Managed.Adb
         {
             get
             {
-                if ( _instance == null )
+                if (_instance == null )
                 {
-                    _instance = new MonitorThread ( );
+                    _instance = new MonitorThread();
                 }
                 return _instance;
             }
@@ -74,12 +74,12 @@ namespace Managed.Adb
         /// Sets the debug selected port.
         /// </summary>
         /// <param name="value">The value.</param>
-        internal void SetDebugSelectedPort ( int value )
+        internal void SetDebugSelectedPort(int value )
         {
             //throw new NotImplementedException ( );
         }
 
-        public void DropClient ( IClient client, bool notify )
+        public void DropClient(IClient client, bool notify )
         {
 
         }

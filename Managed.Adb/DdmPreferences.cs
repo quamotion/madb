@@ -23,7 +23,7 @@ namespace Managed.Adb
         private static int _selectedDebugPort;
         private static LogLevel.LogLevelInfo _logLevel;
 
-        static DdmPreferences ( )
+        static DdmPreferences()
         {
             Timeout = DEFAULT_TIMEOUT;
             LogLevel = DEFAULT_LOG_LEVEL;
@@ -58,9 +58,9 @@ namespace Managed.Adb
                 _selectedDebugPort = value;
 
                 MonitorThread monitorThread = MonitorThread.Instance;
-                if ( monitorThread != null )
+                if (monitorThread != null )
                 {
-                    monitorThread.SetDebugSelectedPort ( value );
+                    monitorThread.SetDebugSelectedPort(value );
                 }
             }
         }

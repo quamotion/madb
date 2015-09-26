@@ -37,11 +37,11 @@ namespace Managed.Adb
         /// <param name="device">The device.</param>
         /// <param name="channel">The channel.</param>
         /// <param name="pid">The pid.</param>
-        public Client ( Device device, Socket channel, int pid )
+        public Client(Device device, Socket channel, int pid )
         {
             this.Device = device;
             this.Channel = channel;
-            this.ClientData = new ClientData ( pid );
+            this.ClientData = new ClientData(pid );
 
             this.IsThreadUpdateEnabled = DdmPreferences.InitialThreadUpdate;
             this.IsHeapUpdateEnabled = DdmPreferences.InitialHeapUpdate;
@@ -95,7 +95,7 @@ namespace Managed.Adb
         {
             get
             {
-                switch ( this.ConnectionState )
+                switch (this.ConnectionState )
                 {
                     case ClientConnectionState.Init:
                     case ClientConnectionState.NotJDWP:
@@ -108,7 +108,7 @@ namespace Managed.Adb
                     case ClientConnectionState.Ready:
                         return true;
                     default:
-                        Log.e ( "ddm", "wtf are we doing in here? You shouldn't see this." );
+                        Log.e("ddm", "wtf are we doing in here? You shouldn't see this." );
                         return false;
                 }
             }
@@ -173,9 +173,9 @@ namespace Managed.Adb
         /// <summary>
         /// Executes the garbage collector.
         /// </summary>
-        public void ExecuteGarbageCollector ( )
+        public void ExecuteGarbageCollector()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
 
             /*try {
                 HandleHeap.SendHPGC ( this );
@@ -187,9 +187,9 @@ namespace Managed.Adb
         /// <summary>
         /// Dumps the hprof.
         /// </summary>
-        public void DumpHprof ( )
+        public void DumpHprof()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
 
             /*bool canStream = ClientData.HasFeature ( ClientData.FEATURE_HPROF_STREAMING );
             try {
@@ -207,94 +207,94 @@ namespace Managed.Adb
         /// <summary>
         /// Toggles the method profiling.
         /// </summary>
-        public void ToggleMethodProfiling ( )
+        public void ToggleMethodProfiling()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Requests the method profiling status.
         /// </summary>
-        public void RequestMethodProfilingStatus ( )
+        public void RequestMethodProfilingStatus()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Requests the thread update.
         /// </summary>
-        public void RequestThreadUpdate ( )
+        public void RequestThreadUpdate()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Requests the thread stack trace.
         /// </summary>
         /// <param name="threadID">The thread ID.</param>
-        public void RequestThreadStackTrace ( int threadID )
+        public void RequestThreadStackTrace(int threadID )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Requests the native heap information.
         /// </summary>
         /// <returns></returns>
-        public bool RequestNativeHeapInformation ( )
+        public bool RequestNativeHeapInformation()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Enables the allocation tracker.
         /// </summary>
         /// <param name="enable">if set to <see langword="true"/> [enable].</param>
-        public void EnableAllocationTracker ( bool enable )
+        public void EnableAllocationTracker(bool enable )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Requests the allocation status.
         /// </summary>
-        public void RequestAllocationStatus ( )
+        public void RequestAllocationStatus()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Requests the allocation details.
         /// </summary>
-        public void RequestAllocationDetails ( )
+        public void RequestAllocationDetails()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Kills this instance.
         /// </summary>
-        public void Kill ( )
+        public void Kill()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Registers the specified selector.
         /// </summary>
         /// <param name="selector">The selector.</param>
-        public void Register ( object selector )
+        public void Register(object selector )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Listens for debugger.
         /// </summary>
         /// <param name="listenPort">The listen port.</param>
-        public void ListenForDebugger ( int listenPort )
+        public void ListenForDebugger(int listenPort )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -302,9 +302,9 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="packet">The packet.</param>
         /// <param name="replyHandler">The reply handler.</param>
-        public void SendAndConsume ( object packet, ChunkHandler replyHandler )
+        public void SendAndConsume(object packet, ChunkHandler replyHandler )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -312,18 +312,18 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="id">The id.</param>
         /// <param name="handler">The handler.</param>
-        public void AddRequestId ( int id, ChunkHandler handler )
+        public void AddRequestId(int id, ChunkHandler handler )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Removes the request id.
         /// </summary>
         /// <param name="id">The id.</param>
-        public void RemoveRequestId ( int id )
+        public void RemoveRequestId(int id )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -331,89 +331,89 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="id">The id.</param>
         /// <returns></returns>
-        public ChunkHandler IsResponseToUs ( int id )
+        public ChunkHandler IsResponseToUs(int id )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Packets the failed.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        public void PacketFailed ( object packet )
+        public void PacketFailed(object packet )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// DDMs the seen.
         /// </summary>
         /// <returns></returns>
-        public bool DdmSeen ( )
+        public bool DdmSeen()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Closes the specified notify.
         /// </summary>
         /// <param name="notify">if set to <see langword="true"/> [notify].</param>
-        public void Close ( bool notify )
+        public void Close(bool notify )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Updates the specified change mask.
         /// </summary>
         /// <param name="changeMask">The change mask.</param>
-        public void Update ( ClientChangeMask changeMask )
+        public void Update(ClientChangeMask changeMask )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Reads this instance.
         /// </summary>
-        public void Read ( )
+        public void Read()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Gets the JDWP packet.
         /// </summary>
         /// <returns></returns>
-        public object GetJdwpPacket ( )
+        public object GetJdwpPacket()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Forwards the packet to client.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        public void ForwardPacketToClient ( object packet )
+        public void ForwardPacketToClient(object packet )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Sends the handshake.
         /// </summary>
         /// <returns></returns>
-        public bool SendHandshake ( )
+        public bool SendHandshake()
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Sends the and consume.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        public void SendAndConsume ( object packet )
+        public void SendAndConsume(object packet )
         {
-            throw new NotImplementedException ( );
+            throw new NotImplementedException();
         }
 
 
@@ -423,9 +423,9 @@ namespace Managed.Adb
         /// <returns>
         /// A <see cref="System.String"/> that represents this instance.
         /// </returns>
-        public override string ToString ( )
+        public override string ToString()
         {
-            return string.Format ( "[Client pid: {0}]", this.ClientData.Pid );
+            return string.Format("[Client pid: {0}]", this.ClientData.Pid );
         }
     }
 }

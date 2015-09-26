@@ -151,7 +151,7 @@ namespace Managed.Adb
         {
             get
             {
-                return ( this.Level * 100 ) / this.Scale;
+                return (this.Level * 100 ) / this.Scale;
             }
         }
 
@@ -161,18 +161,18 @@ namespace Managed.Adb
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
-        public override string ToString ( )
+        public override string ToString()
         {
-            var sb = new StringBuilder ( );
+            var sb = new StringBuilder();
 
-            this.GetType ( ).GetProperties ( BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.IgnoreCase ).ForEach ( p =>
+            this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.IgnoreCase ).ForEach(p =>
             {
                 var n = p.Name;
-                var v = p.GetValue ( this, null );
-                sb.AppendLine (string.Format ( "{0}:{1}", n, v ) );
+                var v = p.GetValue(this, null );
+                sb.AppendLine(string.Format("{0}:{1}", n, v ) );
             } );
 
-            return sb.ToString ( );
+            return sb.ToString();
         }
     }
 }

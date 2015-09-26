@@ -135,16 +135,16 @@ namespace Managed.Adb
         /// <summary>
         /// Initializes the <see cref="AndroidDebugBridge"/> class.
         /// </summary>
-        static AndroidDebugBridge ( )
+        static AndroidDebugBridge()
         {
             // built-in local address/port for ADB.
             try
             {
                 HostAddress = IPAddress.Loopback;
 
-                SocketAddress = new IPEndPoint ( HostAddress, ADB_PORT );
+                SocketAddress = new IPEndPoint(HostAddress, ADB_PORT );
             }
-            catch ( ArgumentOutOfRangeException )
+            catch (ArgumentOutOfRangeException )
             {
 
             }
@@ -180,7 +180,7 @@ namespace Managed.Adb
         /// <para>This must be called once <b>before</b> any call to CreateBridge.</para>
         /// </summary>
         /// <param name="clientSupport">if set to <see langword="true"/> [client support].</param>
-        public static void Initialize ( bool clientSupport )
+        public static void Initialize(bool clientSupport )
         {
             ClientSupport = clientSupport;
 
@@ -199,12 +199,12 @@ namespace Managed.Adb
         /// <summary>
         /// Terminates the ddm library. This must be called upon application termination.
         /// </summary>
-        public static void Terminate ( )
+        public static void Terminate()
         {
             // kill the monitoring services
-            if ( Instance != null && Instance.DeviceMonitor != null )
+            if (Instance != null && Instance.DeviceMonitor != null )
             {
-                Instance.DeviceMonitor.Stop ( );
+                Instance.DeviceMonitor.Stop();
                 Instance.DeviceMonitor = null;
             }
 
@@ -223,9 +223,9 @@ namespace Managed.Adb
         {
             get
             {
-                if ( _instance == null )
+                if (_instance == null )
                 {
-                    _instance = CreateBridge ( );
+                    _instance = CreateBridge();
                 }
                 return _instance;
             }
@@ -255,22 +255,22 @@ namespace Managed.Adb
         /// adb.
         /// If a bridge has already been started, it is directly returned with no changes
         /// <returns></returns>
-        public static AndroidDebugBridge CreateBridge ( )
+        public static AndroidDebugBridge CreateBridge()
         {
-            if ( _instance != null )
+            if (_instance != null )
             {
                 return _instance;
             }
 
             try
             {
-                _instance = new AndroidDebugBridge ( );
-                _instance.Start ( );
-                _instance.OnBridgeChanged ( new AndroidDebugBridgeEventArgs ( _instance ) );
+                _instance = new AndroidDebugBridge();
+                _instance.Start();
+                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(_instance ) );
             }
-            catch ( ArgumentException )
+            catch (ArgumentException )
             {
-                _instance.OnBridgeChanged ( new AndroidDebugBridgeEventArgs ( null ) );
+                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(null ) );
                 _instance = null;
             }
 
@@ -287,32 +287,32 @@ namespace Managed.Adb
         /// <remarks>Any existing server will be disconnected, unless the location is the same and
         /// <code>forceNewBridge</code> is set to false.
         /// </remarks>
-        public static AndroidDebugBridge CreateBridge (string osLocation, bool forceNewBridge )
+        public static AndroidDebugBridge CreateBridge(string osLocation, bool forceNewBridge )
         {
 
-            if ( _instance != null )
+            if (_instance != null )
             {
-                if ( !string.IsNullOrEmpty ( AdbOsLocation ) && string.Compare ( AdbOsLocation, osLocation, true ) == 0 && !forceNewBridge )
+                if (!string.IsNullOrEmpty(AdbOsLocation ) && string.Compare(AdbOsLocation, osLocation, true ) == 0 && !forceNewBridge )
                 {
                     return _instance;
                 }
                 else
                 {
                     // stop the current server
-                    Log.i( TAG, "Stopping Current Instance" );
-                    _instance.Stop ( );
+                    Log.i(TAG, "Stopping Current Instance" );
+                    _instance.Stop();
                 }
             }
 
             try
             {
-                _instance = new AndroidDebugBridge ( osLocation );
-                _instance.Start ( );
-                _instance.OnBridgeChanged ( new AndroidDebugBridgeEventArgs ( _instance ) );
+                _instance = new AndroidDebugBridge(osLocation );
+                _instance.Start();
+                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(_instance ) );
             }
-            catch ( ArgumentException )
+            catch (ArgumentException )
             {
-                _instance.OnBridgeChanged ( new AndroidDebugBridgeEventArgs ( null ) );
+                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(null ) );
                 _instance = null;
             }
 
@@ -323,13 +323,13 @@ namespace Managed.Adb
         /// Disconnects the current debug bridge, and destroy the object.
         /// </summary>
         /// <remarks>This also stops the current adb host server.</remarks>
-        public static void DisconnectBridge ( )
+        public static void DisconnectBridge()
         {
-            if ( _instance != null )
+            if (_instance != null )
             {
-                _instance.Stop ( );
+                _instance.Stop();
 
-                _instance.OnBridgeChanged ( new AndroidDebugBridgeEventArgs ( null ) );
+                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(null ) );
                 _instance = null;
             }
         }
@@ -338,7 +338,7 @@ namespace Managed.Adb
         /// Gets the lock.
         /// </summary>
         /// <returns></returns>
-        public static object GetLock ( )
+        public static object GetLock()
         {
             return Instance;
         }
@@ -353,28 +353,28 @@ namespace Managed.Adb
         /// <param name="osLocation">the location of the command line tool</param>
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="FileNotFoundException"></exception>
-        private AndroidDebugBridge (string osLocation )
+        private AndroidDebugBridge(string osLocation )
         {
-            if ( string.IsNullOrEmpty ( osLocation ) )
+            if (string.IsNullOrEmpty(osLocation ) )
             {
-                throw new ArgumentException ( );
+                throw new ArgumentException();
             }
 
-            if ( !File.Exists ( osLocation ) )
+            if (!File.Exists(osLocation ) )
             {
                 Log.e(TAG, string.Format("unable to locate adb in the specified location: {0}", osLocation) );
-                throw new FileNotFoundException ( "unable to locate adb in the specified location" );
+                throw new FileNotFoundException("unable to locate adb in the specified location" );
             }
 
             AdbOsLocation = osLocation;
 
-            this.CheckAdbVersion ( );
+            this.CheckAdbVersion();
         }
 
         /// <summary>
         /// Creates a new bridge not linked to any particular adb executable.
         /// </summary>
-        private AndroidDebugBridge ( )
+        private AndroidDebugBridge()
         {
         }
 
@@ -385,11 +385,11 @@ namespace Managed.Adb
         /// Raises the <see cref="E:BridgeChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="Managed.Adb.AndroidDebugBridgeEventArgs"/> instance containing the event data.</param>
-        internal void OnBridgeChanged ( AndroidDebugBridgeEventArgs e )
+        internal void OnBridgeChanged(AndroidDebugBridgeEventArgs e )
         {
-            if ( this.BridgeChanged != null )
+            if (this.BridgeChanged != null )
             {
-                this.BridgeChanged ( this, e );
+                this.BridgeChanged(this, e );
             }
         }
 
@@ -397,11 +397,11 @@ namespace Managed.Adb
         /// Raises the <see cref="E:ClientChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="Managed.Adb.ClientEventArgs"/> instance containing the event data.</param>
-        internal void OnClientChanged ( ClientEventArgs e )
+        internal void OnClientChanged(ClientEventArgs e )
         {
-            if ( this.ClientChanged != null )
+            if (this.ClientChanged != null )
             {
-                this.ClientChanged ( this, e );
+                this.ClientChanged(this, e );
             }
         }
 
@@ -409,11 +409,11 @@ namespace Managed.Adb
         /// Raises the <see cref="E:DeviceChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceChanged ( DeviceEventArgs e )
+        internal void OnDeviceChanged(DeviceEventArgs e )
         {
-            if ( this.DeviceChanged != null )
+            if (this.DeviceChanged != null )
             {
-                this.DeviceChanged ( this, e );
+                this.DeviceChanged(this, e );
             }
         }
 
@@ -421,11 +421,11 @@ namespace Managed.Adb
         /// Raises the <see cref="E:DeviceConnected"/> event.
         /// </summary>
         /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceConnected ( DeviceEventArgs e )
+        internal void OnDeviceConnected(DeviceEventArgs e )
         {
-            if ( this.DeviceConnected != null )
+            if (this.DeviceConnected != null )
             {
-                this.DeviceConnected ( this, e );
+                this.DeviceConnected(this, e );
             }
         }
 
@@ -433,11 +433,11 @@ namespace Managed.Adb
         /// Raises the <see cref="E:DeviceDisconnected"/> event.
         /// </summary>
         /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceDisconnected ( DeviceEventArgs e )
+        internal void OnDeviceDisconnected(DeviceEventArgs e )
         {
-            if ( this.DeviceDisconnected != null )
+            if (this.DeviceDisconnected != null )
             {
-                this.DeviceDisconnected ( this, e );
+                this.DeviceDisconnected(this, e );
             }
         }
         #endregion
@@ -447,9 +447,9 @@ namespace Managed.Adb
         /// Starts the debug bridge.
         /// </summary>
         /// <returns><see langword="true"/> if success.</returns>
-        public bool Start ( )
+        public bool Start()
         {
-            if (string.IsNullOrEmpty(AdbOsLocation) || !this.VersionCheck || !this.StartAdb ( ) )
+            if (string.IsNullOrEmpty(AdbOsLocation) || !this.VersionCheck || !this.StartAdb() )
             {
                 return false;
             }
@@ -457,8 +457,8 @@ namespace Managed.Adb
             this.Started = true;
 
             // now that the bridge is connected, we start the underlying services.
-            this.DeviceMonitor = new DeviceMonitor ( this );
-            this.DeviceMonitor.Start ( );
+            this.DeviceMonitor = new DeviceMonitor(this );
+            this.DeviceMonitor.Start();
 
             return true;
         }
@@ -467,22 +467,22 @@ namespace Managed.Adb
         /// Kills the debug bridge, and the adb host server.
         /// </summary>
         /// <returns><see langword="true"/> if success.</returns>
-        public bool Stop ( )
+        public bool Stop()
         {
             // if we haven't started we return false;
-            if ( !this.Started )
+            if (!this.Started )
             {
                 return false;
             }
 
             // kill the monitoring services
-            if ( this.DeviceMonitor != null )
+            if (this.DeviceMonitor != null )
             {
-                this.DeviceMonitor.Stop ( );
+                this.DeviceMonitor.Stop();
                 this.DeviceMonitor = null;
             }
 
-            if ( !this.StopAdb ( ) )
+            if (!this.StopAdb() )
             {
                 return false;
             }
@@ -495,29 +495,29 @@ namespace Managed.Adb
         /// Restarts adb, but not the services around it.
         /// </summary>
         /// <returns><see langword="true"/> if success.</returns>
-        public bool Restart ( )
+        public bool Restart()
         {
-            if ( string.IsNullOrEmpty ( AdbOsLocation ) )
+            if (string.IsNullOrEmpty(AdbOsLocation ) )
             {
-                Log.e ( ADB, "Cannot restart adb when AndroidDebugBridge is created without the location of adb." );
+                Log.e(ADB, "Cannot restart adb when AndroidDebugBridge is created without the location of adb." );
                 return false;
             }
 
-            if ( !this.VersionCheck )
+            if (!this.VersionCheck )
             {
-                Log.LogAndDisplay ( LogLevel.Error, ADB, "Attempting to restart adb, but version check failed!" );
+                Log.LogAndDisplay(LogLevel.Error, ADB, "Attempting to restart adb, but version check failed!" );
                 return false;
             }
-            lock ( this )
+            lock (this )
             {
-                this.StopAdb ( );
+                this.StopAdb();
 
-                bool restart = this.StartAdb ( );
+                bool restart = this.StartAdb();
 
-                if ( restart && this.DeviceMonitor == null )
+                if (restart && this.DeviceMonitor == null )
                 {
-                    this.DeviceMonitor = new DeviceMonitor ( this );
-                    this.DeviceMonitor.Start ( );
+                    this.DeviceMonitor = new DeviceMonitor(this );
+                    this.DeviceMonitor.Start();
                 }
 
                 return restart;
@@ -562,9 +562,9 @@ namespace Managed.Adb
         /// <returns>
         /// 	<see langword="true"/> if [has initial device list]; otherwise, <see langword="false"/>.
         /// </returns>
-        public bool HasInitialDeviceList ( )
+        public bool HasInitialDeviceList()
         {
-            if ( this.DeviceMonitor != null )
+            if (this.DeviceMonitor != null )
             {
                 return this.DeviceMonitor.HasInitialDeviceList;
             }
@@ -602,7 +602,7 @@ namespace Managed.Adb
             get
             {
                 //MonitorThread monitorThread = MonitorThread.Instance;
-                if ( this.DeviceMonitor != null /* && monitorThread != null */ )
+                if (this.DeviceMonitor != null /* && monitorThread != null */ )
                 {
                     return this.DeviceMonitor.IsMonitoring /* && monitorThread.State != State.TERMINATED*/;
                 }
@@ -618,7 +618,7 @@ namespace Managed.Adb
         {
             get
             {
-                if ( this.DeviceMonitor != null )
+                if (this.DeviceMonitor != null )
                 {
                     return this.DeviceMonitor.ConnectionAttemptCount;
                 }
@@ -635,7 +635,7 @@ namespace Managed.Adb
         {
             get
             {
-                if ( this.DeviceMonitor != null )
+                if (this.DeviceMonitor != null )
                 {
                     return this.DeviceMonitor.RestartAttemptCount;
                 }
@@ -663,42 +663,42 @@ namespace Managed.Adb
         /// <summary>
         /// Queries adb for its version number and checks it against #MIN_VERSION_NUMBER and MAX_VERSION_NUMBER
         /// </summary>
-        private void CheckAdbVersion ( )
+        private void CheckAdbVersion()
         {
             // default is bad check
             this.VersionCheck = false;
 
-            if (string.IsNullOrEmpty ( AdbOsLocation ) )
+            if (string.IsNullOrEmpty(AdbOsLocation ) )
             {
-                Log.w( TAG, "AdbOsLocation is Empty" );
+                Log.w(TAG, "AdbOsLocation is Empty" );
                 return;
             }
 
             try
             {
-                Log.d ( DDMS, string.Format ( "Checking '{0} version'", AdbOsLocation ) );
+                Log.d(DDMS, string.Format("Checking '{0} version'", AdbOsLocation ) );
 
-                ProcessStartInfo psi = new ProcessStartInfo ( AdbOsLocation, "version" );
+                ProcessStartInfo psi = new ProcessStartInfo(AdbOsLocation, "version" );
                 psi.WindowStyle = ProcessWindowStyle.Hidden;
                 psi.CreateNoWindow = true;
                 psi.UseShellExecute = false;
                 psi.RedirectStandardError = true;
                 psi.RedirectStandardOutput = true;
 
-                List<string> errorOutput = new List<string> ( );
-                List<string> stdOutput = new List<string> ( );
-                using ( Process proc = Process.Start ( psi ) )
+                List<string> errorOutput = new List<string>();
+                List<string> stdOutput = new List<string>();
+                using (Process proc = Process.Start(psi ) )
                 {
-                    int status = this.GrabProcessOutput ( proc, errorOutput, stdOutput, true /* waitForReaders */);
-                    if ( status != 0 )
+                    int status = this.GrabProcessOutput(proc, errorOutput, stdOutput, true /* waitForReaders */);
+                    if (status != 0 )
                     {
-                        StringBuilder builder = new StringBuilder ( "'adb version' failed!" );
-                        builder.AppendLine ( string.Empty );
+                        StringBuilder builder = new StringBuilder("'adb version' failed!" );
+                        builder.AppendLine(string.Empty );
                         foreach (string error in errorOutput )
                         {
-                            builder.AppendLine ( error );
+                            builder.AppendLine(error );
                         }
-                        Log.LogAndDisplay ( LogLevel.Error, "adb", builder.ToString ( ) );
+                        Log.LogAndDisplay(LogLevel.Error, "adb", builder.ToString() );
                     }
                 }
 
@@ -706,35 +706,35 @@ namespace Managed.Adb
                 bool versionFound = false;
                 foreach (string line in stdOutput )
                 {
-                    versionFound = this.ScanVersionLine ( line );
-                    if ( versionFound )
+                    versionFound = this.ScanVersionLine(line );
+                    if (versionFound )
                     {
                         break;
                     }
                 }
 
-                if ( !versionFound )
+                if (!versionFound )
                 {
                     foreach (string line in errorOutput )
                     {
-                        versionFound = this.ScanVersionLine ( line );
-                        if ( versionFound )
+                        versionFound = this.ScanVersionLine(line );
+                        if (versionFound )
                         {
                             break;
                         }
                     }
                 }
 
-                if ( !versionFound )
+                if (!versionFound )
                 {
                     // if we get here, we failed to parse the output.
-                    Log.LogAndDisplay ( LogLevel.Error, ADB, "Failed to parse the output of 'adb version'" ); 
+                    Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to parse the output of 'adb version'" ); 
                 }
 
             }
-            catch ( IOException e )
+            catch (IOException e )
             {
-                Log.LogAndDisplay ( LogLevel.Error, ADB, "Failed to get the adb version: " + e.Message ); 
+                Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to get the adb version: " + e.Message ); 
             } 
         }
 
@@ -745,29 +745,29 @@ namespace Managed.Adb
         /// <returns><see langword="true"/> if a version number was found (whether it is acceptable or not).</returns>
         /// <remarks>If a version number is found, it checks the version number against what is expected
         /// by this version of ddms.</remarks>
-        private bool ScanVersionLine (string line )
+        private bool ScanVersionLine(string line )
         {
-            if ( !string.IsNullOrEmpty ( line ) )
+            if (!string.IsNullOrEmpty(line ) )
             {
-                Match matcher = Regex.Match ( line, ADB_VERSION_PATTERN );
-                if ( matcher.Success )
+                Match matcher = Regex.Match(line, ADB_VERSION_PATTERN );
+                if (matcher.Success )
                 {
-                    int majorVersion = int.Parse ( matcher.Groups[1].Value );
-                    int minorVersion = int.Parse ( matcher.Groups[2].Value );
-                    int microVersion = int.Parse ( matcher.Groups[3].Value );
+                    int majorVersion = int.Parse(matcher.Groups[1].Value );
+                    int minorVersion = int.Parse(matcher.Groups[2].Value );
+                    int microVersion = int.Parse(matcher.Groups[3].Value );
 
                     // check only the micro version for now.
-                    if ( microVersion < ADB_VERSION_MICRO_MIN )
+                    if (microVersion < ADB_VERSION_MICRO_MIN )
                     {
-                        string message = string.Format ( "Required minimum version of adb: {0}.{1}.{2}. Current version is {0}.{1}.{3}",
+                        string message = string.Format("Required minimum version of adb: {0}.{1}.{2}. Current version is {0}.{1}.{3}",
                                         majorVersion, minorVersion, ADB_VERSION_MICRO_MIN, microVersion );
-                        Log.LogAndDisplay ( LogLevel.Error, ADB, message );
+                        Log.LogAndDisplay(LogLevel.Error, ADB, message );
                     }
-                    else if ( ADB_VERSION_MICRO_MAX != -1 && microVersion > ADB_VERSION_MICRO_MAX )
+                    else if (ADB_VERSION_MICRO_MAX != -1 && microVersion > ADB_VERSION_MICRO_MAX )
                     {
-                        string message = string.Format ( "Required maximum version of adb: {0}.{1}.{2}. Current version is {0}.{1}.{3}", 
+                        string message = string.Format("Required maximum version of adb: {0}.{1}.{2}. Current version is {0}.{1}.{3}", 
                                         majorVersion, minorVersion, ADB_VERSION_MICRO_MAX, microVersion );
-                        Log.LogAndDisplay ( LogLevel.Error, ADB, message );
+                        Log.LogAndDisplay(LogLevel.Error, ADB, message );
                     }
                     else
                     {
@@ -783,11 +783,11 @@ namespace Managed.Adb
         /// Starts the adb host side server.
         /// </summary>
         /// <returns>true if success</returns>
-        private bool StartAdb ( )
+        private bool StartAdb()
         {
-            if ( string.IsNullOrEmpty ( AdbOsLocation ) )
+            if (string.IsNullOrEmpty(AdbOsLocation ) )
             {
-                Log.e ( ADB, "Cannot start adb when AndroidDebugBridge is created without the location of adb." ); 
+                Log.e(ADB, "Cannot start adb when AndroidDebugBridge is created without the location of adb." ); 
                 return false;
             }
 
@@ -796,41 +796,41 @@ namespace Managed.Adb
             try
             {
                 string command = "start-server";
-                Log.d ( DDMS, string.Format ( "Launching '{0} {1}' to ensure ADB is running.", AdbOsLocation, command ) );
-                ProcessStartInfo psi = new ProcessStartInfo ( AdbOsLocation, command );
+                Log.d(DDMS, string.Format("Launching '{0} {1}' to ensure ADB is running.", AdbOsLocation, command ) );
+                ProcessStartInfo psi = new ProcessStartInfo(AdbOsLocation, command );
                 psi.CreateNoWindow = true;
                 psi.WindowStyle = ProcessWindowStyle.Hidden;
                 psi.UseShellExecute = false;
                 psi.RedirectStandardError = true;
                 psi.RedirectStandardOutput = true;
 
-                using ( Process proc = Process.Start ( psi ) )
+                using (Process proc = Process.Start(psi ) )
                 {
-                    List<string> errorOutput = new List<string> ( );
-                    List<string> stdOutput = new List<string> ( );
-                    status = this.GrabProcessOutput ( proc, errorOutput, stdOutput, false /* waitForReaders */);
+                    List<string> errorOutput = new List<string>();
+                    List<string> stdOutput = new List<string>();
+                    status = this.GrabProcessOutput(proc, errorOutput, stdOutput, false /* waitForReaders */);
                 }
             }
-            catch ( IOException ioe )
+            catch (IOException ioe )
             {
-                Log.d ( DDMS, "Unable to run 'adb': {0}", ioe.Message );
+                Log.d(DDMS, "Unable to run 'adb': {0}", ioe.Message );
             }
-            catch ( ThreadInterruptedException ie )
+            catch (ThreadInterruptedException ie )
             {
-                Log.d ( DDMS, "Unable to run 'adb': {0}", ie.Message );
+                Log.d(DDMS, "Unable to run 'adb': {0}", ie.Message );
             }
-            catch ( Exception e )
+            catch (Exception e )
             {
-                Log.e ( DDMS, e );
+                Log.e(DDMS, e );
             }
 
-            if ( status != 0 )
+            if (status != 0 )
             {
-                Log.w ( DDMS, "'adb start-server' failed -- run manually if necessary" );
+                Log.w(DDMS, "'adb start-server' failed -- run manually if necessary" );
                 return false;
             }
 
-            Log.d ( DDMS, "'adb start-server' succeeded" );
+            Log.d(DDMS, "'adb start-server' succeeded" );
             return true;
         }
 
@@ -838,11 +838,11 @@ namespace Managed.Adb
         /// Stops the adb host side server.
         /// </summary>
         /// <returns>true if success</returns>
-        private bool StopAdb ( )
+        private bool StopAdb()
         {
-            if ( string.IsNullOrEmpty ( AdbOsLocation ) )
+            if (string.IsNullOrEmpty(AdbOsLocation ) )
             {
-                Log.e ( ADB, "Cannot stop adb when AndroidDebugBridge is created without the location of adb." );
+                Log.e(ADB, "Cannot stop adb when AndroidDebugBridge is created without the location of adb." );
                 return false;
             }
             int status = -1;
@@ -850,35 +850,35 @@ namespace Managed.Adb
             try
             {
                 string command = "kill-server";
-                ProcessStartInfo psi = new ProcessStartInfo ( AdbOsLocation, command );
+                ProcessStartInfo psi = new ProcessStartInfo(AdbOsLocation, command );
                 psi.CreateNoWindow = true;
                 psi.WindowStyle = ProcessWindowStyle.Hidden;
                 psi.UseShellExecute = false;
                 psi.RedirectStandardError = true;
                 psi.RedirectStandardOutput = true;
 
-                using ( Process proc = Process.Start ( psi ) )
+                using (Process proc = Process.Start(psi ) )
                 {
-                    proc.WaitForExit ( );
+                    proc.WaitForExit();
                     status = proc.ExitCode;
                 }
             }
-            catch ( IOException )
+            catch (IOException )
             {
                 // we'll return false;
             }
-            catch ( Exception )
+            catch (Exception )
             {
                 // we'll return false;
             }
 
-            if ( status != 0 )
+            if (status != 0 )
             {
-                Log.w ( DDMS, "'adb kill-server' failed -- run manually if necessary" ); 
+                Log.w(DDMS, "'adb kill-server' failed -- run manually if necessary" ); 
                 return false;
             }
 
-            Log.d ( DDMS, "'adb kill-server' succeeded" ); 
+            Log.d(DDMS, "'adb kill-server' succeeded" ); 
             return true;
         }
 
@@ -891,91 +891,91 @@ namespace Managed.Adb
         /// <param name="stdOutput">The array to store the stdout output. cannot be null.</param>
         /// <param name="waitforReaders">if true, this will wait for the reader threads.</param>
         /// <returns>the process return code.</returns>
-        private int GrabProcessOutput ( Process process, List<string> errorOutput, List<string> stdOutput, bool waitforReaders )
+        private int GrabProcessOutput(Process process, List<string> errorOutput, List<string> stdOutput, bool waitforReaders )
         {
-            if ( errorOutput == null )
+            if (errorOutput == null )
             {
-                throw new ArgumentNullException ( "errorOutput" );
+                throw new ArgumentNullException("errorOutput" );
             }
-            if ( stdOutput == null )
+            if (stdOutput == null )
             {
-                throw new ArgumentNullException ( "stdOutput" );
+                throw new ArgumentNullException("stdOutput" );
             }
             // read the lines as they come. if null is returned, it's
             // because the process finished
-            Thread t1 = new Thread ( new ThreadStart ( delegate
+            Thread t1 = new Thread(new ThreadStart(delegate
             {
                 // create a buffer to read the stdoutput
                 try
                 {
-                    using ( StreamReader sr = process.StandardError )
+                    using (StreamReader sr = process.StandardError )
                     {
-                        while ( !sr.EndOfStream )
+                        while (!sr.EndOfStream )
                         {
-                            string line = sr.ReadLine ( );
-                            if ( !string.IsNullOrEmpty ( line ) )
+                            string line = sr.ReadLine();
+                            if (!string.IsNullOrEmpty(line ) )
                             {
-                                Log.e ( ADB, line );
-                                errorOutput.Add ( line );
+                                Log.e(ADB, line );
+                                errorOutput.Add(line );
                             }
                         }
                     }
                 }
-                catch ( Exception )
+                catch (Exception )
                 {
                     // do nothing.
                 }
             } ) );
 
-            Thread t2 = new Thread ( new ThreadStart ( delegate
+            Thread t2 = new Thread(new ThreadStart(delegate
             {
                 // create a buffer to read the std output
                 try
                 {
-                    using ( StreamReader sr = process.StandardOutput )
+                    using (StreamReader sr = process.StandardOutput )
                     {
-                        while ( !sr.EndOfStream )
+                        while (!sr.EndOfStream )
                         {
-                            string line = sr.ReadLine ( );
-                            if ( !string.IsNullOrEmpty ( line ) )
+                            string line = sr.ReadLine();
+                            if (!string.IsNullOrEmpty(line ) )
                             {
-                                stdOutput.Add ( line );
+                                stdOutput.Add(line );
                             }
                         }
                     }
                 }
-                catch ( Exception )
+                catch (Exception )
                 {
                     // do nothing.
                 }
             } ) );
 
-            t1.Start ( );
-            t2.Start ( );
+            t1.Start();
+            t2.Start();
 
             // it looks like on windows process#waitFor() can return
             // before the thread have filled the arrays, so we wait for both threads and the
             // process itself.
-            if ( waitforReaders )
+            if (waitforReaders )
             {
                 try
                 {
-                    t1.Join ( );
+                    t1.Join();
                 }
-                catch ( ThreadInterruptedException )
+                catch (ThreadInterruptedException )
                 {
                 }
                 try
                 {
-                    t2.Join ( );
+                    t2.Join();
                 }
-                catch ( ThreadInterruptedException )
+                catch (ThreadInterruptedException )
                 {
                 }
             }
 
             // get the return code from the process
-            process.WaitForExit ( );
+            process.WaitForExit();
             return process.ExitCode;
         }
         #endregion

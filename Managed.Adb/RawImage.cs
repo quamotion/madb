@@ -17,12 +17,12 @@ namespace Managed.Adb
         /// <summary>
         /// Initializes a new instance of the <see cref="RawImage"/> class.
         /// </summary>
-        public RawImage ( )
+        public RawImage()
         {
-            this.Red = new ColorData ( );
-            this.Blue = new ColorData ( );
-            this.Green = new ColorData ( );
-            this.Alpha = new ColorData ( );
+            this.Red = new ColorData();
+            this.Blue = new ColorData();
+            this.Green = new ColorData();
+            this.Alpha = new ColorData();
         }
 
         /// <summary>
@@ -104,38 +104,38 @@ namespace Managed.Adb
          * @param buf the buffer to read from.
          * @return true if success
          */
-        public bool ReadHeader ( int version, BinaryReader buf )
+        public bool ReadHeader(int version, BinaryReader buf )
         {
             this.Version = version;
             // https://github.com/android/platform_system_core/blob/master/adb/framebuffer_service.c
-            switch ( version )
+            switch (version )
             {
                 case 1: /* RGBA_8888 */
                 case 2: /* RGBX_8888 */
                 case 3: /* RGB_888 */
                 case 4: /* RGB_565 */
                 case 5: /* BGRA_8888 */
-                    this.Bpp = (int)buf.ReadInt32 ( );
-                    this.Size = (int)buf.ReadInt32 ( );
-                    this.Width = (int)buf.ReadInt32 ( ); // 480
-                    this.Height = (int)buf.ReadInt32 ( ); // 800
-                    this.Red.Offset = (int)buf.ReadInt32 ( ); // 8
-                    this.Red.Length = (int)buf.ReadInt32 ( ); // 8
-                    this.Blue.Offset = (int)buf.ReadInt32 ( );  // 0
-                    this.Blue.Length = (int)buf.ReadInt32 ( ); // 8
-                    this.Green.Offset = (int)buf.ReadInt32 ( ); // 16
-                    this.Green.Length = (int)buf.ReadInt32 ( ); // 8
-                    this.Alpha.Offset = (int)buf.ReadInt32 ( ); // 24
-                    this.Alpha.Length = (int)buf.ReadInt32 ( ); // 8
+                    this.Bpp = (int)buf.ReadInt32();
+                    this.Size = (int)buf.ReadInt32();
+                    this.Width = (int)buf.ReadInt32(); // 480
+                    this.Height = (int)buf.ReadInt32(); // 800
+                    this.Red.Offset = (int)buf.ReadInt32(); // 8
+                    this.Red.Length = (int)buf.ReadInt32(); // 8
+                    this.Blue.Offset = (int)buf.ReadInt32();  // 0
+                    this.Blue.Length = (int)buf.ReadInt32(); // 8
+                    this.Green.Offset = (int)buf.ReadInt32(); // 16
+                    this.Green.Length = (int)buf.ReadInt32(); // 8
+                    this.Alpha.Offset = (int)buf.ReadInt32(); // 24
+                    this.Alpha.Length = (int)buf.ReadInt32(); // 8
                     break;
                 default:
                     // compatibility mode with original protocol
                     this.Bpp = 16;
 
                     // read actual values.
-                    this.Size = buf.ReadInt32 ( );
-                    this.Width = buf.ReadInt32 ( );
-                    this.Height = buf.ReadInt32 ( );
+                    this.Size = buf.ReadInt32();
+                    this.Width = buf.ReadInt32();
+                    this.Height = buf.ReadInt32();
                     // create default values for the rest. Format is 565
                     this.Red.Offset = 11;
                     this.Red.Length = 5;
@@ -155,9 +155,9 @@ namespace Managed.Adb
          * @param version the version of the protocol
          * @return the number of int that makes up the header.
          */
-        public static int GetHeaderSize ( int version )
+        public static int GetHeaderSize(int version )
         {
-            switch ( version )
+            switch (version )
             {
                 case 16: // compatibility mode
                     return 3; // size, width, height
@@ -176,9 +176,9 @@ namespace Managed.Adb
          * Returns a rotated version of the image
          * The image is rotated counter-clockwise.
          */
-        public RawImage GetRotated ( )
+        public RawImage GetRotated()
         {
-            RawImage rotated = new RawImage ( );
+            RawImage rotated = new RawImage();
             rotated.Version = this.Version;
             rotated.Bpp = this.Bpp;
             rotated.Size = this.Size;
@@ -200,12 +200,12 @@ namespace Managed.Adb
             int byteCount = this.Bpp >> 3; // bpp is in bits, we want bytes to match our array
             int w = this.Width;
             int h = this.Height;
-            for ( int y = 0; y < h; y++ )
+            for (int y = 0; y < h; y++ )
             {
-                for ( int x = 0; x < w; x++ )
+                for (int x = 0; x < w; x++ )
                 {
-                    Array.Copy ( this.Data, ( y * w + x ) * byteCount,
-                        rotated.Data, ( ( w - x - 1 ) * h + y ) * byteCount,
+                    Array.Copy(this.Data, (y * w + x ) * byteCount,
+                        rotated.Data, ((w - x - 1 ) * h + y ) * byteCount,
                                         byteCount );
                 }
             }
@@ -219,9 +219,9 @@ namespace Managed.Adb
         /// <returns>
         /// A <see cref="System.String"/> that represents this instance.
         /// </returns>
-        public override string ToString ( )
+        public override string ToString()
         {
-            return string.Format ( "height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\ns: {11}",
+            return string.Format("height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\ns: {11}",
                 this.Height, this.Width, this.Bpp,
                 this.Red.Offset, this.Red.Length,
                 this.Green.Offset, this.Green.Length,
@@ -236,31 +236,31 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="format">The format.</param>
         /// <returns></returns>
-        public Image ToImage ( PixelFormat format )
+        public Image ToImage(PixelFormat format )
         {
             Bitmap bitmap = null;
             Bitmap image = null;
             BitmapData bitmapdata = null;
             try
             {
-                bitmap = new Bitmap ( this.Width, this.Height, format );
-                bitmapdata = bitmap.LockBits ( new Rectangle ( 0, 0, this.Width, this.Height ), ImageLockMode.WriteOnly, format );
-                image = new Bitmap ( this.Width, this.Height, format );
+                bitmap = new Bitmap(this.Width, this.Height, format );
+                bitmapdata = bitmap.LockBits(new Rectangle(0, 0, this.Width, this.Height ), ImageLockMode.WriteOnly, format );
+                image = new Bitmap(this.Width, this.Height, format );
                 var tdata = this.Data;
-                if ( this.Bpp == 32 )
+                if (this.Bpp == 32 )
                 {
-                    tdata = this.Swap ( tdata );
+                    tdata = this.Swap(tdata );
                 }
-                Marshal.Copy ( tdata, 0, bitmapdata.Scan0, this.Size );
-                bitmap.UnlockBits ( bitmapdata );
-                using ( Graphics g = Graphics.FromImage ( image ) )
+                Marshal.Copy(tdata, 0, bitmapdata.Scan0, this.Size );
+                bitmap.UnlockBits(bitmapdata );
+                using (Graphics g = Graphics.FromImage(image ) )
                 {
-                    g.DrawImage ( bitmap, new Point ( 0, 0 ) );
+                    g.DrawImage(bitmap, new Point(0, 0 ) );
                     return image;
                 }
 
             }
-            catch ( Exception )
+            catch (Exception )
             {
                 throw;
             }
@@ -270,19 +270,19 @@ namespace Managed.Adb
         /// Converts this raw image to an Image
         /// </summary>
         /// <returns></returns>
-        public Image ToImage ( )
+        public Image ToImage()
         {
-            return this.ToImage ( this.Bpp == 32 ? PixelFormat.Format32bppArgb : PixelFormat.Format16bppRgb565 );
+            return this.ToImage(this.Bpp == 32 ? PixelFormat.Format32bppArgb : PixelFormat.Format16bppRgb565 );
         }
 
-        private byte[] Swap ( byte[] b )
+        private byte[] Swap(byte[] b )
         {
-            var clone = new List<byte> ( );
-            b.IntReverseForRawImage ( bitem =>
+            var clone = new List<byte>();
+            b.IntReverseForRawImage(bitem =>
             {
-                clone.AddRange ( bitem );
+                clone.AddRange(bitem );
             } );
-            return clone.ToArray ( );
+            return clone.ToArray();
         }
 
 

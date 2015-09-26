@@ -15,6 +15,6 @@ namespace Managed.Adb
         /// <var>package</var> attribute of the <var>manifest</var> node.</param>
         /// <returns>The non-random debugger port or NO_STATIC_PORT if the Client
         /// should use the automatic debugger port provider.</returns>
-        int getPort ( IDevice device, string appName );
+        int getPort(IDevice device, string appName );
     }
 }

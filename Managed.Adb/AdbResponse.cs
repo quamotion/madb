@@ -14,7 +14,7 @@ namespace Managed.Adb
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbResponse"/> class.
         /// </summary>
-        public AdbResponse ( )
+        public AdbResponse()
         {
             this.Message = string.Empty;
         }

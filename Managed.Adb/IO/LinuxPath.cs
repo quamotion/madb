@@ -69,8 +69,8 @@ namespace Managed.Adb.IO
         /// <returns>
         ///   <see langword="true"/> if this instance [can path circumvent security native] the specified part of path; otherwise, <see langword="false"/>.
         /// </returns>
-        [MethodImpl ( MethodImplOptions.InternalCall )]
-        private static extern bool CanPathCircumventSecurityNative ( string partOfPath );
+        [MethodImpl(MethodImplOptions.InternalCall )]
+        private static extern bool CanPathCircumventSecurityNative(string partOfPath );
 
         /// <summary>Changes the extension of a path string.</summary>
         /// <returns>A string containing the modified path information.On Windows-based desktop platforms, if path is null or an empty string (""), the path information is returned unmodified. If extension is null, the returned string contains the specified path with its extension removed. If path has no extension, and extension is not null, the returned path string contains extension appended to the end of path.</returns>
@@ -78,38 +78,38 @@ namespace Managed.Adb.IO
         /// <param name="path">The path information to modify. The path cannot contain any of the characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>. </param>
         /// <exception cref="T:System.ArgumentException">The path contains one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
-        public static string ChangeExtension ( string path, string extension )
+        public static string ChangeExtension(string path, string extension )
         {
-            if ( path == null )
+            if (path == null )
             {
                 return null;
             }
-            CheckInvalidPathChars ( path );
+            CheckInvalidPathChars(path );
             string str = path;
             int length = path.Length;
-            while ( --length >= 0 )
+            while (--length >= 0 )
             {
                 char ch = path[length];
-                if ( ch == '.' )
+                if (ch == '.' )
                 {
-                    str = path.Substring ( 0, length );
+                    str = path.Substring(0, length );
                     break;
                 }
-                if ( ( ( ch == DirectorySeparatorChar ) || ( ch == AltDirectorySeparatorChar ) ) )
+                if (((ch == DirectorySeparatorChar ) || (ch == AltDirectorySeparatorChar ) ) )
                 {
                     break;
                 }
             }
-            if (string.IsNullOrEmpty ( extension ) || path.Length == 0 )
+            if (string.IsNullOrEmpty(extension ) || path.Length == 0 )
             {
                 return str;
             }
-            if ( extension.Length > 0 && extension[0] != '.' )
+            if (extension.Length > 0 && extension[0] != '.' )
             {
                 str = str + ".";
             }
 
-            return ( str + extension );
+            return (str + extension );
         }
 
         /// <summary>
@@ -120,20 +120,20 @@ namespace Managed.Adb.IO
         /// <param name="compareTo">The compare to.</param>
         /// <param name="ignoreCase">if set to <see langword="true"/> [ignore case].</param>
         /// <returns></returns>
-        private static unsafe bool CharArrayStartsWithOrdinal ( char* array, int numChars, string compareTo, bool ignoreCase )
+        private static unsafe bool CharArrayStartsWithOrdinal(char* array, int numChars, string compareTo, bool ignoreCase )
         {
-            if ( numChars < compareTo.Length )
+            if (numChars < compareTo.Length )
             {
                 return false;
             }
-            if ( ignoreCase )
+            if (ignoreCase )
             {
-                string str = new string ( array, 0, compareTo.Length );
-                return compareTo.Equals ( str, StringComparison.OrdinalIgnoreCase );
+                string str = new string(array, 0, compareTo.Length );
+                return compareTo.Equals(str, StringComparison.OrdinalIgnoreCase );
             }
-            for ( int i = 0; i < compareTo.Length; i++ )
+            for (int i = 0; i < compareTo.Length; i++ )
             {
-                if ( array[i] != compareTo[i] )
+                if (array[i] != compareTo[i] )
                 {
                     return false;
                 }
@@ -149,20 +149,20 @@ namespace Managed.Adb.IO
         /// <param name="compareTo">The compare to.</param>
         /// <param name="ignoreCase">if set to <see langword="true"/> [ignore case].</param>
         /// <returns></returns>
-        private static bool CharArrayStartsWithOrdinal ( char[] array, int numChars, string compareTo, bool ignoreCase )
+        private static bool CharArrayStartsWithOrdinal(char[] array, int numChars, string compareTo, bool ignoreCase )
         {
-            if ( numChars < compareTo.Length )
+            if (numChars < compareTo.Length )
             {
                 return false;
             }
-            if ( ignoreCase )
+            if (ignoreCase )
             {
-                string str = new string ( array, 0, compareTo.Length );
-                return compareTo.Equals ( str, StringComparison.OrdinalIgnoreCase );
+                string str = new string(array, 0, compareTo.Length );
+                return compareTo.Equals(str, StringComparison.OrdinalIgnoreCase );
             }
-            for ( int i = 0; i < compareTo.Length; i++ )
+            for (int i = 0; i < compareTo.Length; i++ )
             {
-                if ( array[i] != compareTo[i] )
+                if (array[i] != compareTo[i] )
                 {
                     return false;
                 }
@@ -174,14 +174,14 @@ namespace Managed.Adb.IO
         /// Checks the invalid path chars.
         /// </summary>
         /// <param name="path">The path.</param>
-        internal static void CheckInvalidPathChars( string path )
+        internal static void CheckInvalidPathChars(string path )
         {
-            for ( int i = 0; i < path.Length; i++ )
+            for (int i = 0; i < path.Length; i++ )
             {
                 int num2 = path[i];
-                if ( ( ( num2 == 0x22 ) || ( num2 == 60 ) ) || ( ( ( num2 == 0x3e ) || ( num2 == 0x7c ) ) || ( num2 < 0x20 ) ) )
+                if (((num2 == 0x22 ) || (num2 == 60 ) ) || (((num2 == 0x3e ) || (num2 == 0x7c ) ) || (num2 < 0x20 ) ) )
                 {
-                    throw new ArgumentException ( "Path contains invalid characters" );
+                    throw new ArgumentException("Path contains invalid characters" );
                 }
             }
         }
@@ -192,15 +192,15 @@ namespace Managed.Adb.IO
         /// <param name="path1">The first path. </param>
         /// <exception cref="T:System.ArgumentNullException">path1 or path2 is null. </exception>
         /// <exception cref="T:System.ArgumentException">path1 or path2 contain one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
-        public static string Combine ( string path1, string path2 )
+        public static string Combine(string path1, string path2 )
         {
-            if ( ( path1 == null ) || ( path2 == null ) )
+            if ((path1 == null ) || (path2 == null ) )
             {
-                throw new ArgumentNullException ( ( path1 == null ) ? "path1" : "path2" );
+                throw new ArgumentNullException((path1 == null ) ? "path1" : "path2" );
             }
-            CheckInvalidPathChars ( path1 );
-            CheckInvalidPathChars ( path2 );
-            return CombineNoChecks ( path1, path2 );
+            CheckInvalidPathChars(path1 );
+            CheckInvalidPathChars(path2 );
+            return CombineNoChecks(path1, path2 );
         }
 
         /// <summary>
@@ -210,16 +210,16 @@ namespace Managed.Adb.IO
         /// <param name="path2">The path2.</param>
         /// <param name="path3">The path3.</param>
         /// <returns></returns>
-        public static string Combine ( string path1, string path2, string path3 )
+        public static string Combine(string path1, string path2, string path3 )
         {
-            if ( ( ( path1 == null ) || ( path2 == null ) ) || ( path3 == null ) )
+            if (((path1 == null ) || (path2 == null ) ) || (path3 == null ) )
             {
-                throw new ArgumentNullException ( ( path1 == null ) ? "path1" : ( ( path2 == null ) ? "path2" : "path3" ) );
+                throw new ArgumentNullException((path1 == null ) ? "path1" : ((path2 == null ) ? "path2" : "path3" ) );
             }
-            CheckInvalidPathChars ( path1 );
-            CheckInvalidPathChars ( path2 );
-            CheckInvalidPathChars ( path3 );
-            return CombineNoChecks ( CombineNoChecks ( path1, path2 ), path3 );
+            CheckInvalidPathChars(path1 );
+            CheckInvalidPathChars(path2 );
+            CheckInvalidPathChars(path3 );
+            return CombineNoChecks(CombineNoChecks(path1, path2 ), path3 );
         }
 
         /// <summary>
@@ -230,17 +230,17 @@ namespace Managed.Adb.IO
         /// <param name="path3">The path3.</param>
         /// <param name="path4">The path4.</param>
         /// <returns></returns>
-        public static string Combine ( string path1, string path2, string path3, string path4 )
+        public static string Combine(string path1, string path2, string path3, string path4 )
         {
-            if ( ( ( path1 == null ) || ( path2 == null ) ) || ( ( path3 == null ) || ( path4 == null ) ) )
+            if (((path1 == null ) || (path2 == null ) ) || ((path3 == null ) || (path4 == null ) ) )
             {
-                throw new ArgumentNullException ( ( path1 == null ) ? "path1" : ( ( path2 == null ) ? "path2" : ( ( path3 == null ) ? "path3" : "path4" ) ) );
+                throw new ArgumentNullException((path1 == null ) ? "path1" : ((path2 == null ) ? "path2" : ((path3 == null ) ? "path3" : "path4" ) ) );
             }
-            CheckInvalidPathChars ( path1 );
-            CheckInvalidPathChars ( path2 );
-            CheckInvalidPathChars ( path3 );
-            CheckInvalidPathChars ( path4 );
-            return CombineNoChecks ( CombineNoChecks ( CombineNoChecks ( path1, path2 ), path3 ), path4 );
+            CheckInvalidPathChars(path1 );
+            CheckInvalidPathChars(path2 );
+            CheckInvalidPathChars(path3 );
+            CheckInvalidPathChars(path4 );
+            return CombineNoChecks(CombineNoChecks(CombineNoChecks(path1, path2 ), path3 ), path4 );
         }
 
         /// <summary>
@@ -248,24 +248,24 @@ namespace Managed.Adb.IO
         /// </summary>
         /// <param name="paths">The paths.</param>
         /// <returns></returns>
-        public static string Combine ( params string[] paths )
+        public static string Combine(params string[] paths )
         {
-            if ( paths == null )
+            if (paths == null )
             {
-                throw new ArgumentNullException ( "paths" );
+                throw new ArgumentNullException("paths" );
             }
             int capacity = 0;
             int num2 = 0;
-            for ( int i = 0; i < paths.Length; i++ )
+            for (int i = 0; i < paths.Length; i++ )
             {
-                if ( paths[i] == null )
+                if (paths[i] == null )
                 {
-                    throw new ArgumentNullException ( "paths" );
+                    throw new ArgumentNullException("paths" );
                 }
-                if ( paths[i].Length != 0 )
+                if (paths[i].Length != 0 )
                 {
-                    CheckInvalidPathChars ( paths[i] );
-                    if ( IsPathRooted ( paths[i] ) )
+                    CheckInvalidPathChars(paths[i] );
+                    if (IsPathRooted(paths[i] ) )
                     {
                         num2 = i;
                         capacity = paths[i].Length;
@@ -275,33 +275,33 @@ namespace Managed.Adb.IO
                         capacity += paths[i].Length;
                     }
                     char ch = paths[i][paths[i].Length - 1];
-                    if ( ( ( ch != DirectorySeparatorChar ) && ( ch != AltDirectorySeparatorChar ) ) )
+                    if (((ch != DirectorySeparatorChar ) && (ch != AltDirectorySeparatorChar ) ) )
                     {
                         capacity++;
                     }
                 }
             }
-            StringBuilder builder = new StringBuilder ( capacity );
-            for ( int j = num2; j < paths.Length; j++ )
+            StringBuilder builder = new StringBuilder(capacity );
+            for (int j = num2; j < paths.Length; j++ )
             {
-                if ( paths[j].Length != 0 )
+                if (paths[j].Length != 0 )
                 {
-                    if ( builder.Length == 0 )
+                    if (builder.Length == 0 )
                     {
-                        builder.Append ( FixupPath ( paths[j] ) );
+                        builder.Append(FixupPath(paths[j] ) );
                     }
                     else
                     {
                         char ch2 = builder[builder.Length - 1];
-                        if ( ( ( ch2 != DirectorySeparatorChar ) && ( ch2 != AltDirectorySeparatorChar ) ) )
+                        if (((ch2 != DirectorySeparatorChar ) && (ch2 != AltDirectorySeparatorChar ) ) )
                         {
-                            builder.Append ( DirectorySeparatorChar );
+                            builder.Append(DirectorySeparatorChar );
                         }
-                            builder.Append ( paths[j] );
+                            builder.Append(paths[j] );
                     }
                 }
             }
-            return builder.ToString ( );
+            return builder.ToString();
 
         }
 
@@ -311,28 +311,28 @@ namespace Managed.Adb.IO
         /// <param name="path1">The path1.</param>
         /// <param name="path2">The path2.</param>
         /// <returns></returns>
-        private static string CombineNoChecks ( string path1, string path2 )
+        private static string CombineNoChecks(string path1, string path2 )
         {
-            if ( path2.Length == 0 )
+            if (path2.Length == 0 )
             {
-                return FixupPath ( path1 );
+                return FixupPath(path1 );
             }
-            if ( path1.Length == 0 )
+            if (path1.Length == 0 )
             {
-                return FixupPath ( path2 );
+                return FixupPath(path2 );
             }
-            if ( IsPathRooted ( path2 ) )
+            if (IsPathRooted(path2 ) )
             {
-                return FixupPath ( path2 );
+                return FixupPath(path2 );
             }
             char ch = path1[path1.Length - 1];
             char ch2 = path2[0];
-            if ( ch != DirectorySeparatorChar && ch != AltDirectorySeparatorChar &&
+            if (ch != DirectorySeparatorChar && ch != AltDirectorySeparatorChar &&
                 ch2 != DirectorySeparatorChar && ch2 != AltDirectorySeparatorChar )
                 {
-                return ( FixupPath ( path1 ) + path2 );
+                return (FixupPath(path1 ) + path2 );
             }
-            return ( FixupPath ( path1 ) + path2 );
+            return (FixupPath(path1 ) + path2 );
         }
 
 
@@ -343,28 +343,28 @@ namespace Managed.Adb.IO
         /// <exception cref="T:System.ArgumentException">The path parameter contains invalid characters, is empty, or contains only white spaces, or contains a wildcard character. </exception>
         /// <exception cref="T:System.IO.PathTooLongException">The path parameter is longer than the system-defined maximum length.</exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetDirectoryName (string path )
+        public static string GetDirectoryName(string path )
         {
-            if ( path != null )
+            if (path != null )
             {
-                CheckInvalidPathChars ( path );
+                CheckInvalidPathChars(path );
                 //path = FixupPath ( path );
 
                 string tpath = path;
-                if ( tpath.Length > 1 )
+                if (tpath.Length > 1 )
                 {
-                    if ( tpath.EndsWith ( new string( new char[] { DirectorySeparatorChar } ) ) )
+                    if (tpath.EndsWith(new string(new char[] { DirectorySeparatorChar } ) ) )
                     {
-                        return tpath.Substring ( 0, tpath.Length );
+                        return tpath.Substring(0, tpath.Length );
                     }
 
-                    tpath = tpath.Substring ( 0, tpath.LastIndexOf ( DirectorySeparatorChar ) + 1 );
+                    tpath = tpath.Substring(0, tpath.LastIndexOf(DirectorySeparatorChar ) + 1 );
 
-                    return FixupPath ( tpath );
+                    return FixupPath(tpath );
                 }
-                else if ( tpath.Length == 1 )
+                else if (tpath.Length == 1 )
                 {
-                    return new string( new char[] { DirectorySeparatorChar } );
+                    return new string(new char[] { DirectorySeparatorChar } );
                 }
             }
             return null;
@@ -375,15 +375,15 @@ namespace Managed.Adb.IO
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public static string GetPathWithoutFile ( string path )
+        public static string GetPathWithoutFile(string path )
         {
-            if ( path != null )
+            if (path != null )
             {
-                CheckInvalidPathChars ( path );
-                string tfilename = GetFileName ( path );
-                string tpath = path.Substring ( 0, path.Length - tfilename.Length );
-                tpath = FixupPath ( tpath );
-                return tpath.Substring ( 0, tpath.LastIndexOf ( DirectorySeparatorChar ) + 1 );
+                CheckInvalidPathChars(path );
+                string tfilename = GetFileName(path );
+                string tpath = path.Substring(0, path.Length - tfilename.Length );
+                tpath = FixupPath(tpath );
+                return tpath.Substring(0, tpath.LastIndexOf(DirectorySeparatorChar ) + 1 );
             }
             return null;
         }
@@ -393,23 +393,23 @@ namespace Managed.Adb.IO
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        private static string FixupPath ( string path )
+        private static string FixupPath(string path )
         {
             string sb = path;
-            sb = sb.Replace ( System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar );
+            sb = sb.Replace(System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar );
 
 
-            if ( sb != "." && !sb.StartsWith ( new string( new char[] { DirectorySeparatorChar } ) ) )
+            if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar } ) ) )
             {
-                sb = string.Format ( ".{0}{1}", DirectorySeparatorChar, sb );
+                sb = string.Format(".{0}{1}", DirectorySeparatorChar, sb );
             }
 
-            if ( !sb.EndsWith ( new string( new char[] { DirectorySeparatorChar } ) ) )
+            if (!sb.EndsWith(new string(new char[] { DirectorySeparatorChar } ) ) )
             {
-                sb = string.Format ( "{0}{1}", sb, DirectorySeparatorChar );
+                sb = string.Format("{0}{1}", sb, DirectorySeparatorChar );
             }
 
-            sb = sb.Replace ( "//", new byte[] { (byte)DirectorySeparatorChar }.GetString ( ) );
+            sb = sb.Replace("//", new byte[] { (byte)DirectorySeparatorChar }.GetString() );
 
             return sb;
         }
@@ -419,27 +419,27 @@ namespace Managed.Adb.IO
         /// <param name="path">The path string from which to get the extension. </param>
         /// <exception cref="T:System.ArgumentException">path contains one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetExtension ( string path )
+        public static string GetExtension(string path )
         {
-            if ( path == null )
+            if (path == null )
             {
                 return null;
             }
-            CheckInvalidPathChars ( path );
+            CheckInvalidPathChars(path );
             int length = path.Length;
             int startIndex = length;
-            while ( --startIndex >= 0 )
+            while (--startIndex >= 0 )
             {
                 char ch = path[startIndex];
-                if ( ch == '.' )
+                if (ch == '.' )
                 {
-                    if ( startIndex != ( length - 1 ) )
+                    if (startIndex != (length - 1 ) )
                     {
-                        return path.Substring ( startIndex, length - startIndex );
+                        return path.Substring(startIndex, length - startIndex );
                     }
                     return string.Empty;
                 }
-                if ( ( ( ch == DirectorySeparatorChar ) || ( ch == AltDirectorySeparatorChar ) ) )
+                if (((ch == DirectorySeparatorChar ) || (ch == AltDirectorySeparatorChar ) ) )
                 {
                     break;
                 }
@@ -452,19 +452,19 @@ namespace Managed.Adb.IO
         /// <param name="path">The path string from which to obtain the file name and extension. </param>
         /// <exception cref="T:System.ArgumentException">path contains one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetFileName ( string path )
+        public static string GetFileName(string path )
         {
-            if ( path != null )
+            if (path != null )
             {
-                CheckInvalidPathChars ( path );
+                CheckInvalidPathChars(path );
                 int length = path.Length;
                 int num2 = length;
-                while ( --num2 >= 0 )
+                while (--num2 >= 0 )
                 {
                     char ch = path[num2];
-                    if ( ( ( ch == DirectorySeparatorChar ) || ( ch == AltDirectorySeparatorChar ) ) )
+                    if (((ch == DirectorySeparatorChar ) || (ch == AltDirectorySeparatorChar ) ) )
                     {
-                        return path.Substring ( num2 + 1, ( length - num2 ) - 1 );
+                        return path.Substring(num2 + 1, (length - num2 ) - 1 );
                     }
                 }
             }
@@ -476,34 +476,34 @@ namespace Managed.Adb.IO
         /// <param name="path">The path of the file. </param>
         /// <exception cref="T:System.ArgumentException">path contains one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetFileNameWithoutExtension ( string path )
+        public static string GetFileNameWithoutExtension(string path )
         {
-            path = GetFileName ( path );
-            if ( path == null )
+            path = GetFileName(path );
+            if (path == null )
             {
                 return null;
             }
-            int length = path.LastIndexOf ( '.' );
-            if ( length == -1 )
+            int length = path.LastIndexOf('.' );
+            if (length == -1 )
             {
                 return path;
             }
-            return path.Substring ( 0, length );
+            return path.Substring(0, length );
         }
 
 
         /// <summary>Gets an array containing the characters that are not allowed in file names.</summary>
         /// <returns>An array containing the characters that are not allowed in file names.</returns>
-        public static char[] GetInvalidFileNameChars ( )
+        public static char[] GetInvalidFileNameChars()
         {
-            return (char[])InvalidFileNameChars.Clone ( );
+            return (char[])InvalidFileNameChars.Clone();
         }
 
         /// <summary>Gets an array containing the characters that are not allowed in path names.</summary>
         /// <returns>An array containing the characters that are not allowed in path names.</returns>
-        public static char[] GetInvalidPathChars ( )
+        public static char[] GetInvalidPathChars()
         {
-            return (char[])RealInvalidPathChars.Clone ( );
+            return (char[])RealInvalidPathChars.Clone();
         }
 
         /// <summary>Gets the root directory information of the specified path.</summary>
@@ -511,14 +511,14 @@ namespace Managed.Adb.IO
         /// <param name="path">The path from which to obtain root directory information. </param>
         /// <exception cref="T:System.ArgumentException">path contains one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character.-or- <see cref="F:System.String.Empty"></see> was passed to path. </exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetPathRoot ( string path )
+        public static string GetPathRoot(string path )
         {
-            if ( path == null )
+            if (path == null )
             {
                 return null;
             }
-            path = FixupPath ( path );
-            return path.Substring ( 0, GetRootLength ( path ) );
+            path = FixupPath(path );
+            return path.Substring(0, GetRootLength(path ) );
         }
 
         /// <summary>
@@ -526,29 +526,29 @@ namespace Managed.Adb.IO
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        internal static int GetRootLength ( string path )
+        internal static int GetRootLength(string path )
         {
-            CheckInvalidPathChars ( path );
+            CheckInvalidPathChars(path );
             int num = 0;
             int length = path.Length;
-            if ( ( length >= 1 ) && IsDirectorySeparator ( path[0] ) )
+            if ((length >= 1 ) && IsDirectorySeparator(path[0] ) )
             {
                 num = 1;
-                if ( ( length >= 2 ) && IsDirectorySeparator ( path[1] ) )
+                if ((length >= 2 ) && IsDirectorySeparator(path[1] ) )
                 {
                     num = 2;
                     int num3 = 2;
-                    while ( ( num < length ) && ( ( ( path[num] != DirectorySeparatorChar ) && ( path[num] != AltDirectorySeparatorChar ) ) || ( --num3 > 0 ) ) )
+                    while ((num < length ) && (((path[num] != DirectorySeparatorChar ) && (path[num] != AltDirectorySeparatorChar ) ) || (--num3 > 0 ) ) )
                     {
                         num++;
                     }
                 }
                 return num;
             }
-            if ( ( length >= 2 ) )
+            if ((length >= 2 ) )
             {
                 num = 2;
-                if ( ( length >= 3 ) && IsDirectorySeparator ( path[2] ) )
+                if ((length >= 3 ) && IsDirectorySeparator(path[2] ) )
                 {
                     num++;
                 }
@@ -561,25 +561,25 @@ namespace Managed.Adb.IO
         /// <param name="path">The path to search for an extension. </param>
         /// <exception cref="T:System.ArgumentException">path contains one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
-        public static bool HasExtension ( string path )
+        public static bool HasExtension(string path )
         {
-            if ( path != null )
+            if (path != null )
             {
-                CheckInvalidPathChars ( path );
-                if ( path.EndsWith ( new string( new char[] { DirectorySeparatorChar } ) ) || path.EndsWith ( new string( new char[] { AltDirectorySeparatorChar } ) ) )
+                CheckInvalidPathChars(path );
+                if (path.EndsWith(new string(new char[] { DirectorySeparatorChar } ) ) || path.EndsWith(new string(new char[] { AltDirectorySeparatorChar } ) ) )
                 {
                     return false;
                 }
 
                 int length = path.Length;
-                while ( --length >= 0 )
+                while (--length >= 0 )
                 {
                     char ch = path[length];
-                    if ( ch == '.' )
+                    if (ch == '.' )
                     {
-                        return ( length != ( path.Length - 1 ) );
+                        return (length != (path.Length - 1 ) );
                     }
-                    if ( ( ( ch == DirectorySeparatorChar ) || ( ch == AltDirectorySeparatorChar ) ) )
+                    if (((ch == DirectorySeparatorChar ) || (ch == AltDirectorySeparatorChar ) ) )
                     {
                         break;
                     }
@@ -594,40 +594,40 @@ namespace Managed.Adb.IO
         /// <param name="path1">The path1.</param>
         /// <param name="path2">The path2.</param>
         /// <returns></returns>
-        internal static string InternalCombine ( string path1, string path2 )
+        internal static string InternalCombine(string path1, string path2 )
         {
-            if ( ( path1 == null ) || ( path2 == null ) )
+            if ((path1 == null ) || (path2 == null ) )
             {
-                throw new ArgumentNullException ( ( path1 == null ) ? "path1" : "path2" );
+                throw new ArgumentNullException((path1 == null ) ? "path1" : "path2" );
             }
-            CheckInvalidPathChars ( path1 );
-            CheckInvalidPathChars ( path2 );
-            if ( path2.Length == 0 )
+            CheckInvalidPathChars(path1 );
+            CheckInvalidPathChars(path2 );
+            if (path2.Length == 0 )
             {
-                throw new ArgumentException ( "Path can not empty", "path2" );
+                throw new ArgumentException("Path can not empty", "path2" );
             }
-            if ( IsPathRooted ( path2 ) )
+            if (IsPathRooted(path2 ) )
             {
-                throw new ArgumentException ( "Path is already rooted", "path2" );
+                throw new ArgumentException("Path is already rooted", "path2" );
             }
             int length = path1.Length;
-            if ( length == 0 )
+            if (length == 0 )
             {
                 return path2;
             }
             char ch = path1[length - 1];
-            if ( ( ( ch != DirectorySeparatorChar ) && ( ch != AltDirectorySeparatorChar ) ) )
+            if (((ch != DirectorySeparatorChar ) && (ch != AltDirectorySeparatorChar ) ) )
             {
-                return ( path1 + DirectorySeparatorChar + path2 );
+                return (path1 + DirectorySeparatorChar + path2 );
             }
-            return ( path1 + path2 );
+            return (path1 + path2 );
         }
 
-        internal static bool IsDirectorySeparator ( char c )
+        internal static bool IsDirectorySeparator(char c )
         {
-            if ( c != DirectorySeparatorChar )
+            if (c != DirectorySeparatorChar )
             {
-                return ( c == AltDirectorySeparatorChar );
+                return (c == AltDirectorySeparatorChar );
             }
             return true;
         }
@@ -637,14 +637,14 @@ namespace Managed.Adb.IO
         /// <param name="path">The path to test. </param>
         /// <exception cref="T:System.ArgumentException">path contains one or more of the invalid characters defined in <see cref="F:System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
-        public static bool IsPathRooted ( string path )
+        public static bool IsPathRooted(string path )
         {
-            if ( path != null )
+            if (path != null )
             {
-                CheckInvalidPathChars ( path );
+                CheckInvalidPathChars(path );
                 int length = path.Length;
-                if ( ( length >= 1 && ( path[0] == DirectorySeparatorChar || path[0] == AltDirectorySeparatorChar ) ) ||
-                    ( length == 1 ) )
+                if ((length >= 1 && (path[0] == DirectorySeparatorChar || path[0] == AltDirectorySeparatorChar ) ) ||
+                    (length == 1 ) )
                     {
                     return true;
                 }
@@ -659,9 +659,9 @@ namespace Managed.Adb.IO
         /// <returns></returns>
         public static string Escape(string path )
         {
-            return new Regex ( ESCAPEPATTERN ).Replace ( path, new MatchEvaluator ( delegate ( Match m )
+            return new Regex(ESCAPEPATTERN ).Replace(path, new MatchEvaluator(delegate(Match m )
             {
-                return m.Result ( "\\\\$1" );
+                return m.Result("\\\\$1" );
             } ) );
         }
 
@@ -672,9 +672,9 @@ namespace Managed.Adb.IO
         /// <returns></returns>
         public static string Quote(string path )
         {
-            if ( path.Contains ( " " ) )
+            if (path.Contains(" " ) )
             {
-                return string.Format ( "\"{0}\"", path );
+                return string.Format("\"{0}\"", path );
             }
             else
             {

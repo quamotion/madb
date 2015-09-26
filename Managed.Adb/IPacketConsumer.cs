@@ -13,22 +13,22 @@ namespace Managed.Adb
         /// <summary>
         /// Reads this instance.
         /// </summary>
-        void Read ( );
+        void Read();
         // TODO: JdwpPacket
-        /*JdwpPacket*/ Object GetJdwpPacket ( );
+        /*JdwpPacket*/ Object GetJdwpPacket();
         /// <summary>
         /// Forwards the packet to client.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        void ForwardPacketToClient ( /*JdwpPacket*/ Object packet );
+        void ForwardPacketToClient(/*JdwpPacket*/ Object packet );
         /// <summary>
         /// Sends the handshake.
         /// </summary>
-        bool SendHandshake ( );
+        bool SendHandshake();
         /// <summary>
         /// Sends the and consume.
         /// </summary>
         /// <param name="packet">The packet.</param>
-        void SendAndConsume ( /*JdwpPacket*/ Object packet );
+        void SendAndConsume(/*JdwpPacket*/ Object packet );
     }
 }

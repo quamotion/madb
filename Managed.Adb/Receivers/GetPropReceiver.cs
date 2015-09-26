@@ -21,7 +21,7 @@ namespace Managed.Adb
         /// Initializes a new instance of the <see cref="GetPropReceiver"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        public GetPropReceiver ( Device device )
+        public GetPropReceiver(Device device )
         {
             this.Device = device;
         }
@@ -37,7 +37,7 @@ namespace Managed.Adb
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines ( string[] lines )
+        protected override void ProcessNewLines(string[] lines )
         {
             // We receive an array of lines. We're expecting
             // to have the build info in the first line, and the build
@@ -46,19 +46,19 @@ namespace Managed.Adb
 
             foreach (string line in lines )
             {
-                if (string.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) || line.StartsWith("$") )
+                if (string.IsNullOrEmpty(line ) || line.StartsWith("#" ) || line.StartsWith("$") )
                 {
                     continue;
                 }
-                var m = line.Match ( GETPROP_PATTERN, RegexOptions.Compiled );
-                if ( m.Success )
+                var m = line.Match(GETPROP_PATTERN, RegexOptions.Compiled );
+                if (m.Success )
                 {
-                    string label = m.Groups[1].Value.Trim ( );
-                    string value = m.Groups[2].Value.Trim ( );
+                    string label = m.Groups[1].Value.Trim();
+                    string value = m.Groups[2].Value.Trim();
 
-                    if ( label.Length > 0 )
+                    if (label.Length > 0 )
                     {
-                        this.Device.Properties.Add ( label, value );
+                        this.Device.Properties.Add(label, value );
                     }
                 }
             }
@@ -67,10 +67,10 @@ namespace Managed.Adb
         /// <summary>
         /// Finishes the receiver
         /// </summary>
-        protected override void Done ( )
+        protected override void Done()
         {
-            this.Device.OnBuildInfoChanged ( EventArgs.Empty );
-            base.Done ( );
+            this.Device.OnBuildInfoChanged(EventArgs.Empty );
+            base.Done();
         }
     }
 }

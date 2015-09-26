@@ -12,7 +12,7 @@ namespace Managed.Adb
     {
         public const int NO_STATIC_PORT = -1;
 
-        public DebugPortManager ( )
+        public DebugPortManager()
         {
 
         }
@@ -30,9 +30,9 @@ namespace Managed.Adb
         {
             get
             {
-                if ( _instance == null )
+                if (_instance == null )
                 {
-                    _instance = new DebugPortManager ( );
+                    _instance = new DebugPortManager();
                 }
                 return _instance;
             }
