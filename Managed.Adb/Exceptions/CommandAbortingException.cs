@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.Serialization;
-
-namespace Managed.Adb.Exceptions
+﻿namespace Managed.Adb.Exceptions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.Serialization;
+    using System.Text;
+
     /// <summary>
     /// Thrown when an executed command identifies that it is being aborted.
     /// </summary>

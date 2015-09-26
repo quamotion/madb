@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using MoreLinq;
-
-namespace Managed.Adb
+﻿namespace Managed.Adb
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text;
+    using MoreLinq;
+
     /// <summary>
     ///
     /// </summary>

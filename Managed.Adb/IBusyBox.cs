@@ -4,11 +4,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-
 namespace Managed.Adb
 {
+    using System;
+    using System.Collections.Generic;
+
     public interface IBusyBox
     {
         /// <include file='.\BusyBox.xml' path='/BusyBox/Available/*'/>

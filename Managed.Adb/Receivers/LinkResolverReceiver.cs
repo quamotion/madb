@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-
-namespace Managed.Adb
+﻿namespace Managed.Adb
 {
+    using System;
+    using System.Linq;
+
     internal sealed class LinkResolverReceiver : MultiLineReceiver
     {
         public LinkResolverReceiver(string fileName)

@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Net.Sockets;
-using System.Threading;
-using MoreLinq;
-
-namespace Managed.Adb
+﻿namespace Managed.Adb
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net.Sockets;
+    using System.Text;
+    using System.Threading;
+    using MoreLinq;
+
     /// <summary>
     /// A Device monitor. This connects to the Android Debug Bridge and get device and
     /// debuggable process information from it.

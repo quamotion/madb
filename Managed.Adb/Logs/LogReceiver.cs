@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Managed.Adb.Logs
+﻿namespace Managed.Adb.Logs
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
     public class LogReceiver
     {
         private const int ENTRY_HEADER_SIZE = 20; // 2*2 + 4*4; see LogEntry.

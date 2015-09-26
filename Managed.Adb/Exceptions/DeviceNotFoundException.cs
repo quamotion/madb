@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Managed.Adb.Exceptions
+﻿namespace Managed.Adb.Exceptions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
     /// <summary>
     /// Unable to connect to the device because it was not found in the list of available devices.
     /// </summary>

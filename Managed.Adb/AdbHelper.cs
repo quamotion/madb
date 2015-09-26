@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Sockets;
-using System.Net;
-using System.IO;
-using System.Threading;
-using Managed.Adb.Exceptions;
-using MoreLinq;
-using Managed.Adb.IO;
-using Managed.Adb.Logs;
-
-// services that are supported by adb: https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT
+﻿// services that are supported by adb: https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT
 namespace Managed.Adb
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Text;
+    using System.Threading;
+    using Managed.Adb.Exceptions;
+    using Managed.Adb.IO;
+    using Managed.Adb.Logs;
+    using MoreLinq;
+
     /// <summary>
     /// Specifies the transport type used between the device and the Android Debug Bridge server.
     /// </summary>

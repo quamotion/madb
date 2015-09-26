@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Managed.Adb.Logs
+﻿namespace Managed.Adb.Logs
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
     public sealed class LogEntry
     {
         public int Length { get; set; }

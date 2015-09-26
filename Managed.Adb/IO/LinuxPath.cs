@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-
-namespace Managed.Adb.IO
+﻿namespace Managed.Adb.IO
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using System.Text.RegularExpressions;
+
     /// <summary>
     /// Just like System.IO.Path, except it is geared for Linux
     /// </summary>
