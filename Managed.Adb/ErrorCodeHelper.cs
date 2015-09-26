@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
-    public static class ErrorCodeHelper {
+namespace Managed.Adb
+{
+    public static class ErrorCodeHelper
+    {
         /** Result code for transfer success. */
     public const int RESULT_OK = 0;
     /** Result code for canceled transfer */
@@ -37,8 +39,10 @@ namespace Managed.Adb {
     public const int RESULT_BUFFER_OVERRUN = 14;
 
 
-        public static String ErrorCodeToString ( int code ) {
-            switch ( code ) {
+        public static String ErrorCodeToString ( int code )
+        {
+            switch ( code )
+            {
                 case RESULT_OK:
                     return "Success.";
                 case RESULT_CANCELED:

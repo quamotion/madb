@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
-    public interface IDebugPortProvider {
+namespace Managed.Adb
+{
+    public interface IDebugPortProvider
+    {
         /// <summary>
         /// Returns a non-random debugger port for the specified application running on the specified Device.
         /// </summary>

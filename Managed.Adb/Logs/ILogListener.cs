@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb.Logs {
-    public interface ILogListener {
+namespace Managed.Adb.Logs
+{
+    public interface ILogListener
+    {
         /// <summary>
         /// Sent when a new LogEntry has been parsed by the LogReceiver.
         /// </summary>

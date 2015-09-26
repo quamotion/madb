@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public interface IPacketConsumer {
+    public interface IPacketConsumer
+    {
         /// <summary>
         /// Reads this instance.
         /// </summary>

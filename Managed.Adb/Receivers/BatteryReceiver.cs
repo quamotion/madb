@@ -5,11 +5,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using MoreLinq;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public class BatteryReceiver : MultiLineReceiver {
+    public class BatteryReceiver : MultiLineReceiver
+    {
         private const String TAG = "BatteryReceiver";
         private const String BATTERY_LEVEL = @"\s*level:\s?(\d+)";
         private const String AC_POWER = @"\s*AC\spowered:\s?(true|false)";
@@ -37,81 +39,111 @@ namespace Managed.Adb {
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines ( string[] lines ) {
+        protected override void ProcessNewLines ( string[] lines )
+        {
             this.BatteryInfo = new BatteryInfo ( );
-            foreach ( var line in lines ) {
+            foreach ( var line in lines )
+            {
                 var match = line.Match( BATTERY_LEVEL, REOPTIONS );
-                if ( match.Success ) {
-                    try {
+                if ( match.Success )
+                {
+                    try
+                    {
                         this.BatteryInfo.Level = Int32.Parse ( match.Groups[1].Value );
-                    } catch ( FormatException ) {
+                    }
+                    catch ( FormatException )
+                    {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
                 }
 
                 match = line.Match ( SCALE, REOPTIONS );
-                if ( match.Success ) {
-                    try {
+                if ( match.Success )
+                {
+                    try
+                    {
                         this.BatteryInfo.Scale = Int32.Parse ( match.Groups[1].Value );
-                    } catch ( FormatException ) {
+                    }
+                    catch ( FormatException )
+                    {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
                 }
 
                 match = line.Match ( AC_POWER, REOPTIONS );
-                if ( match.Success ) {
+                if ( match.Success )
+                {
                     this.BatteryInfo.ACPowered = String.Compare ( match.Groups[1].Value, bool.TrueString, true ) == 0;
                 }
 
                 match = line.Match ( USB_POWER, REOPTIONS );
-                if ( match.Success ) {
+                if ( match.Success )
+                {
                     this.BatteryInfo.UsbPowered = String.Compare ( match.Groups[1].Value, bool.TrueString, true ) == 0;
                 }
 
                 match = line.Match ( PRESENT, REOPTIONS );
-                if ( match.Success ) {
+                if ( match.Success )
+                {
                     this.BatteryInfo.Present = String.Compare ( match.Groups[1].Value, bool.TrueString, true ) == 0;
                 }
 
                 match = line.Match ( STATUS, REOPTIONS );
-                if ( match.Success ) {
-                    try {
+                if ( match.Success )
+                {
+                    try
+                    {
                         var i = Int32.Parse ( match.Groups[1].Value );
                         this.BatteryInfo.Status = i.ToEnum<BatteryInfo.StatusTypes> ( );
-                    } catch ( FormatException ) {
+                    }
+                    catch ( FormatException )
+                    {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
                 }
 
                 match = line.Match ( HEALTH, REOPTIONS );
-                if ( match.Success ) {
-                    try {
+                if ( match.Success )
+                {
+                    try
+                    {
                         var i = Int32.Parse ( match.Groups[1].Value );
                         this.BatteryInfo.Health = i.ToEnum<BatteryInfo.HealthTypes> ( );
-                    } catch ( FormatException ) {
+                    }
+                    catch ( FormatException )
+                    {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
                 }
 
                 match = line.Match ( VOLTAGE, REOPTIONS );
-                if ( match.Success ) {
-                    try {
+                if ( match.Success )
+                {
+                    try
+                    {
                         this.BatteryInfo.Voltage = Int32.Parse ( match.Groups[1].Value );
-                    } catch ( FormatException ) {
+                    }
+                    catch ( FormatException )
+                    {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
                 }
 
                 match = line.Match ( TYPE, REOPTIONS );
-                if ( match.Success ) {
+                if ( match.Success )
+                {
                     this.BatteryInfo.Type = match.Groups[1].Value;
                 }
 
                 match = line.Match ( TEMP, REOPTIONS );
-                if ( match.Success ) {
-                    try {
+                if ( match.Success )
+                {
+                    try
+                    {
                         this.BatteryInfo.Temperature = Int32.Parse ( match.Groups[1].Value );
-                    } catch ( FormatException ) {
+                    }
+                    catch ( FormatException )
+                    {
                         Log.w ( TAG, String.Format ( "Failed to parse {0} as an integer", match.Groups[1].Value ) );
                     }
                 }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <ignore>true</ignore>
-    public static partial class ManagedAdbExtenstions {
+    public static partial class ManagedAdbExtenstions
+    {
 
         /// <summary>
         /// Swaps an unsigned value around, and puts the result in an array that can be sent to a device.
@@ -14,7 +16,8 @@ namespace Managed.Adb {
         /// <param name="dest">the destination array</param>
         /// <param name="offset">offset the offset in the array where to put the swapped value.</param>
         /// <remarks>Array length must be at least offset + 4</remarks>
-        public static void Swap32bitsToArray (this int value, byte[] dest, int offset ) {
+        public static void Swap32bitsToArray (this int value, byte[] dest, int offset )
+        {
             dest[offset] = (byte)( value & 0x000000FF );
             dest[offset + 1] = (byte)( ( value & 0x0000FF00 ) >> 8 );
             dest[offset + 2] = (byte)( ( value & 0x00FF0000 ) >> 16 );
@@ -27,7 +30,8 @@ namespace Managed.Adb {
         /// <param name="value">the array containing the int</param>
         /// <param name="offset">the offset in the array at which the int starts</param>
         /// <returns>the integer read from the array</returns>
-        public static int Swap32bitFromArray ( this byte[] value, int offset ) {
+        public static int Swap32bitFromArray ( this byte[] value, int offset )
+        {
             int v = 0;
             v |= ( (int)value[offset] ) & 0x000000FF;
             v |= ( ( (int)value[offset + 1] ) & 0x000000FF ) << 8;
@@ -45,7 +49,8 @@ namespace Managed.Adb {
         /// <param name="offset">the offset in the array at which the int starts</param>
         /// <remarks>Array length must be at least offset + 2</remarks>
         /// <returns>the integer read from the array.</returns>
-        public static int SwapU16bitFromArray ( this byte[] value, int offset ) {
+        public static int SwapU16bitFromArray ( this byte[] value, int offset )
+        {
             int v = 0;
             v |= ( (int)value[offset] ) & 0x000000FF;
             v |= ( ( (int)value[offset + 1] ) & 0x000000FF ) << 8;
@@ -60,7 +65,8 @@ namespace Managed.Adb {
         /// <param name="offset">the offset in the array at which the int starts</param>
         /// <remarks>Array length must be at least offset + 8</remarks>
         /// <returns>the integer read from the array</returns>
-        public static long Swap64bitFromArray ( this byte[] value, int offset ) {
+        public static long Swap64bitFromArray ( this byte[] value, int offset )
+        {
             long v = 0;
             v |= ( (long)value[offset] ) & 0x00000000000000FFL;
             v |= ( ( (long)value[offset + 1] ) & 0x00000000000000FFL ) << 8;

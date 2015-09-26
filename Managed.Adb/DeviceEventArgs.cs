@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
-        public class DeviceEventArgs : EventArgs {
+namespace Managed.Adb
+{
+        public class DeviceEventArgs : EventArgs
+        {
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceEventArgs"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        public DeviceEventArgs ( IDevice device ) {
+        public DeviceEventArgs ( IDevice device )
+        {
             this.Device = device;
         }
 

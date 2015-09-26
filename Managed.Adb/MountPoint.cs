@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// Represents a mount point.
     /// </summary>
-    public class MountPoint : ICloneable {
+    public class MountPoint : ICloneable
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="MountPoint"/> class.
         /// </summary>
@@ -15,7 +17,8 @@ namespace Managed.Adb {
         /// <param name="name">The name.</param>
         /// <param name="fs">The fs.</param>
         /// <param name="readOnly">if set to <see langword="true"/> [read only].</param>
-        public MountPoint ( string block, string name, string fs, bool readOnly ) {
+        public MountPoint ( string block, string name, string fs, bool readOnly )
+        {
             this.Block = block;
             this.Name = name;
             this.FileSystem = fs;
@@ -54,7 +57,8 @@ namespace Managed.Adb {
         /// <returns>
         /// A <see cref="System.String"/> that represents this instance.
         /// </returns>
-        public override string ToString ( ) {
+        public override string ToString ( )
+        {
             return string.Format ( "{0}\t{1}\t{2}\t{3}", this.Block, this.Name, this.FileSystem, this.IsReadOnly ? "ro" : "rw" );
         }
 
@@ -62,7 +66,8 @@ namespace Managed.Adb {
         /// Creates a clone of this MountPoint
         /// </summary>
         /// <returns></returns>
-        public MountPoint Clone ( ) {
+        public MountPoint Clone ( )
+        {
             return this.MemberwiseClone ( ) as MountPoint;
         }
 
@@ -72,7 +77,8 @@ namespace Managed.Adb {
         /// <returns>
         /// A new object that is a copy of this instance.
         /// </returns>
-        object ICloneable.Clone ( ) {
+        object ICloneable.Clone ( )
+        {
             return this.MemberwiseClone ( );
         }
     }

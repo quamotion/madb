@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public class ClientData {
+    public class ClientData
+    {
         /// <summary>
         /// 
         /// </summary>
         private const String PRE_INITIALIZED = "<pre-initialized>";
 
-        public enum DebuggerStatus {
+        public enum DebuggerStatus
+        {
             /// <summary>
             /// Debugger connection status: not waiting on one, not connected to one, but accepting
             /// new connections. This is the default value.
@@ -37,7 +40,8 @@ namespace Managed.Adb {
         /// <summary>
         /// 
         /// </summary>
-        public enum AllocationTrackingStatus {
+        public enum AllocationTrackingStatus
+        {
                 /// <summary>
                 /// Allocation tracking status: unknown.
                 /// This happens right after a {@link Client} is discovered
@@ -59,7 +63,8 @@ namespace Managed.Adb {
         /// <summary>
         /// 
         /// </summary>
-    public enum MethodProfilingStatus {
+    public enum MethodProfilingStatus
+    {
                 /// <summary>
                 /// Method profiling status: unknown.
                 /// This happens right after a {@link Client} is discovered
@@ -126,7 +131,8 @@ namespace Managed.Adb {
         /// Initializes a new instance of the <see cref="ClientData"/> class.
         /// </summary>
         /// <param name="pid">The pid.</param>
-        public ClientData ( int pid ) {
+        public ClientData ( int pid )
+        {
             this.Pid = pid;
 
             this.DebuggerInterest = DebuggerStatus.DEFAULT;

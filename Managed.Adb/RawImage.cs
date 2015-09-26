@@ -7,15 +7,18 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// Data representing an image taken from a device frame buffer.
     /// </summary>
-    public class RawImage {
+    public class RawImage
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="RawImage"/> class.
         /// </summary>
-        public RawImage ( ) {
+        public RawImage ( )
+        {
             this.Red = new ColorData ( );
             this.Blue = new ColorData ( );
             this.Green = new ColorData ( );
@@ -101,10 +104,12 @@ namespace Managed.Adb {
          * @param buf the buffer to read from.
          * @return true if success
          */
-        public bool ReadHeader ( int version, BinaryReader buf ) {
+        public bool ReadHeader ( int version, BinaryReader buf )
+        {
             this.Version = version;
             // https://github.com/android/platform_system_core/blob/master/adb/framebuffer_service.c
-            switch ( version ) {
+            switch ( version )
+            {
                 case 1: /* RGBA_8888 */
                 case 2: /* RGBX_8888 */
                 case 3: /* RGB_888 */
@@ -150,8 +155,10 @@ namespace Managed.Adb {
          * @param version the version of the protocol
          * @return the number of int that makes up the header.
          */
-        public static int GetHeaderSize ( int version ) {
-            switch ( version ) {
+        public static int GetHeaderSize ( int version )
+        {
+            switch ( version )
+            {
                 case 16: // compatibility mode
                     return 3; // size, width, height
                 case 1:
@@ -169,7 +176,8 @@ namespace Managed.Adb {
          * Returns a rotated version of the image
          * The image is rotated counter-clockwise.
          */
-        public RawImage GetRotated ( ) {
+        public RawImage GetRotated ( )
+        {
             RawImage rotated = new RawImage ( );
             rotated.Version = this.Version;
             rotated.Bpp = this.Bpp;
@@ -192,8 +200,10 @@ namespace Managed.Adb {
             int byteCount = this.Bpp >> 3; // bpp is in bits, we want bytes to match our array
             int w = this.Width;
             int h = this.Height;
-            for ( int y = 0; y < h; y++ ) {
-                for ( int x = 0; x < w; x++ ) {
+            for ( int y = 0; y < h; y++ )
+            {
+                for ( int x = 0; x < w; x++ )
+                {
                     Array.Copy ( this.Data, ( y * w + x ) * byteCount,
                         rotated.Data, ( ( w - x - 1 ) * h + y ) * byteCount,
                                         byteCount );
@@ -209,7 +219,8 @@ namespace Managed.Adb {
         /// <returns>
         /// A <see cref="System.String"/> that represents this instance.
         /// </returns>
-        public override string ToString ( ) {
+        public override string ToString ( )
+        {
             return String.Format ( "height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\ns: {11}",
                 this.Height, this.Width, this.Bpp,
                 this.Red.Offset, this.Red.Length,
@@ -225,26 +236,32 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="format">The format.</param>
         /// <returns></returns>
-        public Image ToImage ( PixelFormat format ) {
+        public Image ToImage ( PixelFormat format )
+        {
             Bitmap bitmap = null;
             Bitmap image = null;
             BitmapData bitmapdata = null;
-            try {
+            try
+            {
                 bitmap = new Bitmap ( this.Width, this.Height, format );
                 bitmapdata = bitmap.LockBits ( new Rectangle ( 0, 0, this.Width, this.Height ), ImageLockMode.WriteOnly, format );
                 image = new Bitmap ( this.Width, this.Height, format );
                 var tdata = this.Data;
-                if ( this.Bpp == 32 ) {
+                if ( this.Bpp == 32 )
+                {
                     tdata = this.Swap ( tdata );
                 }
                 Marshal.Copy ( tdata, 0, bitmapdata.Scan0, this.Size );
                 bitmap.UnlockBits ( bitmapdata );
-                using ( Graphics g = Graphics.FromImage ( image ) ) {
+                using ( Graphics g = Graphics.FromImage ( image ) )
+                {
                     g.DrawImage ( bitmap, new Point ( 0, 0 ) );
                     return image;
                 }
 
-            } catch ( Exception ) {
+            }
+            catch ( Exception )
+            {
                 throw;
             }
         }
@@ -253,13 +270,16 @@ namespace Managed.Adb {
         /// Converts this raw image to an Image
         /// </summary>
         /// <returns></returns>
-        public Image ToImage ( ) {
+        public Image ToImage ( )
+        {
             return this.ToImage ( this.Bpp == 32 ? PixelFormat.Format32bppArgb : PixelFormat.Format16bppRgb565 );
         }
 
-        private byte[] Swap ( byte[] b ) {
+        private byte[] Swap ( byte[] b )
+        {
             var clone = new List<byte> ( );
-            b.IntReverseForRawImage ( bitem => {
+            b.IntReverseForRawImage ( bitem =>
+            {
                 clone.AddRange ( bitem );
             } );
             return clone.ToArray ( );

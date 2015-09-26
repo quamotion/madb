@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public static class LogLevel {
+    public static class LogLevel
+    {
 
         /// <summary>
         /// Initializes the <see cref="LogLevel"/> class.
         /// </summary>
-        static LogLevel ( ) {
+        static LogLevel ( )
+        {
             Levels = new Dictionary<string, LogLevelInfo> ( );
             Verbose = new LogLevelInfo { Priority = 2, Value = "verbose", Letter = 'V' };
             Debug = new LogLevelInfo { Priority = 3, Value = "debug", Letter = 'D' };
@@ -67,10 +70,13 @@ namespace Managed.Adb {
         /// <value>The levels.</value>
         public static Dictionary<String, LogLevelInfo> Levels { get; private set; }
 
-        public static LogLevelInfo GetByString ( String value ) {
+        public static LogLevelInfo GetByString ( String value )
+        {
 
-            foreach ( LogLevelInfo item in Values ) {
-                if ( String.Compare ( item.Value, value, true ) == 0 ) {
+            foreach ( LogLevelInfo item in Values )
+            {
+                if ( String.Compare ( item.Value, value, true ) == 0 )
+                {
                     return item;
                 }
             }
@@ -82,7 +88,8 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="letter">The letter.</param>
         /// <returns></returns>
-        public static LogLevelInfo GetByLetter ( String letter ) {
+        public static LogLevelInfo GetByLetter ( String letter )
+        {
             return GetByLetter ( letter[0] );
         }
 
@@ -91,9 +98,12 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="letter">The letter.</param>
         /// <returns></returns>
-        public static LogLevelInfo GetByLetter ( char letter ) {
-            foreach ( LogLevelInfo item in Values ) {
-                if ( item.Letter == letter ) {
+        public static LogLevelInfo GetByLetter ( char letter )
+        {
+            foreach ( LogLevelInfo item in Values )
+            {
+                if ( item.Letter == letter )
+                {
                     return item;
                 }
             }
@@ -105,8 +115,10 @@ namespace Managed.Adb {
         /// Gets the values.
         /// </summary>
         /// <value>The values.</value>
-        public static Dictionary<string, LogLevelInfo>.ValueCollection Values {
-            get {
+        public static Dictionary<string, LogLevelInfo>.ValueCollection Values
+        {
+            get
+            {
                 return Levels.Values;
             }
         }
@@ -115,8 +127,10 @@ namespace Managed.Adb {
         /// Gets the keys.
         /// </summary>
         /// <value>The keys.</value>
-        public static Dictionary<string, LogLevelInfo>.KeyCollection Keys {
-            get {
+        public static Dictionary<string, LogLevelInfo>.KeyCollection Keys
+        {
+            get
+            {
                 return Levels.Keys;
             }
         }
@@ -124,11 +138,13 @@ namespace Managed.Adb {
         /// <summary>
         /// 
         /// </summary>
-        public class LogLevelInfo {
+        public class LogLevelInfo
+        {
             /// <summary>
             /// Initializes a new instance of the <see cref="LogLevelInfo"/> class.
             /// </summary>
-            public LogLevelInfo ( ) {
+            public LogLevelInfo ( )
+            {
 
             }
 
@@ -138,7 +154,8 @@ namespace Managed.Adb {
             /// <param name="priority">The priority.</param>
             /// <param name="value">The value.</param>
             /// <param name="letter">The letter.</param>
-            public LogLevelInfo ( int priority, String value, Char letter ) {
+            public LogLevelInfo ( int priority, String value, Char letter )
+            {
                 this.Priority = priority;
                 this.Value = value;
                 this.Letter = letter;

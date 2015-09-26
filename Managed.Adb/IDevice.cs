@@ -7,12 +7,14 @@ using System.Net;
 using System.IO;
 using Managed.Adb.Exceptions;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
 
     /// <summary>
     /// 
     /// </summary>
-    public interface IDevice {
+    public interface IDevice
+    {
 
         /// <summary>
         /// Occurs when device state changed.

@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public class InstallReceiver : MultiLineReceiver {
+    public class InstallReceiver : MultiLineReceiver
+    {
         /// <summary>
         /// 
         /// </summary>
@@ -24,16 +26,23 @@ namespace Managed.Adb {
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines ( string[] lines ) {
-            foreach ( String line in lines ) {
-                if ( line.Length > 0 ) {
-                    if ( line.StartsWith ( SUCCESS_OUTPUT ) ) {
+        protected override void ProcessNewLines ( string[] lines )
+        {
+            foreach ( String line in lines )
+            {
+                if ( line.Length > 0 )
+                {
+                    if ( line.StartsWith ( SUCCESS_OUTPUT ) )
+                    {
                         this.ErrorMessage = null;
                         this.Success = true;
-                    } else {
+                    }
+                    else
+                    {
                         var m = line.Match ( FAILURE_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase );
                         this.ErrorMessage = UNKNOWN_ERROR;
-                        if ( m.Success ) {
+                        if ( m.Success )
+                        {
                             string msg = m.Groups[1].Value;
                             this.ErrorMessage = String.IsNullOrEmpty ( msg ) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
                         }

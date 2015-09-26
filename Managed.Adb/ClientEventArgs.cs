@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public enum ClientChangeMask {
+    public enum ClientChangeMask
+    {
         /// <summary>
         /// 
         /// </summary>
@@ -41,14 +43,16 @@ namespace Managed.Adb {
     /// <summary>
     /// 
     /// </summary>
-    public class ClientEventArgs : EventArgs {
+    public class ClientEventArgs : EventArgs
+    {
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientEventArgs"/> class.
         /// </summary>
         /// <param name="client">The client.</param>
         /// <param name="changeMask">The change mask.</param>
-        public ClientEventArgs ( IClient client, ClientChangeMask changeMask ) {
+        public ClientEventArgs ( IClient client, ClientChangeMask changeMask )
+        {
             this.Client = client;
             this.ChangeMask = changeMask;
         }

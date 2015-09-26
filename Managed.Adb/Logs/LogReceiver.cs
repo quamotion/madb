@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb.Logs {
-    public class LogReceiver {
+namespace Managed.Adb.Logs
+{
+    public class LogReceiver
+    {
         private const int ENTRY_HEADER_SIZE = 20; // 2*2 + 4*4; see LogEntry.
-        public LogReceiver ( ILogListener listener ) {
+        public LogReceiver ( ILogListener listener )
+        {
             this.EntryDataOffset = 0;
             this.EntryHeaderBuffer = new byte[ENTRY_HEADER_SIZE];
             this.EntryHeaderOffset = 0;
@@ -21,30 +24,39 @@ namespace Managed.Adb.Logs {
         private ILogListener Listener { get; set; }
         public bool IsCancelled { get; private set; }
 
-        public void Cancel ( ) {
+        public void Cancel ( )
+        {
             this.IsCancelled = true;
         }
 
-        public void ParseNewData ( byte[] data, int offset, int length ) {
+        public void ParseNewData ( byte[] data, int offset, int length )
+        {
             // notify the listener of new raw data
-            if ( this.Listener != null ) {
+            if ( this.Listener != null )
+            {
                 this.Listener.NewData ( data, offset, length );
             }
 
             // loop while there is still data to be read and the receiver has not be cancelled.
-            while ( length > 0 && !this.IsCancelled ) {
+            while ( length > 0 && !this.IsCancelled )
+            {
                 // first check if we have no current entry.
-                if ( this.CurrentEntry == null ) {
-                    if ( this.EntryHeaderOffset + length < ENTRY_HEADER_SIZE ) {
+                if ( this.CurrentEntry == null )
+                {
+                    if ( this.EntryHeaderOffset + length < ENTRY_HEADER_SIZE )
+                    {
                         // if we don't have enough data to finish the header, save
                         // the data we have and return
                         Array.Copy ( data, offset, this.EntryHeaderBuffer, this.EntryHeaderOffset, length );
                         this.EntryHeaderOffset += length;
                         return;
-                    } else {
+                    }
+                    else
+                    {
                         // we have enough to fill the header, let's do it.
                         // did we store some part at the beginning of the header?
-                        if ( this.EntryHeaderOffset != 0 ) {
+                        if ( this.EntryHeaderOffset != 0 )
+                        {
                             // copy the rest of the entry header into the header buffer
                             int size = ENTRY_HEADER_SIZE - this.EntryHeaderOffset;
                             Array.Copy ( data, offset, this.EntryHeaderBuffer, this.EntryHeaderOffset, size );
@@ -59,7 +71,9 @@ namespace Managed.Adb.Logs {
                             // of the entry data
                             offset += size;
                             length -= size;
-                        } else {
+                        }
+                        else
+                        {
                             // create the entry directly from the data array
                             this.CurrentEntry = this.CreateEntry ( data, offset );
                             // adjust current offset and remaining length to the beginning
@@ -73,7 +87,8 @@ namespace Managed.Adb.Logs {
 
                 // at this point, we have an entry, and offset/length have been updated to skip
                 // the entry header.
-                if ( length >= this.CurrentEntry.Length - this.EntryDataOffset ) {
+                if ( length >= this.CurrentEntry.Length - this.EntryDataOffset )
+                {
                     // compute and save the size of the data that we have to read for this entry,
                     // based on how much we may already have read.
                     int dataSize = this.CurrentEntry.Length - this.EntryDataOffset;
@@ -82,7 +97,8 @@ namespace Managed.Adb.Logs {
                     Array.Copy ( data, offset, this.CurrentEntry.Data, this.EntryDataOffset, dataSize );
 
                     // notify the listener of a new entry
-                    if ( this.Listener != null ) {
+                    if ( this.Listener != null )
+                    {
                         this.Listener.NewEntry ( this.CurrentEntry );
                     }
 
@@ -95,7 +111,9 @@ namespace Managed.Adb.Logs {
                     // of the next one.
                     offset += dataSize;
                     length -= dataSize;
-                } else {
+                }
+                else
+                {
                     // we don't have enough data to fill this entry, so we store what we have
                     // in the entry itself.
                     Array.Copy ( data, offset, this.CurrentEntry.Data, this.EntryDataOffset, length );
@@ -108,8 +126,10 @@ namespace Managed.Adb.Logs {
         }
 
 
-        private LogEntry CreateEntry ( byte[] data, int offset ) {
-            if ( data.Length < offset + ENTRY_HEADER_SIZE ) {
+        private LogEntry CreateEntry ( byte[] data, int offset )
+        {
+            if ( data.Length < offset + ENTRY_HEADER_SIZE )
+            {
                 throw new ArgumentException ( "Buffer not big enough to hold full LoggerEntry header" );
             }
 

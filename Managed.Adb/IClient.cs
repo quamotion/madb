@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
         [Flags]
-        public enum ClientChangeState {
+        public enum ClientChangeState
+        {
             Name = 0x0001,
             DebuggerStatus = 0x0002,
             Port = 0x0004,
@@ -22,7 +24,8 @@ namespace Managed.Adb {
             Info = Name | DebuggerStatus | Port,
         }
 
-        public enum ClientConnectionState {
+        public enum ClientConnectionState
+        {
             Init = 1,
             NotJDWP = 2,
             AwaitShake = 10,
@@ -33,7 +36,8 @@ namespace Managed.Adb {
             Disconnected = 21,
         }
 
-    public interface IClient : IPacketConsumer {
+    public interface IClient : IPacketConsumer
+    {
 
 
         ClientConnectionState ConnectionState { get; }

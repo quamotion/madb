@@ -4,15 +4,18 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public abstract class ChunkHandler {
+    public abstract class ChunkHandler
+    {
         /// <summary>
         /// 
         /// </summary>
-        public enum ByteOrder {
+        public enum ByteOrder
+        {
             /// <summary>
             /// 
             /// </summary>
@@ -78,8 +81,10 @@ namespace Managed.Adb {
          * in sub-classes should call this if the chunk type isn't recognized.
          */
         protected void handleUnknownChunk ( IClient client, int type,
-                MemoryStream data, bool isReply, int msgId ) {
-            if ( type == CHUNK_FAIL ) {
+                MemoryStream data, bool isReply, int msgId )
+                {
+            if ( type == CHUNK_FAIL )
+            {
                 int errorCode, msgLen;
                 String msg;
 
@@ -88,7 +93,9 @@ namespace Managed.Adb {
 
                 msg = GetString ( data, msgLen );
                 Log.w ( "ddms", "WARNING: failure code=" + errorCode + " msg=" + msg );
-            } else {
+            }
+            else
+            {
                 Log.w ( "ddms", "WARNING: received unknown chunk " + name ( type )
                         + ": len=" + data.Length + ", reply=" + isReply
                         + ", msgId=0x" + msgId.ToString ( "X8" ) );
@@ -103,7 +110,8 @@ namespace Managed.Adb {
          * This is here because multiple chunk handlers can make use of it,
          * and there's nowhere better to put it.
          */
-        static String GetString ( MemoryStream buf, int len ) {
+        static String GetString ( MemoryStream buf, int len )
+        {
             char[] data = new char[len];
             for ( int i = 0; i < len; i++ )
                 data[i] = (char)buf.ReadByte ( );
@@ -113,7 +121,8 @@ namespace Managed.Adb {
         /**
          * Utility function to copy a String into a ByteBuffer.
          */
-        static void PutString ( MemoryStream buf, String str ) {
+        static void PutString ( MemoryStream buf, String str )
+        {
             byte[] data = Encoding.Default.GetBytes ( str );
             buf.Write ( data, 0, data.Length );
         }
@@ -121,15 +130,18 @@ namespace Managed.Adb {
         /**
          * Convert a 4-character string to a 32-bit type.
          */
-        static int type ( String typeName ) {
+        static int type ( String typeName )
+        {
             int val = 0;
 
-            if ( typeName.Length != 4 ) {
+            if ( typeName.Length != 4 )
+            {
                 Log.e ( "ddms", "Type name must be 4 letter long" );
                 throw new ArgumentException ( "Type name must be 4 letter long" );
             }
 
-            for ( int i = 0; i < 4; i++ ) {
+            for ( int i = 0; i < 4; i++ )
+            {
                 val <<= 8;
                 val |= (byte)typeName[i];
             }
@@ -140,7 +152,8 @@ namespace Managed.Adb {
         /**
          * Convert an integer type to a 4-character string.
          */
-        static String name ( int type ) {
+        static String name ( int type )
+        {
             char[] ascii = new char[4];
 
             ascii[0] = (char)( ( type >> 24 ) & 0xff );
@@ -158,7 +171,8 @@ namespace Managed.Adb {
          *
          * "maxChunkLen" indicates the size of the chunk contents only.
          */
-        static BinaryReader allocBuffer ( int maxChunkLen ) {
+        static BinaryReader allocBuffer ( int maxChunkLen )
+        {
             /*
             using ( MemoryStream ms = new MemoryStream(JdwpPacket.JDWP_HEADER_LEN + 8 +maxChunkLen) ) {
                 using ( EndianBinaryReader ebr = new EndianBinaryReader(CHUNK_ORDER == ByteOrder.LittleEndian ? EndianBitConverter.Little : EndianBitConverter.Big, ms ) ) {
@@ -173,7 +187,8 @@ namespace Managed.Adb {
          * Return the slice of the JDWP packet buffer that holds just the
          * chunk data.
          */
-        static BinaryReader GetChunkDataBuf ( MemoryStream jdwpBuf ) {
+        static BinaryReader GetChunkDataBuf ( MemoryStream jdwpBuf )
+        {
             /* EndianBinaryReader ebr = null;
 
              System.Diagnostics.Debug.Assert ( jdwpBuf.Position == 0 );
@@ -198,7 +213,8 @@ namespace Managed.Adb {
          * Pass in the byte buffer returned by JdwpPacket.getPayload().
          */
         // TODO: JdwpPacket
-        static void finishChunkPacket (/*JdwpPacket*/ Object packet, int type, int chunkLen ) {
+        static void finishChunkPacket (/*JdwpPacket*/ Object packet, int type, int chunkLen )
+        {
             /*ByteBuffer buf = packet.getPayload();
 
             buf.putInt(0x00, type);
@@ -215,7 +231,8 @@ namespace Managed.Adb {
          * @param appName
          * @return
          */
-        protected static IClient checkDebuggerPortForAppName ( IClient client, String appName ) {
+        protected static IClient checkDebuggerPortForAppName ( IClient client, String appName )
+        {
             /*IDebugPortProvider provider = DebugPortManager.getProvider ( );
             if ( provider != null ) {
                 Device device = client.GetDeviceImpl ( );

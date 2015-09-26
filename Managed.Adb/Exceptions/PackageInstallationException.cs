@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb.Exceptions {
+namespace Managed.Adb.Exceptions
+{
     /// <summary>
     /// An exception while installing a package on the device
     /// </summary>
     [Serializable]
-    public class PackageInstallationException : Exception {
+    public class PackageInstallationException : Exception
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>

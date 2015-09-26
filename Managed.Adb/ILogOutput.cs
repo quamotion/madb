@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public interface ILogOutput {
+    public interface ILogOutput
+    {
         /// <summary>
         /// Writes the specified log level.
         /// </summary>

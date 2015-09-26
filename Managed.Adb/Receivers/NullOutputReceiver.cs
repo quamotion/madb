@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public sealed class NullOutputReceiver : IShellOutputReceiver {
+    public sealed class NullOutputReceiver : IShellOutputReceiver
+    {
 
         /// <summary>
         /// Prevents a default instance of the <see cref="NullOutputReceiver" /> class from being created.
         /// </summary>
-        private NullOutputReceiver ( ) {
+        private NullOutputReceiver ( )
+        {
             this.IsCancelled = false;
         }
 
@@ -24,9 +27,12 @@ namespace Managed.Adb {
         /// <value>
         /// The instance.
         /// </value>
-        public static IShellOutputReceiver Instance {
-            get {
-                if ( _instance == null ) {
+        public static IShellOutputReceiver Instance
+        {
+            get
+            {
+                if ( _instance == null )
+                {
                     _instance = new NullOutputReceiver ( );
                 }
                 return _instance;
@@ -39,7 +45,8 @@ namespace Managed.Adb {
         /// <param name="data">The data.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="length">The length.</param>
-        public void AddOutput ( byte[] data, int offset, int length ) {
+        public void AddOutput ( byte[] data, int offset, int length )
+        {
             // do nothing
         }
 
@@ -49,7 +56,8 @@ namespace Managed.Adb {
         /// <remarks>
         /// This should always be called at the end of the "process" in order to indicate that the data is ready to be processed further if needed.
         /// </remarks>
-        public void Flush ( ) {
+        public void Flush ( )
+        {
             // do nothing
         }
 

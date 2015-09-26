@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// Centralized point to provide a IDebugPortProvider to ddmlib.
     /// </summary>
-    public class DebugPortManager {
+    public class DebugPortManager
+    {
         public const int NO_STATIC_PORT = -1;
 
-        public DebugPortManager ( ) {
+        public DebugPortManager ( )
+        {
 
         }
 
@@ -23,9 +26,12 @@ namespace Managed.Adb {
         /// <summary>
         /// Returns an instance of the debug port manager
         /// </summary>
-        public DebugPortManager Instance {
-            get {
-                if ( _instance == null ) {
+        public DebugPortManager Instance
+        {
+            get
+            {
+                if ( _instance == null )
+                {
                     _instance = new DebugPortManager ( );
                 }
                 return _instance;

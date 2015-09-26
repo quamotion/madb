@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// Classes which implement this interface provide methods that deal with displaying transfer progress.
     /// </summary>
-    public interface ISyncProgressMonitor {
+    public interface ISyncProgressMonitor
+    {
         /// <summary>
         /// Sent when the transfer starts
         /// </summary>

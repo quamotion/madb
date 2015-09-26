@@ -5,15 +5,18 @@ using System.Reflection;
 using System.Text;
 using MoreLinq;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public class BatteryInfo {
+    public class BatteryInfo
+    {
         /// <summary>
         /// Battery Status Types
         /// </summary>
-        public enum StatusTypes {
+        public enum StatusTypes
+        {
             /// <summary>
             /// Unknown Status
             /// </summary>
@@ -39,7 +42,8 @@ namespace Managed.Adb {
         /// <summary>
         /// Battery Health Types
         /// </summary>
-        public enum HealthTypes {
+        public enum HealthTypes
+        {
             /// <summary>
             /// Unknown Health
             /// </summary>
@@ -143,8 +147,10 @@ namespace Managed.Adb {
         /// <value>
         /// The calculated level.
         /// </value>
-        public int CalculatedLevel {
-            get {
+        public int CalculatedLevel
+        {
+            get
+            {
                 return ( this.Level * 100 ) / this.Scale;
             }
         }
@@ -155,10 +161,12 @@ namespace Managed.Adb {
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
-        public override string ToString ( ) {
+        public override string ToString ( )
+        {
             var sb = new StringBuilder ( );
 
-            this.GetType ( ).GetProperties ( BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.IgnoreCase ).ForEach ( p => {
+            this.GetType ( ).GetProperties ( BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.IgnoreCase ).ForEach ( p =>
+            {
                 var n = p.Name;
                 var v = p.GetValue ( this, null );
                 sb.AppendLine ( String.Format ( "{0}:{1}", n, v ) );

@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// An Adb Communication Response
     /// </summary>
-    public class AdbResponse {
+    public class AdbResponse
+    {
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbResponse"/> class.
         /// </summary>
-        public AdbResponse ( ) {
+        public AdbResponse ( )
+        {
             this.Message = string.Empty;
         }
 

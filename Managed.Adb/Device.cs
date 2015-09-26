@@ -12,11 +12,13 @@ using Managed.Adb.IO;
 using Managed.Adb.Logs;
 using System.Net;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public enum DeviceState {
+    public enum DeviceState
+    {
         /// <summary>
         /// The device is in recovery mode.
         /// </summary>
@@ -58,7 +60,8 @@ namespace Managed.Adb {
     /// <summary>
     /// Represents an Android device.
     /// </summary>
-    public sealed class Device : IDevice {
+    public sealed class Device : IDevice
+    {
         /// <summary>
         /// Occurs when [state changed].
         /// </summary>
@@ -167,7 +170,8 @@ namespace Managed.Adb {
         /// <param name="model">The model.</param>
         /// <param name="product">The product.</param>
         /// <param name="device">The device.</param>
-        public Device(string serial, DeviceState state, string model, string product, string device) {
+        public Device(string serial, DeviceState state, string model, string product, string device)
+        {
             this.SerialNumber = serial;
             this.State = state;
             this.MountPoints = new Dictionary<String, MountPoint>();
@@ -185,7 +189,8 @@ namespace Managed.Adb {
         /// <summary>
         /// Retrieves the device info.
         /// </summary>
-        private void RetrieveDeviceInfo() {
+        private void RetrieveDeviceInfo()
+        {
             this.RefreshMountPoints();
             this.RefreshEnvironmentVariables();
             this.RefreshProperties();
@@ -196,18 +201,25 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="state">The device state string</param>
         /// <returns></returns>
-        private static DeviceState GetStateFromString(String state) {
+        private static DeviceState GetStateFromString(String state)
+        {
             String tstate = state;
 
-            if(String.Compare(state, "device", false) == 0) {
+            if(String.Compare(state, "device", false) == 0)
+            {
                 tstate = "online";
             }
 
-            if(Enum.IsDefined(typeof(DeviceState), tstate)) {
+            if(Enum.IsDefined(typeof(DeviceState), tstate))
+            {
                 return (DeviceState)Enum.Parse(typeof(DeviceState), tstate, true);
-            } else {
-                foreach(var fi in typeof(DeviceState).GetFields()) {
-                    if(string.Compare(fi.Name, tstate, true) == 0) {
+            }
+            else
+            {
+                foreach(var fi in typeof(DeviceState).GetFields())
+                {
+                    if(string.Compare(fi.Name, tstate, true) == 0)
+                    {
                         return (DeviceState)fi.GetValue(null);
                     }
                 }
@@ -222,12 +234,16 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="data">the line data for the device</param>
         /// <returns></returns>
-        public static Device CreateFromAdbData(String data) {
+        public static Device CreateFromAdbData(String data)
+        {
             Regex re = new Regex(RE_DEVICELIST_INFO, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             Match m = re.Match(data);
-            if(m.Success) {
+            if(m.Success)
+            {
                 return new Device(m.Groups[1].Value, GetStateFromString(m.Groups[2].Value), m.Groups[4].Value, m.Groups[3].Value, m.Groups[5].Value );
-            } else {
+            }
+            else
+            {
                 throw new ArgumentException("Invalid device list data");
             }
         }
@@ -235,7 +251,8 @@ namespace Managed.Adb {
         /// <summary>
         /// Backups this device.
         /// </summary>
-        public void Backup() {
+        public void Backup()
+        {
             AdbHelper.Instance.Backup(AndroidDebugBridge.SocketAddress);
         }
 
@@ -245,21 +262,28 @@ namespace Managed.Adb {
         /// <returns>
         ///   <see langword="true"/> if this instance can use the SU shell; otherwise, <see langword="false"/>.
         /// </returns>
-        public bool CanSU() {
-            if(this._canSU) {
+        public bool CanSU()
+        {
+            if(this._canSU)
+            {
                 return this._canSU;
             }
 
-            try {
+            try
+            {
                 // workitem: 16822
                 // this now checks if permission was denied and accounts for that. 
                 // The nulloutput receiver is fine here because it doesn't need to send the output anywhere,
                 // the execute command can still handle the output with the null output receiver.
                 this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", NullOutputReceiver.Instance);
                 this._canSU = true;
-            } catch(PermissionDeniedException) {
+            }
+            catch(PermissionDeniedException)
+            {
                 this._canSU = false;
-            } catch(FileNotFoundException) {
+            }
+            catch(FileNotFoundException)
+            {
                 this._canSU = false;
             }
 
@@ -296,10 +320,13 @@ namespace Managed.Adb {
         /// <summary>
         /// Gets or sets the Avd name.
         /// </summary>
-        public String AvdName {
+        public String AvdName
+        {
             get { return this._avdName; }
-            set {
-                if(!this.IsEmulator) {
+            set
+            {
+                if(!this.IsEmulator)
+                {
                     throw new ArgumentException("Cannot set the AVD name of the device is not an emulator");
                 }
                 this._avdName = value;
@@ -359,7 +386,8 @@ namespace Managed.Adb {
         /// <returns>
         /// the value or <see langword="null"/> if the property does not exist.
         /// </returns>
-        public String GetProperty(String name) {
+        public String GetProperty(String name)
+        {
             return this.GetProperty(new String[] { name });
         }
 
@@ -368,9 +396,12 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="name">The array of property names.</param>
         /// <returns></returns>
-        public String GetProperty(params String[] name) {
-            foreach(var item in name) {
-                if(this.Properties.ContainsKey(item)) {
+        public String GetProperty(params String[] name)
+        {
+            foreach(var item in name)
+            {
+                if(this.Properties.ContainsKey(item))
+                {
                     return this.Properties[item];
                 }
             }
@@ -382,8 +413,10 @@ namespace Managed.Adb {
         /// Gets a value indicating whether the device is online.
         /// </summary>
         /// <value><see langword="true"/> if the device is online; otherwise, <see langword="false"/>.</value>
-        public bool IsOnline {
-            get {
+        public bool IsOnline
+        {
+            get
+            {
                 return this.State == DeviceState.Online;
             }
         }
@@ -392,8 +425,10 @@ namespace Managed.Adb {
         /// Gets a value indicating whether this device is emulator.
         /// </summary>
         /// <value><see langword="true"/> if this device is emulator; otherwise, <see langword="false"/>.</value>
-        public bool IsEmulator {
-            get {
+        public bool IsEmulator
+        {
+            get
+            {
                 return Regex.Match(this.SerialNumber, RE_EMULATOR_SN).Success;
             }
         }
@@ -402,8 +437,10 @@ namespace Managed.Adb {
         /// Gets a value indicating whether this device is offline.
         /// </summary>
         /// <value><see langword="true"/> if this device is offline; otherwise, <see langword="false"/>.</value>
-        public bool IsOffline {
-            get {
+        public bool IsOffline
+        {
+            get
+            {
                 return this.State == DeviceState.Offline;
             }
         }
@@ -414,8 +451,10 @@ namespace Managed.Adb {
         /// <value>
         /// 	<see langword="true"/> if this device is in boot loader mode; otherwise, <see langword="false"/>.
         /// </value>
-        public bool IsBootLoader {
-            get {
+        public bool IsBootLoader
+        {
+            get
+            {
                 return this.State == DeviceState.BootLoader;
             }
         }
@@ -426,7 +465,8 @@ namespace Managed.Adb {
         /// <value>
         /// 	<see langword="true"/> if this instance is recovery; otherwise, <see langword="false"/>.
         /// </value>
-        public bool IsRecovery {
+        public bool IsRecovery
+        {
             get { return this.State == DeviceState.Recovery; }
         }
 
@@ -446,7 +486,8 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="mnt">The mount point.</param>
         /// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
-        public void RemountMountPoint(MountPoint mnt, bool readOnly) {
+        public void RemountMountPoint(MountPoint mnt, bool readOnly)
+        {
             String command = String.Format("mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name);
             this.ExecuteShellCommand(command, NullOutputReceiver.Instance);
             this.RefreshMountPoints();
@@ -458,11 +499,15 @@ namespace Managed.Adb {
         /// <param name="mountPoint">the mount point</param>
         /// <param name="readOnly">if set to <see langword="true"/> the mount poine will be set to read-only.</param>
         /// <exception cref="IOException">Throws if the mount point does not exist.</exception>
-        public void RemountMountPoint(String mountPoint, bool readOnly) {
-            if(this.MountPoints.ContainsKey(mountPoint)) {
+        public void RemountMountPoint(String mountPoint, bool readOnly)
+        {
+            if(this.MountPoints.ContainsKey(mountPoint))
+            {
                 MountPoint mnt = this.MountPoints[mountPoint];
                 this.RemountMountPoint(mnt, readOnly);
-            } else {
+            }
+            else
+            {
                 throw new IOException("Invalid mount point");
             }
         }
@@ -471,11 +516,16 @@ namespace Managed.Adb {
         /// <summary>
         /// Refreshes the mount points.
         /// </summary>
-        public void RefreshMountPoints() {
-            if(this.IsOnline) {
-                try {
+        public void RefreshMountPoints()
+        {
+            if(this.IsOnline)
+            {
+                try
+                {
                     this.ExecuteShellCommand(MountPointReceiver.MOUNT_COMMAND, new MountPointReceiver(this));
-                } catch(AdbException) {
+                }
+                catch(AdbException)
+                {
 
                 }
             }
@@ -484,11 +534,16 @@ namespace Managed.Adb {
         /// <summary>
         /// Refreshes the environment variables.
         /// </summary>
-        public void RefreshEnvironmentVariables() {
-            if(this.IsOnline) {
-                try {
+        public void RefreshEnvironmentVariables()
+        {
+            if(this.IsOnline)
+            {
+                try
+                {
                     this.ExecuteShellCommand(EnvironmentVariablesReceiver.ENV_COMMAND, new EnvironmentVariablesReceiver(this));
-                } catch(AdbException) {
+                }
+                catch(AdbException)
+                {
 
                 }
             }
@@ -497,12 +552,17 @@ namespace Managed.Adb {
         /// <summary>
         /// Refreshes the properties.
         /// </summary>
-        public void RefreshProperties() {
-            if(this.IsOnline) {
-                try {
+        public void RefreshProperties()
+        {
+            if(this.IsOnline)
+            {
+                try
+                {
                     this.Properties.Clear();
                     this.ExecuteShellCommand(GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver(this));
-                } catch(AdbException aex) {
+                }
+                catch(AdbException aex)
+                {
                     Log.w(LOG_TAG, aex);
                 }
             }
@@ -512,14 +572,16 @@ namespace Managed.Adb {
         /// Reboots the device in to the specified state
         /// </summary>
         /// <param name="into">The reboot state</param>
-        public void Reboot(String into) {
+        public void Reboot(String into)
+        {
             AdbHelper.Instance.Reboot(into, AndroidDebugBridge.SocketAddress, this);
         }
 
         /// <summary>
         /// Reboots the device.
         /// </summary>
-        public void Reboot() {
+        public void Reboot()
+        {
             this.Reboot(String.Empty);
         }
 
@@ -527,7 +589,8 @@ namespace Managed.Adb {
         /// Gets the battery level.
         /// </summary>
         /// <returns></returns>
-        public BatteryInfo GetBatteryInfo() {
+        public BatteryInfo GetBatteryInfo()
+        {
             return this.GetBatteryInfo(5 * 60 * 1000);
         }
 
@@ -536,9 +599,11 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="freshness">The freshness.</param>
         /// <returns></returns>
-        public BatteryInfo GetBatteryInfo(long freshness) {
+        public BatteryInfo GetBatteryInfo(long freshness)
+        {
             if(this._lastBatteryInfo != null
-                                && this._lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness))) {
+                                && this._lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness)))
+                                {
                 return this._lastBatteryInfo;
             }
             var receiver = new BatteryReceiver();
@@ -554,8 +619,10 @@ namespace Managed.Adb {
         /// <value>
         /// 	<see langword="true"/> if this instance has clients; otherwise, <see langword="false"/>.
         /// </value>
-        public bool HasClients {
-            get {
+        public bool HasClients
+        {
+            get
+            {
                 return this.Clients.Count > 0;
             }
         }
@@ -575,10 +642,13 @@ namespace Managed.Adb {
         /// refuse to open the connection because the {@link IDevice} is invalid (or got disconnected).
         /// </remarks>
         /// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
-        public ISyncService SyncService {
-            get {
+        public ISyncService SyncService
+        {
+            get
+            {
                 ISyncService syncService = new SyncService(AndroidDebugBridge.SocketAddress, this);
-                if(syncService.Open()) {
+                if(syncService.Open())
+                {
                     return syncService;
                 }
 
@@ -590,8 +660,10 @@ namespace Managed.Adb {
         /// Takes a screen shot of the device and returns it as a <see cref="RawImage"/>
         /// </summary>
         /// <value>The screenshot.</value>
-        public RawImage Screenshot {
-            get {
+        public RawImage Screenshot
+        {
+            get
+            {
                 return AdbHelper.Instance.GetFrameBuffer(AndroidDebugBridge.SocketAddress, this);
             }
         }
@@ -601,7 +673,8 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
-        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver) {
+        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver)
+        {
             this.ExecuteShellCommand(command, receiver, new object[] { });
         }
 
@@ -611,7 +684,8 @@ namespace Managed.Adb {
         /// <param name="command">The command.</param>
         /// <param name="receiver">The receiver.</param>
         /// <param name="timeout">The timeout.</param>
-        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout) {
+        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout)
+        {
             this.ExecuteShellCommand(command, receiver, new object[] { });
         }
 
@@ -622,7 +696,8 @@ namespace Managed.Adb {
         /// <param name="command">The command.</param>
         /// <param name="receiver">The receiver.</param>
         /// <param name="commandArgs">The command args.</param>
-        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs) {
+        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs)
+        {
             AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver);
         }
 
@@ -633,7 +708,8 @@ namespace Managed.Adb {
         /// <param name="receiver">The receiver.</param>
         /// <param name="timeout">The timeout.</param>
         /// <param name="commandArgs">The command args.</param>
-        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs) {
+        public void ExecuteShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
+        {
             AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver);
         }
 
@@ -644,7 +720,8 @@ namespace Managed.Adb {
         /// <param name="command">The command.</param>
         /// <param name="receiver">The receiver.</param>
         /// <param name="timeout">The period, in milliseconds, after which the command times out.</param>
-        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout) {
+        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout)
+        {
             this.ExecuteRootShellCommand(command, receiver, timeout, new object[] { });
         }
 
@@ -653,7 +730,8 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="command">The command to execute</param>
         /// <param name="receiver">The receiver object getting the result from the command.</param>
-        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver) {
+        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver)
+        {
             this.ExecuteRootShellCommand(command, receiver, int.MaxValue);
         }
 
@@ -663,7 +741,8 @@ namespace Managed.Adb {
         /// <param name="command">The command.</param>
         /// <param name="receiver">The receiver.</param>
         /// <param name="commandArgs">The command args.</param>
-        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs) {
+        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, params object[] commandArgs)
+        {
             this.ExecuteRootShellCommand(command, receiver, int.MaxValue, commandArgs);
         }
 
@@ -674,7 +753,8 @@ namespace Managed.Adb {
         /// <param name="receiver">The receiver.</param>
         /// <param name="timeout">The timeout.</param>
         /// <param name="commandArgs">The command args.</param>
-        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs) {
+        public void ExecuteRootShellCommand(String command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
+        {
             AdbHelper.Instance.ExecuteRemoteRootCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this, receiver, timeout);
         }
 
@@ -683,7 +763,8 @@ namespace Managed.Adb {
         /// Runs the event log service.
         /// </summary>
         /// <param name="receiver">The receiver.</param>
-        public void RunEventLogService(LogReceiver receiver) {
+        public void RunEventLogService(LogReceiver receiver)
+        {
             AdbHelper.Instance.RunEventLogService(AndroidDebugBridge.SocketAddress, this, receiver);
         }
 
@@ -692,7 +773,8 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="logname">The logname.</param>
         /// <param name="receiver">The receiver.</param>
-        public void RunLogService(String logname, LogReceiver receiver) {
+        public void RunLogService(String logname, LogReceiver receiver)
+        {
             AdbHelper.Instance.RunLogService(AndroidDebugBridge.SocketAddress, this, logname, receiver);
         }
 
@@ -702,10 +784,14 @@ namespace Managed.Adb {
         /// <param name="localPort">the local port to forward</param>
         /// <param name="remotePort">the remote port.</param>
         /// <returns><see langword="true"/> if success.</returns>
-        public bool CreateForward(int localPort, int remotePort) {
-            try {
+        public bool CreateForward(int localPort, int remotePort)
+        {
+            try
+            {
                 return AdbHelper.Instance.CreateForward(AndroidDebugBridge.SocketAddress, this, localPort, remotePort);
-            } catch(IOException e) {
+            }
+            catch(IOException e)
+            {
                 Log.w("ddms", e);
                 return false;
             }
@@ -716,10 +802,14 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="localPort">the local port to forward</param>
         /// <returns><see langword="true"/> if success.</returns>
-        public bool RemoveForward(int localPort) {
-            try {
+        public bool RemoveForward(int localPort)
+        {
+            try
+            {
                 return AdbHelper.Instance.RemoveForward(AndroidDebugBridge.SocketAddress, this, localPort);
-            } catch(IOException e) {
+            }
+            catch(IOException e)
+            {
                 Log.w("ddms", e);
                 return false;
             }
@@ -794,7 +884,8 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
         /// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
-        public void InstallPackage(String packageFilePath, bool reinstall) {
+        public void InstallPackage(String packageFilePath, bool reinstall)
+        {
             String remoteFilePath = this.SyncPackageToDevice(packageFilePath);
             this.InstallRemotePackage(remoteFilePath, reinstall);
             this.RemoveRemotePackage(remoteFilePath);
@@ -806,8 +897,10 @@ namespace Managed.Adb {
         /// <param name="localFilePath">the absolute path to file on local host</param>
         /// <returns>destination path on device for file</returns>
         /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
-        public String SyncPackageToDevice(String localFilePath) {
-            try {
+        public String SyncPackageToDevice(String localFilePath)
+        {
+            try
+            {
                 String packageFileName = Path.GetFileName(localFilePath);
                 // only root has access to /data/local/tmp/... not sure how adb does it then...
                 // workitem: 16823
@@ -817,19 +910,25 @@ namespace Managed.Adb {
                 Log.d(packageFileName, String.Format("Uploading {0} onto device '{1}'", packageFileName, this.SerialNumber));
 
                 ISyncService sync = this.SyncService;
-                if(sync != null) {
+                if(sync != null)
+                {
                     String message = String.Format("Uploading file onto device '{0}'", this.SerialNumber);
                     Log.d(LOG_TAG, message);
                     SyncResult result = sync.PushFile(localFilePath, remoteFilePath, Managed.Adb.SyncService.NullProgressMonitor);
 
-                    if(result.Code != ErrorCodeHelper.RESULT_OK) {
+                    if(result.Code != ErrorCodeHelper.RESULT_OK)
+                    {
                         throw new IOException(String.Format("Unable to upload file: {0}", result.Message));
                     }
-                } else {
+                }
+                else
+                {
                     throw new IOException("Unable to open sync connection!");
                 }
                 return remoteFilePath;
-            } catch(IOException e) {
+            }
+            catch(IOException e)
+            {
                 Log.e(LOG_TAG, String.Format("Unable to open sync connection! reason: {0}", e.Message));
                 throw;
             }
@@ -840,12 +939,14 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="remoteFilePath">absolute file path to package file on device</param>
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
-        public void InstallRemotePackage(String remoteFilePath, bool reinstall) {
+        public void InstallRemotePackage(String remoteFilePath, bool reinstall)
+        {
             InstallReceiver receiver = new InstallReceiver();
             String cmd = String.Format("pm install {1}{0}", remoteFilePath, reinstall ? "-r " : String.Empty);
             this.ExecuteShellCommand(cmd, receiver);
 
-            if(!String.IsNullOrEmpty(receiver.ErrorMessage)) {
+            if(!String.IsNullOrEmpty(receiver.ErrorMessage))
+            {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
         }
@@ -856,11 +957,15 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="remoteFilePath">path on device of file to remove</param>
         /// <exception cref="IOException">if file removal failed</exception>
-        public void RemoveRemotePackage(String remoteFilePath) {
+        public void RemoveRemotePackage(String remoteFilePath)
+        {
             // now we delete the app we sync'ed
-            try {
+            try
+            {
                 this.ExecuteShellCommand("rm " + remoteFilePath, NullOutputReceiver.Instance);
-            } catch(IOException e) {
+            }
+            catch(IOException e)
+            {
                 Log.e(LOG_TAG, String.Format("Failed to delete temporary package: {0}", e.Message));
                 throw e;
             }
@@ -873,10 +978,12 @@ namespace Managed.Adb {
         /// <exception cref="IOException"></exception>
         ///   
         /// <exception cref="PackageInstallationException"></exception>
-        public void UninstallPackage(String packageName) {
+        public void UninstallPackage(String packageName)
+        {
             InstallReceiver receiver = new InstallReceiver();
             this.ExecuteShellCommand(String.Format("pm uninstall {0}", packageName), receiver);
-            if(!String.IsNullOrEmpty(receiver.ErrorMessage)) {
+            if(!String.IsNullOrEmpty(receiver.ErrorMessage))
+            {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
         }
@@ -885,8 +992,10 @@ namespace Managed.Adb {
         /// Raises the <see cref="E:StateChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        internal void OnStateChanged(EventArgs e) {
-            if(this.StateChanged != null) {
+        internal void OnStateChanged(EventArgs e)
+        {
+            if(this.StateChanged != null)
+            {
                 this.StateChanged(this, e);
             }
         }
@@ -895,8 +1004,10 @@ namespace Managed.Adb {
         /// Raises the <see cref="E:BuildInfoChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        internal void OnBuildInfoChanged(EventArgs e) {
-            if(this.BuildInfoChanged != null) {
+        internal void OnBuildInfoChanged(EventArgs e)
+        {
+            if(this.BuildInfoChanged != null)
+            {
                 this.BuildInfoChanged(this, e);
             }
         }
@@ -905,8 +1016,10 @@ namespace Managed.Adb {
         /// Raises the <see cref="E:ClientListChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        internal void OnClientListChanged(EventArgs e) {
-            if(this.ClientListChanged != null) {
+        internal void OnClientListChanged(EventArgs e)
+        {
+            if(this.ClientListChanged != null)
+            {
                 this.ClientListChanged(this, e);
             }
         }

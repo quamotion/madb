@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public interface IShellOutputReceiver {
+    public interface IShellOutputReceiver
+    {
         /// <summary>
         /// Adds the output.
         /// </summary>

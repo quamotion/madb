@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
-    public static class DdmPreferences {
+namespace Managed.Adb
+{
+    public static class DdmPreferences
+    {
         /** Default value for thread update flag upon client connection. */
         public const bool DEFAULT_INITIAL_THREAD_UPDATE = false;
         /** Default value for heap update flag upon client connection. */
@@ -21,7 +23,8 @@ namespace Managed.Adb {
         private static int _selectedDebugPort;
         private static LogLevel.LogLevelInfo _logLevel;
 
-        static DdmPreferences ( ) {
+        static DdmPreferences ( )
+        {
             Timeout = DEFAULT_TIMEOUT;
             LogLevel = DEFAULT_LOG_LEVEL;
             SelectedDebugPort = DEFAULT_SELECTED_DEBUG_PORT;
@@ -31,25 +34,32 @@ namespace Managed.Adb {
         }
 
         public static int Timeout { get; set; }
-        public static LogLevel.LogLevelInfo LogLevel {
-            get {
+        public static LogLevel.LogLevelInfo LogLevel
+        {
+            get
+            {
                 return _logLevel;
             }
-            set {
+            set
+            {
                 _logLevel = value;
                 Log.Level = value ;
             }
         }
         public static int DebugPortBase { get; set; }
-        public static int SelectedDebugPort {
-            get {
+        public static int SelectedDebugPort
+        {
+            get
+            {
                 return _selectedDebugPort;
             }
-            set {
+            set
+            {
                 _selectedDebugPort = value;
 
                 MonitorThread monitorThread = MonitorThread.Instance;
-                if ( monitorThread != null ) {
+                if ( monitorThread != null )
+                {
                     monitorThread.SetDebugSelectedPort ( value );
                 }
             }

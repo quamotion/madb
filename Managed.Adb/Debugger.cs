@@ -6,9 +6,12 @@ using System.IO;
 using System.Net.Sockets;
 using System.Net;
 
-namespace Managed.Adb {
-    public class Debugger : IPacketConsumer {
-        public enum ConnectionStates {
+namespace Managed.Adb
+{
+    public class Debugger : IPacketConsumer
+    {
+        public enum ConnectionStates
+        {
             NotConnected = 1,
             AwaitShake = 2,
             Ready = 3
@@ -18,7 +21,8 @@ namespace Managed.Adb {
 
         private const int PRE_DATA_BUF_SIZE = 256;
 
-        public Debugger ( IClient client, int listenPort ) {
+        public Debugger ( IClient client, int listenPort )
+        {
             this.Client = client;
             this.ListenPort = listenPort;
 
@@ -44,7 +48,8 @@ namespace Managed.Adb {
         public bool IsDebuggerAttached { get; private set; }
 
 
-        public void Read ( ) {
+        public void Read ( )
+        {
             throw new NotImplementedException ( );
             int count;
 
@@ -68,7 +73,8 @@ namespace Managed.Adb {
             if ( count < 0 ) throw new IOException ( "read failed" );*/
         }
 
-        public /*JdwpPacket*/ Object GetJdwpPacket ( ) {
+        public /*JdwpPacket*/ Object GetJdwpPacket ( )
+        {
             throw new NotImplementedException ( );
 
             /*if (mConnState == ST_AWAIT_SHAKE) {
@@ -112,11 +118,13 @@ namespace Managed.Adb {
         }
 
         // TODO: JdwpPacket
-        public void ForwardPacketToClient ( /*JdwpPacket*/ Object packet ) {
+        public void ForwardPacketToClient ( /*JdwpPacket*/ Object packet )
+        {
             this.Client.SendAndConsume ( packet );
         }
 
-        public bool SendHandshake ( ) {
+        public bool SendHandshake ( )
+        {
             throw new NotImplementedException ( );
             /*ByteBuffer tempBuffer = ByteBuffer.allocate ( JdwpPacket.HANDSHAKE_LEN );
             JdwpPacket.PutHandshake ( tempBuffer );
@@ -139,8 +147,10 @@ namespace Managed.Adb {
         }
 
         //TODO: JdwpPacket
-        public void SendAndConsume ( /*JdwpPacket*/ Object packet ) {
-            if ( this.Channel == null ) {
+        public void SendAndConsume ( /*JdwpPacket*/ Object packet )
+        {
+            if ( this.Channel == null )
+            {
                 /*
                  * Buffer this up so we can send it to the debugger when it
                  * finally does connect.  This is essential because the VM_START
@@ -151,22 +161,29 @@ namespace Managed.Adb {
                  */
                 //Log.d ( "ddms", "Saving packet 0x" + packet.ID.ToString ( "X" ) );
                 //packet.MovePacket ( PreDataBuffer );
-            } else {
+            }
+            else
+            {
                 //packet.WriteAndConsume ( Channel );
             }
         }
 
         //      public voidr RegisterListener
 
-        public Socket Accept ( ) {
+        public Socket Accept ( )
+        {
             return this.Accept ( this.ListenChannel );
         }
 
-        public Socket Accept ( Socket listenChan ) {
-            lock ( listenChan ) {
-                if ( listenChan != null ) {
+        public Socket Accept ( Socket listenChan )
+        {
+            lock ( listenChan )
+            {
+                if ( listenChan != null )
+                {
                     Socket newChan = listenChan.Accept ( );
-                    if ( this.Channel != null ) {
+                    if ( this.Channel != null )
+                    {
                         Log.w ( "ddms", "debugger already talking to " + this.Client.ToString ( ) + " on " + this.ListenPort.ToString ( ) );
                         newChan.Close ( );
                         return null;
@@ -182,9 +199,12 @@ namespace Managed.Adb {
             }
         }
 
-        public void CloseData ( ) {
-            try {
-                if ( this.Channel != null ) {
+        public void CloseData ( )
+        {
+            try
+            {
+                if ( this.Channel != null )
+                {
                     this.Channel.Close ( );
                     this.Channel = null;
                     this.ConnectionState = ConnectionStates.NotConnected;
@@ -195,24 +215,32 @@ namespace Managed.Adb {
                     this.Client.Update ( ClientChangeMask.ChangeDebuggerStatus );
 
                 }
-            } catch ( IOException ioe ) {
+            }
+            catch ( IOException ioe )
+            {
                 Log.w ( "ddms", ioe );
             }
         }
 
-        public void Close ( ) {
-            try {
-                if ( this.ListenChannel != null ) {
+        public void Close ( )
+        {
+            try
+            {
+                if ( this.ListenChannel != null )
+                {
                     this.ListenChannel.Close ( );
                 }
                 this.ListenChannel = null;
                 this.CloseData ( );
-            } catch ( IOException ioe ) {
+            }
+            catch ( IOException ioe )
+            {
                 Log.w ( "ddms", ioe );
             }
         }
 
-        public override string ToString ( ) {
+        public override string ToString ( )
+        {
             // mChannel != null means we have connection, ST_READY means it's going
             return "[Debugger " + this.ListenPort + "-->" + this.Client.ClientData/*.Pid*/
                             + ( ( this.ConnectionState != ConnectionStates.Ready ) ? " inactive]" : " active]" );

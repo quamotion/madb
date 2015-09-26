@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    public sealed class SyncResult {
+    public sealed class SyncResult
+    {
         /// <summary>
         /// Initializes a new SyncResult
         /// </summary>
         /// <param name="code">The error code</param>
         /// <param name="message">The error message</param>
-        public SyncResult ( int code, String message ) {
+        public SyncResult ( int code, String message )
+        {
 
             this.Message = message ?? ErrorCodeHelper.ErrorCodeToString ( code );
             this.Code = code;
@@ -25,7 +28,8 @@ namespace Managed.Adb {
         /// <param name="code">The error code</param>
         /// <param name="ex">The exception</param>
         public SyncResult ( int code, Exception ex )
-            : this ( code, ex.Message ) {
+            : this ( code, ex.Message )
+            {
 
         }
 
@@ -34,7 +38,8 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="code">The error code</param>
         public SyncResult ( int code )
-            : this ( code, (string)null ) {
+            : this ( code, (string)null )
+            {
 
         }
 

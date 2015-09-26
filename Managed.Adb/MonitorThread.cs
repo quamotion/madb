@@ -4,16 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Managed.Adb {
+namespace Managed.Adb
+{
     /// <summary>
     /// 
     /// </summary>
-    class MonitorThread {
+    class MonitorThread
+    {
 
         /// <summary>
         /// 
         /// </summary>
-        public enum ThreadState {
+        public enum ThreadState
+        {
             /// <summary>
             /// 
             /// </summary>
@@ -31,7 +34,8 @@ namespace Managed.Adb {
         /// <summary>
         /// Initializes a new instance of the <see cref="MonitorThread"/> class.
         /// </summary>
-        private MonitorThread ( ) {
+        private MonitorThread ( )
+        {
             this.Clients = new List<IClient> ( );
         }
 
@@ -43,9 +47,12 @@ namespace Managed.Adb {
         /// Gets the instance.
         /// </summary>
         /// <value>The instance.</value>
-        public static MonitorThread Instance {
-            get {
-                if ( _instance == null ) {
+        public static MonitorThread Instance
+        {
+            get
+            {
+                if ( _instance == null )
+                {
                     _instance = new MonitorThread ( );
                 }
                 return _instance;
@@ -67,11 +74,13 @@ namespace Managed.Adb {
         /// Sets the debug selected port.
         /// </summary>
         /// <param name="value">The value.</param>
-        internal void SetDebugSelectedPort ( int value ) {
+        internal void SetDebugSelectedPort ( int value )
+        {
             //throw new NotImplementedException ( );
         }
 
-        public void DropClient ( IClient client, bool notify ) {
+        public void DropClient ( IClient client, bool notify )
+        {
 
         }
     }

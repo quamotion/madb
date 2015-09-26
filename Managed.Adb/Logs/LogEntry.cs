@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Managed.Adb.Logs {
-    public sealed class LogEntry {
+namespace Managed.Adb.Logs
+{
+    public sealed class LogEntry
+    {
         public int Length { get; set; }
         public int ProcessId { get; set; }
         public int ThreadId { get; set; }
