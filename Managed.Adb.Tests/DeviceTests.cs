@@ -7,13 +7,6 @@ using System.Text;
 namespace Managed.Adb.Tests {
     [TestClass]
 	public class DeviceTests : BaseDeviceTests {
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
-		public void CanBackupTest ( ) {
-			var device = GetFirstDevice ( );
-
-			Assert.IsTrue ( device.CanBackup ( ) );
-		}
 
         [TestMethod]
         [TestCategory("IntegrationTest")]

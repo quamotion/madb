@@ -84,16 +84,10 @@
     <Compile Include="AndroidDebugBridgeTests.cs" />
     <Compile Include="BaseDeviceTests.cs" />
     <Compile Include="BatteryInfoTests.cs" />
-    <Compile Include="BusyBoxTests.cs" />
     <Compile Include="DeviceTests.cs" />
     <Compile Include="DummyDevice.cs" />
-    <Compile Include="FileEntryTests.cs" />
-    <Compile Include="FileSystemTests.cs" />
     <Compile Include="LinkResolverReceiverTests.cs" />
     <Compile Include="LinuxPathTests.cs" />
-    <Compile Include="ListingServiceReceiverTests.cs" />
-    <Compile Include="ListingServiceTests.cs" />
-    <Compile Include="PackageManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

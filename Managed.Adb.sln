@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{AA1EF3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb.Extensions", "Managed.Adb.Extensions\Managed.Adb.Extensions.csproj", "{58030054-1E04-433E-BEB4-4D8143C64C09}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Managed.Adb.Extensions.Tests", "Managed.Adb.Extensions.Tests\Managed.Adb.Extensions.Tests.csproj", "{36F308ED-5B65-4B49-9A6C-BA3999364537}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{58030054-1E04-433E-BEB4-4D8143C64C09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58030054-1E04-433E-BEB4-4D8143C64C09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58030054-1E04-433E-BEB4-4D8143C64C09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36F308ED-5B65-4B49-9A6C-BA3999364537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36F308ED-5B65-4B49-9A6C-BA3999364537}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36F308ED-5B65-4B49-9A6C-BA3999364537}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36F308ED-5B65-4B49-9A6C-BA3999364537}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

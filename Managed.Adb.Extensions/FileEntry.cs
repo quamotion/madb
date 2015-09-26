@@ -88,7 +88,7 @@ namespace Managed.Adb
         /// <param name="name">name of the entry.</param>
         /// <param name="type">entry type.</param>
         /// <param name="isRoot">if set to <see langword="true"/> [is root].</param>
-        internal FileEntry(FileSystem fileSystem, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot)
+        public FileEntry(FileSystem fileSystem, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot)
         {
             this.FetchTime = 0;
             this.Parent = parent;
@@ -106,7 +106,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="device">The device.</param>
         /// <param name="path">The path.</param>
-        internal FileEntry(IDevice device, String path)
+        public FileEntry(IDevice device, String path)
         {
             this.FetchTime = 0;
             this.Parent = null;
@@ -246,7 +246,7 @@ namespace Managed.Adb
         /// </summary>
         public long FetchTime { get; set; }
 
-        internal bool NeedFetch
+        public bool NeedFetch
         {
             get
             {
