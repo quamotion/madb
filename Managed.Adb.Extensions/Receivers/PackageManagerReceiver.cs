@@ -62,7 +62,7 @@ namespace Managed.Adb {
 							}
 						} else {
 							try {
-								entry = FileEntry.Find ( Device, m.Groups[1].Value );
+								entry = FileEntry.Find ( Device, new FileListingService(Device), m.Groups[1].Value );
 								entry.Info = m.Groups[2].Value;
 								PackageManager.Packages.Add ( m.Groups[2].Value, entry );
 							} catch ( PermissionDeniedException ) {

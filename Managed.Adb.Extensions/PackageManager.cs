@@ -26,7 +26,7 @@ namespace Managed.Adb {
 		/// <value>
 		/// The packages.
 		/// </value>
-		public Dictionary<String,   FileEntry> Packages { get; set; }
+		public Dictionary<String,FileEntry> Packages { get; set; }
 
 		/// <summary>
 		/// Refreshes the packages.
@@ -60,7 +60,7 @@ namespace Managed.Adb {
 		/// <param name="package">The package.</param>
 		/// <returns></returns>
 		public FileEntry GetApkFileEntry ( String package ) {
-			return FileEntry.Find ( this.Device, GetApkPath ( package ) );
+			return FileEntry.Find ( this.Device, new FileListingService(Device), GetApkPath ( package ) );
 		}
 
 		/// <summary>

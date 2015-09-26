@@ -14,6 +14,7 @@ namespace Managed.Adb
     /// </summary>
     public class FileEntry
     {
+        private FileSystem fileSystem;
 
         /// <summary>
         /// Finds the file entry, or creates an empty FileEntry if it does not exist.
@@ -22,7 +23,7 @@ namespace Managed.Adb
         /// <param name="path">The path.</param>
         /// <remarks>This does not create the FileEntry on disk. It only creates the FileEntry object.</remarks>
         /// <returns></returns>
-        public static FileEntry FindOrCreate(IDevice device, String path)
+        public static FileEntry FindOrCreate(IDevice device, FileListingService fileListingService, String path)
         {
             device.ThrowIfNull("device");
             path.ThrowIfNullOrEmpty("path");
@@ -31,7 +32,7 @@ namespace Managed.Adb
             {
                 try
                 {
-                    return device.FileListingService.FindFileEntry(path);
+                    return fileListingService.FindFileEntry(path);
                 }
                 catch (FileNotFoundException)
                 {
@@ -62,14 +63,14 @@ namespace Managed.Adb
         /// <exception cref="ArgumentNullException">If the device or path is null.</exception>
         /// <exception cref="FileNotFoundException">If the entrty is not found.</exception>
         /// <returns></returns>
-        public static FileEntry Find(IDevice device, String path)
+        public static FileEntry Find(IDevice device, FileListingService fileListingService, String path)
         {
             device.ThrowIfNull("device");
             path.ThrowIfNullOrEmpty("path");
 
             if (!device.IsOffline)
             {
-                return device.FileListingService.FindFileEntry(path);
+                return fileListingService.FindFileEntry(path);
             }
             else
             {
@@ -87,7 +88,7 @@ namespace Managed.Adb
         /// <param name="name">name of the entry.</param>
         /// <param name="type">entry type.</param>
         /// <param name="isRoot">if set to <see langword="true"/> [is root].</param>
-        internal FileEntry(IDevice device, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot)
+        internal FileEntry(FileSystem fileSystem, FileEntry parent, String name, FileListingService.FileTypes type, bool isRoot)
         {
             this.FetchTime = 0;
             this.Parent = parent;
@@ -97,7 +98,7 @@ namespace Managed.Adb
             Children = new List<FileEntry>();
             CheckAppPackageStatus();
             this.Exists = true;
-            this.Device = device;
+            this.fileSystem = fileSystem;
         }
 
         /// <summary>
@@ -276,7 +277,7 @@ namespace Managed.Adb
                 {
                     return true;
                 }
-                var fe = this.Device.FileSystem.Create(this);
+                var fe = this.fileSystem.Create(this);
                 return fe.Exists;
             }
             catch
@@ -293,7 +294,7 @@ namespace Managed.Adb
         {
             try
             {
-                this.Device.FileSystem.Delete(this.FullEscapedPath);
+                this.fileSystem.Delete(this.FullEscapedPath);
                 return true;
             }
             catch
@@ -390,7 +391,7 @@ namespace Managed.Adb
                 {
                     return FileListingService.FILE_ROOT;
                 }
-                return Device.FileSystem.ResolveLink(this.FullPath);
+                return fileSystem.ResolveLink(this.FullPath);
             }
         }
 

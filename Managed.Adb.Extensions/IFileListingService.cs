@@ -8,7 +8,7 @@ namespace Managed.Adb
     public interface IFileListingService
     {
         /// <include file='.\FileListingService.xml' path='/FileListingService/Device/*'/>
-        Device Device
+        IDevice Device
         {
             get;
         }
@@ -17,13 +17,6 @@ namespace Managed.Adb
         FileEntry Root
         {
             get;
-        }
-
-        /// <include file='.\FileListingService.xml' path='/FileListingService/ForceBusyBox/*'/>
-        bool ForceBusyBox
-        {
-            get;
-            set;
         }
 
         /// <include file='.\FileListingService.xml' path='/FileListingService/GetChildren/*'/>

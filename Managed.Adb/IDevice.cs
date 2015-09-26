@@ -28,22 +28,6 @@ namespace Managed.Adb {
 		event EventHandler<EventArgs> ClientListChanged;
 
 		/// <summary>
-		/// Gets the file system.
-		/// </summary>
-		/// <value>
-		/// The file system.
-		/// </value>
-		IFileSystem FileSystem { get; }
-
-		/// <summary>
-		/// Gets the busy box.
-		/// </summary>
-		/// <value>
-		/// The busy box.
-		/// </value>
-		IBusyBox BusyBox { get; }
-
-		/// <summary>
 		/// Gets the serial number of the device.
 		/// </summary>
 		/// <value>The serial number.</value>
@@ -172,11 +156,6 @@ namespace Managed.Adb {
 		/// </remarks>
 		/// <exception cref="IOException">Throws IOException if the connection with adb failed.</exception>
 		ISyncService SyncService { get; }
-        
-		/// <summary>
-		/// Returns a <see cref="FileListingService"/> for this device.
-		/// </summary>
-		IFileListingService FileListingService { get; }
 
 
 		/// <summary>

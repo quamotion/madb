@@ -11,6 +11,7 @@ namespace Managed.Adb
 {
     public class FileSystem : IFileSystem
     {
+        private FileListingService fileListingService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileSystem"/> class.
@@ -19,6 +20,7 @@ namespace Managed.Adb
         public FileSystem(IDevice device)
         {
             Device = device;
+            this.fileListingService = new FileListingService(device);
         }
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace Managed.Adb
                     var cer = new CommandErrorReceiver();
                     var escaped = LinuxPath.Escape(path);
                     // use native touch command if its available.
-                    var cmd = Device.BusyBox.Available ? "touch" : ">";
+                    var cmd = ">";
                     var command = String.Format("{0} {1}", cmd, escaped);
                     if (Device.CanSU())
                     {
@@ -60,7 +62,7 @@ namespace Managed.Adb
                     else
                     {
                         // at this point, the newly created file should exist.
-                        return Device.FileListingService.FindFileEntry(path);
+                        return this.fileListingService.FindFileEntry(path);
                     }
                 }
             }
@@ -80,7 +82,7 @@ namespace Managed.Adb
             if (fileEntry.IsDirectory)
             {
                 MakeDirectory(fileEntry.FullPath);
-                return Device.FileListingService.FindFileEntry(fileEntry.FullPath);
+                return this.fileListingService.FindFileEntry(fileEntry.FullPath);
             }
             else
             {
@@ -104,7 +106,7 @@ namespace Managed.Adb
             {
                 try
                 {
-                    FileEntry fe = Device.FileListingService.FindFileEntry(path);
+                    FileEntry fe = this.fileListingService.FindFileEntry(path);
                     return fe != null;
                 }
                 catch (FileNotFoundException e)
@@ -148,29 +150,8 @@ namespace Managed.Adb
             CommandErrorReceiver cer = new CommandErrorReceiver();
             try
             {
-                //var fileEntry = FileEntry.FindOrCreate ( Device, path );
-                // if we have busybox we can use the mkdir in there as it supports --parents
-                if (Device.BusyBox.Available && !forceDeviceMethod)
-                {
-                    try
-                    {
-                        Device.BusyBox.ExecuteShellCommand("mkdir -p {0}", cer, path);
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            // if there was an error, then fallback too.
-                            MakeDirectoryFallbackInternal(path, cer);
-                        }
-                        catch { }
-                    }
-                }
-                else
-                {
-                    // if busybox is not available then we have to fallback
-                    MakeDirectoryFallbackInternal(path, cer);
-                }
+                // if busybox is not available then we have to fallback
+                MakeDirectoryFallbackInternal(path, cer);
             }
             catch
             {
@@ -204,7 +185,7 @@ namespace Managed.Adb
             destination.ThrowIfNullOrWhiteSpace("destination");
 
             CommandErrorReceiver cer = new CommandErrorReceiver();
-            FileEntry sfe = Device.FileListingService.FindFileEntry(source);
+            FileEntry sfe = this.fileListingService.FindFileEntry(source);
 
             Device.ExecuteShellCommand("cat {0} > {1}", cer, sfe.FullEscapedPath, destination);
             if (!String.IsNullOrEmpty(cer.ErrorMessage))
@@ -225,7 +206,7 @@ namespace Managed.Adb
             destination.ThrowIfNullOrWhiteSpace("destination");
 
             CommandErrorReceiver cer = new CommandErrorReceiver();
-            FileEntry sfe = Device.FileListingService.FindFileEntry(source);
+            FileEntry sfe = this.fileListingService.FindFileEntry(source);
 
             Device.ExecuteShellCommand("mv {0} {1}", cer, sfe.FullEscapedPath, destination);
             if (!String.IsNullOrEmpty(cer.ErrorMessage))
@@ -245,7 +226,7 @@ namespace Managed.Adb
             path.ThrowIfNullOrWhiteSpace("path");
             permissions.ThrowIfNullOrWhiteSpace("permissions");
 
-            FileEntry entry = Device.FileListingService.FindFileEntry(path);
+            FileEntry entry = this.fileListingService.FindFileEntry(path);
             CommandErrorReceiver cer = new CommandErrorReceiver();
             Device.ExecuteShellCommand("chmod {0} {1}", cer, permissions, entry.FullEscapedPath);
         }
@@ -261,7 +242,7 @@ namespace Managed.Adb
             path.ThrowIfNullOrWhiteSpace("path");
             permissions.ThrowIfNull("permissions");
 
-            FileEntry entry = Device.FileListingService.FindFileEntry(path);
+            FileEntry entry = this.fileListingService.FindFileEntry(path);
             CommandErrorReceiver cer = new CommandErrorReceiver();
             Device.ExecuteShellCommand("chmod {0} {1}", cer, permissions.ToChmod(), entry.FullEscapedPath);
         }
@@ -300,7 +281,7 @@ namespace Managed.Adb
         {
             Device.ThrowIfNull("Device");
             path.ThrowIfNullOrWhiteSpace("path");
-            FileEntry entry = Device.FileListingService.FindFileEntry(path);
+            FileEntry entry = this.fileListingService.FindFileEntry(path);
 
             Delete(entry);
         }
@@ -341,8 +322,8 @@ namespace Managed.Adb
             {
                 Device.ThrowIfNull("Device");
 
-                var blocks = FileEntry.Find(Device, "/dev/block/");
-                blocks.Children = Device.FileListingService.GetChildren(blocks, true, null).ToList();
+                var blocks = FileEntry.Find(Device, fileListingService, "/dev/block/");
+                blocks.Children = this.fileListingService.GetChildren(blocks, true, null).ToList();
                 return blocks.Children.Where(b => b.Type == FileListingService.FileTypes.Block);
             }
         }
@@ -358,18 +339,9 @@ namespace Managed.Adb
             Device.ThrowIfNull("Device");
 
             CommandErrorReceiver cer = new CommandErrorReceiver();
-            if (Device.BusyBox.Available)
-            {
-                Device.ExecuteShellCommand("busybox mount {0} {4} -t {1} {2} {3}", cer, mountPoint.IsReadOnly ? "-r" : "-w",
-                    mountPoint.FileSystem, mountPoint.Block, mountPoint.Name,
-                    !String.IsNullOrEmpty(options) ? String.Format("-o {0}", options) : String.Empty);
-            }
-            else
-            {
-                Device.ExecuteShellCommand("mount {0} {4} -t {1} {2} {3}", cer, mountPoint.IsReadOnly ? "-r" : "-w",
-                    mountPoint.FileSystem, mountPoint.Block, mountPoint.Name,
-                    !String.IsNullOrEmpty(options) ? String.Format("-o {0}", options) : String.Empty);
-            }
+            Device.ExecuteShellCommand("mount {0} {4} -t {1} {2} {3}", cer, mountPoint.IsReadOnly ? "-r" : "-w",
+                mountPoint.FileSystem, mountPoint.Block, mountPoint.Name,
+                !String.IsNullOrEmpty(options) ? String.Format("-o {0}", options) : String.Empty);
         }
 
         /// <summary>
@@ -383,14 +355,7 @@ namespace Managed.Adb
             Device.ThrowIfNull("Device");
 
             CommandErrorReceiver cer = new CommandErrorReceiver();
-            if (Device.BusyBox.Available)
-            {
-                Device.ExecuteShellCommand("busybox mount {0}", cer, mountPoint);
-            }
-            else
-            {
-                Device.ExecuteShellCommand("mount {0}", cer, mountPoint);
-            }
+            Device.ExecuteShellCommand("mount {0}", cer, mountPoint);
         }
 
         /// <summary>
@@ -469,14 +434,7 @@ namespace Managed.Adb
             Device.ThrowIfNull("Device");
 
             CommandErrorReceiver cer = new CommandErrorReceiver();
-            if (Device.BusyBox.Available)
-            {
-                Device.ExecuteShellCommand("busybox umount {1} {0}", cer, !String.IsNullOrEmpty(options) ? String.Format("-o {0}", options) : String.Empty, mountPoint);
-            }
-            else
-            {
-                Device.ExecuteShellCommand("umount {1} {0}", cer, !String.IsNullOrEmpty(options) ? String.Format("-o {0}", options) : String.Empty, mountPoint);
-            }
+            Device.ExecuteShellCommand("umount {1} {0}", cer, !String.IsNullOrEmpty(options) ? String.Format("-o {0}", options) : String.Empty, mountPoint);
         }
 
         /// <summary>
@@ -492,42 +450,32 @@ namespace Managed.Adb
                 return path;
             }
 
-            if (this.Device.BusyBox.Available)
+            try
             {
-                var cresult = new CommandResultReceiver();
-                this.Device.BusyBox.ExecuteShellCommand("readlink -f {0}", cresult, path);
-                // if cresult is empty, return the path
-                return (cresult == null || String.IsNullOrEmpty(cresult.Result)) ? path : cresult.Result;
-            }
-            else
-            {
-                try
+
+                var entriesString = path.Split(new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+                FileEntry current = this.fileListingService.Root;
+
+                foreach (var pathItem in entriesString)
                 {
-
-                    var entriesString = path.Split(new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
-                    FileEntry current = this.Device.FileListingService.Root;
-
-                    foreach (var pathItem in entriesString)
+                    FileEntry[] entries = this.fileListingService.GetChildren(current, true, null);
+                    foreach (var e in entries)
                     {
-                        FileEntry[] entries = this.Device.FileListingService.GetChildren(current, true, null);
-                        foreach (var e in entries)
+                        if (String.Compare(e.Name, pathItem, false) == 0)
                         {
-                            if (String.Compare(e.Name, pathItem, false) == 0)
-                            {
-                                current = e;
-                                break;
-                            }
+                            current = e;
+                            break;
                         }
                     }
+                }
 
-                    return current.FullResolvedPathInternal;
-                }
-                catch (Exception e)
-                {
-                    Log.d("FileSytem", e.Message);
-                }
-                return path;
+                return current.FullResolvedPathInternal;
             }
+            catch (Exception e)
+            {
+                Log.d("FileSytem", e.Message);
+            }
+            return path;
         }
     }
 }

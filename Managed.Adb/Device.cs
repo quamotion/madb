@@ -159,16 +159,6 @@ namespace Managed.Adb {
         /// </summary>
 		private DateTime _lastBatteryCheckTime = DateTime.MinValue;
 
-        /// <summary>
-        /// Backing field for <see cref="FileSystem"/> property.
-        /// </summary>
-        private FileSystem _fileSystem;
-
-        /// <summary>
-        /// Backing field for the <see cref="BusyBox"/> property.
-        /// </summary>
-        private BusyBox _busyBox;
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Device"/> class.
 		/// </summary>
@@ -240,16 +230,6 @@ namespace Managed.Adb {
 			} else {
 				throw new ArgumentException("Invalid device list data");
 			}
-		}
-
-		/// <summary>
-		/// Determines whether this device can perform a backup.
-		/// </summary>
-		/// <returns>
-		///   <see langword="true"/> if this device can perform a backup; otherwise, <see langword="false"/>.
-		/// </returns>
-		public bool CanBackup() {
-			return this.FileSystem.Exists("/system/bin/bu");
 		}
 
 		/// <summary>
@@ -397,44 +377,6 @@ namespace Managed.Adb {
 
 			return null;
 		}
-
-		/// <summary>
-		/// Gets the file system for this device.
-		/// </summary>
-        public IFileSystem FileSystem
-        {
-            get
-            {
-                lock (this)
-                {
-                    if (this._fileSystem == null)
-                    {
-                        this._fileSystem = new FileSystem(this);
-                    }
-                }
-
-                return this._fileSystem;
-            }
-        }
-
-		/// <summary>
-		/// Gets the busy box object for this device.
-		/// </summary>
-		public IBusyBox BusyBox
-        {
-            get
-            {
-                lock(this)
-                {
-                    if(this._busyBox == null)
-                    {
-                        this._busyBox = new BusyBox(this);
-                    }
-                }
-
-                return this._busyBox;
-            }
-        }
 
 		/// <summary>
 		/// Gets a value indicating whether the device is online.
@@ -641,25 +583,6 @@ namespace Managed.Adb {
 				}
 
 				return null;
-			}
-		}
-
-		/// <summary>
-		/// Returns a <see cref="PackageManager"/> for this device.
-		/// </summary>
-		public PackageManager PackageManager {
-			get {
-				return new PackageManager(this);
-			}
-		}
-
-		/// <summary>
-		/// Returns a <see cref="FileListingService"/> for this device.
-		/// </summary>
-		/// <value></value>
-		public IFileListingService FileListingService {
-			get {
-				return new FileListingService(this);
 			}
 		}
 
@@ -919,8 +842,7 @@ namespace Managed.Adb {
 		/// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
 		public void InstallRemotePackage(String remoteFilePath, bool reinstall) {
 			InstallReceiver receiver = new InstallReceiver();
-			FileEntry entry = FileListingService.FindFileEntry(remoteFilePath);
-			String cmd = String.Format("pm install {1}{0}", entry.FullEscapedPath, reinstall ? "-r " : String.Empty);
+			String cmd = String.Format("pm install {1}{0}", remoteFilePath, reinstall ? "-r " : String.Empty);
 			ExecuteShellCommand(cmd, receiver);
 
 			if(!String.IsNullOrEmpty(receiver.ErrorMessage)) {

@@ -120,43 +120,6 @@ namespace Managed.Adb {
 			return false;
 		}
 
-		/// <summary>
-		/// Gets the file type from the mode
-		/// </summary>
-		/// <param name="mode">the file mode flags</param>
-		/// <returns></returns>
-		private static FileListingService.FileTypes GetFileType ( FileMode mode ) {
-			if ( ( mode & FileMode.Socket ) == FileMode.Socket ) {
-				return FileListingService.FileTypes.Socket;
-			}
-
-			if ( ( mode & FileMode.SymbolicLink ) == FileMode.SymbolicLink ) {
-				return FileListingService.FileTypes.Link;
-			}
-
-			if ( ( mode & FileMode.Regular ) == FileMode.Regular ) {
-				return FileListingService.FileTypes.File;
-			}
-
-			if ( ( mode & FileMode.Block ) == FileMode.Block ) {
-				return FileListingService.FileTypes.Block;
-			}
-
-			if ( ( mode & FileMode.Directory ) == FileMode.Directory ) {
-				return FileListingService.FileTypes.Directory;
-			}
-
-			if ( ( mode & FileMode.Character ) == FileMode.Character ) {
-				return FileListingService.FileTypes.Character;
-			}
-
-			if ( ( mode & FileMode.FIFO ) == FileMode.FIFO ) {
-				return FileListingService.FileTypes.FIFO;
-			}
-
-			return FileListingService.FileTypes.Other;
-		}
-
 
 
 		/// <summary>
@@ -321,54 +284,6 @@ namespace Managed.Adb {
 			}
 		}
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Pull/*'/>
-        public SyncResult Pull ( IEnumerable<FileEntry> entries, String localPath, ISyncProgressMonitor monitor ) {
-			if ( monitor == null ) {
-				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
-			}
-			
-			// first we check the destination is a directory and exists
-			DirectoryInfo d = new DirectoryInfo ( localPath );
-			if ( !d.Exists ) {
-				return new SyncResult ( ErrorCodeHelper.RESULT_NO_DIR_TARGET );
-			}
-
-			if ( !d.IsDirectory() ) {
-				return new SyncResult ( ErrorCodeHelper.RESULT_TARGET_IS_FILE );
-			}
-
-			// get a FileListingService object
-			FileListingService fls = new FileListingService ( Device );
-
-			// compute the number of file to move
-			long total = GetTotalRemoteFileSize ( entries, fls );
-			Log.i (TAG, "total transfer: {0}", total );
-
-			// start the monitor
-			monitor.Start ( total );
-
-			SyncResult result = DoPull ( entries, localPath, fls, monitor );
-
-			monitor.Stop ( );
-
-			return result;
-		}
-
-        /// <include file='.\ISyncService.xml' path='/SyncService/PullFile/*'/>
-		public SyncResult PullFile ( FileEntry remote, String localFilename, ISyncProgressMonitor monitor ) {
-			if ( monitor == null ) {
-				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
-			}
-
-			long total = remote.Size;
-			monitor.Start ( total );
-
-			SyncResult result = DoPullFile ( remote.FullPath, localFilename, monitor );
-
-			monitor.Stop ( );
-			return result;
-		}
-
         /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
         public SyncResult PullFile ( String remoteFilepath, String localFilename, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
@@ -376,44 +291,11 @@ namespace Managed.Adb {
 			}
 
 			long totalWork = 0;
-			try {
-				FileListingService fls = new FileListingService ( this.Device );
-				FileEntry remoteFileEntry = fls.FindFileEntry ( remoteFilepath );
-				totalWork = remoteFileEntry.Size;
-			} catch ( FileNotFoundException ffe ) {
-				Log.w ( "ddms", ffe );
-			}
 			monitor.Start ( totalWork );
 
 			SyncResult result = DoPullFile ( remoteFilepath, localFilename, monitor );
 
 			monitor.Stop ( );
-			return result;
-		}
-
-        /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
-        public SyncResult Push ( IEnumerable<String> local, FileEntry remote, ISyncProgressMonitor monitor ) {
-			if ( monitor == null ) {
-				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
-			}
-
-			if ( !remote.IsDirectory ) {
-				return new SyncResult ( ErrorCodeHelper.RESULT_REMOTE_IS_FILE );
-			}
-
-			// make a list of File from the list of String
-			List<FileSystemInfo> files = new List<FileSystemInfo> ( );
-			foreach ( String path in local ) {
-				files.Add ( path.GetFileSystemInfo ( ) );
-			}
-
-			// get the total count of the bytes to transfer
-			long total = GetTotalLocalFileSize ( files );
-
-			monitor.Start ( total );
-			SyncResult result = DoPush ( files, remote.FullPath, monitor );
-			monitor.Stop ( );
-
 			return result;
 		}
 
@@ -575,7 +457,7 @@ namespace Managed.Adb {
 			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
 		}
 
-		private SyncResult DoPush ( IEnumerable<FileSystemInfo> files, string remotePath, ISyncProgressMonitor monitor ) {
+		public SyncResult DoPush ( IEnumerable<FileSystemInfo> files, string remotePath, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
@@ -624,7 +506,7 @@ namespace Managed.Adb {
 		/// <param name="monitor">the monitor. The monitor must be started already.</param>
 		/// <returns>a SyncResult object with a code and an optional message.</returns>
 		/// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
-		private SyncResult DoPullFile ( string remotePath, string localPath, ISyncProgressMonitor monitor ) {
+		public SyncResult DoPullFile ( string remotePath, string localPath, ISyncProgressMonitor monitor ) {
 			if ( monitor == null ) {
 				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
 			}
@@ -733,104 +615,12 @@ namespace Managed.Adb {
 		}
 
 		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="entries"></param>
-		/// <param name="localPath"></param>
-		/// <param name="fls"></param>
-		/// <param name="monitor"></param>
-		/// <returns></returns>
-		/// <exception cref="System.IO.IOException">Throws if unable to create a file or folder</exception>
-		/// <exception cref="System.ArgumentNullException">Throws if the ISyncProgressMonitor is null</exception>
-		private SyncResult DoPull ( IEnumerable<FileEntry> entries, string localPath, FileListingService fileListingService, ISyncProgressMonitor monitor ) {
-			if ( monitor == null ) {
-				throw new ArgumentNullException ( "monitor", "Monitor cannot be null" );
-			}
-
-			// check if we're cancelled
-			if ( monitor.IsCanceled ) {
-
-				return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
-			}
-
-			// check if we need to create the local directory
-			DirectoryInfo localDir = new DirectoryInfo ( localPath );
-			if ( !localDir.Exists ) {
-				localDir.Create ( );
-			}
-
-			foreach ( FileEntry e in entries ) {
-				// check if we're canceled
-				if ( monitor.IsCanceled ) {
-					return new SyncResult ( ErrorCodeHelper.RESULT_CANCELED );
-				}
-
-				// the destination item (folder or file)
-
-
-				String dest = Path.Combine ( localPath, e.Name );
-
-				// get type (we only pull directory and files for now)
-				FileListingService.FileTypes type = e.Type;
-				if ( type == FileListingService.FileTypes.Directory ) {
-					monitor.StartSubTask ( e.FullPath, dest );
-					// then recursively call the content. Since we did a ls command
-					// to get the number of files, we can use the cache
-					FileEntry[] children = fileListingService.GetChildren ( e, true, null );
-					SyncResult result = DoPull ( children, dest, fileListingService, monitor );
-					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
-						return result;
-					}
-					monitor.Advance ( 1 );
-				} else if ( type == FileListingService.FileTypes.File ) {
-					monitor.StartSubTask ( e.FullPath, dest );
-					SyncResult result = DoPullFile ( e.FullPath, dest, monitor );
-					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
-						return result;
-					}
-				} else if ( type == FileListingService.FileTypes.Link ) {
-					monitor.StartSubTask ( e.FullPath, dest );
-					SyncResult result = DoPullFile ( e.FullResolvedPath, dest, monitor );
-					if ( result.Code != ErrorCodeHelper.RESULT_OK ) {
-						return result;
-					}
-				} else {
-					Log.d ( "ddms-sync", String.Format ( "unknown type to transfer: {0}", type ) );
-				}
-			}
-
-			return new SyncResult ( ErrorCodeHelper.RESULT_OK );
-		}
-
-		/// <summary>
-		/// compute the recursive file size of all the files in the list. Folder have a weight of 1.
-		/// </summary>
-		/// <param name="entries">The remote files</param>
-		/// <param name="fls">The FileListingService</param>
-		/// <returns>The total number of bytes of the specified remote files</returns>
-		private long GetTotalRemoteFileSize ( IEnumerable<FileEntry> entries, FileListingService fls ) {
-			long count = 0;
-			foreach ( FileEntry e in entries ) {
-				FileListingService.FileTypes type = e.Type;
-				if ( type == FileListingService.FileTypes.Directory ) {
-					// get the children
-					IEnumerable<FileEntry> children = fls.GetChildren ( e, false, null );
-					count += GetTotalRemoteFileSize ( children, fls ) + 1;
-				} else if ( type == FileListingService.FileTypes.File ) {
-					count += e.Size;
-				}
-			}
-
-			return count;
-		}
-
-		/// <summary>
 		/// compute the recursive file size of all the files in the list. Folders have a weight of 1.
 		/// </summary>
 		/// <param name="files">The local files / folders</param>
 		/// <returns>The total number of bytes</returns>
 		/// <remarks>This does not check for circular links.</remarks>
-		private long GetTotalLocalFileSize ( IEnumerable<FileSystemInfo> fsis ) {
+		public long GetTotalLocalFileSize ( IEnumerable<FileSystemInfo> fsis ) {
 			long count = 0;
 
 			foreach ( FileSystemInfo fsi in fsis ) {

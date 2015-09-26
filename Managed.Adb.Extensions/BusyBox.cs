@@ -13,6 +13,9 @@ namespace Managed.Adb {
 	/// </summary>
 	public class BusyBox : IBusyBox
     {
+        private IFileListingService fileListingService;
+        private FileSystem fileSystem;
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -28,6 +31,8 @@ namespace Managed.Adb {
 		/// <param name="device">The device.</param>
 		public BusyBox ( IDevice device ) {
 			this.Device = device;
+            this.fileSystem = new FileSystem(this.Device);
+            this.fileListingService = new FileListingService(this.Device);
 			Version = new System.Version ( "0.0.0.0" );
 			Commands = new List<String> ( );
 			CheckForBusyBox ( );
@@ -54,23 +59,23 @@ namespace Managed.Adb {
 
 				FileEntry path = null;
 				try {
-					path = Device.FileListingService.FindFileEntry ( BUSYBOX_BIN );
+					path = this.fileListingService.FindFileEntry ( BUSYBOX_BIN );
 				} catch ( FileNotFoundException ) {
 					// path doesn't exist, so we make it.
-					Device.FileSystem.MakeDirectory ( BUSYBOX_BIN );
+					this.fileSystem.MakeDirectory ( BUSYBOX_BIN );
 					// attempt to get the FileEntry after the directory has been made
-					path = Device.FileListingService.FindFileEntry ( BUSYBOX_BIN );
+					path = this.fileListingService.FindFileEntry ( BUSYBOX_BIN );
 				}
 
-				Device.FileSystem.Chmod ( path.FullPath, "0755" );
+				this.fileSystem.Chmod ( path.FullPath, "0755" );
 
 				String bbPath = LinuxPath.Combine ( path.FullPath, BUSYBOX_COMMAND );
 
-				Device.FileSystem.Copy ( busybox, bbPath );
+				this.fileSystem.Copy ( busybox, bbPath );
 
 
-				bb = Device.FileListingService.FindFileEntry ( bbPath );
-				Device.FileSystem.Chmod ( bb.FullPath, "0755" );
+				bb = this.fileListingService.FindFileEntry ( bbPath );
+				this.fileSystem.Chmod ( bb.FullPath, "0755" );
 
 				Device.ExecuteShellCommand ( "{0}/busybox --install {0}", new ConsoleOutputReceiver ( ), path.FullPath );
 

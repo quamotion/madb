@@ -169,35 +169,28 @@ namespace Managed.Adb {
 		/// </summary>
 		private FileEntry _root = null;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="FileListingService"/> class.
-		/// </summary>
-		/// <param name="device">The device.</param>
-		/// <param name="forceBusyBox">if set to <see langword="true"/> [force busy box].</param>
-		public FileListingService ( Device device, bool forceBusyBox ) {
-			this.Device = device;
-			this.Threads = new List<Thread> ( );
-			this.ForceBusyBox = forceBusyBox && device.BusyBox.Available;
-		}
+        private FileSystem fileSystem;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileListingService"/> class.
 		/// </summary>
 		/// <param name="device">The device.</param>
-		public FileListingService ( Device device )
-			: this ( device, device.BusyBox.Available ) {
-
-		}
+		public FileListingService ( IDevice device )
+        {
+            this.Device = device;
+            this.fileSystem = new FileSystem(this.Device);
+            this.Threads = new List<Thread>();
+        }
 
         /// <include file='.\FileListingService.xml' path='/FileListingService/Device/*'/>
-        public Device Device { get; private set; }
+        public IDevice Device { get; private set; }
 
         /// <include file='.\FileListingService.xml' path='/FileListingService/Root/*'/>
 		public FileEntry Root {
 			get {
 				if ( Device != null ) {
 					if ( _root == null ) {
-						_root = new FileEntry ( this.Device, null /* parent */, string.Empty /* name */, FileTypes.Directory, true /* isRoot */ );
+						_root = new FileEntry ( this.fileSystem, null /* parent */, string.Empty /* name */, FileTypes.Directory, true /* isRoot */ );
 					}
 					return _root;
 				}
@@ -208,8 +201,51 @@ namespace Managed.Adb {
 			}
 		}
 
-        /// <include file='.\FileListingService.xml' path='/FileListingService/ForceBusyBox/*'/>
-        public bool ForceBusyBox { get; set; }
+
+        /// <summary>
+        /// Gets the file type from the mode
+        /// </summary>
+        /// <param name="mode">the file mode flags</param>
+        /// <returns></returns>
+        private static FileTypes GetFileType(SyncService.FileMode mode)
+        {
+            if ((mode & SyncService.FileMode.Socket) == SyncService.FileMode.Socket)
+            {
+                return FileListingService.FileTypes.Socket;
+            }
+
+            if ((mode & SyncService.FileMode.SymbolicLink) == SyncService.FileMode.SymbolicLink)
+            {
+                return FileListingService.FileTypes.Link;
+            }
+
+            if ((mode & SyncService.FileMode.Regular) == SyncService.FileMode.Regular)
+            {
+                return FileListingService.FileTypes.File;
+            }
+
+            if ((mode & SyncService.FileMode.Block) == SyncService.FileMode.Block)
+            {
+                return FileListingService.FileTypes.Block;
+            }
+
+            if ((mode & SyncService.FileMode.Directory) == SyncService.FileMode.Directory)
+            {
+                return FileListingService.FileTypes.Directory;
+            }
+
+            if ((mode & SyncService.FileMode.Character) == SyncService.FileMode.Character)
+            {
+                return FileListingService.FileTypes.Character;
+            }
+
+            if ((mode & SyncService.FileMode.FIFO) == SyncService.FileMode.FIFO)
+            {
+                return FileListingService.FileTypes.FIFO;
+            }
+
+            return FileListingService.FileTypes.Other;
+        }
 
         /// <include file='.\FileListingService.xml' path='/FileListingService/GetChildren/*'/>
 		public FileEntry[] GetChildren ( FileEntry entry, bool useCache, IListingReceiver receiver ) {
@@ -306,7 +342,7 @@ namespace Managed.Adb {
 
 			try {
 				// create the command
-				String command = String.Format ( ForceBusyBox ? BUSYBOX_LS : TOOLBOX_LS, entry.FullPath );
+				String command = String.Format ( TOOLBOX_LS, entry.FullPath );
 				// create the receiver object that will parse the result from ls
 				ListingServiceReceiver receiver = new ListingServiceReceiver ( entry, entryList, linkList );
 
@@ -350,7 +386,7 @@ namespace Managed.Adb {
 
         /// <include file='.\FileListingService.xml' path='/FileListingService/FindFileEntry2/*'/>
         public FileEntry FindFileEntry ( FileEntry parent, String path ) {
-			var rpath = Device.FileSystem.ResolveLink ( path );
+			var rpath = this.fileSystem.ResolveLink ( path );
 			var entriesString = rpath.Split ( new char[] { LinuxPath.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries );
 			FileEntry current = parent;
 
