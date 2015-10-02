@@ -25,8 +25,8 @@
         /** Default timeout values for adb connection (milliseconds) */
         public const int DEFAULT_TIMEOUT = 5000; // standard delay, in ms
 
-        private static int _selectedDebugPort;
-        private static LogLevel.LogLevelInfo _logLevel;
+        private static int selectedDebugPort;
+        private static LogLevel.LogLevelInfo logLevel;
 
         static DdmPreferences()
         {
@@ -44,12 +44,12 @@
         {
             get
             {
-                return _logLevel;
+                return logLevel;
             }
 
             set
             {
-                _logLevel = value;
+                logLevel = value;
                 Log.Level = value ;
             }
         }
@@ -60,12 +60,12 @@
         {
             get
             {
-                return _selectedDebugPort;
+                return selectedDebugPort;
             }
 
             set
             {
-                _selectedDebugPort = value;
+                selectedDebugPort = value;
 
                 MonitorThread monitorThread = MonitorThread.Instance;
                 if (monitorThread != null)

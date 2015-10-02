@@ -18,7 +18,7 @@
             this.IsCancelled = false;
         }
 
-        private static NullOutputReceiver _instance = null;
+        private static NullOutputReceiver instance = null;
 
         /// <summary>
         /// Gets the instance.
@@ -30,12 +30,12 @@
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
-                    _instance = new NullOutputReceiver();
+                    instance = new NullOutputReceiver();
                 }
 
-                return _instance;
+                return instance;
             }
         }
 

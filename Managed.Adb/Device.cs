@@ -147,22 +147,22 @@
         /// <summary>
         /// The name of the Android Virtual Device (emulator).
         /// </summary>
-        private string _avdName;
+        private string avdName;
 
         /// <summary>
         /// Indicates whether the user can obtain su (root) privileges.
         /// </summary>
-        private bool _canSU = false;
+        private bool canSU = false;
 
         /// <summary>
         /// The latest battery information.
         /// </summary>
-        private BatteryInfo _lastBatteryInfo = null;
+        private BatteryInfo lastBatteryInfo = null;
 
         /// <summary>
         /// The time at which the battery information was last obtained.
         /// </summary>
-        private DateTime _lastBatteryCheckTime = DateTime.MinValue;
+        private DateTime lastBatteryCheckTime = DateTime.MinValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Device"/> class.
@@ -265,9 +265,9 @@
         /// </returns>
         public bool CanSU()
         {
-            if (this._canSU)
+            if (this.canSU)
             {
-                return this._canSU;
+                return this.canSU;
             }
 
             try
@@ -277,18 +277,18 @@
                 // The nulloutput receiver is fine here because it doesn't need to send the output anywhere,
                 // the execute command can still handle the output with the null output receiver.
                 this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", NullOutputReceiver.Instance);
-                this._canSU = true;
+                this.canSU = true;
             }
             catch (PermissionDeniedException)
             {
-                this._canSU = false;
+                this.canSU = false;
             }
             catch (FileNotFoundException)
             {
-                this._canSU = false;
+                this.canSU = false;
             }
 
-            return this._canSU;
+            return this.canSU;
         }
 
         /// <summary>
@@ -324,7 +324,7 @@
         {
             get
             {
-                return this._avdName;
+                return this.avdName;
             }
 
             set
@@ -334,7 +334,7 @@
                     throw new ArgumentException("Cannot set the AVD name of the device is not an emulator");
                 }
 
-                this._avdName = value;
+                this.avdName = value;
             }
         }
 
@@ -603,17 +603,17 @@
         /// <returns></returns>
         public BatteryInfo GetBatteryInfo(long freshness)
         {
-            if (this._lastBatteryInfo != null
-                                && this._lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness)))
+            if (this.lastBatteryInfo != null
+                                && this.lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness)))
                                 {
-                return this._lastBatteryInfo;
+                return this.lastBatteryInfo;
             }
 
             var receiver = new BatteryReceiver();
             this.ExecuteShellCommand("dumpsys battery", receiver, BATTERY_TIMEOUT);
-            this._lastBatteryInfo = receiver.BatteryInfo;
-            this._lastBatteryCheckTime = DateTime.Now;
-            return this._lastBatteryInfo;
+            this.lastBatteryInfo = receiver.BatteryInfo;
+            this.lastBatteryCheckTime = DateTime.Now;
+            return this.lastBatteryInfo;
         }
 
         /// <summary>

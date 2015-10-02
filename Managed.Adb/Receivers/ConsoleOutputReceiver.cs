@@ -15,7 +15,7 @@
         /// </summary>
         private const string TAG = "ConsoleOutputReceiver";
 
-        private static ConsoleOutputReceiver _instance = null;
+        private static ConsoleOutputReceiver instance = null;
 
         /// <summary>
         /// Gets the instance.
@@ -27,12 +27,12 @@
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
-                    _instance = new ConsoleOutputReceiver();
+                    instance = new ConsoleOutputReceiver();
                 }
 
-                return _instance;
+                return instance;
             }
         }
 

@@ -78,7 +78,7 @@ namespace Managed.Adb
         /// <summary>
         /// The singleton instance of the <see cref="AdbHelper"/> class.
         /// </summary>
-        private static AdbHelper _instance = null;
+        private static AdbHelper instance = null;
 
         /// <summary>
         /// Gets an instance of the AdbHelper.
@@ -87,12 +87,12 @@ namespace Managed.Adb
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
-                    _instance = new AdbHelper();
+                    instance = new AdbHelper();
                 }
 
-                return _instance;
+                return instance;
             }
         }
 

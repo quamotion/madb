@@ -21,7 +21,7 @@
         /// </summary>
         public IDebugPortProvider Provider { get; set; }
 
-        private static DebugPortManager _instance;
+        private static DebugPortManager instance;
 
         /// <summary>
         /// Returns an instance of the debug port manager
@@ -30,12 +30,12 @@
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
-                    _instance = new DebugPortManager();
+                    instance = new DebugPortManager();
                 }
 
-                return _instance;
+                return instance;
             }
         }
     }

@@ -43,7 +43,7 @@
         /// <summary>
         ///
         /// </summary>
-        private static MonitorThread _instance;
+        private static MonitorThread instance;
 
         /// <summary>
         /// Gets the instance.
@@ -53,12 +53,12 @@
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
-                    _instance = new MonitorThread();
+                    instance = new MonitorThread();
                 }
 
-                return _instance;
+                return instance;
             }
         }
 

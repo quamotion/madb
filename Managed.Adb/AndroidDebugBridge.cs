@@ -122,12 +122,12 @@
         /// <summary>
         ///
         /// </summary>
-        private static AndroidDebugBridge _instance;
+        private static AndroidDebugBridge instance;
 
         /// <summary>
         ///
         /// </summary>
-        private static bool _clientSupport;
+        private static bool clientSupport;
 
         /// <summary>
         /// Gets or sets the socket address.
@@ -231,12 +231,12 @@
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
-                    _instance = CreateBridge();
+                    instance = CreateBridge();
                 }
 
-                return _instance;
+                return instance;
             }
         }
 
@@ -264,24 +264,24 @@
         /// <returns></returns>
         public static AndroidDebugBridge CreateBridge()
         {
-            if (_instance != null)
+            if (instance != null)
             {
-                return _instance;
+                return instance;
             }
 
             try
             {
-                _instance = new AndroidDebugBridge();
-                _instance.Start();
-                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(_instance));
+                instance = new AndroidDebugBridge();
+                instance.Start();
+                instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(instance));
             }
             catch (ArgumentException)
             {
-                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(null));
-                _instance = null;
+                instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(null));
+                instance = null;
             }
 
-            return _instance;
+            return instance;
         }
 
         /// <summary>
@@ -296,33 +296,33 @@
         /// </remarks>
         public static AndroidDebugBridge CreateBridge(string osLocation, bool forceNewBridge)
         {
-            if (_instance != null)
+            if (instance != null)
             {
                 if (!string.IsNullOrEmpty(AdbOsLocation) && string.Compare(AdbOsLocation, osLocation, true) == 0 && !forceNewBridge)
                 {
-                    return _instance;
+                    return instance;
                 }
                 else
                 {
                     // stop the current server
                     Log.i(TAG, "Stopping Current Instance");
-                    _instance.Stop();
+                    instance.Stop();
                 }
             }
 
             try
             {
-                _instance = new AndroidDebugBridge(osLocation);
-                _instance.Start();
-                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(_instance));
+                instance = new AndroidDebugBridge(osLocation);
+                instance.Start();
+                instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(instance));
             }
             catch (ArgumentException)
             {
-                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(null));
-                _instance = null;
+                instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(null));
+                instance = null;
             }
 
-            return _instance;
+            return instance;
         }
 
         /// <summary>
@@ -331,12 +331,12 @@
         /// <remarks>This also stops the current adb host server.</remarks>
         public static void DisconnectBridge()
         {
-            if (_instance != null)
+            if (instance != null)
             {
-                _instance.Stop();
+                instance.Stop();
 
-                _instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(null));
-                _instance = null;
+                instance.OnBridgeChanged(new AndroidDebugBridgeEventArgs(null));
+                instance = null;
             }
         }
 
