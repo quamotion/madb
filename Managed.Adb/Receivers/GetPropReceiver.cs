@@ -42,7 +42,6 @@
             // to have the build info in the first line, and the build
             // date in the 2nd line. There seems to be an empty line
             // after all that.
-
             foreach (string line in lines)
             {
                 if (string.IsNullOrEmpty(line) || line.StartsWith("#") || line.StartsWith("$"))

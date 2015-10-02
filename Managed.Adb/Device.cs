@@ -322,7 +322,10 @@
         /// </summary>
         public string AvdName
         {
-            get { return this._avdName; }
+            get
+            {
+                return this._avdName;
+            }
 
             set
             {
@@ -898,6 +901,7 @@
             try
             {
                 string packageFileName = Path.GetFileName(localFilePath);
+
                 // only root has access to /data/local/tmp/... not sure how adb does it then...
                 // workitem: 16823
                 // workitem: 19711

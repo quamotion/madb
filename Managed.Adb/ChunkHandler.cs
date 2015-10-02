@@ -45,7 +45,9 @@
         /// <summary>
         /// Prevents a default instance of the <see cref="ChunkHandler"/> class from being created.
         /// </summary>
-        ChunkHandler() { }
+        ChunkHandler()
+        {
+        }
 
         /**
          * Client is ready.  The monitor thread calls this method on all
@@ -116,7 +118,10 @@
         {
             char[] data = new char[len];
             for (int i = 0; i < len; i++)
+            {
                 data[i] = (char)buf.ReadByte();
+            }
+
             return new string(data);
         }
 
@@ -214,7 +219,6 @@
          *
          * Pass in the byte buffer returned by JdwpPacket.getPayload().
          */
-        // TODO: JdwpPacket
         static void finishChunkPacket(/*JdwpPacket*/ object packet, int type, int chunkLen)
         {
             /*ByteBuffer buf = packet.getPayload();

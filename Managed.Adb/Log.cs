@@ -39,7 +39,10 @@
             /* prep for hex dump */
             int i = SpaceLine.Length - 1;
             while (i >= 0)
+            {
                 SpaceLine[i--] = ' ';
+            }
+
             SpaceLine[0] = SpaceLine[1] = SpaceLine[2] = SpaceLine[3] = '0';
             SpaceLine[4] = '-';
             Level = DdmPreferences.LogLevel;
@@ -67,7 +70,6 @@
             /// </summary>
             public const bool LOGD = true;
         }
-;
 
         /// <summary>
         /// Outputs a Verbose level message.
@@ -266,8 +268,6 @@
             int i, ch;
             bool needErase = true;
 
-            //Log.w(tag, "HEX DUMP: off=" + offset + ", length=" + length);
-
             baseAddr = 0;
             while (length != 0)
             {
@@ -311,9 +311,13 @@
                     ch++;
 
                     if (val >= 0x20 && val < 0x7f)
+                    {
                         line[kAscOffset + i] = (char)val;
+                    }
                     else
+                    {
                         line[kAscOffset + i] = '.';
+                    }
                 }
 
                 WriteLine(level, tag, new string(line));

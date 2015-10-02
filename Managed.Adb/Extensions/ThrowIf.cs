@@ -54,7 +54,10 @@
             string name = string.Empty;
             Expression body = func.Body;
             if (body is MemberExpression)
+            {
                 name = ((MemberExpression)body).Member.Name;
+            }
+
             throw e(name);
         }
 

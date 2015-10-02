@@ -115,6 +115,7 @@
         public bool ReadHeader(int version, BinaryReader buf)
         {
             this.Version = version;
+
             // https://github.com/android/platform_system_core/blob/master/adb/framebuffer_service.c
             switch (version)
             {
@@ -144,6 +145,7 @@
                     this.Size = buf.ReadInt32();
                     this.Width = buf.ReadInt32();
                     this.Height = buf.ReadInt32();
+
                     // create default values for the rest. Format is 565
                     this.Red.Offset = 11;
                     this.Red.Length = 5;

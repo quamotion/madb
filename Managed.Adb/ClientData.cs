@@ -146,7 +146,6 @@
             this.Pid = pid;
 
             this.DebuggerInterest = DebuggerStatus.DEFAULT;
-            //ThreadMap = new Dictionary<Integer, ThreadInfo> ( );
         }
 
         /// <summary>

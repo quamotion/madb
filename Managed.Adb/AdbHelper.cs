@@ -242,7 +242,9 @@ namespace Managed.Adb
                 adbChan.Connect(address);
                 adbChan.Blocking = true;
                 if (!this.Write(adbChan, request))
+                {
                     throw new IOException("failed asking for adb version");
+                }
 
                 AdbResponse resp = this.ReadAdbResponse(adbChan, false /* readDiagString */);
                 if (!resp.IOSuccess || !resp.Okay)
@@ -312,14 +314,17 @@ namespace Managed.Adb
                 this.SetDevice(socket, device);
 
                 byte[] req = this.CreateJdwpForwardRequest(pid);
-                // Log.hexDump(req);
 
                 if (!this.Write(socket, req))
+                {
                     throw new AdbException("failed submitting request to ADB"); //$NON-NLS-1$
+                }
 
                 AdbResponse resp = this.ReadAdbResponse(socket, false /* readDiagString */);
                 if (!resp.Okay)
+                {
                     throw new AdbException("connection request rejected: " + resp.Message); //$NON-NLS-1$
+                }
             }
             catch (AdbException ioe)
             {
@@ -341,9 +346,14 @@ namespace Managed.Adb
             string request;
 
             if (address == null)
+            {
                 request = "tcp:" + port;
+            }
             else
+            {
                 request = "tcp:" + port + ":" + address;
+            }
+
             return this.FormAdbRequest(request);
         }
 
@@ -617,7 +627,6 @@ namespace Managed.Adb
                 adbChan.Blocking = true;
 
                 // host-serial should be different based on the transport...
-
                 byte[] request = this.FormAdbRequest(string.Format("host-serial:{0}:forward:tcp:{1};tcp:{2}", //$NON-NLS-1$
                                 device.SerialNumber, localPort, remotePort));
 
@@ -844,7 +853,9 @@ namespace Managed.Adb
                 // to a specific device
                 this.SetDevice(adbChan, device);
                 if (!this.Write(adbChan, request))
+                {
                     throw new AdbException("failed asking for frame buffer");
+                }
 
                 AdbResponse resp = this.ReadAdbResponse(adbChan, false /* readDiagString */);
                 if (!resp.IOSuccess || !resp.Okay)
@@ -874,6 +885,7 @@ namespace Managed.Adb
 
                 // get the header size (this is a count of int)
                 int headerSize = RawImage.GetHeaderSize(version);
+
                 // read the header
                 reply = new byte[headerSize * 4];
                 if (!this.Read(adbChan, reply))
@@ -901,7 +913,9 @@ namespace Managed.Adb
                                 + ", height=" + imageParams.Height);
 
                 if (!this.Write(adbChan, nudge))
+                {
                     throw new AdbException("failed nudging");
+                }
 
                 reply = new byte[imageParams.Size];
                 if (!this.Read(adbChan, reply))
@@ -1448,4 +1462,3 @@ namespace Managed.Adb
         }
     }
 }
-

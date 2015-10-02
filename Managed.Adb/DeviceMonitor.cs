@@ -342,7 +342,6 @@
                     // * if we do not find it, we remove it from the current list.
                     // Once this is done, the new list contains device we aren't monitoring yet, so we
                     // add them to the list, and start monitoring them.
-
                     for (int d = 0; d < this.Devices.Count;)
                     {
                         Device device = this.Devices[d];
@@ -353,6 +352,7 @@
                         for (int dd = 0; dd < count; dd++)
                         {
                             Device newDevice = list[dd];
+
                             // see if it matches in id and serial number.
                             if (string.Compare(newDevice.SerialNumber, device.SerialNumber, true) == 0)
                             {
@@ -472,6 +472,7 @@
                 {
                     // get environment variables
                     this.QueryNewDeviceForEnvironmentVariables(device);
+
                     // instead of getting the 3 hard coded ones, we use mount command and get them all...
                     // if that fails, then it automatically falls back to the hard coded ones.
                     this.QueryNewDeviceForMountingPoint(device);
@@ -541,13 +542,7 @@
 
                         lock (this.Devices)
                         {
-                            // always wakeup before doing the register. The synchronized block
-                            // ensure that the selector won't select() before the end of this block.
-                            // @see deviceClientMonitorLoop
-                            //Selector.wakeup ( );
-
                             socket.Blocking = true;
-                            //socket.register(mSelector, SelectionKey.OP_READ, device);
                         }
 
                         return true;
@@ -778,7 +773,6 @@
                 {
                     client.ClientData.DebuggerConnectionStatus = Managed.Adb.ClientData.DebuggerStatus.ERROR;
                     Log.e("ddms", "Can't bind to local {0} for debugger", debuggerPort);
-                    // oh well
                 }
 
                 client.RequestAllocationStatus();

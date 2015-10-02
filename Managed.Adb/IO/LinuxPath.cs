@@ -373,7 +373,6 @@
             if (path != null)
             {
                 CheckInvalidPathChars(path);
-                //path = FixupPath ( path );
 
                 string tpath = path;
                 if (tpath.Length > 1)

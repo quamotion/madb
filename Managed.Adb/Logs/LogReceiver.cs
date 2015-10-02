@@ -81,6 +81,7 @@
                         {
                             // create the entry directly from the data array
                             this.CurrentEntry = this.CreateEntry(data, offset);
+
                             // adjust current offset and remaining length to the beginning
                             // of the entry data
                             offset += ENTRY_HEADER_SIZE;

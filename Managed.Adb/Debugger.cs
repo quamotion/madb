@@ -173,8 +173,6 @@ namespace Managed.Adb
             }
         }
 
-        //      public voidr RegisterListener
-
         public Socket Accept()
         {
             return this.Accept(this.ListenChannel);

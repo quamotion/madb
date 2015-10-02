@@ -52,6 +52,7 @@
                     bool ro = string.Compare("ro", m.Groups[4].Value.Trim(), false) == 0;
                     MountPoint mnt = new MountPoint(block, name, fs, ro);
                     string key = name.Substring(1);
+
                     // currently does not support multiple mounts to the same location...
                     if (!this.Device.MountPoints.ContainsKey(name))
                     {
