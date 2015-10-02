@@ -45,7 +45,7 @@
         /// <summary>
         /// Prevents a default instance of the <see cref="ChunkHandler"/> class from being created.
         /// </summary>
-        ChunkHandler()
+        private ChunkHandler()
         {
         }
 
@@ -114,7 +114,7 @@
          * This is here because multiple chunk handlers can make use of it,
          * and there's nowhere better to put it.
          */
-        static string GetString(MemoryStream buf, int len)
+        private static string GetString(MemoryStream buf, int len)
         {
             char[] data = new char[len];
             for (int i = 0; i < len; i++)
@@ -128,7 +128,7 @@
         /**
          * Utility function to copy a String into a ByteBuffer.
          */
-        static void PutString(MemoryStream buf, string str)
+        private static void PutString(MemoryStream buf, string str)
         {
             byte[] data = Encoding.Default.GetBytes(str);
             buf.Write(data, 0, data.Length);
@@ -137,7 +137,7 @@
         /**
          * Convert a 4-character string to a 32-bit type.
          */
-        static int type(string typeName)
+        private static int type(string typeName)
         {
             int val = 0;
 
@@ -159,7 +159,7 @@
         /**
          * Convert an integer type to a 4-character string.
          */
-        static string name(int type)
+        private static string name(int type)
         {
             char[] ascii = new char[4];
 
@@ -178,7 +178,7 @@
          *
          * "maxChunkLen" indicates the size of the chunk contents only.
          */
-        static BinaryReader allocBuffer(int maxChunkLen)
+        private static BinaryReader allocBuffer(int maxChunkLen)
         {
             /*
             using ( MemoryStream ms = new MemoryStream(JdwpPacket.JDWP_HEADER_LEN + 8 +maxChunkLen) ) {
@@ -194,7 +194,7 @@
          * Return the slice of the JDWP packet buffer that holds just the
          * chunk data.
          */
-        static BinaryReader GetChunkDataBuf(MemoryStream jdwpBuf)
+        private static BinaryReader GetChunkDataBuf(MemoryStream jdwpBuf)
         {
             /* EndianBinaryReader ebr = null;
 
@@ -219,7 +219,7 @@
          *
          * Pass in the byte buffer returned by JdwpPacket.getPayload().
          */
-        static void finishChunkPacket(/*JdwpPacket*/ object packet, int type, int chunkLen)
+        private static void finishChunkPacket(/*JdwpPacket*/ object packet, int type, int chunkLen)
         {
             /*ByteBuffer buf = packet.getPayload();
 

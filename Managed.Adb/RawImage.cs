@@ -215,8 +215,8 @@
             {
                 for (int x = 0; x < w; x++)
                 {
-                    Array.Copy(this.Data, (y * w + x) * byteCount,
-                        rotated.Data, ((w - x - 1) * h + y) * byteCount,
+                    Array.Copy(this.Data, ((y * w) + x) * byteCount,
+                        rotated.Data, (((w - x - 1) * h) + y) * byteCount,
                                         byteCount);
                 }
             }

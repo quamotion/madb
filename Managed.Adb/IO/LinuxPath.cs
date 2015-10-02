@@ -20,12 +20,12 @@
         /// <summary>
         /// The directory separator character
         /// </summary>
-        public static readonly char DirectorySeparatorChar = '/';
+        public const char DirectorySeparatorChar = '/';
 
         /// <summary>
         /// The directory separator alternate character
         /// </summary>
-        public static readonly char AltDirectorySeparatorChar = '/';
+        public const char AltDirectorySeparatorChar = '/';
 
         /// <summary>
         /// Invalid characters for a file name
@@ -50,12 +50,12 @@
         /// <summary>
         /// the max length of a file path
         /// </summary>
-        internal static readonly int MaxPath = 260;
+        internal const int MaxPath = 260;
 
         /// <summary>
         /// The character used to separate multiple paths
         /// </summary>
-        public static readonly char PathSeparator = ';';
+        public const char PathSeparator = ';';
 
         /// <summary>
         /// Invalid characters for a file/directory path

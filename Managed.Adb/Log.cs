@@ -58,7 +58,7 @@
         /// <summary>
         ///
         /// </summary>
-        sealed class Config
+        private sealed class Config
         {
             /// <summary>
             /// Log Verbose

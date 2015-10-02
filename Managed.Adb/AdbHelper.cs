@@ -61,7 +61,7 @@ namespace Managed.Adb
         /// <summary>
         /// The default encoding
         /// </summary>
-        public static string DEFAULT_ENCODING = "ISO-8859-1";
+        public const string DEFAULT_ENCODING = "ISO-8859-1";
 
         /// <summary>
         /// The default port to use when connecting to a device over TCP/IP.

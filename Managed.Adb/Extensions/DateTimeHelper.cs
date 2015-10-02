@@ -12,7 +12,11 @@
         /// <summary>
         /// Gets EPOCH time
         /// </summary>
-        public static readonly DateTime Epoch = new DateTime(1970, 1, 1);
+        public static DateTime Epoch
+        {
+            get;
+            private set;
+        } = new DateTime(1970, 1, 1);
 
         /// <summary>
         /// Gets epoch time.

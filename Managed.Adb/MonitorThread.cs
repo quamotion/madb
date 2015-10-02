@@ -9,7 +9,7 @@
     /// <summary>
     ///
     /// </summary>
-    class MonitorThread
+    internal class MonitorThread
     {
         /// <summary>
         ///
