@@ -13,7 +13,7 @@
         /// </summary>
         public PermissionDeniedException()
             : base("Permission to access the specified resource was denied.")
-            {
+        {
         }
 
         /// <summary>
@@ -22,7 +22,7 @@
         /// <param name="message">The message.</param>
         public PermissionDeniedException(string message)
             : base(message)
-            {
+        {
         }
 
         /// <summary>
@@ -30,7 +30,7 @@
         /// </summary>
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
-        public PermissionDeniedException(SerializationInfo serializationInfo,StreamingContext context) : base(serializationInfo,context)
+        public PermissionDeniedException(SerializationInfo serializationInfo, StreamingContext context) : base(serializationInfo, context)
         {
         }
 
@@ -41,7 +41,7 @@
         /// <param name="innerException">The inner exception.</param>
         public PermissionDeniedException(string message, Exception innerException)
             : base(message, innerException)
-            {
+        {
         }
     }
 }

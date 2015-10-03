@@ -226,7 +226,7 @@
         /// <param name="device">The device.</param>
         public SyncService(Device device)
             : this(AndroidDebugBridge.SocketAddress, device)
-            {
+        {
         }
 
         /// <summary>
@@ -630,7 +630,7 @@
                 // check we have the proper data back
                 if (CheckResult(pullResult, DATA.GetBytes()) == false &&
                                 CheckResult(pullResult, DONE.GetBytes()) == false)
-                                {
+                {
                     return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR);
                 }
             }
@@ -653,7 +653,7 @@
             FileStream fos = null;
             try
             {
-                fos = new FileStream(f.FullName,System.IO.FileMode.Create,FileAccess.Write);
+                fos = new FileStream(f.FullName, System.IO.FileMode.Create, FileAccess.Write);
             }
             catch (FileNotFoundException e)
             {
