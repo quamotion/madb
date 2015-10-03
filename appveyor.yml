@@ -11,7 +11,7 @@ assembly_info:
   assembly_informational_version: '{version}'
 
 build_script:
-  - msbuild Managed.Adb.sln /p:Configuration=Release /p:Platform=x86 /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - msbuild Managed.Adb.sln /p:Configuration=Release /p:Platform="Any CPU" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 on_success:
   - cmd: nuget pack Managed.Adb.nuspec -Version %APPVEYOR_BUILD_VERSION%
