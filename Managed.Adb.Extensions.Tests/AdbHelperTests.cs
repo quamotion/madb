@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Managed.Adb.Extensions.Tests
 {
     [TestClass]
-    public class AdbHelperTests : BaseDeviceTests
+    public class AdbHelperIntegrationTests : BaseDeviceTests
     {
 
         public class FileSyncProgressMonitor : ISyncProgressMonitor

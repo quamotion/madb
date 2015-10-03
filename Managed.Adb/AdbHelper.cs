@@ -14,6 +14,7 @@ namespace Managed.Adb
     using Managed.Adb.Exceptions;
     using Managed.Adb.Logs;
     using MoreLinq;
+    using System.Diagnostics;
 
     /// <summary>
     /// <para>
@@ -62,6 +63,12 @@ namespace Managed.Adb
         }
 
         /// <summary>
+        /// Gets the encoding used when communicating with adb.
+        /// </summary>
+        public static Encoding Encoding
+        { get; } = Encoding.GetEncoding(DefaultEncoding);
+
+        /// <summary>
         /// Gets an instance of the AdbHelper.
         /// </summary>
         public static AdbHelper Instance
@@ -75,6 +82,23 @@ namespace Managed.Adb
 
                 return instance;
             }
+        }
+
+        /// <summary>
+        /// Create an ASCII string preceded by four hex digits. The opening "####"
+        /// is the length of the rest of the string, encoded as ASCII hex(case
+        /// doesn't matter).
+        /// </summary>
+        /// <param name="req">The request to form.
+        /// </param>
+        /// <returns>
+        /// An array containing <c>####req</c>.
+        /// </returns>
+        public static byte[] FormAdbRequest(string req)
+        {
+            string resultStr = string.Format("{0}{1}\n", req.Length.ToString("X4"), req);
+            byte[] result = Encoding.GetBytes(resultStr);
+            return result;
         }
 
         /// <summary>
@@ -132,7 +156,7 @@ namespace Managed.Adb
         /// <gist id="cbacc7b384ec7a4c27f7" />
         public int KillAdb(IPEndPoint address)
         {
-            byte[] request = this.FormAdbRequest("host:kill");
+            byte[] request = FormAdbRequest("host:kill");
             using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
                 socket.Connect(address);
@@ -165,7 +189,7 @@ namespace Managed.Adb
         [Obsolete("This is not yet functional")]
         public void Backup(IPEndPoint address)
         {
-            byte[] request = this.FormAdbRequest("backup:all");
+            byte[] request = FormAdbRequest("backup:all");
             using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
                 socket.Connect(address);
@@ -215,7 +239,7 @@ namespace Managed.Adb
         /// <gist id="3a130af63ca1f94d0152" />
         public int GetAdbVersion(IPEndPoint address)
         {
-            byte[] request = this.FormAdbRequest("host:version");
+            byte[] request = FormAdbRequest("host:version");
             byte[] reply;
             Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
@@ -337,35 +361,7 @@ namespace Managed.Adb
                 request = "tcp:" + port + ":" + address;
             }
 
-            return this.FormAdbRequest(request);
-        }
-
-        /// <summary>
-        /// Create an ASCII string preceded by four hex digits. The opening "####"
-        /// is the length of the rest of the string, encoded as ASCII hex(case
-        /// doesn't matter).
-        /// </summary>
-        /// <param name="req">The request to form.
-        /// </param>
-        /// <returns>
-        /// An array containing <c>####req</c>.
-        /// </returns>
-        public byte[] FormAdbRequest(string req)
-        {
-            string resultStr = string.Format("{0}{1}\n", req.Length.ToString("X4"), req);
-            byte[] result;
-            try
-            {
-                result = resultStr.GetBytes(AdbHelper.DefaultEncoding);
-            }
-            catch (EncoderFallbackException efe)
-            {
-                Log.e(TAG, efe);
-                return null;
-            }
-
-            System.Diagnostics.Debug.Assert(result.Length == req.Length + 5, string.Format("result: {1}{0}\nreq: {3}{2}", result.Length, result.GetString(AdbHelper.DefaultEncoding), req.Length, req));
-            return result;
+            return FormAdbRequest(request);
         }
 
         /// <summary>
@@ -641,7 +637,7 @@ namespace Managed.Adb
                 adbChan.Blocking = true;
 
                 // host-serial should be different based on the transport...
-                byte[] request = this.FormAdbRequest($"host-serial:{device.SerialNumber}:forward:tcp:{localPort};tcp:{remotePort}");
+                byte[] request = FormAdbRequest($"host-serial:{device.SerialNumber}:forward:tcp:{localPort};tcp:{remotePort}");
 
                 if (!this.Write(adbChan, request))
                 {
@@ -688,7 +684,7 @@ namespace Managed.Adb
                 adbChan.Blocking = true;
 
                 // host-serial should be different based on the transport...
-                byte[] request = this.FormAdbRequest(
+                byte[] request = FormAdbRequest(
                     string.Format(
                         "host-serial:{0}:forward:tcp:{1};localabstract:{2}", // $NON-NLS-1$
                         device.SerialNumber,
@@ -855,7 +851,7 @@ namespace Managed.Adb
         public RawImage GetFrameBuffer(IPEndPoint adbSockAddr, IDevice device)
         {
             RawImage imageParams = new RawImage();
-            byte[] request = this.FormAdbRequest("framebuffer:");
+            byte[] request = FormAdbRequest("framebuffer:");
             byte[] nudge =
             {
                         0
@@ -1135,7 +1131,7 @@ namespace Managed.Adb
             if (device != null)
             {
                 string msg = "host:transport:" + device.SerialNumber;
-                byte[] device_query = this.FormAdbRequest(msg);
+                byte[] device_query = FormAdbRequest(msg);
 
                 if (!this.Write(adbChan, device_query))
                 {
@@ -1246,11 +1242,11 @@ namespace Managed.Adb
             byte[] request;
             if (string.IsNullOrEmpty(into))
             {
-                request = this.FormAdbRequest("reboot:");
+                request = FormAdbRequest("reboot:");
             }
             else
             {
-                request = this.FormAdbRequest("reboot:" + into);
+                request = FormAdbRequest("reboot:" + into);
             }
 
             using (this.ExecuteRawSocketCommand(adbSockAddr, device, request))
@@ -1348,7 +1344,7 @@ namespace Managed.Adb
                 throw new ArgumentNullException("endpoint");
             }
 
-            byte[] request = this.FormAdbRequest(string.Format("host:connect:{0}:{1}", endpoint.Host, endpoint.Port));
+            byte[] request = FormAdbRequest(string.Format("host:connect:{0}:{1}", endpoint.Host, endpoint.Port));
 
             using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
@@ -1383,7 +1379,7 @@ namespace Managed.Adb
         private byte[] CreateJdwpForwardRequest(int pid)
         {
             string req = string.Format("jdwp:{0}", pid);
-            return this.FormAdbRequest(req);
+            return FormAdbRequest(req);
         }
 
         /// <summary>
@@ -1400,7 +1396,7 @@ namespace Managed.Adb
         /// Device rejected command: {0}.With(resp.Message)</exception>
         private Socket ExecuteRawSocketCommand(IPEndPoint address, IDevice device, string command)
         {
-            return this.ExecuteRawSocketCommand(address, device, this.FormAdbRequest(command));
+            return this.ExecuteRawSocketCommand(address, device, FormAdbRequest(command));
         }
 
         /// <summary>
@@ -1412,7 +1408,7 @@ namespace Managed.Adb
         /// </returns>
         private Socket ExecuteRawSocketCommand(IPEndPoint address, string command)
         {
-            return this.ExecuteRawSocketCommand(address, this.FormAdbRequest(command));
+            return this.ExecuteRawSocketCommand(address, FormAdbRequest(command));
         }
 
         /// <summary>

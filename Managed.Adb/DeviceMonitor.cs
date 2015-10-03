@@ -245,7 +245,7 @@ namespace Managed.Adb
         /// <returns></returns>
         private bool SendDeviceListMonitoringRequest()
         {
-            byte[] request = AdbHelper.Instance.FormAdbRequest("host:track-devices");
+            byte[] request = AdbHelper.FormAdbRequest("host:track-devices");
 
             if (AdbHelper.Instance.Write(this.MainAdbConnection, request) == false)
             {
@@ -637,7 +637,7 @@ namespace Managed.Adb
         private bool SendDeviceMonitoringRequest(Socket socket, Device device)
         {
             AdbHelper.Instance.SetDevice(socket, device);
-            byte[] request = AdbHelper.Instance.FormAdbRequest("track-jdwp");
+            byte[] request = AdbHelper.FormAdbRequest("track-jdwp");
             if (!AdbHelper.Instance.Write(socket, request))
             {
                 Log.e(TAG, "Sending jdwp tracking request failed!");

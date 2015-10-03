@@ -289,7 +289,7 @@ namespace Managed.Adb
                 // target a specific device
                 AdbHelper.Instance.SetDevice(this.Channel, this.Device);
 
-                byte[] request = AdbHelper.Instance.FormAdbRequest("sync:");
+                byte[] request = AdbHelper.FormAdbRequest("sync:");
                 AdbHelper.Instance.Write(this.Channel, request, -1, DdmPreferences.Timeout);
 
                 AdbResponse resp = AdbHelper.Instance.ReadAdbResponse(this.Channel, false /* readDiagString */);
