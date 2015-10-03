@@ -80,7 +80,6 @@
         /// <param name="value">The value.</param>
         internal void SetDebugSelectedPort(int value)
         {
-            //throw new NotImplementedException ( );
         }
 
         public void DropClient(IClient client, bool notify)

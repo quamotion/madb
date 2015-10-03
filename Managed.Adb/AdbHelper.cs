@@ -173,7 +173,7 @@ namespace Managed.Adb
             }
         }
 
-        //https://github.com/android/platform_system_core/blob/master/adb/backup_service.c
+        // https://github.com/android/platform_system_core/blob/master/adb/backup_service.c
 
         /// <summary>
         /// Backups the specified address.
@@ -317,13 +317,13 @@ namespace Managed.Adb
 
                 if (!this.Write(socket, req))
                 {
-                    throw new AdbException("failed submitting request to ADB"); //$NON-NLS-1$
+                    throw new AdbException("failed submitting request to ADB");
                 }
 
                 AdbResponse resp = this.ReadAdbResponse(socket, false /* readDiagString */);
                 if (!resp.Okay)
                 {
-                    throw new AdbException("connection request rejected: " + resp.Message); //$NON-NLS-1$
+                    throw new AdbException("connection request rejected: " + resp.Message);
                 }
             }
             catch (AdbException ioe)
@@ -415,11 +415,9 @@ namespace Managed.Adb
         /// </exception>
         public void Write(Socket socket, byte[] data, int length, int timeout)
         {
-            //using ( var buf = new MemoryStream ( data, 0, length != -1 ? length : data.Length ) ) {
             int numWaits = 0;
             int count = -1;
 
-            //while ( buf.Position != buf.Length ) {
             try
             {
                 count = socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
@@ -449,9 +447,6 @@ namespace Managed.Adb
                 Log.e(TAG, sex);
                 throw;
             }
-
-            //}
-            //}
         }
 
         /// <summary>
@@ -835,7 +830,7 @@ namespace Managed.Adb
         public RawImage GetFrameBuffer(IPEndPoint adbSockAddr, IDevice device)
         {
             RawImage imageParams = new RawImage();
-            byte[] request = this.FormAdbRequest("framebuffer:"); //$NON-NLS-1$
+            byte[] request = this.FormAdbRequest("framebuffer:");
             byte[] nudge =
             {
                         0

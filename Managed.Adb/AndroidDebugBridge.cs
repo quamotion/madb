@@ -550,10 +550,6 @@
         {
             get
             {
-                //if ( DeviceMonitor != null ) {
-                //  return DeviceMonitor.Devices;
-                //}
-                //return new List<Device> ( );
                 return AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress);
             }
         }
@@ -614,7 +610,6 @@
         {
             get
             {
-                //MonitorThread monitorThread = MonitorThread.Instance;
                 if (this.DeviceMonitor != null /* && monitorThread != null */)
                 {
                     return this.DeviceMonitor.IsMonitoring /* && monitorThread.State != State.TERMINATED*/;

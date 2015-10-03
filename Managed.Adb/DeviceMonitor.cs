@@ -445,7 +445,6 @@
         /// <param name="device">The device.</param>
         private void RemoveDevice(Device device)
         {
-            //device.Clients.Clear ( );
             this.Devices.Remove(device);
 
             Socket channel = device.ClientMonitoringSocket;
@@ -569,7 +568,6 @@
 
         private void StartDeviceMonitorThread()
         {
-            //Selector = Selector.Open();
             Thread t = new Thread(new ThreadStart(this.DeviceClientMonitorLoop));
             t.Name = "Device Client Monitor";
             t.Start();
@@ -588,7 +586,6 @@
                     {
                     }
 
-                    //int count = Selector.Select ( );
                     int count = 0;
 
                     if (!this.IsRunning)
@@ -882,7 +879,6 @@
                 }
             }
 
-            //throw new IOException ( "unable to read data length" );
             // we receive something we can't read. It's better to reset the connection at this point.
             return -1;
         }

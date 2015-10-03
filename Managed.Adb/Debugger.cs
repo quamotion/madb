@@ -151,7 +151,6 @@ namespace Managed.Adb
             }*/
         }
 
-        //TODO: JdwpPacket
         public void SendAndConsume(/*JdwpPacket*/ object packet)
         {
             if (this.Channel == null)
@@ -164,12 +163,9 @@ namespace Managed.Adb
                  * capture and interpret VM_START and send it later if we
                  * didn't choose to un-suspend the VM for our own purposes.
                  */
-                //Log.d ( "ddms", "Saving packet 0x" + packet.ID.ToString ( "X" ) );
-                //packet.MovePacket ( PreDataBuffer );
             }
             else
             {
-                //packet.WriteAndConsume ( Channel );
             }
         }
 
@@ -212,9 +208,6 @@ namespace Managed.Adb
                     this.Channel = null;
                     this.ConnectionState = ConnectionStates.NotConnected;
 
-                    //TODO: ClientData
-                    /*ClientData cd = Client.ClientData;
-                    cd.DebuggerConnectionStatus = DebuggerStatus.Default;*/
                     this.Client.Update(ClientChangeMask.ChangeDebuggerStatus);
                 }
             }

@@ -130,19 +130,19 @@
         private const string LOG_TAG = "Device";
 
         /// <summary>
-        /// The time-out when receiving battery information.
+        /// The time-out when receiving battery information. The default is two seconds.
         /// </summary>
-        private const int BATTERY_TIMEOUT = 2 * 1000; //2 seconds
+        private const int BATTERY_TIMEOUT = 2 * 1000;
 
         /// <summary>
-        /// The time-out when receiving device properties.
+        /// The time-out when receiving device properties. The default is two seconds.
         /// </summary>
-        private const int GETPROP_TIMEOUT = 2 * 1000; //2 seconds
+        private const int GETPROP_TIMEOUT = 2 * 1000;
 
         /// <summary>
-        /// The time-out when installing applications.
+        /// The time-out when installing applications. The default is two seconds.
         /// </summary>
-        private const int INSTALL_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+        private const int INSTALL_TIMEOUT = 2 * 60 * 1000;
 
         /// <summary>
         /// The name of the Android Virtual Device (emulator).

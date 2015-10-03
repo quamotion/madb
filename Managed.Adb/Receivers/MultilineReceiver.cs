@@ -71,7 +71,7 @@
                 string s = null;
                 try
                 {
-                    s = Encoding.GetEncoding(ENCODING).GetString(data, offset, length); //$NON-NLS-1$
+                    s = Encoding.GetEncoding(ENCODING).GetString(data, offset, length);
                 }
                 catch (DecoderFallbackException)
                 {
@@ -90,11 +90,10 @@
                     }
 
                     // now we split the lines
-                    //Lines.Clear ( );
                     int start = 0;
                     do
                     {
-                        int index = s.IndexOf(NEWLINE, start); //$NON-NLS-1$
+                        int index = s.IndexOf(NEWLINE, start);
 
                         // if \r\n was not found, this is an unfinished line
                         // and we store it to be processed for the next packet
