@@ -218,6 +218,7 @@
   <ItemGroup>
     <None Include="Managd.Adb.snk" />
     <None Include="packages.config" />
+    <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ISyncService.xml" />

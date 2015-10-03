@@ -1,4 +1,8 @@
-﻿namespace Managed.Adb.Logs
+﻿// <copyright file="ILogListener.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
+
+namespace Managed.Adb.Logs
 {
     using System;
     using System.Collections.Generic;

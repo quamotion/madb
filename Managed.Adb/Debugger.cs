@@ -1,3 +1,7 @@
+// <copyright file="Debugger.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
+
 namespace Managed.Adb
 {
     using System;

@@ -1,4 +1,8 @@
-﻿namespace Managed.Adb.IO
+﻿// <copyright file="LinuxPath.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
+
+namespace Managed.Adb.IO
 {
     using System;
     using System.Collections.Generic;
