@@ -13,12 +13,6 @@ namespace Managed.Adb.Tests
         public event EventHandler<EventArgs> BuildInfoChanged;
 
         public event EventHandler<EventArgs> ClientListChanged;
-        
-        public IBusyBox BusyBox
-        {
-            get;
-            set;
-        }
 
         public string SerialNumber
         {
@@ -101,11 +95,6 @@ namespace Managed.Adb.Tests
         }
 
         public bool IsBootLoader
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public List<IClient> Clients
         {
             get { throw new NotImplementedException(); }
         }

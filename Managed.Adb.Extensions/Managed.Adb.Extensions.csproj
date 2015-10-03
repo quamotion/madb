@@ -52,11 +52,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BusyBox.cs" />
+    <Compile Include="ChunkHandler.cs" />
+    <Compile Include="Client.cs" />
+    <Compile Include="ClientChangeState.cs" />
+    <Compile Include="ClientConnectionState.cs" />
+    <Compile Include="ClientData.cs" />
+    <Compile Include="ClientEventArgs.cs" />
+    <Compile Include="Debugger.cs" />
+    <Compile Include="DebugPortManager.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileListingService.cs" />
     <Compile Include="FileSystem.cs" />
+    <Compile Include="IBusyBox.cs" />
+    <Compile Include="IClient.cs" />
     <Compile Include="IFileListingService.cs" />
     <Compile Include="IFileSystem.cs" />
+    <Compile Include="IPacketConsumer.cs" />
     <Compile Include="PackageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Receivers\CommandErrorReceiver.cs" />

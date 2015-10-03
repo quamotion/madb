@@ -183,7 +183,6 @@ namespace Managed.Adb
             this.MountPoints = new Dictionary<string, MountPoint>();
             this.Properties = new Dictionary<string, string>();
             this.EnvironmentVariables = new Dictionary<string, string>();
-            this.Clients = new List<IClient>();
 
             this.Model = model;
             this.Product = product;
@@ -619,25 +618,6 @@ namespace Managed.Adb
             this.lastBatteryCheckTime = DateTime.Now;
             return this.lastBatteryInfo;
         }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance has clients.
-        /// </summary>
-        /// <value>
-        /// 	<see langword="true"/> if this instance has clients; otherwise, <see langword="false"/>.
-        /// </value>
-        public bool HasClients
-        {
-            get
-            {
-                return this.Clients.Count > 0;
-            }
-        }
-
-        /// <summary>
-        /// Gets the list of clients
-        /// </summary>
-        public List<IClient> Clients { get; private set; }
 
         /// <summary>
         /// Returns a <see cref="SyncService"/> object to push / pull files to and from the device.

@@ -43,7 +43,6 @@ namespace Managed.Adb
             this.Server = bridge;
             this.Devices = new List<Device>();
             this.DebuggerPorts = new List<int>();
-            this.ClientsToReopen = new Dictionary<IClient, int>();
             this.DebuggerPorts.Add(DdmPreferences.DebugPortBase);
             this.LengthBuffer = new byte[4];
             this.LengthBuffer2 = new byte[4];
@@ -58,11 +57,6 @@ namespace Managed.Adb
         /// Gets the debugger ports.
         /// </summary>
         public IList<int> DebuggerPorts { get; private set; }
-
-        /// <summary>
-        /// Gets the clients to reopen.
-        /// </summary>
-        public Dictionary<IClient, int> ClientsToReopen { get; private set; }
 
         /// <summary>
         /// Gets the server.
@@ -110,23 +104,6 @@ namespace Managed.Adb
         /// The main adb connection.
         /// </value>
         private Socket MainAdbConnection { get; set; }
-
-        /// <summary>
-        /// Adds the client to drop and reopen.
-        /// </summary>
-        /// <param name="client">The client.</param>
-        /// <param name="port">The port.</param>
-        public void AddClientToDropAndReopen(IClient client, int port)
-        {
-            lock (this.ClientsToReopen)
-            {
-                Log.d(TAG, "Adding {0} to list of client to reopen ({1})", client, port);
-                if (!this.ClientsToReopen.ContainsKey(client))
-                {
-                    this.ClientsToReopen.Add(client, port);
-                }
-            }
-        }
 
         /// <summary>
         /// Starts the monitoring
@@ -597,40 +574,6 @@ namespace Managed.Adb
                         return;
                     }
 
-                    lock (this.ClientsToReopen)
-                    {
-                        if (this.ClientsToReopen.Count > 0)
-                        {
-                            Dictionary<IClient, int>.KeyCollection clients = this.ClientsToReopen.Keys;
-                            MonitorThread monitorThread = MonitorThread.Instance;
-
-                            foreach (IClient client in clients)
-                            {
-                                Device device = client.DeviceImplementation;
-                                int pid = client.ClientData.Pid;
-
-                                monitorThread.DropClient(client, false /* notify */);
-
-                                // This is kinda bad, but if we don't wait a bit, the client
-                                // will never answer the second handshake!
-                                this.WaitBeforeContinue();
-
-                                int port = this.ClientsToReopen[client];
-
-                                if (port == DebugPortManager.NO_STATIC_PORT)
-                                {
-                                    port = this.GetNextDebuggerPort();
-                                }
-
-                                Log.d("DeviceMonitor", "Reopening " + client);
-                                this.OpenClient(device, pid, port, monitorThread);
-                                device.OnClientListChanged(EventArgs.Empty);
-                            }
-
-                            this.ClientsToReopen.Clear();
-                        }
-                    }
-
                     if (count == 0)
                     {
                         continue;
@@ -717,87 +660,6 @@ namespace Managed.Adb
             }
 
             return resp.Okay;
-        }
-
-        /// <summary>
-        /// Opens the client.
-        /// </summary>
-        /// <param name="device">The device.</param>
-        /// <param name="pid">The pid.</param>
-        /// <param name="port">The port.</param>
-        /// <param name="monitorThread">The monitor thread.</param>
-        private void OpenClient(Device device, int pid, int port, MonitorThread monitorThread)
-        {
-            Socket clientSocket;
-            try
-            {
-                clientSocket = AdbHelper.Instance.CreatePassThroughConnection(AndroidDebugBridge.SocketAddress, device, pid);
-
-                clientSocket.Blocking = true;
-            }
-            catch (IOException ioe)
-            {
-                Log.w(TAG, "Failed to connect to client {0}: {1}'", pid, ioe.Message);
-                return;
-            }
-
-            this.CreateClient(device, pid, clientSocket, port, monitorThread);
-        }
-
-        /// <summary>
-        /// Creates the client.
-        /// </summary>
-        /// <param name="device">The device.</param>
-        /// <param name="pid">The pid.</param>
-        /// <param name="socket">The socket.</param>
-        /// <param name="debuggerPort">The debugger port.</param>
-        /// <param name="monitorThread">The monitor thread.</param>
-        private void CreateClient(Device device, int pid, Socket socket, int debuggerPort, MonitorThread monitorThread)
-        {
-            /*
-             * Successfully connected to something. Create a Client object, add
-             * it to the list, and initiate the JDWP handshake.
-             */
-
-            Client client = new Client(device, socket, pid);
-
-            if (client.SendHandshake())
-            {
-                try
-                {
-                    if (AndroidDebugBridge.ClientSupport)
-                    {
-                        client.ListenForDebugger(debuggerPort);
-                    }
-                }
-                catch (IOException)
-                {
-                    client.ClientData.DebuggerConnectionStatus = Managed.Adb.ClientData.DebuggerStatus.ERROR;
-                    Log.e("ddms", "Can't bind to local {0} for debugger", debuggerPort);
-                }
-
-                client.RequestAllocationStatus();
-            }
-            else
-            {
-                Log.e("ddms", "Handshake with {0} failed!", client);
-                /*
-                 * The handshake send failed. We could remove it now, but if the
-                 * failure is "permanent" we'll just keep banging on it and
-                 * getting the same result. Keep it in the list with its "error"
-                 * state so we don't try to reopen it.
-                 */
-            }
-
-            if (client.IsValid)
-            {
-                device.Clients.Add(client);
-                monitorThread.Clients.Add(client);
-            }
-            else
-            {
-                client = null;
-            }
         }
 
         /// <summary>

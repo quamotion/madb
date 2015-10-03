@@ -150,11 +150,6 @@ namespace Managed.Adb
         bool IsBootLoader { get; }
 
         /// <summary>
-        /// Gets the list of clients
-        /// </summary>
-        List<IClient> Clients { get; }
-
-        /// <summary>
         /// Returns a <see cref="SyncService"/> object to push / pull files to and from the device.
         /// </summary>
         /// <remarks>

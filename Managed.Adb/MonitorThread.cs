@@ -41,7 +41,6 @@ namespace Managed.Adb
         /// </summary>
         private MonitorThread()
         {
-            this.Clients = new List<IClient>();
         }
 
         /// <summary>
@@ -73,20 +72,10 @@ namespace Managed.Adb
         public bool Quit { get; private set; }
 
         /// <summary>
-        /// Gets or sets the clients.
-        /// </summary>
-        /// <value>The clients.</value>
-        public List<IClient> Clients { get; private set; }
-
-        /// <summary>
         /// Sets the debug selected port.
         /// </summary>
         /// <param name="value">The value.</param>
         internal void SetDebugSelectedPort(int value)
-        {
-        }
-
-        public void DropClient(IClient client, bool notify)
         {
         }
     }

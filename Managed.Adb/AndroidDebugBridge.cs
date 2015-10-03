@@ -48,12 +48,6 @@ namespace Managed.Adb
         /// <ignore>true</ignore>
         public event EventHandler<DeviceEventArgs> DeviceDisconnected;
 
-        /// <summary>
-        /// Occurs when [client changed].
-        /// </summary>
-        /// <ignore>true</ignore>
-        public event EventHandler<ClientEventArgs> ClientChanged;
-
         /*
          * Minimum and maximum version of adb supported. This correspond to
          * ADB_SERVER_VERSION found in //device/tools/adb/adb.h
@@ -405,18 +399,6 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Raises the <see cref="E:ClientChanged"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="Managed.Adb.ClientEventArgs"/> instance containing the event data.</param>
-        internal void OnClientChanged(ClientEventArgs e)
-        {
-            if (this.ClientChanged != null)
-            {
-                this.ClientChanged(this, e);
-            }
-        }
-
-        /// <summary>
         /// Raises the <see cref="E:DeviceChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
@@ -580,30 +562,6 @@ namespace Managed.Adb
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Gets or sets the client to accept debugger connection on the custom "Selected debug port".
-        /// </summary>
-        /// <remarks>Not Yet Implemented</remarks>
-        public IClient SelectedClient
-        {
-            get
-            {
-                /*MonitorThread monitorThread = MonitorThread.Instance;
-                if ( monitorThread != null ) {
-                    return monitorThread.SelectedClient = selectedClient;
-                }*/
-                return null;
-            }
-
-            set
-            {
-                /*MonitorThread monitorThread = MonitorThread.Instance;
-                if ( monitorThread != null ) {
-                    monitorThread.SelectedClient = value;
-                }*/
-            }
         }
 
         /// <summary>
