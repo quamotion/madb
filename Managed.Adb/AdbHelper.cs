@@ -7,44 +7,22 @@ namespace Managed.Adb
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
     using Managed.Adb.Exceptions;
-    using Managed.Adb.IO;
     using Managed.Adb.Logs;
     using MoreLinq;
 
     /// <summary>
-    /// Specifies the transport type used between the device and the Android Debug Bridge server.
-    /// </summary>
-    public enum TransportType
-    {
-        /// <summary>
-        /// The device is connected through USB
-        /// </summary>
-        Usb,
-
-        /// <summary>
-        /// The device is connected through a local TCP connection.
-        /// </summary>
-        Local,
-
-        /// <summary>
-        /// The device is connected through any transport type.
-        /// </summary>
-        Any,
-
-        /// <summary>
-        /// The device is connected through the host transport type.
-        /// </summary>
-        Host
-    }
-
-    /// <summary>
-    /// The ADB Helper class
+    /// <para>
+    /// The Android Debug Bridge Helper class, to handle requests and connections to adb.
+    /// </para>
+    /// <para>
+    /// <seealso cref="AndroidDebugBridge"/> is the public API to connection to adb, while <see cref="AdbHelper"/>
+    /// does the low level stuff.
+    /// </para>
     /// </summary>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
@@ -52,24 +30,29 @@ namespace Managed.Adb
     public class AdbHelper
     {
         /// <summary>
+        /// The default encoding
+        /// </summary>
+        public const string DefaultEncoding = "ISO-8859-1";
+
+        /// <summary>
         /// Logging tag
         /// </summary>
         private const string TAG = "AdbHelper";
 
         /// <summary>
-        /// The time to wait
+        /// The default time to wait in the milliseconds.
         /// </summary>
-        private const int WAIT_TIME = 5;
-
-        /// <summary>
-        /// The default encoding
-        /// </summary>
-        public const string DEFAULT_ENCODING = "ISO-8859-1";
+        private const int WaitTime = 5;
 
         /// <summary>
         /// The default port to use when connecting to a device over TCP/IP.
         /// </summary>
-        private const int DEFAULT_PORT = 5555;
+        private const int DefaultPort = 5555;
+
+        /// <summary>
+        /// The singleton instance of the <see cref="AdbHelper"/> class.
+        /// </summary>
+        private static AdbHelper instance = null;
 
         /// <summary>
         /// Prevents a default instance of the <see cref="AdbHelper"/> class from being created.
@@ -77,11 +60,6 @@ namespace Managed.Adb
         private AdbHelper()
         {
         }
-
-        /// <summary>
-        /// The singleton instance of the <see cref="AdbHelper"/> class.
-        /// </summary>
-        private static AdbHelper instance = null;
 
         /// <summary>
         /// Gets an instance of the AdbHelper.
@@ -266,7 +244,7 @@ namespace Managed.Adb
                     return -1;
                 }
 
-                string lenHex = reply.GetString(AdbHelper.DEFAULT_ENCODING);
+                string lenHex = reply.GetString(AdbHelper.DefaultEncoding);
                 int len = int.Parse(lenHex, System.Globalization.NumberStyles.HexNumber);
 
                 // the protocol version.
@@ -279,7 +257,7 @@ namespace Managed.Adb
                     return -1;
                 }
 
-                string sReply = reply.GetString(AdbHelper.DEFAULT_ENCODING);
+                string sReply = reply.GetString(AdbHelper.DefaultEncoding);
                 return int.Parse(sReply, System.Globalization.NumberStyles.HexNumber);
             }
             catch (Exception ex)
@@ -343,7 +321,9 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="address">The address.</param>
         /// <param name="port">The port.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// This returns an array containing <c>"####tcp:{port}:{addStr}"</c>.
+        /// </returns>
         public byte[] CreateAdbForwardRequest(string address, int port)
         {
             string request;
@@ -361,17 +341,22 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Forms the adb request.
+        /// Create an ASCII string preceded by four hex digits. The opening "####"
+        /// is the length of the rest of the string, encoded as ASCII hex(case
+        /// doesn't matter).
         /// </summary>
-        /// <param name="req">The req.</param>
-        /// <returns></returns>
+        /// <param name="req">The request to form.
+        /// </param>
+        /// <returns>
+        /// An array containing <c>####req</c>.
+        /// </returns>
         public byte[] FormAdbRequest(string req)
         {
             string resultStr = string.Format("{0}{1}\n", req.Length.ToString("X4"), req);
             byte[] result;
             try
             {
-                result = resultStr.GetBytes(AdbHelper.DEFAULT_ENCODING);
+                result = resultStr.GetBytes(AdbHelper.DefaultEncoding);
             }
             catch (EncoderFallbackException efe)
             {
@@ -379,16 +364,22 @@ namespace Managed.Adb
                 return null;
             }
 
-            System.Diagnostics.Debug.Assert(result.Length == req.Length + 5, string.Format("result: {1}{0}\nreq: {3}{2}", result.Length, result.GetString(AdbHelper.DEFAULT_ENCODING), req.Length, req));
+            System.Diagnostics.Debug.Assert(result.Length == req.Length + 5, string.Format("result: {1}{0}\nreq: {3}{2}", result.Length, result.GetString(AdbHelper.DefaultEncoding), req.Length, req));
             return result;
         }
 
         /// <summary>
-        /// Writes the specified data to the specified socket.
+        /// Write until all data in "data" is written or the connection fails or times out.
         /// </summary>
-        /// <param name="socket">The socket.</param>
-        /// <param name="data">The data.</param>
-        /// <returns></returns>
+        /// <param name="socket">The socket to write to.</param>
+        /// <param name="data">The data to send.</param>
+        /// <returns>
+        /// Returns <see langword="true"/> if all data was written; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// This uses the default time out value.
+        /// </remarks>
         public bool Write(Socket socket, byte[] data)
         {
             try
@@ -405,13 +396,14 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Writes the specified data to the specified socket.
+        /// Write until all data in <paramref name="data"/> is written, the optional <paramref name="length"/> is reached,
+        /// the <paramref name="timeout"/> expires, or the connection fails.
         /// </summary>
-        /// <param name="socket">The socket.</param>
-        /// <param name="data">The data.</param>
-        /// <param name="length">The length.</param>
-        /// <param name="timeout">The timeout.</param>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
+        /// <param name="socket">The socket to write the data to.</param>
+        /// <param name="data">The data to send.</param>
+        /// <param name="length">The length to write or -1 to send the whole buffer.</param>
+        /// <param name="timeout">The timeout value. A timeout of zero means "wait forever".</param>
+        /// <exception cref="AdbException">
         /// channel EOF
         /// or
         /// timeout
@@ -431,13 +423,13 @@ namespace Managed.Adb
                 else if (count == 0)
                 {
                     // TODO: need more accurate timeout?
-                    if (timeout != 0 && numWaits * WAIT_TIME > timeout)
+                    if (timeout != 0 && numWaits * WaitTime > timeout)
                     {
                         throw new AdbException("timeout");
                     }
 
                     // non-blocking spin
-                    Thread.Sleep(WAIT_TIME);
+                    Thread.Sleep(WaitTime);
                     numWaits++;
                 }
                 else
@@ -453,11 +445,16 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Reads the adb response.
+        /// Reads the response from ADB after a command.
         /// </summary>
-        /// <param name="socket">The socket.</param>
-        /// <param name="readDiagString">if set to <see langword="true"/> [read diag string].</param>
-        /// <returns></returns>
+        /// <param name="socket">The socket channel that is connected to adb.</param>
+        /// <param name="readDiagString">
+        /// if <see langword="true"/>, we're expecting an <c>OKAY</c> response to be
+        /// followed by a diagnostic string. Otherwise, we only expect the
+        /// diagnostic string to follow a <c>FAIL</c>.</param>
+        /// <returns>
+        /// A <see cref="AdbResponse"/> that represents the response received from ADB.
+        /// </returns>
         public AdbResponse ReadAdbResponse(Socket socket, bool readDiagString)
         {
             AdbResponse resp = new AdbResponse();
@@ -522,11 +519,21 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Reads the data from specified socket.
+        /// Reads from the socket until the array is filled, or no more data is coming (because
+        /// the socket closed or the timeout expired).
         /// </summary>
-        /// <param name="socket">The socket.</param>
-        /// <param name="data">The data.</param>
-        /// <returns></returns>
+        /// <param name="socket">
+        /// The opened socket to read from. It must be in non-blocking mode for timeouts to work.
+        /// </param>
+        /// <param name="data">
+        /// The buffer to store the read data into.</param>
+        /// <returns>
+        /// <see langword="true"/> if the data was read successfully; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// This uses the default time out value.
+        /// </remarks>
         public bool Read(Socket socket, byte[] data)
         {
             try
@@ -543,13 +550,26 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Reads the data from specified socket.
+        /// Reads from the socket until the array is filled, the optional <paramref name="length"/>
+        /// is reached, or no more data is coming (because the socket closed or the
+        /// timeout expired). After <paramref name="timeout"/> milliseconds since the
+        /// previous successful read, this will return whether or not new data has
+        /// been found.
         /// </summary>
-        /// <param name="socket">The socket.</param>
-        /// <param name="data">The data.</param>
-        /// <param name="length">The length.</param>
-        /// <param name="timeout">The timeout.</param>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
+        /// <param name="socket">
+        /// The opened socket to read from. It must be in non-blocking
+        /// mode for timeouts to work
+        /// </param>
+        /// <param name="data">
+        /// The buffer to store the read data into.
+        /// </param>
+        /// <param name="length">
+        /// The length to read or -1 to fill the data buffer completely
+        /// </param>
+        /// <param name="timeout">
+        /// The timeout value in ms. A timeout of zero means "wait forever".
+        /// </param>
+        /// <exception cref="AdbException">
         /// EOF
         /// or
         /// No Data to read: exception.Message
@@ -593,30 +613,26 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Creates the JDWP forward request.
+        ///  Creates a port forwarding between a local and a remote port.
         /// </summary>
-        /// <param name="pid">The pid.</param>
-        /// <returns></returns>
-        private byte[] CreateJdwpForwardRequest(int pid)
-        {
-            string req = string.Format("jdwp:{0}", pid);
-            return this.FormAdbRequest(req);
-        }
-
-        /// <summary>
-        /// Creates the forward.
-        /// </summary>
-        /// <param name="adbSockAddr">The adb sock addr.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="localPort">The local port.</param>
-        /// <param name="remotePort">The remote port.</param>
-        /// <returns></returns>
+        /// <param name="adbSockAddr">
+        /// The socket address to connect to adb
+        /// </param>
+        /// <param name="device">
+        /// The device on which to do the port forwarding
+        /// </param>
+        /// <param name="localPort">
+        /// The local port to forward.
+        /// </param>
+        /// <param name="remotePort">
+        /// The remote port to forward to
+        /// </param>
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
         /// failed to submit the forward command.
         /// or
         /// Device rejected command:  + resp.Message
         /// </exception>
-        public bool CreateForward(IPEndPoint adbSockAddr, IDevice device, int localPort, int remotePort)
+        public void CreateForward(IPEndPoint adbSockAddr, IDevice device, int localPort, int remotePort)
         {
             Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
@@ -645,8 +661,6 @@ namespace Managed.Adb
                     adbChan.Close();
                 }
             }
-
-            return true;
         }
 
         /// <summary>
@@ -715,33 +729,37 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Removes the forward.
+        /// Remove a port forwarding between a local and a remote port.
         /// </summary>
-        /// <param name="address">The adb socket address.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="localPort">The local port.</param>
-        /// <returns></returns>
-        public bool RemoveForward(IPEndPoint address, IDevice device, int localPort)
+        /// <param name="address">
+        /// The socket address to connect to adb
+        /// </param>
+        /// <param name="device">
+        /// The device on which to remove the port forwarding
+        /// </param>
+        /// <param name="localPort">
+        /// Specification of the local port that was forwarded
+        /// </param>
+        public void RemoveForward(IPEndPoint address, IDevice device, int localPort)
         {
             using (var socket = this.ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward:tcp:{1}".With(device.SerialNumber, localPort)))
             {
-                // do nothing...
-                return true;
             }
         }
 
         /// <summary>
-        /// Removes all forwards.
+        /// Removes all forwards for a given device.
         /// </summary>
-        /// <param name="address">The address.</param>
-        /// <param name="device">The device.</param>
-        /// <returns></returns>
-        public bool RemoveAllForward(IPEndPoint address, IDevice device)
+        /// <param name="address">
+        /// The socket address to connect to adb
+        /// </param>
+        /// <param name="device">
+        /// The device on which to remove the port forwarding
+        /// </param>
+        public void RemoveAllForward(IPEndPoint address, IDevice device)
         {
             using (var socket = this.ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward-all".With(device.SerialNumber)))
             {
-                // do nothing...
-                return true;
             }
         }
 
@@ -758,10 +776,14 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Replies to string.
+        /// Converts an ADB reply to a string.
         /// </summary>
-        /// <param name="reply">The reply.</param>
-        /// <returns></returns>
+        /// <param name="reply">
+        /// A <see cref="byte"/> array that represents the ADB reply.
+        /// </param>
+        /// <returns>
+        /// A <see cref="string"/> that represents the ADB reply.
+        /// </returns>
         public string ReplyToString(byte[] reply)
         {
             string result;
@@ -772,7 +794,7 @@ namespace Managed.Adb
             catch (DecoderFallbackException uee)
             {
                 Log.e(TAG, uee);
-                result = "";
+                result = string.Empty;
             }
 
             return result;
@@ -905,9 +927,7 @@ namespace Managed.Adb
                     }
                 }
 
-                Log.d(TAG, "image params: bpp=" + imageParams.Bpp + ", size="
-                                + imageParams.Size + ", width=" + imageParams.Width
-                                + ", height=" + imageParams.Height);
+                Log.d(TAG, $"image params: bpp={imageParams.Bpp}, size={imageParams.Size}, width={imageParams.Width}, height={imageParams.Height}");
 
                 if (!this.Write(adbChan, nudge))
                 {
@@ -1016,7 +1036,7 @@ namespace Managed.Adb
                             if (rcvr == null || !rcvr.ParsesErrors)
                             {
                                 string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                string sdata = data.GetString(0, count, AdbHelper.DEFAULT_ENCODING);
+                                string sdata = data.GetString(0, count, AdbHelper.DefaultEncoding);
 
                                 var sdataTrimmed = sdata.Trim();
                                 if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))
@@ -1156,7 +1176,6 @@ namespace Managed.Adb
         /// <param name="logName">Name of the log.</param>
         /// <param name="rcvr">The RCVR.</param>
         /// <exception cref="AdbException">failed asking for log</exception>
-        /// <exception cref="Managed.Adb.Exceptions.AdbCommandRejectedException"></exception>
         public void RunLogService(IPEndPoint address, IDevice device, string logName, LogReceiver rcvr)
         {
             using (var socket = this.ExecuteRawSocketCommand(address, device, "log:{0}".With(logName)))
@@ -1185,7 +1204,7 @@ namespace Managed.Adb
                         {
                             try
                             {
-                                Thread.Sleep(WAIT_TIME * 5);
+                                Thread.Sleep(WaitTime * 5);
                             }
                             catch (ThreadInterruptedException)
                             {
@@ -1260,7 +1279,7 @@ namespace Managed.Adb
                 throw new ArgumentNullException("address");
             }
 
-            return this.Connect(adbEndpoint, new IPEndPoint(address, DEFAULT_PORT));
+            return this.Connect(adbEndpoint, new IPEndPoint(address, DefaultPort));
         }
 
         /// <summary>
@@ -1283,7 +1302,7 @@ namespace Managed.Adb
                 throw new ArgumentNullException("host");
             }
 
-            return this.Connect(adbEndpoint, new DnsEndPoint(host, DEFAULT_PORT));
+            return this.Connect(adbEndpoint, new DnsEndPoint(host, DefaultPort));
         }
 
         /// <summary>
@@ -1353,12 +1372,29 @@ namespace Managed.Adb
         }
 
         /// <summary>
+        /// Creates a port forwarding request to a jdwp process.
+        /// </summary>
+        /// <param name="pid">
+        /// The jdwp process pid on the device.
+        /// </param>
+        /// <returns>
+        /// An array containing <c>####jwdp:{pid}</c>.
+        /// </returns>
+        private byte[] CreateJdwpForwardRequest(int pid)
+        {
+            string req = string.Format("jdwp:{0}", pid);
+            return this.FormAdbRequest(req);
+        }
+
+        /// <summary>
         /// Executes a raw socket command.
         /// </summary>
         /// <param name="address">The address.</param>
         /// <param name="device">The device.</param>
         /// <param name="command">The command.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// The socket on which the command was executed.
+        /// </returns>
         /// <exception cref="AdbException">failed to submit the command: {0}.With(command)
         /// or
         /// Device rejected command: {0}.With(resp.Message)</exception>
@@ -1371,8 +1407,9 @@ namespace Managed.Adb
         /// Executes the raw socket command.
         /// </summary>
         /// <param name="address">The address.</param>
-        /// <param name="command">The command.</param>
-        /// <returns></returns>
+        /// <param name="command">The command.</param>        /// <returns>
+        /// The socket on which the command was executed.
+        /// </returns>
         private Socket ExecuteRawSocketCommand(IPEndPoint address, string command)
         {
             return this.ExecuteRawSocketCommand(address, this.FormAdbRequest(command));
@@ -1382,8 +1419,9 @@ namespace Managed.Adb
         /// Executes the raw socket command.
         /// </summary>
         /// <param name="address">The address.</param>
-        /// <param name="command">The command.</param>
-        /// <returns></returns>
+        /// <param name="command">The command.</param>        /// <returns>
+        /// The socket on which the command was executed.
+        /// </returns>
         private Socket ExecuteRawSocketCommand(IPEndPoint address, byte[] command)
         {
             return this.ExecuteRawSocketCommand(address, null, command);
@@ -1395,7 +1433,9 @@ namespace Managed.Adb
         /// <param name="address">The address.</param>
         /// <param name="device">The device.</param>
         /// <param name="command">The command. Should call FormAdbRequest on the string to create the byte array.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// The socket on which the command was executed.
+        /// </returns>
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
         /// Device is offline
         /// or
@@ -1438,10 +1478,14 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        ///
+        /// Returns the host prefix that should be used for a device.
         /// </summary>
-        /// <param name="device">The device.</param>
-        /// <returns></returns>
+        /// <param name="device">
+        /// The device for which to get the host prefix.
+        /// </param>
+        /// <returns>
+        /// The host prefix that should be used for the device.
+        /// </returns>
         private string HostPrefixFromDevice(IDevice device)
         {
             switch (device.TransportType)

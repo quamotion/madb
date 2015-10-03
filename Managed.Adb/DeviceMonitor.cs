@@ -804,7 +804,7 @@ namespace Managed.Adb
                 }
             }
 
-            return data.GetString(AdbHelper.DEFAULT_ENCODING);
+            return data.GetString(AdbHelper.DefaultEncoding);
         }
 
         /// <summary>

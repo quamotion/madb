@@ -396,7 +396,7 @@ namespace Managed.Adb
             Log.i(TAG, "Remote File: {0}", remotePath);
             try
             {
-                byte[] remotePathContent = remotePath.GetBytes(AdbHelper.DEFAULT_ENCODING);
+                byte[] remotePathContent = remotePath.GetBytes(AdbHelper.DefaultEncoding);
 
                 if (remotePathContent.Length > REMOTE_PATH_MAX_LENGTH)
                 {
@@ -614,7 +614,7 @@ namespace Managed.Adb
 
             try
             {
-                byte[] remotePathContent = remotePath.GetBytes(AdbHelper.DEFAULT_ENCODING);
+                byte[] remotePathContent = remotePath.GetBytes(AdbHelper.DefaultEncoding);
 
                 if (remotePathContent.Length > REMOTE_PATH_MAX_LENGTH)
                 {

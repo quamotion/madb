@@ -7,14 +7,6 @@ using System.Text;
 namespace Managed.Adb.Tests {
     [TestClass]
 	public class DeviceTests : BaseDeviceTests {
-
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
-		public void BackupTest ( ) {
-			var device = GetFirstDevice ( );
-			device.Backup ( );
-		}
-
         [TestMethod]
         public void CreateFromDeviceDataVSEmulatorTest()
         {

@@ -253,14 +253,6 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Backups this device.
-        /// </summary>
-        public void Backup()
-        {
-            AdbHelper.Instance.Backup(AndroidDebugBridge.SocketAddress);
-        }
-
-        /// <summary>
         /// Determines whether this instance can use the SU shell.
         /// </summary>
         /// <returns>
@@ -771,7 +763,8 @@ namespace Managed.Adb
         {
             try
             {
-                return AdbHelper.Instance.CreateForward(AndroidDebugBridge.SocketAddress, this, localPort, remotePort);
+                AdbHelper.Instance.CreateForward(AndroidDebugBridge.SocketAddress, this, localPort, remotePort);
+                return true;
             }
             catch (IOException e)
             {
@@ -789,7 +782,8 @@ namespace Managed.Adb
         {
             try
             {
-                return AdbHelper.Instance.RemoveForward(AndroidDebugBridge.SocketAddress, this, localPort);
+                AdbHelper.Instance.RemoveForward(AndroidDebugBridge.SocketAddress, this, localPort);
+                return true;
             }
             catch (IOException e)
             {
