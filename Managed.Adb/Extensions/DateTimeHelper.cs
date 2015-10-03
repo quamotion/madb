@@ -17,10 +17,7 @@ namespace Managed.Adb
         /// Gets EPOCH time
         /// </summary>
         public static DateTime Epoch
-        {
-            get;
-            private set;
-        } = new DateTime(1970, 1, 1);
+        { get; } = new DateTime(1970, 1, 1);
 
         /// <summary>
         /// Gets epoch time.
@@ -49,7 +46,7 @@ namespace Managed.Adb
         /// <returns></returns>
         public static long ToUnixEpoch(this DateTime date)
         {
-            TimeSpan t = (date - Epoch);
+            TimeSpan t = date - Epoch;
             long epoch = (long)t.TotalSeconds;
             return epoch;
         }

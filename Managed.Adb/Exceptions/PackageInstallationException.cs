@@ -26,7 +26,8 @@ namespace Managed.Adb.Exceptions
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public PackageInstallationException(string message) : base(message)
+        public PackageInstallationException(string message)
+            : base(message)
         {
         }
 
@@ -35,7 +36,8 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="inner">The inner.</param>
-        public PackageInstallationException(string message, Exception inner) : base(message, inner)
+        public PackageInstallationException(string message, Exception inner)
+            : base(message, inner)
         {
         }
 

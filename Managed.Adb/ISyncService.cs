@@ -15,7 +15,7 @@ namespace Managed.Adb
     /// <summary>
     /// Interface containing methods for file synchronisation.
     /// </summary>
-    public interface ISyncService: IDisposable
+    public interface ISyncService : IDisposable
     {
         Device Device { get; }
 

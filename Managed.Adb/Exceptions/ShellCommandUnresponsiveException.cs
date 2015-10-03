@@ -11,7 +11,8 @@ namespace Managed.Adb.Exceptions
 
     public class ShellCommandUnresponsiveException : AdbException
     {
-        public ShellCommandUnresponsiveException() : base("The shell command has become unresponsive")
+        public ShellCommandUnresponsiveException()
+            : base("The shell command has become unresponsive")
         {
         }
     }

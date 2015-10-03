@@ -608,8 +608,8 @@ namespace Managed.Adb
         public BatteryInfo GetBatteryInfo(long freshness)
         {
             if (this.lastBatteryInfo != null
-                                && this.lastBatteryCheckTime > (DateTime.Now.AddMilliseconds(-freshness)))
-                                {
+                                && this.lastBatteryCheckTime > DateTime.Now.AddMilliseconds(-freshness))
+            {
                 return this.lastBatteryInfo;
             }
 

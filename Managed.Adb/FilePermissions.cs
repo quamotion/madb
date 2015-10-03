@@ -11,7 +11,8 @@ namespace Managed.Adb
 
     public class FilePermissions
     {
-        public FilePermissions() : this("---------")
+        public FilePermissions()
+            : this("---------")
         {
         }
 

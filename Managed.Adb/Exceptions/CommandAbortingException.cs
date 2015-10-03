@@ -37,7 +37,8 @@ namespace Managed.Adb.Exceptions
         /// </summary>
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
-        public CommandAbortingException(SerializationInfo serializationInfo, StreamingContext context) : base(serializationInfo, context)
+        public CommandAbortingException(SerializationInfo serializationInfo, StreamingContext context)
+            : base(serializationInfo, context)
         {
         }
 

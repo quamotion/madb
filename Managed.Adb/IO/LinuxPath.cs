@@ -106,7 +106,7 @@ namespace Managed.Adb.IO
                     break;
                 }
 
-                if (((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar)))
+                if ((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar))
                 {
                     break;
                 }
@@ -122,7 +122,7 @@ namespace Managed.Adb.IO
                 str = str + ".";
             }
 
-            return (str + extension);
+            return str + extension;
         }
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace Managed.Adb.IO
                     }
 
                     char ch = paths[i][paths[i].Length - 1];
-                    if (((ch != DirectorySeparatorChar) && (ch != AltDirectorySeparatorChar)))
+                    if ((ch != DirectorySeparatorChar) && (ch != AltDirectorySeparatorChar))
                     {
                         capacity++;
                     }
@@ -319,7 +319,7 @@ namespace Managed.Adb.IO
                     else
                     {
                         char ch2 = builder[builder.Length - 1];
-                        if (((ch2 != DirectorySeparatorChar) && (ch2 != AltDirectorySeparatorChar)))
+                        if ((ch2 != DirectorySeparatorChar) && (ch2 != AltDirectorySeparatorChar))
                         {
                             builder.Append(DirectorySeparatorChar);
                         }
@@ -360,10 +360,10 @@ namespace Managed.Adb.IO
             if (ch != DirectorySeparatorChar && ch != AltDirectorySeparatorChar &&
                 ch2 != DirectorySeparatorChar && ch2 != AltDirectorySeparatorChar)
                 {
-                return (FixupPath(path1) + path2);
+                return FixupPath(path1) + path2;
             }
 
-            return (FixupPath(path1) + path2);
+            return FixupPath(path1) + path2;
         }
 
         /// <summary>Returns the directory information for the specified path string.</summary>
@@ -471,7 +471,7 @@ namespace Managed.Adb.IO
                     return string.Empty;
                 }
 
-                if (((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar)))
+                if ((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar))
                 {
                     break;
                 }
@@ -495,7 +495,7 @@ namespace Managed.Adb.IO
                 while (--num2 >= 0)
                 {
                     char ch = path[num2];
-                    if (((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar)))
+                    if ((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar))
                     {
                         return path.Substring(num2 + 1, (length - num2) - 1);
                     }
@@ -583,7 +583,7 @@ namespace Managed.Adb.IO
                 return num;
             }
 
-            if ((length >= 2))
+            if (length >= 2)
             {
                 num = 2;
                 if ((length >= 3) && IsDirectorySeparator(path[2]))
@@ -616,10 +616,10 @@ namespace Managed.Adb.IO
                     char ch = path[length];
                     if (ch == '.')
                     {
-                        return (length != (path.Length - 1));
+                        return length != (path.Length - 1);
                     }
 
-                    if (((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar)))
+                    if ((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar))
                     {
                         break;
                     }
@@ -661,19 +661,19 @@ namespace Managed.Adb.IO
             }
 
             char ch = path1[length - 1];
-            if (((ch != DirectorySeparatorChar) && (ch != AltDirectorySeparatorChar)))
+            if ((ch != DirectorySeparatorChar) && (ch != AltDirectorySeparatorChar))
             {
-                return (path1 + DirectorySeparatorChar + path2);
+                return path1 + DirectorySeparatorChar + path2;
             }
 
-            return (path1 + path2);
+            return path1 + path2;
         }
 
         internal static bool IsDirectorySeparator(char c)
         {
             if (c != DirectorySeparatorChar)
             {
-                return (c == AltDirectorySeparatorChar);
+                return c == AltDirectorySeparatorChar;
             }
 
             return true;

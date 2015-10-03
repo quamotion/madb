@@ -203,7 +203,7 @@ namespace Managed.Adb
 
         private static byte[] CreateSendFileRequest(byte[] command, byte[] path, FileMode mode)
         {
-            string modeString = string.Format(",{0}", ((int)mode & 0777));
+            string modeString = string.Format(",{0}", (int)mode & 0777);
             byte[] modeContent = null;
             try
             {

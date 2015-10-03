@@ -17,7 +17,8 @@ namespace Managed.Adb.Exceptions
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceNotFoundException"/> class.
         /// </summary>
-        public DeviceNotFoundException() : base("The device was not found.")
+        public DeviceNotFoundException()
+            : base("The device was not found.")
         {
         }
 

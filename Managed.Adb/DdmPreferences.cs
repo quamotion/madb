@@ -21,10 +21,7 @@ namespace Managed.Adb
         public const int DEFAULT_DEBUG_PORT_BASE = 8600;
         /** Default value for the logcat {@link LogLevel} */
         public static LogLevel.LogLevelInfo DEFAULT_LOG_LEVEL
-        {
-            get;
-            private set;
-        } = Managed.Adb.LogLevel.Error;
+        { get; } = Managed.Adb.LogLevel.Error;
 
         /** Default timeout values for adb connection (milliseconds) */
         public const int DEFAULT_TIMEOUT = 5000; // standard delay, in ms
