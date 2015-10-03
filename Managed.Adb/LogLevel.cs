@@ -11,7 +11,7 @@
     public static class LogLevel
     {
         /// <summary>
-        /// Initializes the <see cref="LogLevel"/> class.
+        /// Initializes static members of the <see cref="LogLevel"/> class.
         /// </summary>
         static LogLevel()
         {

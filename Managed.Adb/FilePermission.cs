@@ -38,7 +38,7 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Permission"/> class.
+        /// Initializes a new instance of the <see cref="FilePermission"/> class.
         /// </summary>
         public FilePermission()
             : this("---")
@@ -46,7 +46,7 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Permission"/> class.
+        /// Initializes a new instance of the <see cref="FilePermission"/> class.
         /// </summary>
         /// <param name="linuxPermissions">The linux permissions.</param>
         public FilePermission(string linuxPermissions)

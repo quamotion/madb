@@ -32,7 +32,7 @@
         private static readonly char[] HEXDIGIT = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
         /// <summary>
-        /// Static Initializer for the <see cref="Log"/> class.
+        /// Initializes static members of the <see cref="Log"/> class.
         /// </summary>
         static Log()
         {
@@ -49,7 +49,7 @@
         }
 
         /// <summary>
-        /// Cerates a new Instance of <see cref="Log"/>
+        /// Initializes a new instance of the <see cref="Log"/> class.
         /// </summary>
         private Log()
         {

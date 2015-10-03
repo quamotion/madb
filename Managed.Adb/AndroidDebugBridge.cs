@@ -142,7 +142,7 @@
         public static IPAddress HostAddress { get; private set; }
 
         /// <summary>
-        /// Initializes the <see cref="AndroidDebugBridge"/> class.
+        /// Initializes static members of the <see cref="AndroidDebugBridge"/> class.
         /// </summary>
         static AndroidDebugBridge()
         {
@@ -354,7 +354,7 @@
         #region constructors
 
         /// <summary>
-        /// Creates a new bridge.
+        /// Initializes a new instance of the <see cref="AndroidDebugBridge"/> class.
         /// </summary>
         /// <param name="osLocation">the location of the command line tool</param>
         /// <exception cref="ArgumentException"></exception>
@@ -378,7 +378,7 @@
         }
 
         /// <summary>
-        /// Creates a new bridge not linked to any particular adb executable.
+        /// Initializes a new instance of the <see cref="AndroidDebugBridge"/> class.
         /// </summary>
         private AndroidDebugBridge()
         {

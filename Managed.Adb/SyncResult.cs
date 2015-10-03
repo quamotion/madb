@@ -11,7 +11,7 @@
     public sealed class SyncResult
     {
         /// <summary>
-        /// Initializes a new SyncResult
+        /// Initializes a new instance of the <see cref="SyncResult"/> class.
         /// </summary>
         /// <param name="code">The error code</param>
         /// <param name="message">The error message</param>
@@ -22,7 +22,7 @@
         }
 
         /// <summary>
-        /// Initializes a new SyncResult
+        /// Initializes a new instance of the <see cref="SyncResult"/> class.
         /// </summary>
         /// <param name="code">The error code</param>
         /// <param name="ex">The exception</param>
@@ -32,7 +32,7 @@
         }
 
         /// <summary>
-        /// Initializes a new SyncResult
+        /// Initializes a new instance of the <see cref="SyncResult"/> class.
         /// </summary>
         /// <param name="code">The error code</param>
         public SyncResult(int code)
