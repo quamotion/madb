@@ -4,42 +4,22 @@
 
 namespace Managed.Adb
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Net.Sockets;
-    using System.Text;
 
-        [Flags]
-        public enum ClientChangeState
-        {
-            Name = 0x0001,
-            DebuggerStatus = 0x0002,
-            Port = 0x0004,
-            ThreadMode = 0x0008,
-            ThreadData = 0x0010,
-            HeapMode = 0x0020,
-            HeapData = 0x0040,
-            NativeHeapData = 0x0080,
-            ThreadStackTrace = 0x0100,
-            HeapAllocations = 0x0200,
-            HeapAllocationStatus = 0x0400,
-            MethodProfilingStatus = 0x0800,
-            Info = Name | DebuggerStatus | Port,
-        }
-
-        public enum ClientConnectionState
-        {
-            Init = 1,
-            NotJDWP = 2,
-            AwaitShake = 10,
-            NeedDDMPacket = 11,
-            NotDDM = 12,
-            Ready = 13,
-            Error = 20,
-            Disconnected = 21,
-        }
-
+    /// <summary>
+    /// <para>This represents a single client, usually a Dalvik VM process.
+    /// </para>
+    /// <para>
+    /// This class gives access to basic client information, as well as methods to perform actions
+    /// on the client.
+    /// </para>
+    /// <para>
+    /// More detailed information, usually updated in real time, can be access through the
+    /// <see cref="ClientData"/> class. Each <see cref="Client"/> object has its own <see cref="ClientData"/>
+    /// accessed through <see cref="ClientData"/>.
+    /// </para>
+    /// </summary>
+    /// <seealso cref=""/>
     public interface IClient : IPacketConsumer
     {
         ClientConnectionState ConnectionState { get; }

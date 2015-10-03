@@ -17,24 +17,9 @@ namespace Managed.Adb
     public class Client : IClient
     {
         /// <summary>
-        ///
+        /// The version of the server protocol we support.
         /// </summary>
-        private const int SERVER_PROTOCOL_VERSION = 1;
-
-        /// <summary>
-        ///
-        /// </summary>
-        private const int INITIAL_BUF_SIZE = 2 * 1024;
-
-        /// <summary>
-        ///
-        /// </summary>
-        private const int MAX_BUF_SIZE = 200 * 1024 * 1024;
-
-        /// <summary>
-        ///
-        /// </summary>
-        private const int WRITE_BUF_SIZE = 256;
+        private const int ServerProtocolVersion = 1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Client"/> class.

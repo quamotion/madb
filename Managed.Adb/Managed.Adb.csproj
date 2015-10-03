@@ -135,6 +135,8 @@
     <Compile Include="AndroidDebugBridgeEventArgs.cs" />
     <Compile Include="BatteryInfo.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="ClientChangeState.cs" />
+    <Compile Include="ClientConnectionState.cs" />
     <Compile Include="ClientData.cs" />
     <Compile Include="ColorData.cs" />
     <Compile Include="Exceptions\CommandAbortingException.cs" />
