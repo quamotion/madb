@@ -627,8 +627,7 @@ namespace Managed.Adb
                 adbChan.Blocking = true;
 
                 // host-serial should be different based on the transport...
-                byte[] request = this.FormAdbRequest(string.Format("host-serial:{0}:forward:tcp:{1};tcp:{2}", //$NON-NLS-1$
-                                device.SerialNumber, localPort, remotePort));
+                byte[] request = this.FormAdbRequest($"host-serial:{device.SerialNumber}:forward:tcp:{localPort};tcp:{remotePort}");
 
                 if (!this.Write(adbChan, request))
                 {

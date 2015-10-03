@@ -776,14 +776,12 @@
                     // check only the micro version for now.
                     if (microVersion < ADB_VERSION_MICRO_MIN)
                     {
-                        string message = string.Format("Required minimum version of adb: {0}.{1}.{2}. Current version is {0}.{1}.{3}",
-                                        majorVersion, minorVersion, ADB_VERSION_MICRO_MIN, microVersion);
+                        string message = $"Required minimum version of adb: {majorVersion}.{minorVersion}.{ADB_VERSION_MICRO_MIN}. Current version is {majorVersion}.{minorVersion}.{microVersion}");
                         Log.LogAndDisplay(LogLevel.Error, ADB, message);
                     }
                     else if (ADB_VERSION_MICRO_MAX != -1 && microVersion > ADB_VERSION_MICRO_MAX)
                     {
-                        string message = string.Format("Required maximum version of adb: {0}.{1}.{2}. Current version is {0}.{1}.{3}",
-                                        majorVersion, minorVersion, ADB_VERSION_MICRO_MAX, microVersion);
+                        string message = $"Required maximum version of adb: {majorVersion}.{minorVersion}.{ADB_VERSION_MICRO_MAX}. Current version is {majorVersion}.{minorVersion}.{microVersion}");
                         Log.LogAndDisplay(LogLevel.Error, ADB, message);
                     }
                     else

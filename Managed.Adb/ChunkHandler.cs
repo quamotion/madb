@@ -77,15 +77,13 @@
          *
          * The handler may not modify the contents of "data".
          */
-        public abstract void HandleChunk(IClient client, int type,
-                byte[] data, bool isReply, int msgId);
+        public abstract void HandleChunk(IClient client, int type, byte[] data, bool isReply, int msgId);
 
         /**
          * Handle chunks not recognized by handlers.  The handleChunk() method
          * in sub-classes should call this if the chunk type isn't recognized.
          */
-        protected void handleUnknownChunk(IClient client, int type,
-                MemoryStream data, bool isReply, int msgId)
+        protected void handleUnknownChunk(IClient client, int type, MemoryStream data, bool isReply, int msgId)
                 {
             if (type == CHUNK_FAIL)
             {

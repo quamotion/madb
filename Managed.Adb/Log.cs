@@ -379,9 +379,10 @@
         /// <returns></returns>
         public static string GetLogFormatString(LogLevel.LogLevelInfo logLevel, string tag, string message)
         {
-            long msec = DateTime.Now.ToUnixEpoch();
-            return string.Format("{0:00}:{1:00} {2}/{3}: {4}\n", (msec / 60000) % 60, (msec / 1000) % 60,
-                            logLevel.Letter, tag, message);
+            long totalmsec = DateTime.Now.ToUnixEpoch();
+            var sec = (totalmsec / 60000) % 60;
+            var msec = (totalmsec / 1000) % 60;
+            return string.Format($"{sec:00}:{msec:00} {logLevel.Letter}/{tag}: {message}\n");
         }
     }
 }

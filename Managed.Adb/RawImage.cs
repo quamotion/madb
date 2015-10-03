@@ -215,9 +215,11 @@
             {
                 for (int x = 0; x < w; x++)
                 {
-                    Array.Copy(this.Data, ((y * w) + x) * byteCount,
-                        rotated.Data, (((w - x - 1) * h) + y) * byteCount,
-                                        byteCount);
+                    Array.Copy(
+                        this.Data, ((y * w) + x) * byteCount,
+                        rotated.Data,
+                        (((w - x - 1) * h) + y) * byteCount,
+                        byteCount);
                 }
             }
 
@@ -232,12 +234,18 @@
         /// </returns>
         public override string ToString()
         {
-            return string.Format("height: {0}\nwidth: {1}\nbpp: {2}\nro: {3}\nrl: {4}\ngo: {5}\ngl: {6}\nbo: {7}\nbl: {8}\nao: {9}\nal: {10}\ns: {11}",
-                this.Height, this.Width, this.Bpp,
-                this.Red.Offset, this.Red.Length,
-                this.Green.Offset, this.Green.Length,
-                this.Blue.Offset, this.Blue.Length,
-                this.Alpha.Offset, this.Alpha.Length, this.Size);
+            return $@"height: {this.Height}
+width: {this.Width}
+bpp: {this.Bpp}
+ro: {this.Red.Offset}
+rl: {this.Red.Length}
+go: {this.Green.Offset}
+gl: {this.Green.Length}
+bo: {this.Blue.Offset}
+bl: {this.Blue.Length}
+ao: {this.Alpha.Offset}
+al: {this.Alpha.Length}
+s: {this.Size}";
         }
 
         /// <summary>
