@@ -178,58 +178,6 @@ namespace Managed.Adb
             }
         }
 
-        // https://github.com/android/platform_system_core/blob/master/adb/backup_service.c
-
-        /// <summary>
-        /// Backups the specified address.
-        /// </summary>
-        /// <param name="address">The address.</param>
-        /// <exception cref="System.IO.IOException">failed asking to backup device</exception>
-        /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/backup_service.c">backup_service.c</seealso>
-        [Obsolete("This is not yet functional")]
-        public void Backup(IPEndPoint address)
-        {
-            byte[] request = FormAdbRequest("backup:all");
-            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
-            {
-                socket.Connect(address);
-                socket.Blocking = true;
-                if (!this.Write(socket, request))
-                {
-                    throw new IOException("failed asking to backup device");
-                }
-
-                var resp = this.ReadAdbResponse(socket, false);
-                if (!resp.IOSuccess || !resp.Okay)
-                {
-                    Log.e(TAG, "Got timeout or unhappy response from ADB req: " + resp.Message);
-                    socket.Close();
-                    return;
-                }
-
-                var data = new byte[6000];
-                int count = -1;
-                while (count != 0)
-                {
-                    count = socket.Receive(data);
-                    Console.Write("received: {0}", count);
-                }
-            }
-        }
-
-        // https://github.com/android/platform_system_core/blob/master/adb/backup_service.c
-
-        /// <summary>
-        /// Restores this instance.
-        /// </summary>
-        /// <exception cref="System.NotImplementedException"></exception>
-        /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/backup_service.c">backup_service.c</seealso>
-        [Obsolete("This is not yet functional")]
-        public void Restore()
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Gets the adb version of the server.
         /// </summary>
