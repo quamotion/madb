@@ -247,14 +247,14 @@ namespace Managed.Adb
         {
             byte[] request = AdbHelper.FormAdbRequest("host:track-devices");
 
-            if (AdbHelper.Instance.Write(this.MainAdbConnection, request) == false)
+            if (AdbHelper.Write(this.MainAdbConnection, request) == false)
             {
                 Log.e(TAG, "Sending Tracking request failed!");
                 this.MainAdbConnection.Close();
                 throw new IOException("Sending Tracking request failed!");
             }
 
-            AdbResponse resp = AdbHelper.Instance.ReadAdbResponse(this.MainAdbConnection, false /* readDiagString */);
+            AdbResponse resp = AdbHelper.ReadAdbResponse(this.MainAdbConnection, false /* readDiagString */);
 
             if (!resp.IOSuccess)
             {
@@ -638,14 +638,14 @@ namespace Managed.Adb
         {
             AdbHelper.Instance.SetDevice(socket, device);
             byte[] request = AdbHelper.FormAdbRequest("track-jdwp");
-            if (!AdbHelper.Instance.Write(socket, request))
+            if (!AdbHelper.Write(socket, request))
             {
                 Log.e(TAG, "Sending jdwp tracking request failed!");
                 socket.Close();
                 throw new IOException();
             }
 
-            AdbResponse resp = AdbHelper.Instance.ReadAdbResponse(socket, false /* readDiagString */);
+            AdbResponse resp = AdbHelper.ReadAdbResponse(socket, false /* readDiagString */);
             if (resp.IOSuccess == false)
             {
                 Log.e(TAG, "Failed to read the adb response!");

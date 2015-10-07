@@ -290,9 +290,9 @@ namespace Managed.Adb
                 AdbHelper.Instance.SetDevice(this.Channel, this.Device);
 
                 byte[] request = AdbHelper.FormAdbRequest("sync:");
-                AdbHelper.Instance.Write(this.Channel, request, -1, DdmPreferences.Timeout);
+                AdbHelper.Write(this.Channel, request, -1, DdmPreferences.Timeout);
 
-                AdbResponse resp = AdbHelper.Instance.ReadAdbResponse(this.Channel, false /* readDiagString */);
+                AdbResponse resp = AdbHelper.ReadAdbResponse(this.Channel, false /* readDiagString */);
 
                 if (!resp.IOSuccess || !resp.Okay)
                 {
@@ -428,7 +428,7 @@ namespace Managed.Adb
             // file and network IO exceptions.
             try
             {
-                AdbHelper.Instance.Write(this.Channel, msg, -1, timeOut);
+                AdbHelper.Write(this.Channel, msg, -1, timeOut);
             }
             catch (IOException e)
             {
@@ -478,7 +478,7 @@ namespace Managed.Adb
                 // now write it
                 try
                 {
-                    AdbHelper.Instance.Write(this.Channel, DataBuffer, readCount + 8, timeOut);
+                    AdbHelper.Write(this.Channel, DataBuffer, readCount + 8, timeOut);
                 }
                 catch (IOException e)
                 {
@@ -506,12 +506,12 @@ namespace Managed.Adb
                 msg = CreateRequest(DONE, (int)time);
 
                 // and send it.
-                AdbHelper.Instance.Write(this.Channel, msg, -1, timeOut);
+                AdbHelper.Write(this.Channel, msg, -1, timeOut);
 
                 // read the result, in a byte array containing 2 ints
                 // (id, size)
                 byte[] result = new byte[8];
-                AdbHelper.Instance.Read(this.Channel, result, -1 /* full length */, timeOut);
+                AdbHelper.Read(this.Channel, result, -1 /* full length */, timeOut);
 
                 if (!CheckResult(result, OKAY.GetBytes()))
                 {
@@ -520,7 +520,7 @@ namespace Managed.Adb
                         // read some error message...
                         int len = result.Swap32bitFromArray(4);
 
-                        AdbHelper.Instance.Read(this.Channel, DataBuffer, len, timeOut);
+                        AdbHelper.Read(this.Channel, DataBuffer, len, timeOut);
 
                         // output the result?
                         string message = DataBuffer.GetString(0, len);
@@ -625,11 +625,11 @@ namespace Managed.Adb
                 msg = CreateFileRequest(RECV.GetBytes(), remotePathContent);
 
                 // and send it.
-                AdbHelper.Instance.Write(this.Channel, msg, -1, timeOut);
+                AdbHelper.Write(this.Channel, msg, -1, timeOut);
 
                 // read the result, in a byte array containing 2 ints
                 // (id, size)
-                AdbHelper.Instance.Read(this.Channel, pullResult, -1, timeOut);
+                AdbHelper.Read(this.Channel, pullResult, -1, timeOut);
 
                 // check we have the proper data back
                 if (CheckResult(pullResult, DATA.GetBytes()) == false &&
@@ -700,10 +700,10 @@ namespace Managed.Adb
                     try
                     {
                         // now read the length we received
-                        AdbHelper.Instance.Read(this.Channel, data, length, timeOut);
+                        AdbHelper.Read(this.Channel, data, length, timeOut);
 
                         // get the header for the next packet.
-                        AdbHelper.Instance.Read(this.Channel, pullResult, -1, timeOut);
+                        AdbHelper.Read(this.Channel, pullResult, -1, timeOut);
                     }
                     catch (IOException e)
                     {
@@ -778,12 +778,12 @@ namespace Managed.Adb
                 // create the stat request message.
                 byte[] msg = CreateFileRequest(STAT, path);
 
-                AdbHelper.Instance.Write(this.Channel, msg, -1 /* full length */, DdmPreferences.Timeout);
+                AdbHelper.Write(this.Channel, msg, -1 /* full length */, DdmPreferences.Timeout);
 
                 // read the result, in a byte array containing 4 ints
                 // (id, mode, size, time)
                 byte[] statResult = new byte[16];
-                AdbHelper.Instance.Read(this.Channel, statResult, -1 /* full length */, DdmPreferences.Timeout);
+                AdbHelper.Read(this.Channel, statResult, -1 /* full length */, DdmPreferences.Timeout);
 
                 // check we have the proper data back
                 if (CheckResult(statResult, Encoding.Default.GetBytes(STAT)) == false)
