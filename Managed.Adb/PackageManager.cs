@@ -26,7 +26,7 @@ namespace Managed.Adb {
 		/// <value>
 		/// The packages.
 		/// </value>
-		public Dictionary<String,FileEntry> Packages { get; set; }
+		public Dictionary<String,   FileEntry> Packages { get; set; }
 
 		/// <summary>
 		/// Refreshes the packages.

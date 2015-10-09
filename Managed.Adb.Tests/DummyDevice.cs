@@ -6,25 +6,13 @@ using System.Text;
 
 namespace Managed.Adb.Tests
 {
-    internal class DummyDevice : IDevice
+    public class DummyDevice : IDevice
     {
         public event EventHandler<EventArgs> StateChanged;
 
         public event EventHandler<EventArgs> BuildInfoChanged;
 
         public event EventHandler<EventArgs> ClientListChanged;
-
-        public IFileSystem FileSystem
-        {
-            get;
-            set;
-        }
-
-        public IBusyBox BusyBox
-        {
-            get;
-            set;
-        }
 
         public string SerialNumber
         {
@@ -111,17 +99,7 @@ namespace Managed.Adb.Tests
             get { throw new NotImplementedException(); }
         }
 
-        public List<IClient> Clients
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         public ISyncService SyncService
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public IFileListingService FileListingService
         {
             get { throw new NotImplementedException(); }
         }

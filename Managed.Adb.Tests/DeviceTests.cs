@@ -8,21 +8,6 @@ namespace Managed.Adb.Tests {
     [TestClass]
 	public class DeviceTests : BaseDeviceTests {
         [TestMethod]
-        [TestCategory("IntegrationTest")]
-		public void CanBackupTest ( ) {
-			var device = GetFirstDevice ( );
-
-			Assert.IsTrue ( device.CanBackup ( ) );
-		}
-
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
-		public void BackupTest ( ) {
-			var device = GetFirstDevice ( );
-			device.Backup ( );
-		}
-
-        [TestMethod]
         public void CreateFromDeviceDataVSEmulatorTest()
         {
             string data = @"169.254.138.177:5555   offline product:VS Emulator Android Device - 480 x 800 model:Android_Device___480_x_800 device:donatello";

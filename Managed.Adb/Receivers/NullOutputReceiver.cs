@@ -1,64 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// <copyright file="NullOutputReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
 
-namespace Managed.Adb {
-	/// <summary>
-	/// 
-	/// </summary>
-	public sealed class NullOutputReceiver : IShellOutputReceiver {
+namespace Managed.Adb
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
 
-		/// <summary>
-		/// Prevents a default instance of the <see cref="NullOutputReceiver" /> class from being created.
-		/// </summary>
-		private NullOutputReceiver ( ) {
-			IsCancelled = false;
-		}
+    /// <summary>
+    ///
+    /// </summary>
+    public sealed class NullOutputReceiver : IShellOutputReceiver
+    {
+        /// <summary>
+        /// Prevents a default instance of the <see cref="NullOutputReceiver" /> class from being created.
+        /// </summary>
+        private NullOutputReceiver()
+        {
+            this.IsCancelled = false;
+        }
 
-		private static NullOutputReceiver _instance = null;
+        private static NullOutputReceiver instance = null;
 
-		/// <summary>
-		/// Gets the instance.
-		/// </summary>
-		/// <value>
-		/// The instance.
-		/// </value>
-		public static IShellOutputReceiver Instance {
-			get {
-				if ( _instance == null ) {
-					_instance = new NullOutputReceiver ( );
-				}
-				return _instance;
-			}
-		}
+        /// <summary>
+        /// Gets the instance.
+        /// </summary>
+        /// <value>
+        /// The instance.
+        /// </value>
+        public static IShellOutputReceiver Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new NullOutputReceiver();
+                }
 
-		/// <summary>
-		/// Adds the output.
-		/// </summary>
-		/// <param name="data">The data.</param>
-		/// <param name="offset">The offset.</param>
-		/// <param name="length">The length.</param>
-		public void AddOutput ( byte[] data, int offset, int length ) {
-			// do nothing
-		}
+                return instance;
+            }
+        }
 
-		/// <summary>
-		/// Flushes the output.
-		/// </summary>
-		/// <remarks>
-		/// This should always be called at the end of the "process" in order to indicate that the data is ready to be processed further if needed.
-		/// </remarks>
-		public void Flush ( ) {
-			// do nothing
-		}
+        /// <summary>
+        /// Adds the output.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        public void AddOutput(byte[] data, int offset, int length)
+        {
+            // do nothing
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether this instance is cancelled.
-		/// </summary>
-		/// <value>
-		/// <see langword="true"/> if this instance is cancelled; otherwise, <see langword="false"/>.
-		/// </value>
+        /// <summary>
+        /// Flushes the output.
+        /// </summary>
+        /// <remarks>
+        /// This should always be called at the end of the "process" in order to indicate that the data is ready to be processed further if needed.
+        /// </remarks>
+        public void Flush()
+        {
+            // do nothing
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is cancelled.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if this instance is cancelled; otherwise, <see langword="false"/>.
+        /// </value>
         public bool IsCancelled { get; private set; }
 
         /// <summary>
@@ -71,13 +83,12 @@ namespace Managed.Adb {
         /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbHelper"/>
         /// will detect common error messages and throw an exception.
         /// </remarks>
-        public bool ParsesErrors 
-        { 
+        public bool ParsesErrors
+        {
             get
             {
                 return false;
             }
         }
-	}
-
+    }
 }

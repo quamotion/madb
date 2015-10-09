@@ -1,27 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// <copyright file="MultilineReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
 
-namespace Managed.Adb {
-	/// <summary>
-	/// 
-	/// </summary>
-	public abstract class MultiLineReceiver : IShellOutputReceiver {
+namespace Managed.Adb
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public const String NEWLINE = "\r\n";
-		/// <summary>
-		/// 
-		/// </summary>
-		public const String ENCODING = "ISO-8859-1";
+    /// <summary>
+    ///
+    /// </summary>
+    public abstract class MultiLineReceiver : IShellOutputReceiver
+    {
+        /// <summary>
+        ///
+        /// </summary>
+        public const string NEWLINE = "\r\n";
 
-		/// <summary>
-		/// Gets or sets a value indicating whether [trim lines].
-		/// </summary>
-		/// <value><see langword="true"/> if [trim lines]; otherwise, <see langword="false"/>.</value>
+        /// <summary>
+        ///
+        /// </summary>
+        public const string ENCODING = "ISO-8859-1";
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [trim lines].
+        /// </summary>
+        /// <value><see langword="true"/> if [trim lines]; otherwise, <see langword="false"/>.</value>
         public bool TrimLines { get; set; }
 
         /// <summary>
@@ -36,117 +42,133 @@ namespace Managed.Adb {
         /// </remarks>
         public virtual bool ParsesErrors { get; protected set; }
 
-		/// <summary>
-		/// Gets or sets the unfinished line.
-		/// </summary>
-		/// <value>The unfinished line.</value>
-		protected String UnfinishedLine { get; set; }
-		/// <summary>
-		/// Gets or sets the lines.
-		/// </summary>
-		/// <value>The lines.</value>
-		protected ICollection<String> Lines { get; set; }
+        /// <summary>
+        /// Gets or sets the unfinished line.
+        /// </summary>
+        /// <value>The unfinished line.</value>
+        protected string UnfinishedLine { get; set; }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
-		/// </summary>
-		public MultiLineReceiver( ) {
-			Lines = new List<String> ( );
-		}
+        /// <summary>
+        /// Gets or sets the lines.
+        /// </summary>
+        /// <value>The lines.</value>
+        protected ICollection<string> Lines { get; set; }
 
-		/// <summary>
-		/// Adds the output.
-		/// </summary>
-		/// <param name="data">The data.</param>
-		/// <param name="offset">The offset.</param>
-		/// <param name="length">The length.</param>
-		public void AddOutput( byte[] data, int offset, int length ) {
-			if ( !IsCancelled ) {
-				String s = null;
-				try {
-					s = Encoding.GetEncoding ( ENCODING ).GetString ( data, offset, length ); //$NON-NLS-1$
-				} catch ( DecoderFallbackException ) {
-					// normal encoding didn't work, try the default one
-					s = Encoding.Default.GetString ( data, offset, length );
-				}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
+        /// </summary>
+        public MultiLineReceiver()
+        {
+            this.Lines = new List<string>();
+        }
 
-				// ok we've got a string
-				if ( !String.IsNullOrEmpty ( s ) ) {
-					// if we had an unfinished line we add it.
-					if ( !String.IsNullOrEmpty ( UnfinishedLine ) ) {
-						s = UnfinishedLine + s;
-						UnfinishedLine = null;
-					}
+        /// <summary>
+        /// Adds the output.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        public void AddOutput(byte[] data, int offset, int length)
+        {
+            if (!this.IsCancelled)
+            {
+                string s = null;
+                try
+                {
+                    s = Encoding.GetEncoding(ENCODING).GetString(data, offset, length);
+                }
+                catch (DecoderFallbackException)
+                {
+                    // normal encoding didn't work, try the default one
+                    s = Encoding.Default.GetString(data, offset, length);
+                }
 
-					// now we split the lines
-					//Lines.Clear ( );
-					int start = 0;
-					do {
-						int index = s.IndexOf ( NEWLINE, start ); //$NON-NLS-1$
+                // ok we've got a string
+                if (!string.IsNullOrEmpty(s))
+                {
+                    // if we had an unfinished line we add it.
+                    if (!string.IsNullOrEmpty(this.UnfinishedLine))
+                    {
+                        s = this.UnfinishedLine + s;
+                        this.UnfinishedLine = null;
+                    }
 
-						// if \r\n was not found, this is an unfinished line
-						// and we store it to be processed for the next packet
-						if ( index == -1 ) {
-							UnfinishedLine = s.Substring ( start );
-							break;
-						}
+                    // now we split the lines
+                    int start = 0;
+                    do
+                    {
+                        int index = s.IndexOf(NEWLINE, start);
 
-						// so we found a \r\n;
-						// extract the line
-						String line = s.Substring ( start, index - start );
-						if ( TrimLines ) {
-							line = line.Trim ( );
-						}
-						Lines.Add ( line );
+                        // if \r\n was not found, this is an unfinished line
+                        // and we store it to be processed for the next packet
+                        if (index == -1)
+                        {
+                            this.UnfinishedLine = s.Substring(start);
+                            break;
+                        }
 
-						// move start to after the \r\n we found
-						start = index + 2;
-					} while ( true );
-				}
-			}
-		}
+                        // so we found a \r\n;
+                        // extract the line
+                        string line = s.Substring(start, index - start);
+                        if (this.TrimLines)
+                        {
+                            line = line.Trim();
+                        }
 
-		/// <summary>
-		/// Flushes the output.
-		/// </summary>
-		public void Flush( ) {
-			if (!IsCancelled && Lines.Count > 0 ) {
-				// at this point we've split all the lines.
-				// make the array
-				String[] lines = Lines.ToArray ( );
+                        this.Lines.Add(line);
 
-				// send it for final processing
-				ProcessNewLines ( lines );
-				Lines.Clear ( );
-			}
+                        // move start to after the \r\n we found
+                        start = index + 2;
+                    }
+                    while (true);
+                }
+            }
+        }
 
-			if ( !IsCancelled && !String.IsNullOrEmpty ( UnfinishedLine ) ) {
-				ProcessNewLines ( new String[] { UnfinishedLine } );
-			}
+        /// <summary>
+        /// Flushes the output.
+        /// </summary>
+        public void Flush()
+        {
+            if (!this.IsCancelled && this.Lines.Count > 0)
+            {
+                // at this point we've split all the lines.
+                // make the array
+                string[] lines = this.Lines.ToArray();
 
-			Done ( );
-		}
+                // send it for final processing
+                this.ProcessNewLines(lines);
+                this.Lines.Clear();
+            }
 
-		/// <summary>
-		/// Finishes the receiver
-		/// </summary>
-		protected virtual void Done( ) {
-			// Do nothing
-		}
+            if (!this.IsCancelled && !string.IsNullOrEmpty(this.UnfinishedLine))
+            {
+                this.ProcessNewLines(new string[] { this.UnfinishedLine });
+            }
 
-		/// <summary>
-		/// Gets a value indicating whether this instance is canceled.
-		/// </summary>
-		/// <value>
-		/// 	<see langword="true"/> if this instance is canceled; otherwise, <see langword="false"/>.
-		/// </value>
-		public virtual bool IsCancelled { get; protected set; }
+            this.Done();
+        }
 
-		/// <summary>
-		/// Processes the new lines.
-		/// </summary>
-		/// <param name="lines">The lines.</param>
-		protected abstract void ProcessNewLines( String[] lines );
-	}
+        /// <summary>
+        /// Finishes the receiver
+        /// </summary>
+        protected virtual void Done()
+        {
+            // Do nothing
+        }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance is canceled.
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if this instance is canceled; otherwise, <see langword="false"/>.
+        /// </value>
+        public virtual bool IsCancelled { get; protected set; }
+
+        /// <summary>
+        /// Processes the new lines.
+        /// </summary>
+        /// <param name="lines">The lines.</param>
+        protected abstract void ProcessNewLines(string[] lines);
+    }
 }

@@ -4,32 +4,26 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace Managed.Adb
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+
     /// <summary>
     /// Interface containing methods for file synchronisation.
     /// </summary>
-    public interface ISyncService: IDisposable
+    public interface ISyncService : IDisposable
     {
-        /// <include file='.\ISyncService.xml' path='/SyncService/PushFile/*'/>
-        SyncResult PushFile(String local, String remote, ISyncProgressMonitor monitor);
+        Device Device { get; }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
-        SyncResult Push(IEnumerable<String> local, FileEntry remote, ISyncProgressMonitor monitor);
+        /// <include file='.\ISyncService.xml' path='/SyncService/PushFile/*'/>
+        SyncResult PushFile(string local, string remote, ISyncProgressMonitor monitor);
 
         /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
-        SyncResult PullFile(String remoteFilepath, String localFilename, ISyncProgressMonitor monitor);
-
-        /// <include file='.\ISyncService.xml' path='/SyncService/PullFile/*'/>
-        SyncResult PullFile(FileEntry remote, String localFilename, ISyncProgressMonitor monitor);
-
-        /// <include file='.\ISyncService.xml' path='/SyncService/Pull/*'/>
-        SyncResult Pull(IEnumerable<FileEntry> entries, String localPath, ISyncProgressMonitor monitor);
+        SyncResult PullFile(string remoteFilepath, string localFilename, ISyncProgressMonitor monitor);
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Close/*'/>
         void Close();
@@ -39,5 +33,11 @@ namespace Managed.Adb
 
         /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
         bool IsOpen {get; }
+
+        SyncResult DoPush(IEnumerable<FileSystemInfo> files, string remotePath, ISyncProgressMonitor monitor);
+
+        SyncResult DoPullFile(string remotePath, string localPath, ISyncProgressMonitor monitor);
+
+        long GetTotalLocalFileSize(IEnumerable<FileSystemInfo> fsis);
     }
 }

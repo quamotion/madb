@@ -1,8 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿// <copyright file="LinkResolverReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
 
 namespace Managed.Adb
 {
+    using System;
+    using System.Linq;
+
     internal sealed class LinkResolverReceiver : MultiLineReceiver
     {
         public LinkResolverReceiver(string fileName)

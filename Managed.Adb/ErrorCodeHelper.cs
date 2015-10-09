@@ -1,11 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// <copyright file="ErrorCodeHelper.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
 
-namespace Managed.Adb {
-	public static class ErrorCodeHelper {
-		/** Result code for transfer success. */
+namespace Managed.Adb
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
+    public static class ErrorCodeHelper
+    {
+        /** Result code for transfer success. */
     public const int RESULT_OK = 0;
     /** Result code for canceled transfer */
     public const int RESULT_CANCELED = 1;
@@ -36,43 +42,43 @@ namespace Managed.Adb {
     /** Result code for receiving too much data from the remove device at once */
     public const int RESULT_BUFFER_OVERRUN = 14;
 
-
-		public static String ErrorCodeToString ( int code ) {
-			switch ( code ) {
-				case RESULT_OK:
-					return "Success.";
-				case RESULT_CANCELED:
-					return "Tranfert canceled by the user.";
-				case RESULT_UNKNOWN_ERROR:
-					return "Unknown Error.";
-				case RESULT_CONNECTION_ERROR:
-					return "Adb Connection Error.";
-				case RESULT_NO_REMOTE_OBJECT:
-					return "Remote object doesn't exist!";
-				case RESULT_TARGET_IS_FILE:
-					return "Target object is a file.";
-				case RESULT_NO_DIR_TARGET:
-					return "Target directory doesn't exist.";
-				case RESULT_REMOTE_PATH_ENCODING:
-					return "Remote Path encoding is not supported.";
-				case RESULT_REMOTE_PATH_LENGTH:
-					return "Remove path is too long.";
-				case RESULT_FILE_WRITE_ERROR:
-					return "Writing local file failed!";
-				case RESULT_FILE_READ_ERROR:
-					return "Reading local file failed!";
-				case RESULT_NO_LOCAL_FILE:
-					return "Local file doesn't exist.";
-				case RESULT_LOCAL_IS_DIRECTORY:
-					return "Local path is a directory.";
-				case RESULT_REMOTE_IS_FILE:
-					return "Remote path is a file.";
-				case RESULT_BUFFER_OVERRUN:
-					return "Receiving too much data.";
-				default:
-					return "Unknown error code.";
-			}
-
-		}
-	}
+        public static string ErrorCodeToString(int code)
+        {
+            switch (code)
+            {
+                case RESULT_OK:
+                    return "Success.";
+                case RESULT_CANCELED:
+                    return "Tranfert canceled by the user.";
+                case RESULT_UNKNOWN_ERROR:
+                    return "Unknown Error.";
+                case RESULT_CONNECTION_ERROR:
+                    return "Adb Connection Error.";
+                case RESULT_NO_REMOTE_OBJECT:
+                    return "Remote object doesn't exist!";
+                case RESULT_TARGET_IS_FILE:
+                    return "Target object is a file.";
+                case RESULT_NO_DIR_TARGET:
+                    return "Target directory doesn't exist.";
+                case RESULT_REMOTE_PATH_ENCODING:
+                    return "Remote Path encoding is not supported.";
+                case RESULT_REMOTE_PATH_LENGTH:
+                    return "Remove path is too long.";
+                case RESULT_FILE_WRITE_ERROR:
+                    return "Writing local file failed!";
+                case RESULT_FILE_READ_ERROR:
+                    return "Reading local file failed!";
+                case RESULT_NO_LOCAL_FILE:
+                    return "Local file doesn't exist.";
+                case RESULT_LOCAL_IS_DIRECTORY:
+                    return "Local path is a directory.";
+                case RESULT_REMOTE_IS_FILE:
+                    return "Remote path is a file.";
+                case RESULT_BUFFER_OVERRUN:
+                    return "Receiving too much data.";
+                default:
+                    return "Unknown error code.";
+            }
+        }
+    }
 }
