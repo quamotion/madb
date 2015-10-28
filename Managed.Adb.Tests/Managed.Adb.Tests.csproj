@@ -68,6 +68,8 @@
     <Compile Include="BaseDeviceTests.cs" />
     <Compile Include="BatteryInfoTests.cs" />
     <Compile Include="DeviceTests.cs" />
+    <Compile Include="DummyAdbSocket.cs" />
+    <Compile Include="DummyAdbSocketFactory.cs" />
     <Compile Include="DummyDevice.cs" />
     <Compile Include="LinkResolverReceiverTests.cs" />
     <Compile Include="LinuxPathTests.cs" />
