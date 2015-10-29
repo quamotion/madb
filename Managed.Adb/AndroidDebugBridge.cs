@@ -451,7 +451,7 @@ namespace Managed.Adb
             this.Started = true;
 
             // now that the bridge is connected, we start the underlying services.
-            this.DeviceMonitor = new DeviceMonitor(this);
+            this.DeviceMonitor = new DeviceMonitor(AdbHelper.SocketFactory.Create(AndroidDebugBridge.SocketAddress));
             this.DeviceMonitor.Start();
 
             return true;
@@ -511,7 +511,7 @@ namespace Managed.Adb
 
                 if (restart && this.DeviceMonitor == null)
                 {
-                    this.DeviceMonitor = new DeviceMonitor(this);
+                    this.DeviceMonitor = new DeviceMonitor(AdbHelper.SocketFactory.Create(AndroidDebugBridge.SocketAddress));
                     this.DeviceMonitor.Start();
                 }
 
@@ -538,82 +538,6 @@ namespace Managed.Adb
             {
                 return AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress)
                     .Select(d => new Device(d)).ToList();
-            }
-        }
-
-        /// <summary>
-        /// Returns whether the bridge has acquired the initial list from adb after being created.
-        /// </summary>
-        /// <remarks>
-        /// <p/>Calling getDevices() right after createBridge(String, boolean) will
-        /// generally result in an empty list. This is due to the internal asynchronous communication
-        /// mechanism with <code>adb</code> that does not guarantee that the IDevice list has been
-        /// built before the call to getDevices().
-        /// <p/>The recommended way to get the list of IDevice objects is to create a
-        /// IDeviceChangeListener object.
-        /// </remarks>
-        /// <returns>
-        /// 	<see langword="true"/> if [has initial device list]; otherwise, <see langword="false"/>.
-        /// </returns>
-        public bool HasInitialDeviceList()
-        {
-            if (this.DeviceMonitor != null)
-            {
-                return this.DeviceMonitor.HasInitialDeviceList;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Returns whether the AndroidDebugBridge object is still connected to the adb daemon.
-        /// </summary>
-        /// <value><see langword="true"/> if this instance is connected; otherwise, <see langword="false"/>.</value>
-        public bool IsConnected
-        {
-            get
-            {
-                if (this.DeviceMonitor != null /* && monitorThread != null */)
-                {
-                    return this.DeviceMonitor.IsMonitoring /* && monitorThread.State != State.TERMINATED*/;
-                }
-
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Returns the number of times the AndroidDebugBridge object attempted to connect
-        /// </summary>
-        /// <value>The connection attempt count.</value>
-        public int ConnectionAttemptCount
-        {
-            get
-            {
-                if (this.DeviceMonitor != null)
-                {
-                    return this.DeviceMonitor.ConnectionAttemptCount;
-                }
-
-                return -1;
-            }
-        }
-
-        /// <summary>
-        /// Returns the number of times the AndroidDebugBridge object attempted to restart
-        /// the adb daemon.
-        /// </summary>
-        /// <value>The restart attempt count.</value>
-        public int RestartAttemptCount
-        {
-            get
-            {
-                if (this.DeviceMonitor != null)
-                {
-                    return this.DeviceMonitor.RestartAttemptCount;
-                }
-
-                return -1;
             }
         }
 

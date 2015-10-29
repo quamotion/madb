@@ -27,7 +27,7 @@ namespace Managed.Adb
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
         /// </summary>
-        public DeviceMonitor(AdbSocket socket)
+        public DeviceMonitor(IAdbSocket socket)
         {
             this.Socket = socket;
             this.Devices = new List<DeviceData>();
@@ -38,7 +38,7 @@ namespace Managed.Adb
         /// </summary>
         public IList<DeviceData> Devices { get; private set; }
 
-        public AdbSocket Socket { get; private set; }
+        public IAdbSocket Socket { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is monitoring.
