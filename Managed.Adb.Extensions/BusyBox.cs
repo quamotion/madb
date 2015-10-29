@@ -137,7 +137,7 @@ namespace Managed.Adb {
 			command.ThrowIfNullOrWhiteSpace ( "command" );
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
 			Log.d ( "executing (su): {0}", cmd );
-			AdbHelper.Instance.ExecuteRemoteRootCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device.DeviceData, receiver );
+            Device.ExecuteRootShellCommand(cmd, receiver );
 		}
 
         /// <include file='.\BusyBox.xml' path='/BusyBox/Device/*'/>

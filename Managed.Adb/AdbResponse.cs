@@ -31,6 +31,17 @@ namespace Managed.Adb
             Timeout = false
         };
 
+        public static AdbResponse FromError(string message)
+        {
+            return new AdbResponse()
+            {
+                IOSuccess = true,
+                Message = message,
+                Okay = false,
+                Timeout = false
+            };
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether the IO communication was a success.
         /// </summary>

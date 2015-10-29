@@ -115,7 +115,7 @@ namespace Managed.Adb
             if (!response.IOSuccess || !response.Okay)
             {
                 this.socket.Close();
-                throw new AdbException($"An error occurred while reading a response from ADB: {response.Message}");
+                throw new AdbException($"An error occurred while reading a response from ADB: {response.Message}", response);
             }
 
             return response;

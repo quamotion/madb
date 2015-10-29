@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Managed.Adb.Exceptions;
+using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Managed.Adb.Tests
@@ -33,8 +35,26 @@ namespace Managed.Adb.Tests
 
         public override AdbResponse ReadAdbResponse(bool readDiagString)
         {
-            var response = base.ReadAdbResponse(readDiagString);
+            Exception exception = null;
+            AdbResponse response;
+
+            try
+            {
+                response = base.ReadAdbResponse(readDiagString);
+            }
+            catch(AdbException ex)
+            {
+                exception = ex;
+                response = ex.Response;
+            }
+
             this.Responses.Enqueue(response);
+
+            if(exception != null)
+            {
+                throw exception;
+            }
+
             return response;
         }
 

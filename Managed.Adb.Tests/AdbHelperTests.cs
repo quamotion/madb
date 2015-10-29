@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Managed.Adb.Exceptions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace Managed.Adb.Tests
         IDummyAdbSocket socket;
         IPEndPoint endPoint;
 
-        bool integrationTest = true;
+        bool integrationTest = false;
 
         [TestInitialize]
         public void Initialize()
@@ -213,6 +214,264 @@ namespace Managed.Adb.Tests
             Assert.AreEqual("Hello, World\r\n", receiver.ToString());
         }
 
+        [TestMethod]
+        public void CreateForwardTest()
+        {
+            this.RunCreateForwardTest(
+                (device) => AdbHelper.Instance.CreateForward(this.endPoint, device, "tcp:1", "tcp:2", true),
+                "tcp:1;tcp:2");
+        }
+
+        [TestMethod]
+        public void CreateTcpForwardTest()
+        {
+            this.RunCreateForwardTest(
+                (device) => AdbHelper.Instance.CreateForward(this.endPoint, device, 3, 4),
+                "tcp:3;tcp:4");
+        }
+
+        [TestMethod]
+        public void CreateSocketForwardTest()
+        {
+            this.RunCreateForwardTest(
+                (device) => AdbHelper.Instance.CreateForward(this.endPoint, device, 5, "/socket/1"),
+                "tcp:5;local:/socket/1");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AdbException))]
+        public void CreateDuplicateForwardTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.FromError("cannot rebind existing socket")
+            };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                "host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"
+            };
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () =>
+                {
+                    AdbHelper.Instance.CreateForward(this.endPoint, device, "tcp:1", "tcp:2", false);
+                });
+        }
+
+        [TestMethod]
+        public void ListForwardTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[] {
+                "169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"
+            };
+
+            var requests = new string[]
+            {
+                "host-serial:169.254.109.177:5555:list-forward"
+            };
+
+            ForwardData[] forwards = null;
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () => forwards = AdbHelper.Instance.ListForward(this.endPoint, device).ToArray());
+
+            Assert.IsNotNull(forwards);
+            Assert.AreEqual(3, forwards.Length);
+            Assert.AreEqual("169.254.109.177:5555", forwards[0].SerialNumber);
+            Assert.AreEqual("tcp:1", forwards[0].Local);
+            Assert.AreEqual("tcp:2", forwards[0].Remote);
+        }
+
+        [TestMethod]
+        public void RemoveForwardTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                "host-serial:169.254.109.177:5555:killforward:tcp:1"
+            };
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () => AdbHelper.Instance.RemoveForward(this.endPoint, device, 1));
+        }
+
+        [TestMethod]
+        public void RemoveAllForwardsTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                "host-serial:169.254.109.177:5555:killforward-all"
+            };
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () => AdbHelper.Instance.RemoveAllForwards(this.endPoint, device));
+        }
+
+        [TestMethod]
+        public void ConnectIPAddressTest()
+        {
+            this.RunConnectTest(
+                () => AdbHelper.Instance.Connect(this.endPoint, IPAddress.Loopback),
+                "127.0.0.1:5555");
+        }
+
+        [TestMethod]
+        public void ConnectDnsEndpointTest()
+        {
+            this.RunConnectTest(
+                () => AdbHelper.Instance.Connect(this.endPoint, new DnsEndPoint("localhost", 1234)),
+                "localhost:1234");
+        }
+
+        [TestMethod]
+        public void ConnectIPEndpointTest()
+        {
+            this.RunConnectTest(
+                () => AdbHelper.Instance.Connect(this.endPoint, new IPEndPoint(IPAddress.Loopback, 4321)),
+                "127.0.0.1:4321");
+        }
+
+        [TestMethod]
+        public void ConnectHostEndpointTest()
+        {
+            this.RunConnectTest(
+                () => AdbHelper.Instance.Connect(this.endPoint, "localhost"),
+                "localhost:5555");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConnectIPAddressNullTest()
+        {
+            AdbHelper.Instance.Connect(this.endPoint, (IPAddress)null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConnectDnsEndpointNullTest()
+        {
+            AdbHelper.Instance.Connect(this.endPoint, (DnsEndPoint)null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConnectIPEndpointNullTest()
+        {
+            AdbHelper.Instance.Connect(this.endPoint, (IPEndPoint)null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConnectHostEndpointNullTest()
+        {
+            AdbHelper.Instance.Connect(this.endPoint, (string)null);
+        }
+
+        public void RunConnectTest(Action test, string connectString)
+        {
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                $"host:connect:{connectString}"
+            };
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                test);
+        }
+
+        private void RunCreateForwardTest(Action<DeviceData> test, string forwardString)
+        {
+            var device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                $"host-serial:169.254.109.177:5555:forward:{forwardString}"
+            };
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () => test(device));
+        }
+
         /// <summary>
         /// <para>
         /// Runs an ADB helper test, either as a unit test or as an integration test.
@@ -263,7 +522,16 @@ namespace Managed.Adb.Tests
                 }
             }
 
-            test();
+            Exception exception = null;
+
+            try
+            {
+                test();
+            }
+            catch(Exception ex)
+            {
+                exception = ex;
+            }
 
             if (!integrationTest)
             {
@@ -275,8 +543,7 @@ namespace Managed.Adb.Tests
                 Assert.AreEqual(0, socket.Responses.Count);
 
                 // Make sure a request was sent
-                Assert.AreEqual(1, socket.Requests.Count);
-                Assert.AreEqual("host:version", socket.Requests[0]);
+                CollectionAssert.AreEqual(requests.ToList(), socket.Requests);
             }
             else
             {
@@ -285,6 +552,11 @@ namespace Managed.Adb.Tests
                 CollectionAssert.AreEqual(requests.ToList(), socket.Requests);
                 CollectionAssert.AreEqual(responses.ToList(), socket.Responses);
                 CollectionAssert.AreEqual(responseMessages.ToList(), socket.ResponseMessages);
+            }
+
+            if(exception != null)
+            {
+                throw exception;
             }
         }
     }

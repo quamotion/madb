@@ -640,7 +640,7 @@ namespace Managed.Adb
         /// <param name="commandArgs">The command args.</param>
         public void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
         {
-            AdbHelper.Instance.ExecuteRemoteRootCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this.DeviceData, receiver, timeout);
+            AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format("su -c \"{0}\"", command), this.DeviceData, receiver, int.MaxValue);
         }
 
         /// <summary>

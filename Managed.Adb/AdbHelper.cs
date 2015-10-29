@@ -402,7 +402,7 @@ namespace Managed.Adb
         /// <param name="device">
         /// The device on which to remove the port forwarding
         /// </param>
-        public void RemoveAllForward(IPEndPoint endPoint, DeviceData device)
+        public void RemoveAllForwards(IPEndPoint endPoint, DeviceData device)
         {
             using (IAdbSocket socket = SocketFactory.Create(endPoint))
             {
@@ -646,34 +646,6 @@ namespace Managed.Adb
         /// <summary>
         /// Executes a shell command on the remote device
         /// </summary>
-        /// <param name="endPoint">The end point.</param>
-        /// <param name="command">The command.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="rcvr">The RCVR.</param>
-        /// <remarks>
-        /// Should check if you CanSU before calling this.
-        /// </remarks>
-        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr)
-        {
-            this.ExecuteRemoteRootCommand(endPoint, string.Format("su -c \"{0}\"", command), device, rcvr, int.MaxValue);
-        }
-
-        /// <summary>
-        /// Executes a shell command on the remote device
-        /// </summary>
-        /// <param name="endPoint">The end point.</param>
-        /// <param name="command">The command.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="rcvr">The RCVR.</param>
-        /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
-        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
-        {
-            this.ExecuteRemoteCommand(endPoint, string.Format("su -c \"{0}\"", command), device, rcvr);
-        }
-
-        /// <summary>
-        /// Executes a shell command on the remote device
-        /// </summary>
         /// <param name="endPoint">The socket end point</param>
         /// <param name="command">The command to execute</param>
         /// <param name="device">The device to execute on</param>
@@ -817,7 +789,7 @@ namespace Managed.Adb
         {
             if (string.IsNullOrEmpty(host))
             {
-                throw new ArgumentNullException("host");
+                throw new ArgumentNullException(nameof(host));
             }
 
             this.Connect(adbEndpoint, new DnsEndPoint(host, DefaultPort));
@@ -853,35 +825,15 @@ namespace Managed.Adb
         /// </param>
         public void Connect(IPEndPoint adbEndpoint, DnsEndPoint endpoint)
         {
+            if (endpoint == null)
+            {
+                throw new ArgumentNullException(nameof(endpoint));
+            }
+
             using (IAdbSocket socket = SocketFactory.Create(adbEndpoint))
             {
                 socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
                 var response = socket.ReadAdbResponse(false);
-            }
-        }
-
-        /// <summary>
-        /// Returns the host prefix that should be used for a device.
-        /// </summary>
-        /// <param name="device">
-        /// The device for which to get the host prefix.
-        /// </param>
-        /// <returns>
-        /// The host prefix that should be used for the device.
-        /// </returns>
-        private string HostPrefixFromDevice(TransportType transportType)
-        {
-            switch (transportType)
-            {
-                case TransportType.Host:
-                    return "host-serial";
-                case TransportType.Usb:
-                    return "host-usb";
-                case TransportType.Local:
-                    return "host-local";
-                case TransportType.Any:
-                default:
-                    return "host";
             }
         }
     }
