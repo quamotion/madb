@@ -25,12 +25,12 @@ namespace Managed.Adb
             this.socket.Blocking = true;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.socket.Dispose();
         }
 
-        public void Read(byte[] data)
+        public virtual void Read(byte[] data)
         {
             if (!AdbHelper.Read(this.socket, data))
             {
@@ -39,7 +39,22 @@ namespace Managed.Adb
             }
         }
 
-        public string ReadString()
+        public virtual int Read(byte[] data, int timeout)
+        {
+            int currentTimeout = this.socket.ReceiveTimeout;
+
+            try
+            {
+                this.socket.ReceiveTimeout = timeout;
+                return this.socket.Receive(data);
+            }
+            finally
+            {
+                this.socket.ReceiveTimeout = currentTimeout;
+            }
+        }
+
+        public virtual string ReadString()
         {
             // The first 4 bytes contain the length of the string
             var reply = new byte[4];
@@ -57,7 +72,7 @@ namespace Managed.Adb
             return value;
         }
 
-        public AdbResponse ReadAdbResponse(bool readDiagString)
+        public virtual AdbResponse ReadAdbResponse(bool readDiagString)
         {
             var response = AdbHelper.ReadAdbResponse(this.socket, readDiagString);
 
@@ -70,7 +85,7 @@ namespace Managed.Adb
             return response;
         }
 
-        public void SendAdbRequest(string request)
+        public virtual void SendAdbRequest(string request)
         {
             byte[] data = AdbHelper.FormAdbRequest(request);
 

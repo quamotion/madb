@@ -40,21 +40,30 @@ namespace Managed.Adb
             }
         }
 
+        private StringBuilder output = new StringBuilder();
+
         /// <summary>
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-            protected override void ProcessNewLines(string[] lines)
+        protected override void ProcessNewLines(string[] lines)
+        {
+            foreach (var line in lines)
             {
-                foreach (var line in lines)
+                if (string.IsNullOrEmpty(line) || line.StartsWith("#") || line.StartsWith("$"))
                 {
-                    if (string.IsNullOrEmpty(line) || line.StartsWith("#") || line.StartsWith("$"))
-                    {
-                        continue;
-                    }
-
-                    Log.d(TAG, line);
+                    continue;
                 }
+
+                this.output.AppendLine(line);
+
+                Log.d(TAG, line);
             }
+        }
+
+        public override string ToString()
+        {
+            return this.output.ToString();
+        }
     }
 }

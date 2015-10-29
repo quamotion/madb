@@ -150,6 +150,43 @@ namespace Managed.Adb.Tests
                 });
         }
 
+        [TestMethod]
+        public void ExecuteRemoteCommandTest()
+        {
+            var device = new DummyDevice()
+            {
+                SerialNumber = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.OK,
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "shell:echo Hello, World"
+            };
+
+            var receiver = new ConsoleOutputReceiver();
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () =>
+                {
+                    AdbHelper.Instance.ExecuteRemoteCommand(this.endPoint, "echo Hello, World", device, receiver);
+                });
+
+            Assert.AreEqual("Hello, World\r\n", receiver.ToString());
+        }
+
         /// <summary>
         /// <para>
         /// Runs an ADB helper test, either as a unit test or as an integration test.

@@ -897,16 +897,18 @@ namespace Managed.Adb
         /// <exception cref="PermissionDeniedException"></exception>
         public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
-            using (var socket = this.ExecuteRawSocketCommand(endPoint, device, "shell:{0}".With(command)))
+            using (IAdbSocket socket = SocketFactory.Create(endPoint))
             {
-                socket.ReceiveTimeout = maxTimeToOutputResponse;
-                socket.SendTimeout = maxTimeToOutputResponse;
+                this.SetDevice(socket, device);
+                socket.SendAdbRequest($"shell:{command}");
+                var resopnse = socket.ReadAdbResponse(false);
 
                 try
                 {
-                    byte[] data = new byte[16384];
-                    int count = -1;
-                    while (count != 0)
+                    // Read in blocks of 16kb
+                    byte[] data = new byte[16 * 1024];
+
+                    while (true)
                     {
                         if (rcvr != null && rcvr.IsCancelled)
                         {
@@ -914,12 +916,14 @@ namespace Managed.Adb
                             throw new OperationCanceledException();
                         }
 
-                        count = socket.Receive(data);
+                        int count = socket.Read(data, maxTimeToOutputResponse);
+
                         if (count == 0)
                         {
                             // we're at the end, we flush the output
                             rcvr.Flush();
                             Log.w(TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count);
+                            break;
                         }
                         else
                         {

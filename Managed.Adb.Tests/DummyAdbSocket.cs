@@ -39,5 +39,10 @@ namespace Managed.Adb.Tests
         {
             this.Requests.Add(request);
         }
+
+        public int Read(byte[] data, int timeout)
+        {
+            return 0;
+        }
     }
 }

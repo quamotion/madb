@@ -16,7 +16,8 @@ namespace Managed.Adb.Tests
 
         public string SerialNumber
         {
-            get { throw new NotImplementedException(); }
+            get;
+            set;
         }
 
         public System.Net.IPEndPoint Endpoint
@@ -53,11 +54,9 @@ namespace Managed.Adb.Tests
 
         public DeviceState State
         {
-            get
-            {
-                return DeviceState.Online;
-            }
-        }
+            get;
+            set;
+        } = DeviceState.Online;
 
         public Dictionary<string, string> Properties
         {

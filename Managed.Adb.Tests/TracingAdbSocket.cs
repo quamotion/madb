@@ -19,27 +19,33 @@ namespace Managed.Adb.Tests
 
         public List<string> Requests
         { get; } = new List<string>();
-        
+
+        public override void Dispose()
+        {
+            // Don't dispose the underlying socket. The tests always re-use
+            // the same socket.
+        }
+
         public void Read(byte[] data)
         {
             base.Read(data);
         }
 
-        public AdbResponse ReadAdbResponse(bool readDiagString)
+        public override AdbResponse ReadAdbResponse(bool readDiagString)
         {
             var response = base.ReadAdbResponse(readDiagString);
             this.Responses.Enqueue(response);
             return response;
         }
 
-        public string ReadString()
+        public override string ReadString()
         {
             var value = base.ReadString();
             this.ResponseMessages.Enqueue(value);
             return value;
         }
 
-        public void SendAdbRequest(string request)
+        public override void SendAdbRequest(string request)
         {
             this.Requests.Add(request);
             base.SendAdbRequest(request);

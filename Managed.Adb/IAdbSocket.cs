@@ -13,6 +13,7 @@ namespace Managed.Adb
         AdbResponse ReadAdbResponse(bool readDiagString);
 
         void Read(byte[] data);
+        int Read(byte[] data, int timeout);
 
         string ReadString();
     }
