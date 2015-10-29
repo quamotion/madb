@@ -148,7 +148,11 @@ namespace Managed.Adb.Tests
         [TestMethod]
         public void SetDeviceTest()
         {
-            var device = new Device("169.254.109.177:5555", DeviceState.Online, string.Empty, string.Empty, string.Empty);
+            var device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
 
             var responses = new AdbResponse[]
             {
@@ -175,9 +179,9 @@ namespace Managed.Adb.Tests
         [TestMethod]
         public void ExecuteRemoteCommandTest()
         {
-            var device = new DummyDevice()
+            var device = new DeviceData()
             {
-                SerialNumber = "169.254.109.177:5555",
+                Serial = "169.254.109.177:5555",
                 State = DeviceState.Online
             };
 

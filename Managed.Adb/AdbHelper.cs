@@ -139,8 +139,8 @@ namespace Managed.Adb
         /// <summary>
         /// Ask the ADB server for its internal version number.
         /// </summary>
-        /// <param name="address">
-        /// The address where ADB is listening.
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
         /// </param>
         /// <returns>
         /// The ADB version number.
@@ -151,9 +151,9 @@ namespace Managed.Adb
         /// <exception cref="AdbException">
         /// An error occurred connecting to ADB
         /// </exception>
-        public int GetAdbVersion(IPEndPoint address)
+        public int GetAdbVersion(IPEndPoint endPoint)
         {
-            using (var socket = SocketFactory.Create(address))
+            using (var socket = SocketFactory.Create(endPoint))
             {
                 socket.SendAdbRequest("host:version");
                 var response = socket.ReadAdbResponse(false);
@@ -168,13 +168,13 @@ namespace Managed.Adb
         /// ADB client detects that an obsolete server is running after an
         /// upgrade.
         /// </summary>
-        /// <param name="address">
-        /// The address where ADB is listening.
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
         /// </param>
         /// <exception cref="System.IO.IOException">failed asking to kill adb</exception>
-        public void KillAdb(IPEndPoint address)
+        public void KillAdb(IPEndPoint endPoint)
         {
-            using (IAdbSocket socket = SocketFactory.Create(address))
+            using (IAdbSocket socket = SocketFactory.Create(endPoint))
             {
                 socket.SendAdbRequest("host:kill");
 
@@ -186,12 +186,13 @@ namespace Managed.Adb
         /// <summary>
         /// Gets the devices that are available for communication.
         /// </summary>
-        /// <param name="address">The address.</param>
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
+        /// </param>
         /// <returns>A list of devices that are connected.</returns>
-        /// <gist id="a8acf10d48370d138247" />
-        public List<DeviceData> GetDevices(IPEndPoint address)
+        public List<DeviceData> GetDevices(IPEndPoint endPoint)
         {
-            using (IAdbSocket socket = SocketFactory.Create(address))
+            using (IAdbSocket socket = SocketFactory.Create(endPoint))
             {
                 socket.SendAdbRequest("host:devices-l");
                 socket.ReadAdbResponse(false);
@@ -207,6 +208,205 @@ namespace Managed.Adb
                 });
 
                 return s;
+            }
+        }
+
+        // host:track-devices is implemented by the DeviceMonitor.
+
+        // host:emulator is not implemented
+
+        /// <summary>
+        /// Ask to switch the connection to the device/emulator identified by
+        /// <paramref name="device"/>. After this request, every client request will
+        /// be sent directly to the adbd daemon running on the device.
+        /// </summary>
+        /// <param name="socket">
+        /// An instance of the <see cref="IAdbSocket"/> class which is connected to
+        /// the Android Debug Bridge.
+        /// </param>
+        /// <param name="device">
+        /// The device to which to connect.
+        /// </param>
+        /// <remarks>
+        /// If <paramref name="device"/> is <see langword="null"/>, this metod
+        /// does nothing.
+        /// </remarks>
+        public void SetDevice(IAdbSocket socket, DeviceData device)
+        {
+            // if the device is not null, then we first tell adb we're looking to talk
+            // to a specific device
+            if (device != null)
+            {
+                socket.SendAdbRequest($"host:transport:{device.Serial}");
+
+                try
+                {
+                    socket.ReadAdbResponse(false);
+                }
+                catch (AdbException e)
+                {
+                    if (string.Equals("device not found", e.AdbError, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new DeviceNotFoundException(device.Serial);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
+
+        // host:transport-usb is not implemented
+        // host:transport-local is not implemented
+        // host:transport-any is not implemented
+
+        // <host-prefix>:get-product is not implemented
+        // <host-prefix>:get-serialno is not implemented
+        // <host-prefix>:get-devpath is not implemented
+        // <host-prefix>:get-state is not implemented
+
+        /// <summary>
+        /// Asks the ADB server to forward local connections from <paramref name="local"/>
+        /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
+        /// </summary>
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
+        /// </param>
+        /// <param name="device">
+        /// The device to which to forward the connections.
+        /// </param>
+        /// <param name="local">
+        /// <para>
+        /// The local address to forward. This value can be in one of:
+        /// </para>
+        /// <list type="ordered">
+        ///     <item>
+        ///         <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
+        ///     </item>
+        ///     <item>
+        ///         <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt;
+        ///     </item>
+        /// </list>
+        /// </param>
+        /// <param name="remote">
+        /// <para>
+        /// The remote address to forward. This value can be in one of:
+        /// </para>
+        /// <list type="ordered">
+        ///     <item>
+        ///         <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
+        ///     </item>
+        ///     <item>
+        ///         <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt; on device
+        ///     </item>
+        ///     <item>
+        ///         <c>jdwp:&lt;pid&gt;</c>: JDWP thread on VM process &lt;pid&gt; on device.
+        ///     </item>
+        /// </list>
+        /// <param name="allowRebind">
+        /// If set to <see langword="true"/>, the request will fail if there is already a forward
+        /// connection from <paramref name="local"/>.
+        /// </param>
+        /// </param>
+        public void CreateForward(IPEndPoint endPoint, DeviceData device, string local, string remote, bool allowRebind)
+        {
+            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            {
+                string rebind = allowRebind ? string.Empty : "norebind:";
+
+                socket.SendAdbRequest($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}");
+                var response = socket.ReadAdbResponse(false);
+            }
+        }
+
+        /// <summary>
+        ///  Creates a port forwarding between a local and a remote port.
+        /// </summary>
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
+        /// </param>
+        /// <param name="device">
+        /// The device to which to forward the connections.
+        /// </param>
+        /// <param name="localPort">
+        /// The local port to forward.
+        /// </param>
+        /// <param name="remotePort">
+        /// The remote port to forward to
+        /// </param>
+        /// <exception cref="Managed.Adb.Exceptions.AdbException">
+        /// failed to submit the forward command.
+        /// or
+        /// Device rejected command:  + resp.Message
+        /// </exception>
+        public void CreateForward(IPEndPoint endPoint, DeviceData device, int localPort, int remotePort)
+        {
+            this.CreateForward(endPoint, device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
+        }
+
+        /// <summary>
+        /// Forwards a remote Unix socket to a local TCP socket.
+        /// </summary>
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
+        /// </param>
+        /// <param name="device">
+        /// The device to which to forward the connections.
+        /// </param>
+        /// <param name="localPort">
+        /// The local port to forward.
+        /// </param>
+        /// <param name="remoteSocket">
+        /// The remote Unix socket.
+        /// </param>
+        /// <exception cref="Managed.Adb.Exceptions.AdbException">
+        /// The client failed to submit the forward command.
+        /// </exception>
+        /// <exception cref="Managed.Adb.Exceptions.AdbException">
+        /// The device rejected command. The error message will include the error message provided by the device.
+        /// </exception>
+        public void CreateForward(IPEndPoint endPoint, DeviceData device, int localPort, string remoteSocket)
+        {
+            this.CreateForward(endPoint, device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
+        }
+
+        /// <summary>
+        /// Remove a port forwarding between a local and a remote port.
+        /// </summary>
+        /// <param name="address">
+        /// The socket address to connect to adb
+        /// </param>
+        /// <param name="device">
+        /// The device on which to remove the port forwarding
+        /// </param>
+        /// <param name="localPort">
+        /// Specification of the local port that was forwarded
+        /// </param>
+        public void RemoveForward(IPEndPoint address, DeviceData device, int localPort)
+        {
+            using (IAdbSocket socket = SocketFactory.Create(address))
+            {
+                socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
+                var response = socket.ReadAdbResponse(false);
+            }
+        }
+
+        /// <summary>
+        /// Removes all forwards for a given device.
+        /// </summary>
+        /// <param name="address">
+        /// The socket address to connect to adb
+        /// </param>
+        /// <param name="device">
+        /// The device on which to remove the port forwarding
+        /// </param>
+        public void RemoveAllForward(IPEndPoint address, DeviceData device)
+        {
+            using (IAdbSocket socket = SocketFactory.Create(address))
+            {
+                socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
+                var response = socket.ReadAdbResponse(false);
             }
         }
 
@@ -455,146 +655,6 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        ///  Creates a port forwarding between a local and a remote port.
-        /// </summary>
-        /// <param name="adbSockAddr">
-        /// The socket address to connect to adb
-        /// </param>
-        /// <param name="device">
-        /// The device on which to do the port forwarding
-        /// </param>
-        /// <param name="localPort">
-        /// The local port to forward.
-        /// </param>
-        /// <param name="remotePort">
-        /// The remote port to forward to
-        /// </param>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// failed to submit the forward command.
-        /// or
-        /// Device rejected command:  + resp.Message
-        /// </exception>
-        public void CreateForward(IPEndPoint adbSockAddr, IDevice device, int localPort, int remotePort)
-        {
-            Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
-            {
-                adbChan.Connect(adbSockAddr);
-                adbChan.Blocking = true;
-
-                // host-serial should be different based on the transport...
-                byte[] request = FormAdbRequest($"host-serial:{device.SerialNumber}:forward:tcp:{localPort};tcp:{remotePort}");
-
-                if (!Write(adbChan, request))
-                {
-                    throw new AdbException("failed to submit the forward command.");
-                }
-
-                AdbResponse resp = ReadAdbResponse(adbChan, false /* readDiagString */);
-                if (!resp.IOSuccess || !resp.Okay)
-                {
-                    throw new AdbException("Device rejected command: " + resp.Message);
-                }
-            }
-            finally
-            {
-                if (adbChan != null)
-                {
-                    adbChan.Close();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Forwards a remote Unix socket to a local TCP socket.
-        /// </summary>
-        /// <param name="adbSockAddr">The adb socket address.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="localPort">The local port.</param>
-        /// <param name="remoteSocket">The remote Unix socket.</param>
-        /// <returns>
-        /// This method always returns <see langword="true"/>.
-        /// </returns>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// The client failed to submit the forward command.
-        /// </exception>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// The device rejected command. The error message will include the error message provided by the device.
-        /// </exception>
-        public bool CreateForward(IPEndPoint adbSockAddr, IDevice device, int localPort, string remoteSocket)
-        {
-            Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
-            {
-                adbChan.Connect(adbSockAddr);
-                adbChan.Blocking = true;
-
-                // host-serial should be different based on the transport...
-                byte[] request = FormAdbRequest(
-                    string.Format(
-                        "host-serial:{0}:forward:tcp:{1};localabstract:{2}", // $NON-NLS-1$
-                        device.SerialNumber,
-                        localPort,
-                        remoteSocket));
-
-                if (!Write(adbChan, request))
-                {
-                    throw new AdbException("failed to submit the forward command.");
-                }
-
-                AdbResponse resp = ReadAdbResponse(adbChan, false /* readDiagString */);
-                if (!resp.IOSuccess || !resp.Okay)
-                {
-                    throw new AdbException("Device rejected command: " + resp.Message);
-                }
-            }
-            finally
-            {
-                if (adbChan != null)
-                {
-                    adbChan.Close();
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Remove a port forwarding between a local and a remote port.
-        /// </summary>
-        /// <param name="address">
-        /// The socket address to connect to adb
-        /// </param>
-        /// <param name="device">
-        /// The device on which to remove the port forwarding
-        /// </param>
-        /// <param name="localPort">
-        /// Specification of the local port that was forwarded
-        /// </param>
-        public void RemoveForward(IPEndPoint address, IDevice device, int localPort)
-        {
-            using (var socket = this.ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward:tcp:{1}".With(device.SerialNumber, localPort)))
-            {
-            }
-        }
-
-        /// <summary>
-        /// Removes all forwards for a given device.
-        /// </summary>
-        /// <param name="address">
-        /// The socket address to connect to adb
-        /// </param>
-        /// <param name="device">
-        /// The device on which to remove the port forwarding
-        /// </param>
-        public void RemoveAllForward(IPEndPoint address, IDevice device)
-        {
-            using (var socket = this.ExecuteRawSocketCommand(address, device, "host-serial:{0}:killforward-all".With(device.SerialNumber)))
-            {
-            }
-        }
-
-        /// <summary>
         /// Determines whether the specified reply is okay.
         /// </summary>
         /// <param name="reply">The reply.</param>
@@ -755,7 +815,7 @@ namespace Managed.Adb
         /// <remarks>
         /// Should check if you CanSU before calling this.
         /// </remarks>
-        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr)
+        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr)
         {
             this.ExecuteRemoteRootCommand(endPoint, string.Format("su -c \"{0}\"", command), device, rcvr, int.MaxValue);
         }
@@ -768,7 +828,7 @@ namespace Managed.Adb
         /// <param name="device">The device.</param>
         /// <param name="rcvr">The RCVR.</param>
         /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
-        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
+        public void ExecuteRemoteRootCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
             this.ExecuteRemoteCommand(endPoint, string.Format("su -c \"{0}\"", command), device, rcvr);
         }
@@ -792,7 +852,7 @@ namespace Managed.Adb
         /// <exception cref="UnknownOptionException"></exception>
         /// <exception cref="CommandAbortingException"></exception>
         /// <exception cref="PermissionDeniedException"></exception>
-        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
+        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
             using (IAdbSocket socket = SocketFactory.Create(endPoint))
             {
@@ -906,7 +966,7 @@ namespace Managed.Adb
         /// <exception cref="IOException">Throws if there is a problem reading / writing to the socket</exception>
         /// <exception cref="OperationCanceledException">Throws if the execution was canceled</exception>
         /// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
-        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, IDevice device, IShellOutputReceiver rcvr)
+        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr)
         {
             this.ExecuteRemoteCommand(endPoint, command, device, rcvr, int.MaxValue);
         }
@@ -951,31 +1011,6 @@ namespace Managed.Adb
             }
         }
 
-        public void SetDevice(IAdbSocket socket, IDevice device)
-        {
-            // if the device is not null, then we first tell adb we're looking to talk
-            // to a specific device
-            if (device != null)
-            {
-                socket.SendAdbRequest($"host:transport:{device.SerialNumber}");
-
-                try
-                {
-                    socket.ReadAdbResponse(false);
-                }
-                catch (AdbException e)
-                {
-                    if (string.Equals("device not found", e.AdbError, StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new DeviceNotFoundException(device.SerialNumber);
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// Runs the Event log service on the Device, and provides its output to the LogReceiver.

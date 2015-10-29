@@ -33,6 +33,8 @@ namespace Managed.Adb
         /// </summary>
         event EventHandler<EventArgs> ClientListChanged;
 
+        DeviceData DeviceData { get; }
+
         /// <summary>
         /// Gets the serial number of the device.
         /// </summary>

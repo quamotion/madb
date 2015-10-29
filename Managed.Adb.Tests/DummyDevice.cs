@@ -14,6 +14,12 @@ namespace Managed.Adb.Tests
 
         public event EventHandler<EventArgs> ClientListChanged;
 
+        public DeviceData DeviceData
+        {
+            get;
+            set;
+        }
+
         public string SerialNumber
         {
             get;
