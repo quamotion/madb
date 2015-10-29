@@ -32,6 +32,12 @@ namespace Managed.Adb.Exceptions
         {
         }
 
+        public AdbException(string message, string adbError)
+            : base(message)
+        {
+            this.AdbError = adbError;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbException"/> class.
         /// </summary>
@@ -50,6 +56,12 @@ namespace Managed.Adb.Exceptions
         public AdbException(string message, Exception innerException)
             : base(message, innerException)
         {
+        }
+
+        public string AdbError
+        {
+            get;
+            private set;
         }
     }
 }

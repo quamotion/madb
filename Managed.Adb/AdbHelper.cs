@@ -1050,6 +1050,32 @@ namespace Managed.Adb
             }
         }
 
+        public void SetDevice(IAdbSocket socket, IDevice device)
+        {
+            // if the device is not null, then we first tell adb we're looking to talk
+            // to a specific device
+            if (device != null)
+            {
+                socket.SendAdbRequest($"host:transport:{device.SerialNumber}");
+
+                try
+                {
+                    socket.ReadAdbResponse(false);
+                }
+                catch (AdbException e)
+                {
+                    if (string.Equals("device not found", e.AdbError, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new DeviceNotFoundException(device.SerialNumber);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Runs the Event log service on the Device, and provides its output to the LogReceiver.
         /// </summary>

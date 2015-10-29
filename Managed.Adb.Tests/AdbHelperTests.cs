@@ -123,6 +123,33 @@ namespace Managed.Adb.Tests
             Assert.AreEqual("donatello", device.DeviceProperty);
         }
 
+        [TestMethod]
+        public void SetDeviceTest()
+        {
+            var device = new Device("169.254.109.177:5555", DeviceState.Online, string.Empty, string.Empty, string.Empty);
+
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555"
+            };
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () =>
+                {
+                    AdbHelper.Instance.SetDevice(this.socket, device);
+                });
+        }
+
         /// <summary>
         /// <para>
         /// Runs an ADB helper test, either as a unit test or as an integration test.
