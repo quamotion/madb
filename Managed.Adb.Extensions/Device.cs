@@ -19,49 +19,6 @@ namespace Managed.Adb
     using Managed.Adb.Logs;
 
     /// <summary>
-    ///
-    /// </summary>
-    public enum DeviceState
-    {
-        /// <summary>
-        /// The device is in recovery mode.
-        /// </summary>
-        Recovery,
-
-        /// <summary>
-        /// The device is in bootloader mode
-        /// </summary>
-        BootLoader,
-
-        /// <summary>
-        /// The instance is not connected to adb or is not responding.
-        /// </summary>
-        Offline,
-
-        /// <summary>
-        /// The instance is now connected to the adb server. Note that this state does not imply that the Android system is
-        /// fully booted and operational, since the instance connects to adb while the system is still booting.
-        /// However, after boot-up, this is the normal operational state of an emulator/device instance.
-        /// </summary>
-        Online,
-
-        /// <summary>
-        /// The device is in download mode.
-        /// </summary>
-        Download,
-
-        /// <summary>
-        /// The device state is unknown.
-        /// </summary>
-        Unknown,
-
-        /// <summary>
-        /// The device is connected to adb, but adb is not authorized for remote debugging of this device.
-        /// </summary>
-        Unauthorized
-    }
-
-    /// <summary>
     /// Represents an Android device.
     /// </summary>
     public sealed class Device : IDevice
@@ -121,12 +78,6 @@ namespace Managed.Adb
         ///  Emulator Serial Number regexp.
         /// </summary>
         private const string RE_EMULATOR_SN = @"emulator-(\d+)";
-
-        /// <summary>
-        /// Device list info regex
-        /// </summary>
-        /// <workitem>21136</workitem>
-        internal const string RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download|unauthorized)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
 
         /// <summary>
         /// The tag to use when logging messages.
@@ -204,57 +155,6 @@ namespace Managed.Adb
             this.RefreshMountPoints();
             this.RefreshEnvironmentVariables();
             this.RefreshProperties();
-        }
-
-        /// <summary>
-        /// Get the device state from the string value
-        /// </summary>
-        /// <param name="state">The device state string</param>
-        /// <returns></returns>
-        internal static DeviceState GetStateFromString(string state)
-        {
-            string tstate = state;
-
-            if (string.Compare(state, "device", false) == 0)
-            {
-                tstate = "online";
-            }
-
-            if (Enum.IsDefined(typeof(DeviceState), tstate))
-            {
-                return (DeviceState)Enum.Parse(typeof(DeviceState), tstate, true);
-            }
-            else
-            {
-                foreach (var fi in typeof(DeviceState).GetFields())
-                {
-                    if (string.Compare(fi.Name, tstate, true) == 0)
-                    {
-                        return (DeviceState)fi.GetValue(null);
-                    }
-                }
-            }
-
-            return DeviceState.Unknown;
-        }
-
-        /// <summary>
-        /// Create a device from Adb Device list data
-        /// </summary>
-        /// <param name="data">the line data for the device</param>
-        /// <returns></returns>
-        public static Device CreateFromAdbData(string data)
-        {
-            Regex re = new Regex(RE_DEVICELIST_INFO, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            Match m = re.Match(data);
-            if (m.Success)
-            {
-                return new Device(m.Groups[1].Value, GetStateFromString(m.Groups[2].Value), m.Groups[4].Value, m.Groups[3].Value, m.Groups[5].Value);
-            }
-            else
-            {
-                throw new ArgumentException("Invalid device list data");
-            }
         }
 
         /// <summary>
@@ -576,7 +476,7 @@ namespace Managed.Adb
         /// <param name="into">The reboot state</param>
         public void Reboot(string into)
         {
-            AdbHelper.Instance.Reboot(into, AndroidDebugBridge.SocketAddress, this);
+            AdbHelper.Instance.Reboot(into, AndroidDebugBridge.SocketAddress, this.DeviceData);
         }
 
         /// <summary>
@@ -749,7 +649,7 @@ namespace Managed.Adb
         /// <param name="receiver">The receiver.</param>
         public void RunEventLogService(LogReceiver receiver)
         {
-            AdbHelper.Instance.RunEventLogService(AndroidDebugBridge.SocketAddress, this, receiver);
+            AdbHelper.Instance.RunEventLogService(AndroidDebugBridge.SocketAddress, this.DeviceData, receiver);
         }
 
         /// <summary>
@@ -759,7 +659,7 @@ namespace Managed.Adb
         /// <param name="receiver">The receiver.</param>
         public void RunLogService(string logname, LogReceiver receiver)
         {
-            AdbHelper.Instance.RunLogService(AndroidDebugBridge.SocketAddress, this, logname, receiver);
+            AdbHelper.Instance.RunLogService(AndroidDebugBridge.SocketAddress, this.DeviceData, logname, receiver);
         }
 
         /// <summary>

@@ -109,9 +109,10 @@
     <Compile Include="AdbSocketFactory.cs" />
     <Compile Include="AndroidDebugBridge.cs" />
     <Compile Include="AndroidDebugBridgeEventArgs.cs" />
-    <Compile Include="BatteryInfo.cs" />
     <Compile Include="ColorData.cs" />
     <Compile Include="DeviceData.cs" />
+    <Compile Include="DeviceDataEventArgs.cs" />
+    <Compile Include="DeviceState.cs" />
     <Compile Include="Exceptions\CommandAbortingException.cs" />
     <Compile Include="Exceptions\PackageInstallationException.cs" />
     <Compile Include="Exceptions\ShellCommandUnresponsiveException.cs" />
@@ -128,25 +129,18 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="RawImage.cs" />
-    <Compile Include="Receivers\BatteryReceiver.cs" />
     <Compile Include="Receivers\ConsoleOutputReceiver.cs" />
     <Compile Include="DdmPreferences.cs" />
     <Compile Include="DeviceMonitor.cs" />
-    <Compile Include="Receivers\EnvironmentVariablesReceiver.cs" />
     <Compile Include="Exceptions\AdbException.cs" />
     <Compile Include="Exceptions\DeviceNotFoundException.cs" />
     <Compile Include="Exceptions\PermissionDeniedException.cs" />
     <Compile Include="Extensions\ArrayHelper.cs" />
     <Compile Include="Extensions\DateTimeHelper.cs" />
-    <Compile Include="Device.cs" />
-    <Compile Include="DeviceEventArgs.cs" />
     <Compile Include="ErrorCodeHelper.cs" />
     <Compile Include="Extensions\FileInfoHelper.cs" />
     <Compile Include="Extensions\StringHelper.cs" />
     <Compile Include="FilePermission.cs" />
-    <Compile Include="Receivers\GetPropReceiver.cs" />
-    <Compile Include="IDebugPortProvider.cs" />
-    <Compile Include="IDevice.cs" />
     <Compile Include="ILogOutput.cs" />
     <Compile Include="Receivers\InstallReceiver.cs" />
     <Compile Include="IO\LinuxPath.cs" />
@@ -157,7 +151,6 @@
     <Compile Include="LogLevel.cs" />
     <Compile Include="MountPoint.cs" />
     <Compile Include="Logs\LogReceiver.cs" />
-    <Compile Include="Receivers\MountPointReceiver.cs" />
     <Compile Include="Receivers\MultilineReceiver.cs" />
     <Compile Include="Receivers\NullOutputReceiver.cs" />
     <Compile Include="NullSyncProgressMonitor.cs" />

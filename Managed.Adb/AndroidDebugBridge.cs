@@ -34,19 +34,19 @@ namespace Managed.Adb
         /// Occurs when [device changed].
         /// </summary>
         /// <ignore>true</ignore>
-        public event EventHandler<DeviceEventArgs> DeviceChanged;
+        public event EventHandler<DeviceDataEventArgs> DeviceChanged;
 
         /// <summary>
         /// Occurs when [device connected].
         /// </summary>
         /// <ignore>true</ignore>
-        public event EventHandler<DeviceEventArgs> DeviceConnected;
+        public event EventHandler<DeviceDataEventArgs> DeviceConnected;
 
         /// <summary>
         /// Occurs when [device disconnected].
         /// </summary>
         /// <ignore>true</ignore>
-        public event EventHandler<DeviceEventArgs> DeviceDisconnected;
+        public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
         /*
          * Minimum and maximum version of adb supported. This correspond to
@@ -402,7 +402,7 @@ namespace Managed.Adb
         /// Raises the <see cref="E:DeviceChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceChanged(DeviceEventArgs e)
+        internal void OnDeviceChanged(DeviceDataEventArgs e)
         {
             if (this.DeviceChanged != null)
             {
@@ -414,7 +414,7 @@ namespace Managed.Adb
         /// Raises the <see cref="E:DeviceConnected"/> event.
         /// </summary>
         /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceConnected(DeviceEventArgs e)
+        internal void OnDeviceConnected(DeviceDataEventArgs e)
         {
             if (this.DeviceConnected != null)
             {
@@ -426,7 +426,7 @@ namespace Managed.Adb
         /// Raises the <see cref="E:DeviceDisconnected"/> event.
         /// </summary>
         /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceDisconnected(DeviceEventArgs e)
+        internal void OnDeviceDisconnected(DeviceDataEventArgs e)
         {
             if (this.DeviceDisconnected != null)
             {
@@ -532,12 +532,11 @@ namespace Managed.Adb
         /// Gets the devices.
         /// </summary>
         /// <value>The devices.</value>
-        public IList<Device> Devices
+        public IList<DeviceData> Devices
         {
             get
             {
-                return AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress)
-                    .Select(d => new Device(d)).ToList();
+                return AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress);
             }
         }
 

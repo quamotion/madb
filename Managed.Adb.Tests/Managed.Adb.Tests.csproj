@@ -62,15 +62,11 @@
     <Compile Include="..\Shared\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AdbHelperIntegrationTests.cs" />
     <Compile Include="AdbHelperTests.cs" />
     <Compile Include="AndroidDebugBridgeTests.cs" />
-    <Compile Include="BaseDeviceTests.cs" />
-    <Compile Include="BatteryInfoTests.cs" />
     <Compile Include="DeviceTests.cs" />
     <Compile Include="DummyAdbSocket.cs" />
     <Compile Include="DummyAdbSocketFactory.cs" />
-    <Compile Include="DummyDevice.cs" />
     <Compile Include="IDummyAdbSocket.cs" />
     <Compile Include="LinkResolverReceiverTests.cs" />
     <Compile Include="LinuxPathTests.cs" />

@@ -969,53 +969,12 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Sets the device.
-        /// </summary>
-        /// <param name="adbChan">The adb chan.</param>
-        /// <param name="device">The device.</param>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// failed submitting device ( + device + ) request to ADB
-        /// or
-        /// device ( + device + ) request rejected:  + resp.Message
-        /// </exception>
-        /// <exception cref="Managed.Adb.Exceptions.DeviceNotFoundException"></exception>
-        public void SetDevice(Socket adbChan, IDevice device)
-        {
-            // if the device is not null, then we first tell adb we're looking to talk
-            // to a specific device
-            if (device != null)
-            {
-                string msg = "host:transport:" + device.SerialNumber;
-                byte[] device_query = FormAdbRequest(msg);
-
-                if (!Write(adbChan, device_query))
-                {
-                    throw new AdbException("failed submitting device (" + device + ") request to ADB");
-                }
-
-                AdbResponse resp = ReadAdbResponse(adbChan, false /* readDiagString */);
-                if (!resp.Okay)
-                {
-                    if (string.Compare("device not found", resp.Message, true) == 0)
-                    {
-                        throw new DeviceNotFoundException(device.SerialNumber);
-                    }
-                    else
-                    {
-                        throw new AdbException("device (" + device + ") request rejected: " + resp.Message);
-                    }
-                }
-            }
-        }
-
-
-        /// <summary>
         /// Runs the Event log service on the Device, and provides its output to the LogReceiver.
         /// </summary>
         /// <param name="address">The address.</param>
         /// <param name="device">The device.</param>
         /// <param name="rcvr">The RCVR.</param>
-        public void RunEventLogService(IPEndPoint address, IDevice device, LogReceiver rcvr)
+        public void RunEventLogService(IPEndPoint address, DeviceData device, LogReceiver rcvr)
         {
             this.RunLogService(address, device, "events", rcvr);
         }
@@ -1028,10 +987,13 @@ namespace Managed.Adb
         /// <param name="logName">Name of the log.</param>
         /// <param name="rcvr">The RCVR.</param>
         /// <exception cref="AdbException">failed asking for log</exception>
-        public void RunLogService(IPEndPoint address, IDevice device, string logName, LogReceiver rcvr)
+        public void RunLogService(IPEndPoint address, DeviceData device, string logName, LogReceiver rcvr)
         {
-            using (var socket = this.ExecuteRawSocketCommand(address, device, "log:{0}".With(logName)))
+            using (IAdbSocket socket = SocketFactory.Create(address))
             {
+                socket.SendAdbRequest($"log:{logName}");
+                var response = socket.ReadAdbResponse(false);
+
                 byte[] data = new byte[16384];
                 using (var ms = new MemoryStream(data))
                 {
@@ -1047,7 +1009,7 @@ namespace Managed.Adb
 
                         var buffer = new byte[4 * 1024];
 
-                        count = socket.Receive(buffer);
+                        count = socket.Read(buffer, DdmPreferences.Timeout);
                         if (count < 0)
                         {
                             break;
@@ -1082,7 +1044,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="adbSocketAddress">The adb socket address.</param>
         /// <param name="device">The device.</param>
-        public void Reboot(IPEndPoint adbSocketAddress, IDevice device)
+        public void Reboot(IPEndPoint adbSocketAddress, DeviceData device)
         {
             this.Reboot(string.Empty, adbSocketAddress, device);
         }
@@ -1093,21 +1055,14 @@ namespace Managed.Adb
         /// <param name="into">The into.</param>
         /// <param name="adbSockAddr">The adb sock addr.</param>
         /// <param name="device">The device.</param>
-        public void Reboot(string into, IPEndPoint adbSockAddr, IDevice device)
+        public void Reboot(string into, IPEndPoint adbSockAddr, DeviceData device)
         {
-            byte[] request;
-            if (string.IsNullOrEmpty(into))
-            {
-                request = FormAdbRequest("reboot:");
-            }
-            else
-            {
-                request = FormAdbRequest("reboot:" + into);
-            }
+            var request = $"reboot:{into}";
 
-            using (this.ExecuteRawSocketCommand(adbSockAddr, device, request))
+            using (IAdbSocket socket = SocketFactory.Create(adbSockAddr))
             {
-                // nothing to do...
+                socket.SendAdbRequest(request);
+                var response = socket.ReadAdbResponse(false);
             }
         }
 
@@ -1224,97 +1179,6 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Executes a raw socket command.
-        /// </summary>
-        /// <param name="address">The address.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="command">The command.</param>
-        /// <returns>
-        /// The socket on which the command was executed.
-        /// </returns>
-        /// <exception cref="AdbException">failed to submit the command: {0}.With(command)
-        /// or
-        /// Device rejected command: {0}.With(resp.Message)</exception>
-        private Socket ExecuteRawSocketCommand(IPEndPoint address, IDevice device, string command)
-        {
-            return this.ExecuteRawSocketCommand(address, device, FormAdbRequest(command));
-        }
-
-        /// <summary>
-        /// Executes the raw socket command.
-        /// </summary>
-        /// <param name="address">The address.</param>
-        /// <param name="command">The command.</param>        /// <returns>
-        /// The socket on which the command was executed.
-        /// </returns>
-        private Socket ExecuteRawSocketCommand(IPEndPoint address, string command)
-        {
-            return this.ExecuteRawSocketCommand(address, FormAdbRequest(command));
-        }
-
-        /// <summary>
-        /// Executes the raw socket command.
-        /// </summary>
-        /// <param name="address">The address.</param>
-        /// <param name="command">The command.</param>        /// <returns>
-        /// The socket on which the command was executed.
-        /// </returns>
-        private Socket ExecuteRawSocketCommand(IPEndPoint address, byte[] command)
-        {
-            return this.ExecuteRawSocketCommand(address, null, command);
-        }
-
-        /// <summary>
-        /// Executes the raw socket command.
-        /// </summary>
-        /// <param name="address">The address.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="command">The command. Should call FormAdbRequest on the string to create the byte array.</param>
-        /// <returns>
-        /// The socket on which the command was executed.
-        /// </returns>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// Device is offline
-        /// or
-        /// failed to submit the command: {0}..With(command.GetString().Trim())
-        /// or
-        /// Device rejected command: {0}.With(resp.Message)
-        /// </exception>
-        /// <exception cref="AdbException">Device is offline.
-        /// or
-        /// failed to submit the command: {0}.With(command)
-        /// or
-        /// Device rejected command: {0}.With(resp.Message)</exception>
-        private Socket ExecuteRawSocketCommand(IPEndPoint address, IDevice device, byte[] command)
-        {
-            if (device != null && !device.IsOnline)
-            {
-                throw new AdbException("Device is offline");
-            }
-
-            Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            adbChan.Connect(address);
-            adbChan.Blocking = true;
-            if (device != null)
-            {
-                this.SetDevice(adbChan, device);
-            }
-
-            if (!Write(adbChan, command))
-            {
-                throw new AdbException("failed to submit the command: {0}.".With(command.GetString().Trim()));
-            }
-
-            AdbResponse resp = ReadAdbResponse(adbChan, false /* readDiagString */);
-            if (!resp.IOSuccess || !resp.Okay)
-            {
-                throw new AdbException("Device rejected command: {0}".With(resp.Message));
-            }
-
-            return adbChan;
-        }
-
-        /// <summary>
         /// Returns the host prefix that should be used for a device.
         /// </summary>
         /// <param name="device">
@@ -1323,9 +1187,9 @@ namespace Managed.Adb
         /// <returns>
         /// The host prefix that should be used for the device.
         /// </returns>
-        private string HostPrefixFromDevice(IDevice device)
+        private string HostPrefixFromDevice(TransportType transportType)
         {
-            switch (device.TransportType)
+            switch (transportType)
             {
                 case TransportType.Host:
                     return "host-serial";

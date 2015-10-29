@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Managed.Adb.Tests {
     [TestClass]
-	public class AndroidDebugBridgeTests : BaseDeviceTests {
+	public class AndroidDebugBridgeTests {
 
         [TestMethod]
         [TestCategory("IntegrationTest")]
@@ -19,7 +19,7 @@ namespace Managed.Adb.Tests {
 				Assert.IsTrue ( result, "Failed to start ADB" );
 				
 				adb.Devices.ForEach ( d => {
-					Console.WriteLine ( "{0}\t{1}", d.SerialNumber, d.State );
+					Console.WriteLine ( "{0}\t{1}", d.Serial, d.State );
 				} );
 
 				adb.Stop ( );
