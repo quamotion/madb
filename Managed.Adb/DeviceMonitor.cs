@@ -4,14 +4,14 @@
 
 namespace Managed.Adb
 {
+    using MoreLinq;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net.Sockets;
-    using System.Text;
     using System.Threading;
-    using MoreLinq;
 
     /// <summary>
     /// A Device monitor. This connects to the Android Debug Bridge and get device and
@@ -25,43 +25,20 @@ namespace Managed.Adb
         private const string TAG = "DeviceMonitor";
 
         /// <summary>
-        ///
-        /// </summary>
-        private byte[] LengthBuffer = null;
-
-        /// <summary>
-        ///
-        /// </summary>
-        private byte[] LengthBuffer2 = null;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
         /// </summary>
-        /// <param name="bridge">The bridge.</param>
-        public DeviceMonitor(AndroidDebugBridge bridge)
+        public DeviceMonitor(AdbSocket socket)
         {
-            this.Server = bridge;
-            this.Devices = new List<Device>();
-            this.DebuggerPorts = new List<int>();
-            this.DebuggerPorts.Add(DdmPreferences.DebugPortBase);
-            this.LengthBuffer = new byte[4];
-            this.LengthBuffer2 = new byte[4];
+            this.Socket = socket;
+            this.Devices = new List<DeviceData>();
         }
 
         /// <summary>
         /// Gets the devices.
         /// </summary>
-        public IList<Device> Devices { get; private set; }
+        public IList<DeviceData> Devices { get; private set; }
 
-        /// <summary>
-        /// Gets the debugger ports.
-        /// </summary>
-        public IList<int> DebuggerPorts { get; private set; }
-
-        /// <summary>
-        /// Gets the server.
-        /// </summary>
-        public AndroidDebugBridge Server { get; private set; }
+        public AdbSocket Socket { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is monitoring.
@@ -78,24 +55,6 @@ namespace Managed.Adb
         /// 	<see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.
         /// </value>
         public bool IsRunning { get; private set; }
-
-        /// <summary>
-        /// Gets the connection attempt count.
-        /// </summary>
-        public int ConnectionAttemptCount { get; private set; }
-
-        /// <summary>
-        /// Gets the restart attempt count.
-        /// </summary>
-        public int RestartAttemptCount { get; private set; }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance has initial device list.
-        /// </summary>
-        /// <value>
-        /// 	<see langword="true"/> if this instance has initial device list; otherwise, <see langword="false"/>.
-        /// </value>
-        public bool HasInitialDeviceList { get; private set; }
 
         /// <summary>
         /// Gets or sets the main adb connection.
@@ -133,11 +92,6 @@ namespace Managed.Adb
             catch (IOException)
             {
             }
-
-            // wake up the secondary loop by closing the selector.
-            /*if ( Selector != null ) {
-                Selector.WakeUp ( );
-            }*/
         }
 
         /// <summary>
@@ -146,686 +100,102 @@ namespace Managed.Adb
         private void DeviceMonitorLoop()
         {
             this.IsRunning = true;
+
+            // Set up the connection to track the list of devices.
+            this.Socket.SendAdbRequest("host:track-devices");
+            this.Socket.ReadAdbResponse(false);
+
             do
             {
                 try
                 {
-                    if (this.MainAdbConnection == null)
-                    {
-                        Log.d(TAG, "Opening adb connection");
-                        this.MainAdbConnection = this.OpenAdbConnection();
+                    // read the length of the incoming message
+                    // The first 4 bytes contain the length of the string
+                    var reply = new byte[4];
+                    this.Socket.Read(reply, int.MaxValue);
 
-                        if (this.MainAdbConnection == null)
-                        {
-                            this.ConnectionAttemptCount++;
-                            Log.i(TAG, "Connection attempts: {0}", this.ConnectionAttemptCount);
+                    // Convert the bytes to a hex string
+                    string lenHex = reply.GetString(AdbHelper.DefaultEncoding);
+                    int len = int.Parse(lenHex, NumberStyles.HexNumber);
 
-                            if (this.ConnectionAttemptCount > 10)
-                            {
-                                if (this.Server.Start() == false)
-                                {
-                                    this.RestartAttemptCount++;
-                                    Log.e(TAG, "adb restart attempts: {0}", this.RestartAttemptCount);
-                                }
-                                else
-                                {
-                                    this.RestartAttemptCount = 0;
-                                }
-                            }
+                    // And get the string
+                    reply = new byte[len];
+                    this.Socket.Read(reply);
 
-                            this.WaitBeforeContinue();
-                        }
-                        else
-                        {
-                            Log.d(TAG, "Connected to adb for device monitoring");
-                            this.ConnectionAttemptCount = 0;
-                        }
-                    }
+                    string value = reply.GetString(AdbHelper.DefaultEncoding);
 
-                    if (this.MainAdbConnection != null && !this.IsMonitoring && this.MainAdbConnection.Connected)
-                    {
-                        this.IsMonitoring = this.SendDeviceListMonitoringRequest();
-                    }
-
-                    if (this.IsMonitoring)
-                    {
-                        // read the length of the incoming message
-                        int length = this.ReadLength(this.MainAdbConnection, this.LengthBuffer);
-
-                        if (length >= 0)
-                        {
-                            // read the incoming message
-                            this.ProcessIncomingDeviceData(length);
-
-                            // flag the fact that we have build the list at least once.
-                            this.HasInitialDeviceList = true;
-                        }
-                    }
-                }
-                catch (IOException ioe)
-                {
-                    if (!this.IsRunning)
-                    {
-                        Log.e(TAG, "Adb connection Error: ", ioe);
-                        this.IsMonitoring = false;
-                        if (this.MainAdbConnection != null)
-                        {
-                            try
-                            {
-                                this.MainAdbConnection.Close();
-                            }
-                            catch (IOException)
-                            {
-                                // we can safely ignore that one.
-                            }
-
-                            this.MainAdbConnection = null;
-                        }
-                    }
+                    this.ProcessIncomingDeviceData(value);
                 }
                 catch (Exception ex)
                 {
-                    Log.w(TAG, ex);
+                    Log.e(TAG, ex);
                 }
             }
             while (this.IsRunning);
-        }
-
-        /// <summary>
-        /// Waits before continuing.
-        /// </summary>
-        private void WaitBeforeContinue()
-        {
-            Thread.Sleep(1000);
-        }
-
-        /// <summary>
-        /// Sends the device list monitoring request.
-        /// </summary>
-        /// <returns></returns>
-        private bool SendDeviceListMonitoringRequest()
-        {
-            byte[] request = AdbHelper.FormAdbRequest("host:track-devices");
-
-            if (AdbHelper.Write(this.MainAdbConnection, request) == false)
-            {
-                Log.e(TAG, "Sending Tracking request failed!");
-                this.MainAdbConnection.Close();
-                throw new IOException("Sending Tracking request failed!");
-            }
-
-            AdbResponse resp = AdbHelper.ReadAdbResponse(this.MainAdbConnection, false /* readDiagString */);
-
-            if (!resp.IOSuccess)
-            {
-                Log.e(TAG, "Failed to read the adb response!");
-                this.MainAdbConnection.Close();
-                throw new IOException("Failed to read the adb response!");
-            }
-
-            if (!resp.Okay)
-            {
-                // request was refused by adb!
-                Log.e(TAG, "adb refused request: {0}", resp.Message);
-            }
-
-            return resp.Okay;
         }
 
         /// <summary>
         /// Processes the incoming device data.
         /// </summary>
-        /// <param name="length">The length.</param>
-        private void ProcessIncomingDeviceData(int length)
+        private void ProcessIncomingDeviceData(string result)
         {
-            List<Device> list = new List<Device>();
+            List<DeviceData> list = new List<DeviceData>();
 
-            if (length > 0)
+            string[] devices = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            devices.ForEach(d =>
             {
-                byte[] buffer = new byte[length];
-                string result = this.Read(this.MainAdbConnection, buffer);
-
-                string[] devices = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                devices.ForEach(d =>
+                try
                 {
-                    try
+                    var dv = DeviceData.CreateFromAdbData(d);
+                    if (dv != null)
                     {
-                        var dv = Device.CreateFromAdbData(d);
-                        if (dv != null)
-                        {
-                            list.Add(dv);
-                        }
+                        list.Add(dv);
                     }
-                    catch (ArgumentException ae)
-                    {
-                        Log.e(TAG, ae);
-                    }
-                });
-            }
+                }
+                catch (ArgumentException ae)
+                {
+                    Log.e(TAG, ae);
+                }
+            });
 
             // now merge the new devices with the old ones.
             this.UpdateDevices(list);
         }
 
-        private void UpdateDevices(List<Device> list)
+        private void UpdateDevices(List<DeviceData> list)
         {
-            // because we are going to call mServer.deviceDisconnected which will acquire this lock
-            // we lock it first, so that the AndroidDebugBridge lock is always locked first.
-            lock (AndroidDebugBridge.GetLock())
+            lock (this.Devices)
             {
-                lock (this.Devices)
+                // For each device in the current list, we look for a matching the new list.
+                // * if we find it, we update the current object with whatever new information
+                //   there is
+                //   (mostly state change, if the device becomes ready, we query for build info).
+                //   We also remove the device from the new list to mark it as "processed"
+                // * if we do not find it, we remove it from the current list.
+                // Once this is done, the new list contains device we aren't monitoring yet, so we
+                // add them to the list, and start monitoring them.
+
+                // Add or update existing devices
+                foreach (var device in list)
                 {
-                    // For each device in the current list, we look for a matching the new list.
-                    // * if we find it, we update the current object with whatever new information
-                    //   there is
-                    //   (mostly state change, if the device becomes ready, we query for build info).
-                    //   We also remove the device from the new list to mark it as "processed"
-                    // * if we do not find it, we remove it from the current list.
-                    // Once this is done, the new list contains device we aren't monitoring yet, so we
-                    // add them to the list, and start monitoring them.
-                    for (int d = 0; d < this.Devices.Count;)
+                    var existingDevice = this.Devices.SingleOrDefault(d => d.Serial == device.Serial);
+
+                    if (existingDevice == null)
                     {
-                        Device device = this.Devices[d];
-
-                        // look for a similar device in the new list.
-                        int count = list.Count;
-                        bool foundMatch = false;
-                        for (int dd = 0; dd < count; dd++)
-                        {
-                            Device newDevice = list[dd];
-
-                            // see if it matches in id and serial number.
-                            if (string.Compare(newDevice.SerialNumber, device.SerialNumber, true) == 0)
-                            {
-                                foundMatch = true;
-
-                                // update the state if needed.
-                                if (device.State != newDevice.State)
-                                {
-                                    device.State = newDevice.State;
-                                    device.OnStateChanged(EventArgs.Empty);
-
-                                    // if the device just got ready/online, we need to start
-                                    // monitoring it.
-                                    if (device.IsOnline)
-                                    {
-                                        if (AndroidDebugBridge.ClientSupport)
-                                        {
-                                            if (this.StartMonitoringDevice(device) == false)
-                                            {
-                                                Log.e(TAG, "Failed to start monitoring {0}", device.SerialNumber);
-                                            }
-                                        }
-
-                                        if (device.Properties.Count == 0)
-                                        {
-                                            this.QueryNewDeviceForInfo(device);
-                                        }
-                                    }
-                                }
-
-                                // remove the new device from the list since it's been used
-                                list.RemoveAt(dd);
-                                break;
-                            }
-                        }
-
-                        if (foundMatch == false)
-                        {
-                            // the device is gone, we need to remove it, and keep current index
-                            // to process the next one.
-                            this.RemoveDevice(device);
-                            device.State = DeviceState.Offline;
-                            device.OnStateChanged(EventArgs.Empty);
-                            this.Server.OnDeviceDisconnected(new DeviceEventArgs(device));
-                        }
-                        else
-                        {
-                            // process the next one
-                            d++;
-                        }
-                    }
-
-                    // at this point we should still have some new devices in newList, so we
-                    // process them.
-                    foreach (Device newDevice in list)
-                    {
-                        // add them to the list
-                        this.Devices.Add(newDevice);
-                        if (this.Server != null)
-                        {
-                            newDevice.State = DeviceState.Online;
-                            newDevice.OnStateChanged(EventArgs.Empty);
-                            this.Server.OnDeviceConnected(new DeviceEventArgs(newDevice));
-                        }
-
-                        // start monitoring them.
-                        if (AndroidDebugBridge.ClientSupport)
-                        {
-                            if (newDevice.IsOnline)
-                            {
-                                this.StartMonitoringDevice(newDevice);
-                            }
-                        }
-
-                        // look for their build info.
-                        if (newDevice.IsOnline)
-                        {
-                            this.QueryNewDeviceForInfo(newDevice);
-                        }
-                    }
-                }
-            }
-
-            list.Clear();
-        }
-
-        /// <summary>
-        /// Removes the device.
-        /// </summary>
-        /// <param name="device">The device.</param>
-        private void RemoveDevice(Device device)
-        {
-            this.Devices.Remove(device);
-
-            Socket channel = device.ClientMonitoringSocket;
-            if (channel != null)
-            {
-                try
-                {
-                    channel.Close();
-                }
-                catch (IOException)
-                {
-                    // doesn't really matter if the close fails.
-                }
-            }
-        }
-
-        private void QueryNewDeviceForInfo(Device device)
-        {
-            // TODO: do this in a separate thread.
-            try
-            {
-                // first get the list of properties.
-                if (device.State != DeviceState.Offline && device.State != DeviceState.Unknown)
-                {
-                    // get environment variables
-                    this.QueryNewDeviceForEnvironmentVariables(device);
-
-                    // instead of getting the 3 hard coded ones, we use mount command and get them all...
-                    // if that fails, then it automatically falls back to the hard coded ones.
-                    this.QueryNewDeviceForMountingPoint(device);
-
-                    // now get the emulator Virtual Device name (if applicable).
-                    if (device.IsEmulator)
-                    {
-                        /*EmulatorConsole console = EmulatorConsole.getConsole ( device );
-                        if ( console != null ) {
-                            device.AvdName = console.AvdName;
-                        }*/
-                    }
-                }
-            }
-            catch (IOException)
-            {
-                // if we can't get the build info, it doesn't matter too much
-            }
-        }
-
-        private void QueryNewDeviceForEnvironmentVariables(Device device)
-        {
-            try
-            {
-                if (device.State != DeviceState.Offline && device.State != DeviceState.Unknown)
-                {
-                    device.RefreshEnvironmentVariables();
-                }
-            }
-            catch (IOException)
-            {
-                // if we can't get the build info, it doesn't matter too much
-            }
-        }
-
-        private void QueryNewDeviceForMountingPoint(Device device)
-        {
-            try
-            {
-                if (device.State != DeviceState.Offline && device.State != DeviceState.Unknown)
-                {
-                    device.RefreshMountPoints();
-                }
-            }
-            catch (IOException)
-            {
-                // if we can't get the build info, it doesn't matter too much
-            }
-        }
-
-        private bool StartMonitoringDevice(Device device)
-        {
-            Socket socket = this.OpenAdbConnection();
-
-            if (socket != null)
-            {
-                try
-                {
-                    bool result = this.SendDeviceMonitoringRequest(socket, device);
-                    if (result)
-                    {
-                        /*if ( Selector == null ) {
-                            StartDeviceMonitorThread ( );
-                        }*/
-
-                        device.ClientMonitoringSocket = socket;
-
-                        lock (this.Devices)
-                        {
-                            socket.Blocking = true;
-                        }
-
-                        return true;
-                    }
-                }
-                catch (IOException e)
-                {
-                    try
-                    {
-                        // attempt to close the socket if needed.
-                        socket.Close();
-                    }
-                    catch (IOException e1)
-                    {
-                        // we can ignore that one. It may already have been closed.
-                    }
-
-                    Log.d(TAG, "Connection Failure when starting to monitor device '{0}' : {1}", device, e.Message);
-                }
-            }
-
-            return false;
-        }
-
-        private void StartDeviceMonitorThread()
-        {
-            Thread t = new Thread(new ThreadStart(this.DeviceClientMonitorLoop));
-            t.Name = "Device Client Monitor";
-            t.Start();
-        }
-
-        private void DeviceClientMonitorLoop()
-        {
-            do
-            {
-                try
-                {
-                    // This synchronized block stops us from doing the select() if a new
-                    // Device is being added.
-                    // @see startMonitoringDevice()
-                    lock (this.Devices)
-                    {
-                    }
-
-                    int count = 0;
-
-                    if (!this.IsRunning)
-                    {
-                        return;
-                    }
-
-                    if (count == 0)
-                    {
-                        continue;
-                    }
-
-                    /*List<SelectionKey> keys = Selector.selectedKeys();
-                    List<SelectionKey>.Enumerator iter = keys.GetEnumerator();
-
-                    while (iter.MoveNext()) {
-                            SelectionKey key = iter.next();
-                            iter.remove();
-
-                            if (key.isValid() && key.isReadable()) {
-                                    Object attachment = key.attachment();
-
-                                    if (attachment instanceof Device) {
-                                            Device device = (Device)attachment;
-
-                                            SocketChannel socket = device.getClientMonitoringSocket();
-
-                                            if (socket != null) {
-                                                    try {
-                                                            int length = readLength(socket, mLengthBuffer2);
-
-                                                            processIncomingJdwpData(device, socket, length);
-                                                    } catch (IOException ioe) {
-                                                            Log.d("DeviceMonitor",
-                                                                            "Error reading jdwp list: " + ioe.getMessage());
-                                                            socket.close();
-
-                                                            // restart the monitoring of that device
-                                                            synchronized (mDevices) {
-                                                                    if (mDevices.contains(device)) {
-                                                                            Log.d("DeviceMonitor",
-                                                                                            "Restarting monitoring service for " + device);
-                                                                            startMonitoringDevice(device);
-                                                                    }
-                                                            }
-                                                    }
-                                            }
-                                    }
-                            }
-                    }*/
-                }
-                catch (IOException e)
-                {
-                    if (!this.IsRunning)
-                    {
-                    }
-                }
-            }
-            while (this.IsRunning);
-        }
-
-        /// <summary>
-        /// Sends the device monitoring request.
-        /// </summary>
-        /// <param name="socket">The socket.</param>
-        /// <param name="device">The device.</param>
-        /// <returns></returns>
-        private bool SendDeviceMonitoringRequest(Socket socket, Device device)
-        {
-            AdbHelper.Instance.SetDevice(socket, device);
-            byte[] request = AdbHelper.FormAdbRequest("track-jdwp");
-            if (!AdbHelper.Write(socket, request))
-            {
-                Log.e(TAG, "Sending jdwp tracking request failed!");
-                socket.Close();
-                throw new IOException();
-            }
-
-            AdbResponse resp = AdbHelper.ReadAdbResponse(socket, false /* readDiagString */);
-            if (resp.IOSuccess == false)
-            {
-                Log.e(TAG, "Failed to read the adb response!");
-                socket.Close();
-                throw new IOException();
-            }
-
-            if (resp.Okay == false)
-            {
-                // request was refused by adb!
-                Log.e(TAG, "adb refused request: " + resp.Message);
-            }
-
-            return resp.Okay;
-        }
-
-        /// <summary>
-        /// Gets the next debugger port.
-        /// </summary>
-        /// <returns></returns>
-        private int GetNextDebuggerPort()
-        {
-            // get the first port and remove it
-            lock (this.DebuggerPorts)
-            {
-                if (this.DebuggerPorts.Count > 0)
-                {
-                    int port = this.DebuggerPorts[0];
-
-                    // remove it.
-                    this.DebuggerPorts.RemoveAt(0);
-
-                    // if there's nothing left, add the next port to the list
-                    if (this.DebuggerPorts.Count == 0)
-                    {
-                        this.DebuggerPorts.Add(port + 1);
-                    }
-
-                    return port;
-                }
-            }
-
-            return -1;
-        }
-
-        /// <summary>
-        /// Adds the port to available list.
-        /// </summary>
-        /// <param name="port">The port.</param>
-        public void AddPortToAvailableList(int port)
-        {
-            if (port > 0)
-            {
-                lock (this.DebuggerPorts)
-                {
-                    // because there could be case where clients are closed twice, we have to make
-                    // sure the port number is not already in the list.
-                    if (this.DebuggerPorts.IndexOf(port) == -1)
-                    {
-                        // add the port to the list while keeping it sorted. It's not like there's
-                        // going to be tons of objects so we do it linearly.
-                        int count = this.DebuggerPorts.Count;
-                        for (int i = 0; i < count; i++)
-                        {
-                            if (port < this.DebuggerPorts[i])
-                            {
-                                this.DebuggerPorts.Insert(i, port);
-                                break;
-                            }
-                        }
-
-                        // TODO: check if we can compact the end of the list.
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Reads the length of the next message from a socket.
-        /// </summary>
-        /// <param name="socket">The Socket to read from.</param>
-        /// <param name="buffer"></param>
-        /// <returns>the length, or 0 (zero) if no data is available from the socket.</returns>
-        private int ReadLength(Socket socket, byte[] buffer)
-        {
-            string msg = this.Read(socket, buffer);
-            if (msg != null)
-            {
-                try
-                {
-                    int len = int.Parse(msg, System.Globalization.NumberStyles.HexNumber);
-                    return len;
-                }
-                catch (FormatException nfe)
-                {
-                    // we'll throw an exception below.
-                }
-            }
-
-            // we receive something we can't read. It's better to reset the connection at this point.
-            return -1;
-        }
-
-        /// <summary>
-        /// Reads the specified socket.
-        /// </summary>
-        /// <param name="socket">The socket.</param>
-        /// <param name="data">The data.</param>
-        /// <returns></returns>
-        private string Read(Socket socket, byte[] data)
-        {
-            int count = -1;
-            int totalRead = 0;
-
-            while (count != 0 && totalRead < data.Length)
-            {
-                try
-                {
-                    int left = data.Length - totalRead;
-                    int buflen = left < socket.ReceiveBufferSize ? left : socket.ReceiveBufferSize;
-
-                    byte[] buffer = new byte[buflen];
-                    socket.ReceiveBufferSize = buffer.Length;
-                    count = socket.Receive(buffer, buflen, SocketFlags.None);
-                    if (count < 0)
-                    {
-                        throw new IOException("EOF");
-                    }
-                    else if (count == 0)
-                    {
+                        this.Devices.Add(device);
                     }
                     else
                     {
-                        Array.Copy(buffer, 0, data, totalRead, count);
-                        totalRead += count;
+                        existingDevice.State = device.State;
                     }
                 }
-                catch (SocketException sex)
+
+                // Remove devices
+                foreach (var device in this.Devices.Where(d => !list.Any(e => e.Serial == d.Serial)).ToArray())
                 {
-                    if (!this.IsRunning)
-                    {
-                        return string.Empty;
-                    }
-                    else
-                    {
-                        if (sex.Message.Contains("connection was aborted"))
-                        {
-                            // ignore this?
-                            return string.Empty;
-                        }
-                        else
-                        {
-                            throw new IOException(string.Format("No Data to read: {0}", sex.Message));
-                        }
-                    }
+                    this.Devices.Remove(device);
                 }
             }
-
-            return data.GetString(AdbHelper.DefaultEncoding);
-        }
-
-        /// <summary>
-        /// Attempts to connect to the debug bridge server.
-        /// </summary>
-        /// <returns>a connect socket if success, null otherwise</returns>
-        private Socket OpenAdbConnection()
-        {
-            Log.d(TAG, "Connecting to adb for Device List Monitoring...");
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
-            {
-                socket.Connect(AndroidDebugBridge.SocketAddress);
-                socket.NoDelay = true;
-            }
-            catch (IOException e)
-            {
-                Log.w(TAG, e);
-            }
-
-            return socket;
         }
     }
 }
