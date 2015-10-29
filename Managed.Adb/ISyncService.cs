@@ -17,7 +17,7 @@ namespace Managed.Adb
     /// </summary>
     public interface ISyncService : IDisposable
     {
-        Device Device { get; }
+        DeviceData Device { get; }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/PushFile/*'/>
         SyncResult PushFile(string local, string remote, ISyncProgressMonitor monitor);
@@ -29,7 +29,7 @@ namespace Managed.Adb
         void Close();
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
-        bool Open();
+        void Open();
 
         /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
         bool IsOpen {get; }

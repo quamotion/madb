@@ -25,6 +25,16 @@ namespace Managed.Adb
             this.socket.Blocking = true;
         }
 
+        public bool Connected
+        {
+            get { return this.socket.Connected; }
+        }
+
+        public void Close()
+        {
+            this.socket.Close();
+        }
+
         public virtual void Dispose()
         {
             this.socket.Dispose();
@@ -52,6 +62,21 @@ namespace Managed.Adb
             {
                 this.socket.ReceiveTimeout = currentTimeout;
             }
+        }
+
+        public virtual void SendFileRequest(string command, string path, SyncService.FileMode mode)
+        {
+            byte[] commandContent = command.GetBytes(AdbHelper.Encoding);
+            byte[] pathContent = path.GetBytes(AdbHelper.Encoding);
+
+            byte[] request = SyncService.CreateSendFileRequest(commandContent, pathContent, mode);
+            AdbHelper.Write(this.socket, request, -1, DdmPreferences.Timeout);
+        }
+
+        public virtual void SendSyncRequest(string command, int value)
+        {
+            var msg = SyncService.CreateRequest(command, value);
+            AdbHelper.Write(this.socket, msg, -1, DdmPreferences.Timeout);
         }
 
         public virtual string ReadString()
@@ -93,6 +118,11 @@ namespace Managed.Adb
             {
                 throw new IOException($"Failed sending the request '{request}' to ADB");
             }
+        }
+
+        public Socket Socket
+        {
+            get;
         }
     }
 }

@@ -17,6 +17,8 @@ namespace Managed.Adb.Extensions
         /// <include file='.\ISyncService.xml' path='/SyncService/Pull/*'/>
         public static SyncResult Pull(this ISyncService syncService, IEnumerable<FileEntry> entries, String localPath, ISyncProgressMonitor monitor)
         {
+            throw new NotImplementedException();
+            /*
             if (monitor == null)
             {
                 throw new ArgumentNullException("monitor", "Monitor cannot be null");
@@ -49,6 +51,7 @@ namespace Managed.Adb.Extensions
             monitor.Stop();
 
             return result;
+            */
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/PullFile/*'/>

@@ -629,10 +629,14 @@ namespace Managed.Adb
         {
             get
             {
-                ISyncService syncService = new SyncService(AndroidDebugBridge.SocketAddress, this);
-                if (syncService.Open())
+                ISyncService syncService = new SyncService(AndroidDebugBridge.SocketAddress, this.DeviceData);
+                try
                 {
+                    syncService.Open();
                     return syncService;
+                }
+                catch (Exception)
+                {
                 }
 
                 return null;

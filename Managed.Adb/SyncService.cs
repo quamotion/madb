@@ -74,30 +74,6 @@ namespace Managed.Adb
             FIFO = 0x1000  // type: fifo
         }
 
-        /*private const int S_ISOCK = 0xc000; // type: symbolic link
-        private const int S_IFLNK = 0xa000; // type: symbolic link
-        private const int S_IFREG = 0x8000; // type: regular file
-        private const int S_IFBLK = 0x6000; // type: block device
-        private const int S_IFDIR = 0x4000; // type: directory
-        private const int S_IFCHR = 0x2000; // type: character device
-        private const int S_IFIFO = 0x1000; // type: fifo
-
-        private const int S_ISUID = 0x0800; // set-uid bit
-        private const int S_ISGID = 0x0400; // set-gid bit
-        private const int S_ISVTX = 0x0200; // sticky bit
-        private const int S_IRWXU = 0x01C0; // user permissions
-        private const int S_IRUSR = 0x0100; // user: read;
-        private const int S_IWUSR = 0x0080; // user: write;
-        private const int S_IXUSR = 0x0040; // user: execute;
-        private const int S_IRWXG = 0x0038; // group permissions
-        private const int S_IRGRP = 0x0020; // group: read;
-        private const int S_IWGRP = 0x0010; // group: write;
-        private const int S_IXGRP = 0x0008; // group: execute;
-        private const int S_IRWXO = 0x0007; // other permissions
-        private const int S_IROTH = 0x0004; // other: read;
-        private const int S_IWOTH = 0x0002; // other: write;
-        private const int S_IXOTH = 0x0001; // other: execute;*/
-
         private const int SYNC_DATA_MAX = 64 * 1024;
         private const int REMOTE_PATH_MAX_LENGTH = 1024;
 
@@ -147,7 +123,7 @@ namespace Managed.Adb
         /// <param name="command">the 4 byte command (STAT, RECV, ...).</param>
         /// <param name="value"></param>
         /// <returns>the byte[] to send to the device through adb</returns>
-        private static byte[] CreateRequest(string command, int value)
+        internal static byte[] CreateRequest(string command, int value)
         {
             return CreateRequest(Encoding.Default.GetBytes(command), value);
         }
@@ -201,7 +177,7 @@ namespace Managed.Adb
             return CreateSendFileRequest(Encoding.Default.GetBytes(command), Encoding.Default.GetBytes(path), mode);
         }
 
-        private static byte[] CreateSendFileRequest(byte[] command, byte[] path, FileMode mode)
+        internal static byte[] CreateSendFileRequest(byte[] command, byte[] path, FileMode mode)
         {
             string modeString = string.Format(",{0}", (int)mode & 0777);
             byte[] modeContent = null;
@@ -228,7 +204,7 @@ namespace Managed.Adb
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        public SyncService(Device device)
+        public SyncService(DeviceData device)
             : this(AndroidDebugBridge.SocketAddress, device)
         {
         }
@@ -238,7 +214,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="address">The address.</param>
         /// <param name="device">The device.</param>
-        public SyncService(IPEndPoint address, Device device)
+        public SyncService(IPEndPoint address, DeviceData device)
         {
             this.Address = address;
             this.Device = device;
@@ -259,9 +235,9 @@ namespace Managed.Adb
         /// <value>
         /// The device.
         /// </value>
-        public Device Device { get; private set; }
+        public DeviceData Device { get; private set; }
 
-        private Socket Channel { get; set; }
+        private IAdbSocket Channel { get; set; }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
         public bool IsOpen
@@ -273,34 +249,22 @@ namespace Managed.Adb
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
-        public bool Open()
+        public void Open()
         {
             if (this.IsOpen)
             {
-                return true;
+                return;
             }
 
             try
             {
-                this.Channel = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                this.Channel.Connect(this.Address);
-                this.Channel.Blocking = true;
+                this.Channel = AdbHelper.SocketFactory.Create(this.Address);
 
                 // target a specific device
                 AdbHelper.Instance.SetDevice(this.Channel, this.Device);
 
-                byte[] request = AdbHelper.FormAdbRequest("sync:");
-                AdbHelper.Write(this.Channel, request, -1, DdmPreferences.Timeout);
-
-                AdbResponse resp = AdbHelper.ReadAdbResponse(this.Channel, false /* readDiagString */);
-
-                if (!resp.IOSuccess || !resp.Okay)
-                {
-                    Log.w("ddms:syncservice", "Got timeout or unhappy response from ADB sync req: {0}", resp.Message);
-                    this.Channel.Close();
-                    this.Channel = null;
-                    return false;
-                }
+                this.Channel.SendAdbRequest("sync:");
+                var resp = this.Channel.ReadAdbResponse(false);
             }
             catch (IOException)
             {
@@ -308,7 +272,7 @@ namespace Managed.Adb
                 throw;
             }
 
-            return true;
+            return;
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Close/*'/>
@@ -396,9 +360,7 @@ namespace Managed.Adb
             Log.i(TAG, "Remote File: {0}", remotePath);
             try
             {
-                byte[] remotePathContent = remotePath.GetBytes(AdbHelper.DefaultEncoding);
-
-                if (remotePathContent.Length > REMOTE_PATH_MAX_LENGTH)
+                if (remotePath.Length > REMOTE_PATH_MAX_LENGTH)
                 {
                     return new SyncResult(ErrorCodeHelper.RESULT_REMOTE_PATH_LENGTH);
                 }
@@ -411,9 +373,6 @@ namespace Managed.Adb
 
                 // create the stream to read the file
                 fs = new FileStream(local, System.IO.FileMode.Open, FileAccess.Read);
-
-                // create the header for the action
-                msg = CreateSendFileRequest(SEND.GetBytes(), remotePathContent, (FileMode)0644);
             }
             catch (EncoderFallbackException e)
             {
@@ -428,7 +387,7 @@ namespace Managed.Adb
             // file and network IO exceptions.
             try
             {
-                AdbHelper.Write(this.Channel, msg, -1, timeOut);
+                this.Channel.SendFileRequest(SEND, remotePath, (FileMode)0644);
             }
             catch (IOException e)
             {
@@ -478,7 +437,7 @@ namespace Managed.Adb
                 // now write it
                 try
                 {
-                    AdbHelper.Write(this.Channel, DataBuffer, readCount + 8, timeOut);
+                    AdbHelper.Write(this.Channel.Socket, DataBuffer, readCount + 8, timeOut);
                 }
                 catch (IOException e)
                 {
@@ -506,12 +465,12 @@ namespace Managed.Adb
                 msg = CreateRequest(DONE, (int)time);
 
                 // and send it.
-                AdbHelper.Write(this.Channel, msg, -1, timeOut);
+                AdbHelper.Write(this.Channel.Socket, msg, -1, timeOut);
 
                 // read the result, in a byte array containing 2 ints
                 // (id, size)
                 byte[] result = new byte[8];
-                AdbHelper.Read(this.Channel, result, -1 /* full length */, timeOut);
+                AdbHelper.Read(this.Channel.Socket, result, -1 /* full length */, timeOut);
 
                 if (!CheckResult(result, OKAY.GetBytes()))
                 {
@@ -520,7 +479,7 @@ namespace Managed.Adb
                         // read some error message...
                         int len = result.Swap32bitFromArray(4);
 
-                        AdbHelper.Read(this.Channel, DataBuffer, len, timeOut);
+                        AdbHelper.Read(this.Channel.Socket, DataBuffer, len, timeOut);
 
                         // output the result?
                         string message = DataBuffer.GetString(0, len);
@@ -625,11 +584,11 @@ namespace Managed.Adb
                 msg = CreateFileRequest(RECV.GetBytes(), remotePathContent);
 
                 // and send it.
-                AdbHelper.Write(this.Channel, msg, -1, timeOut);
+                AdbHelper.Write(this.Channel.Socket, msg, -1, timeOut);
 
                 // read the result, in a byte array containing 2 ints
                 // (id, size)
-                AdbHelper.Read(this.Channel, pullResult, -1, timeOut);
+                AdbHelper.Read(this.Channel.Socket, pullResult, -1, timeOut);
 
                 // check we have the proper data back
                 if (CheckResult(pullResult, DATA.GetBytes()) == false &&
@@ -700,10 +659,10 @@ namespace Managed.Adb
                     try
                     {
                         // now read the length we received
-                        AdbHelper.Read(this.Channel, data, length, timeOut);
+                        AdbHelper.Read(this.Channel.Socket, data, length, timeOut);
 
                         // get the header for the next packet.
-                        AdbHelper.Read(this.Channel, pullResult, -1, timeOut);
+                        AdbHelper.Read(this.Channel.Socket, pullResult, -1, timeOut);
                     }
                     catch (IOException e)
                     {
@@ -778,12 +737,12 @@ namespace Managed.Adb
                 // create the stat request message.
                 byte[] msg = CreateFileRequest(STAT, path);
 
-                AdbHelper.Write(this.Channel, msg, -1 /* full length */, DdmPreferences.Timeout);
+                AdbHelper.Write(this.Channel.Socket, msg, -1 /* full length */, DdmPreferences.Timeout);
 
                 // read the result, in a byte array containing 4 ints
                 // (id, mode, size, time)
                 byte[] statResult = new byte[16];
-                AdbHelper.Read(this.Channel, statResult, -1 /* full length */, DdmPreferences.Timeout);
+                AdbHelper.Read(this.Channel.Socket, statResult, -1 /* full length */, DdmPreferences.Timeout);
 
                 // check we have the proper data back
                 if (CheckResult(statResult, Encoding.Default.GetBytes(STAT)) == false)
