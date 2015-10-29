@@ -122,7 +122,7 @@ namespace Managed.Adb.Tests
                 "host:devices-l"
             };
 
-            List<Device> devices = null;
+            List<DeviceData> devices = null;
 
             this.RunTest(
                 responses,
@@ -139,10 +139,10 @@ namespace Managed.Adb.Tests
 
             var device = devices.Single();
             
-            Assert.AreEqual("169.254.109.177:5555", device.SerialNumber);
+            Assert.AreEqual("169.254.109.177:5555", device.Serial);
             Assert.AreEqual(DeviceState.Online, device.State);
             Assert.AreEqual("5__KitKat__4_4__XXHDPI_Phone", device.Model);
-            Assert.AreEqual("donatello", device.DeviceProperty);
+            Assert.AreEqual("donatello", device.Name);
         }
 
         [TestMethod]

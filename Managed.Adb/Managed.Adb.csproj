@@ -111,6 +111,7 @@
     <Compile Include="AndroidDebugBridgeEventArgs.cs" />
     <Compile Include="BatteryInfo.cs" />
     <Compile Include="ColorData.cs" />
+    <Compile Include="DeviceData.cs" />
     <Compile Include="Exceptions\CommandAbortingException.cs" />
     <Compile Include="Exceptions\PackageInstallationException.cs" />
     <Compile Include="Exceptions\ShellCommandUnresponsiveException.cs" />

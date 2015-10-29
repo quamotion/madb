@@ -133,24 +133,11 @@ namespace Managed.Adb
             return FormAdbRequest(request);
         }
 
-        /// <summary>
-        /// Kills the running adb server.
-        /// </summary>
-        /// <param name="address">The address.</param>
-        /// <exception cref="System.IO.IOException">failed asking to kill adb</exception>
-        public void KillAdb(IPEndPoint address)
-        {
-            using (IAdbSocket socket = SocketFactory.Create(address))
-            {
-                socket.SendAdbRequest("host:kill");
-
-                // The host will immediately close the connection after the kill
-                // command has been sent; no need to read the response.
-            }
-        }
+        // The individual services are listed in the same order as
+        // https://android.googlesource.com/platform/system/core/+/master/adb/SERVICES.TXT
 
         /// <summary>
-        /// Gets the adb version of the server.
+        /// Ask the ADB server for its internal version number.
         /// </summary>
         /// <param name="address">
         /// The address where ADB is listening.
@@ -173,6 +160,53 @@ namespace Managed.Adb
                 var version = socket.ReadString();
 
                 return int.Parse(version, NumberStyles.HexNumber);
+            }
+        }
+
+        /// <summary>
+        /// Ask the ADB server to quit immediately. This is used when the
+        /// ADB client detects that an obsolete server is running after an
+        /// upgrade.
+        /// </summary>
+        /// <param name="address">
+        /// The address where ADB is listening.
+        /// </param>
+        /// <exception cref="System.IO.IOException">failed asking to kill adb</exception>
+        public void KillAdb(IPEndPoint address)
+        {
+            using (IAdbSocket socket = SocketFactory.Create(address))
+            {
+                socket.SendAdbRequest("host:kill");
+
+                // The host will immediately close the connection after the kill
+                // command has been sent; no need to read the response.
+            }
+        }
+
+        /// <summary>
+        /// Gets the devices that are available for communication.
+        /// </summary>
+        /// <param name="address">The address.</param>
+        /// <returns>A list of devices that are connected.</returns>
+        /// <gist id="a8acf10d48370d138247" />
+        public List<DeviceData> GetDevices(IPEndPoint address)
+        {
+            using (IAdbSocket socket = SocketFactory.Create(address))
+            {
+                socket.SendAdbRequest("host:devices-l");
+                socket.ReadAdbResponse(false);
+                var reply = socket.ReadString();
+
+                string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                List<DeviceData> s = new List<DeviceData>();
+                data.ForEach(item =>
+                {
+                    var device = DeviceData.CreateFromAdbData(item);
+                    s.Add(device);
+                });
+
+                return s;
             }
         }
 
@@ -595,33 +629,6 @@ namespace Managed.Adb
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Gets the devices that are available for communication.
-        /// </summary>
-        /// <param name="address">The address.</param>
-        /// <returns>A list of devices that are connected.</returns>
-        /// <gist id="a8acf10d48370d138247" />
-        public List<Device> GetDevices(IPEndPoint address)
-        {
-            using (IAdbSocket socket = SocketFactory.Create(address))
-            {
-                socket.SendAdbRequest("host:devices-l");
-                socket.ReadAdbResponse(false);
-                var reply = socket.ReadString();
-
-                string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-
-                List<Device> s = new List<Device>();
-                data.ForEach(item =>
-                {
-                    var device = Device.CreateFromAdbData(item);
-                    s.Add(device);
-                });
-
-                return s;
-            }
         }
 
         /// <summary>

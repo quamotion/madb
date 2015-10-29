@@ -126,7 +126,7 @@ namespace Managed.Adb
         /// Device list info regex
         /// </summary>
         /// <workitem>21136</workitem>
-        private const string RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download|unauthorized)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
+        internal const string RE_DEVICELIST_INFO = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download|unauthorized)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
 
         /// <summary>
         /// The tag to use when logging messages.
@@ -168,6 +168,11 @@ namespace Managed.Adb
         /// </summary>
         private DateTime lastBatteryCheckTime = DateTime.MinValue;
 
+        public Device(DeviceData data)
+            : this(data.Serial, data.State, data.Model, data.Product, data.Name)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Device"/> class.
         /// </summary>
@@ -206,7 +211,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="state">The device state string</param>
         /// <returns></returns>
-        private static DeviceState GetStateFromString(string state)
+        internal static DeviceState GetStateFromString(string state)
         {
             string tstate = state;
 

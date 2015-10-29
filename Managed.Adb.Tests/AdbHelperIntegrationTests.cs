@@ -15,26 +15,6 @@ namespace Managed.Adb.Tests
     {
         [TestMethod]
         [TestCategory("IntegrationTest")]
-        public void GetDevicesTest()
-        {
-            List<Device> devices = AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress);
-            Assert.IsTrue(devices.Count >= 1);
-            foreach (var item in devices)
-            {
-                Console.WriteLine("{0}\t{1}{2}", item.SerialNumber, item.State, item.IsEmulator ? " - Emulator" : String.Empty);
-            }
-        }
-
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
-        public void KillAdbTest()
-        {
-            var device = GetFirstDevice();
-            AdbHelper.Instance.KillAdb(AndroidDebugBridge.SocketAddress);
-        }
-
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
         public void DeviceGetMountPointsTest()
         {
             Device device = GetFirstDevice();

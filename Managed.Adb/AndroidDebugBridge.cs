@@ -536,7 +536,8 @@ namespace Managed.Adb
         {
             get
             {
-                return AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress);
+                return AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress)
+                    .Select(d => new Device(d)).ToList();
             }
         }
 

@@ -7,9 +7,9 @@ using System.Text;
 namespace Managed.Adb.Tests {
 	public class BaseDeviceTests {
 		protected Device GetFirstDevice( ) {
-			List<Device> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
+			List<DeviceData> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
 			Assert.IsTrue ( devices.Count >= 1 );
-			return devices[0];
+			return new Device(devices[0]);
 		}
 
 	}
