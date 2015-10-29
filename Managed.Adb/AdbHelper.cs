@@ -9,6 +9,7 @@ namespace Managed.Adb
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
@@ -374,8 +375,8 @@ namespace Managed.Adb
         /// <summary>
         /// Remove a port forwarding between a local and a remote port.
         /// </summary>
-        /// <param name="address">
-        /// The socket address to connect to adb
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
         /// </param>
         /// <param name="device">
         /// The device on which to remove the port forwarding
@@ -383,9 +384,9 @@ namespace Managed.Adb
         /// <param name="localPort">
         /// Specification of the local port that was forwarded
         /// </param>
-        public void RemoveForward(IPEndPoint address, DeviceData device, int localPort)
+        public void RemoveForward(IPEndPoint endPoint, DeviceData device, int localPort)
         {
-            using (IAdbSocket socket = SocketFactory.Create(address))
+            using (IAdbSocket socket = SocketFactory.Create(endPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
                 var response = socket.ReadAdbResponse(false);
@@ -395,20 +396,252 @@ namespace Managed.Adb
         /// <summary>
         /// Removes all forwards for a given device.
         /// </summary>
-        /// <param name="address">
-        /// The socket address to connect to adb
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
         /// </param>
         /// <param name="device">
         /// The device on which to remove the port forwarding
         /// </param>
-        public void RemoveAllForward(IPEndPoint address, DeviceData device)
+        public void RemoveAllForward(IPEndPoint endPoint, DeviceData device)
         {
-            using (IAdbSocket socket = SocketFactory.Create(address))
+            using (IAdbSocket socket = SocketFactory.Create(endPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
                 var response = socket.ReadAdbResponse(false);
             }
         }
+
+        /// <summary>
+        /// List all existing forward connections from this server.
+        /// </summary>
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
+        /// </param>
+        /// <param name="device">
+        /// The device for which to list the existing foward connections.
+        /// </param>
+        /// <returns>
+        /// A <see cref="ForwardData"/> entry for each existing forward connection.
+        /// </returns>
+        public IEnumerable<ForwardData> ListForward(IPEndPoint endPoint, DeviceData device)
+        {
+            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            {
+                socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
+                var response = socket.ReadAdbResponse(false);
+
+                var data = socket.ReadString();
+
+                var parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                return parts.Select(p => ForwardData.FromString(p));
+            }
+        }
+
+        /// <summary>
+        /// Executes the remote command.
+        /// </summary>
+        /// <param name="endPoint">
+        /// The endpoint at which the Android Debug Bridge is listening.
+        /// </param>
+        /// <param name="command">
+        /// The command to execute.
+        /// </param>
+        /// <param name="device">
+        /// The device on which to execute the command.
+        /// </param>
+        /// <param name="rcvr">
+        /// A <see cref="IShellOutputReceiver"/> that receives the command output. Set to <see langword="null"/>
+        /// if you are not interested in the output.
+        /// </param>
+        /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
+        /// <exception cref="System.OperationCanceledException"></exception>
+        /// <exception cref="System.IO.FileNotFoundException">
+        /// </exception>
+        /// <exception cref="Managed.Adb.Exceptions.UnknownOptionException"></exception>
+        /// <exception cref="Managed.Adb.Exceptions.CommandAbortingException"></exception>
+        /// <exception cref="Managed.Adb.Exceptions.PermissionDeniedException"></exception>
+        /// <exception cref="Managed.Adb.Exceptions.ShellCommandUnresponsiveException"></exception>
+        /// <exception cref="AdbException">failed submitting shell command</exception>
+        /// <exception cref="UnknownOptionException"></exception>
+        /// <exception cref="CommandAbortingException"></exception>
+        /// <exception cref="PermissionDeniedException"></exception>
+        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
+        {
+            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            {
+                this.SetDevice(socket, device);
+                socket.SendAdbRequest($"shell:{command}");
+                var resopnse = socket.ReadAdbResponse(false);
+
+                try
+                {
+                    // Read in blocks of 16kb
+                    byte[] data = new byte[16 * 1024];
+
+                    while (true)
+                    {
+                        if (rcvr != null && rcvr.IsCancelled)
+                        {
+                            Log.w(TAG, "execute: cancelled");
+                            throw new OperationCanceledException();
+                        }
+
+                        int count = socket.Read(data, maxTimeToOutputResponse);
+
+                        if (count == 0)
+                        {
+                            // we're at the end, we flush the output
+                            rcvr.Flush();
+                            Log.w(TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count);
+                            break;
+                        }
+                        else
+                        {
+                            // Attempt to detect error messages and throw an exception based on them. The caller can override
+                            // this behavior by specifying a receiver that has the ParsesErrors flag set to true; in this case,
+                            // the receiver is responsible for all error handling.
+                            if (rcvr == null || !rcvr.ParsesErrors)
+                            {
+                                string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                string sdata = data.GetString(0, count, AdbHelper.DefaultEncoding);
+
+                                var sdataTrimmed = sdata.Trim();
+                                if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))
+                                {
+                                    Log.w(TAG, "The remote execution returned: '{0}: not found'", cmd[0]);
+                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}: not found'", cmd[0]));
+                                }
+
+                                if (sdataTrimmed.EndsWith("No such file or directory"))
+                                {
+                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
+                                    throw new FileNotFoundException(string.Format("The remote execution returned: {0}", sdataTrimmed));
+                                }
+
+                                // for "unknown options"
+                                if (sdataTrimmed.Contains("Unknown option"))
+                                {
+                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
+                                    throw new UnknownOptionException(sdataTrimmed);
+                                }
+
+                                // for "aborting" commands
+                                if (sdataTrimmed.IsMatch("Aborting.$"))
+                                {
+                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
+                                    throw new CommandAbortingException(sdataTrimmed);
+                                }
+
+                                // for busybox applets
+                                // cmd: applet not found
+                                if (sdataTrimmed.IsMatch("applet not found$") && cmd.Length > 1)
+                                {
+                                    Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
+                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
+                                }
+
+                                // checks if the permission to execute the command was denied.
+                                // workitem: 16822
+                                if (sdataTrimmed.IsMatch("(permission|access) denied$"))
+                                {
+                                    Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
+                                    throw new PermissionDeniedException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
+                                }
+                            }
+
+                            // Add the data to the receiver
+                            if (rcvr != null)
+                            {
+                                rcvr.AddOutput(data, 0, count);
+                            }
+                        }
+                    }
+                }
+                catch (SocketException)
+                {
+                    throw new ShellCommandUnresponsiveException();
+                }
+                finally
+                {
+                    rcvr.Flush();
+                }
+            }
+        }
+
+        // shell: not implemented
+        // remount: not implemented
+        // dev:<path> not implemented
+        // tcp:<port> not implemented
+        // tcp:<port>:<server-name> not implemented
+        // local:<path> not implemented
+        // localreserved:<path> not implemented
+        // localabstract:<path> not implemented
+
+        /// <summary>
+        /// Gets the frame buffer from the specified end point.
+        /// </summary>
+        /// <param name="adbSockAddr">The adb sock addr.</param>
+        /// <param name="device">The device.</param>
+        /// <returns>Returns the RawImage.</returns>
+        /// <exception cref="Managed.Adb.Exceptions.AdbException">
+        /// failed asking for frame buffer
+        /// or
+        /// failed nudging
+        /// </exception>
+        public RawImage GetFrameBuffer(IPEndPoint adbSockAddr, DeviceData device)
+        {
+            using (IAdbSocket socket = SocketFactory.Create(adbSockAddr))
+            {
+                RawImage imageParams = new RawImage();
+                socket.SendAdbRequest($"host-serial:{device.Serial}:framebuffer:");
+                socket.ReadAdbResponse(false);
+
+                // After the OKAY, the service sends 16-byte binary structure
+                // containing the following fields (little - endian format):
+                // depth:
+                //    uint32_t:
+                //    framebuffer depth
+                // size: uint32_t: framebuffer size in bytes
+                // width:   uint32_t: framebuffer width in pixels
+                // height:  uint32_t: framebuffer height in pixels
+
+                // first the protocol version.
+                var reply = new byte[4];
+                socket.Read(reply);
+                int version = BitConverter.ToInt16(reply, 0);
+
+                // get the header size (this is a count of int)
+                int headerSize = RawImage.GetHeaderSize(version);
+
+                // read the header
+                reply = new byte[headerSize * 4];
+                socket.Read(reply);
+
+                using (MemoryStream ms = new MemoryStream(reply))
+                using (BinaryReader reader = new BinaryReader(ms))
+                {
+                    // fill the RawImage with the header
+                    if (imageParams.ReadHeader(version, reader) == false)
+                    {
+                        Log.w(TAG, "Unsupported protocol: " + version);
+                        return null;
+                    }
+                }
+
+                Log.d(TAG, $"image params: bpp={imageParams.Bpp}, size={imageParams.Size}, width={imageParams.Width}, height={imageParams.Height}");
+
+                reply = new byte[imageParams.Size];
+                socket.Read(reply);
+                imageParams.Data = reply;
+                return imageParams;
+            }
+        }
+
+        // jdwp:<pid>: not implemented
+        // track-jdwp: not implemented
+        // sync: not implemented
+        // reverse:<forward-command>: not implemented
 
         /// <summary>
         /// Write until all data in "data" is written or the connection fails or times out.
@@ -692,120 +925,6 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Gets the frame buffer from the specified end point.
-        /// </summary>
-        /// <param name="adbSockAddr">The adb sock addr.</param>
-        /// <param name="device">The device.</param>
-        /// <returns>Returns the RawImage.</returns>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// failed asking for frame buffer
-        /// or
-        /// failed nudging
-        /// </exception>
-        public RawImage GetFrameBuffer(IPEndPoint adbSockAddr, IDevice device)
-        {
-            RawImage imageParams = new RawImage();
-            byte[] request = FormAdbRequest("framebuffer:");
-            byte[] nudge =
-            {
-                        0
-                };
-            byte[] reply;
-
-            Socket adbChan = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
-            {
-                adbChan.Connect(adbSockAddr);
-                adbChan.Blocking = true;
-
-                // if the device is not -1, then we first tell adb we're looking to talk
-                // to a specific device
-                this.SetDevice(adbChan, device);
-                if (!Write(adbChan, request))
-                {
-                    throw new AdbException("failed asking for frame buffer");
-                }
-
-                AdbResponse resp = ReadAdbResponse(adbChan, false /* readDiagString */);
-                if (!resp.IOSuccess || !resp.Okay)
-                {
-                    Log.w(TAG, "Got timeout or unhappy response from ADB fb req: " + resp.Message);
-                    adbChan.Close();
-                    return null;
-                }
-
-                // first the protocol version.
-                reply = new byte[4];
-                if (!Read(adbChan, reply))
-                {
-                    Log.w(TAG, "got partial reply from ADB fb:");
-
-                    adbChan.Close();
-                    return null;
-                }
-
-                BinaryReader buf;
-                int version = 0;
-                using (MemoryStream ms = new MemoryStream(reply))
-                {
-                    buf = new BinaryReader(ms);
-                    version = buf.ReadInt16();
-                }
-
-                // get the header size (this is a count of int)
-                int headerSize = RawImage.GetHeaderSize(version);
-
-                // read the header
-                reply = new byte[headerSize * 4];
-                if (!Read(adbChan, reply))
-                {
-                    Log.w(TAG, "got partial reply from ADB fb:");
-
-                    adbChan.Close();
-                    return null;
-                }
-
-                using (MemoryStream ms = new MemoryStream(reply))
-                {
-                    buf = new BinaryReader(ms);
-
-                    // fill the RawImage with the header
-                    if (imageParams.ReadHeader(version, buf) == false)
-                    {
-                        Log.w(TAG, "Unsupported protocol: " + version);
-                        return null;
-                    }
-                }
-
-                Log.d(TAG, $"image params: bpp={imageParams.Bpp}, size={imageParams.Size}, width={imageParams.Width}, height={imageParams.Height}");
-
-                if (!Write(adbChan, nudge))
-                {
-                    throw new AdbException("failed nudging");
-                }
-
-                reply = new byte[imageParams.Size];
-                if (!Read(adbChan, reply))
-                {
-                    Log.w(TAG, "got truncated reply from ADB fb data");
-                    adbChan.Close();
-                    return null;
-                }
-
-                imageParams.Data = reply;
-            }
-            finally
-            {
-                if (adbChan != null)
-                {
-                    adbChan.Close();
-                }
-            }
-
-            return imageParams;
-        }
-
-        /// <summary>
         /// Executes a shell command on the remote device
         /// </summary>
         /// <param name="endPoint">The end point.</param>
@@ -831,128 +950,6 @@ namespace Managed.Adb
         public void ExecuteRemoteRootCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
             this.ExecuteRemoteCommand(endPoint, string.Format("su -c \"{0}\"", command), device, rcvr);
-        }
-
-        /// <summary>
-        /// Executes the remote command.
-        /// </summary>
-        /// <param name="endPoint">The end point.</param>
-        /// <param name="command">The command.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="rcvr">The RCVR.</param>
-        /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
-        /// <exception cref="System.OperationCanceledException"></exception>
-        /// <exception cref="System.IO.FileNotFoundException">
-        /// </exception>
-        /// <exception cref="Managed.Adb.Exceptions.UnknownOptionException"></exception>
-        /// <exception cref="Managed.Adb.Exceptions.CommandAbortingException"></exception>
-        /// <exception cref="Managed.Adb.Exceptions.PermissionDeniedException"></exception>
-        /// <exception cref="Managed.Adb.Exceptions.ShellCommandUnresponsiveException"></exception>
-        /// <exception cref="AdbException">failed submitting shell command</exception>
-        /// <exception cref="UnknownOptionException"></exception>
-        /// <exception cref="CommandAbortingException"></exception>
-        /// <exception cref="PermissionDeniedException"></exception>
-        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
-        {
-            using (IAdbSocket socket = SocketFactory.Create(endPoint))
-            {
-                this.SetDevice(socket, device);
-                socket.SendAdbRequest($"shell:{command}");
-                var resopnse = socket.ReadAdbResponse(false);
-
-                try
-                {
-                    // Read in blocks of 16kb
-                    byte[] data = new byte[16 * 1024];
-
-                    while (true)
-                    {
-                        if (rcvr != null && rcvr.IsCancelled)
-                        {
-                            Log.w(TAG, "execute: cancelled");
-                            throw new OperationCanceledException();
-                        }
-
-                        int count = socket.Read(data, maxTimeToOutputResponse);
-
-                        if (count == 0)
-                        {
-                            // we're at the end, we flush the output
-                            rcvr.Flush();
-                            Log.w(TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count);
-                            break;
-                        }
-                        else
-                        {
-                            // Attempt to detect error messages and throw an exception based on them. The caller can override
-                            // this behavior by specifying a receiver that has the ParsesErrors flag set to true; in this case,
-                            // the receiver is responsible for all error handling.
-                            if (rcvr == null || !rcvr.ParsesErrors)
-                            {
-                                string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                string sdata = data.GetString(0, count, AdbHelper.DefaultEncoding);
-
-                                var sdataTrimmed = sdata.Trim();
-                                if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))
-                                {
-                                    Log.w(TAG, "The remote execution returned: '{0}: not found'", cmd[0]);
-                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}: not found'", cmd[0]));
-                                }
-
-                                if (sdataTrimmed.EndsWith("No such file or directory"))
-                                {
-                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new FileNotFoundException(string.Format("The remote execution returned: {0}", sdataTrimmed));
-                                }
-
-                                // for "unknown options"
-                                if (sdataTrimmed.Contains("Unknown option"))
-                                {
-                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new UnknownOptionException(sdataTrimmed);
-                                }
-
-                                // for "aborting" commands
-                                if (sdataTrimmed.IsMatch("Aborting.$"))
-                                {
-                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new CommandAbortingException(sdataTrimmed);
-                                }
-
-                                // for busybox applets
-                                // cmd: applet not found
-                                if (sdataTrimmed.IsMatch("applet not found$") && cmd.Length > 1)
-                                {
-                                    Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
-                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
-                                }
-
-                                // checks if the permission to execute the command was denied.
-                                // workitem: 16822
-                                if (sdataTrimmed.IsMatch("(permission|access) denied$"))
-                                {
-                                    Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
-                                    throw new PermissionDeniedException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
-                                }
-                            }
-
-                            // Add the data to the receiver
-                            if (rcvr != null)
-                            {
-                                rcvr.AddOutput(data, 0, count);
-                            }
-                        }
-                    }
-                }
-                catch (SocketException)
-                {
-                    throw new ShellCommandUnresponsiveException();
-                }
-                finally
-                {
-                    rcvr.Flush();
-                }
-            }
         }
 
         /// <summary>

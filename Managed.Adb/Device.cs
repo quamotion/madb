@@ -647,7 +647,7 @@ namespace Managed.Adb
         {
             get
             {
-                return AdbHelper.Instance.GetFrameBuffer(AndroidDebugBridge.SocketAddress, this);
+                return AdbHelper.Instance.GetFrameBuffer(AndroidDebugBridge.SocketAddress, this.DeviceData);
             }
         }
 
