@@ -134,79 +134,18 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Opens the specified address on the device on the specified port.
-        /// </summary>
-        /// <param name="address">The address.</param>
-        /// <param name="device">The device.</param>
-        /// <param name="port">The port.</param>
-        /// <returns>The open socket</returns>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// failed submitting request to ADB
-        /// or
-        /// connection request rejected
-        /// </exception>
-        public Socket Open(IPAddress address, IDevice device, int port)
-        {
-            Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
-            {
-                s.Connect(address, port);
-                s.Blocking = true;
-                s.NoDelay = false;
-
-                this.SetDevice(s, device);
-
-                byte[] req = CreateAdbForwardRequest(null, port);
-                if (!Write(s, req))
-                {
-                    throw new AdbException("failed submitting request to ADB");
-                }
-
-                AdbResponse resp = ReadAdbResponse(s, false);
-                if (!resp.Okay)
-                {
-                    throw new AdbException("connection request rejected");
-                }
-
-                s.Blocking = true;
-            }
-            catch (AdbException)
-            {
-                s.Close();
-                throw;
-            }
-
-            return s;
-        }
-
-        /// <summary>
         /// Kills the running adb server.
         /// </summary>
         /// <param name="address">The address.</param>
-        /// <returns>0 for success; -1 for failure.</returns>
         /// <exception cref="System.IO.IOException">failed asking to kill adb</exception>
-        /// <gist id="cbacc7b384ec7a4c27f7" />
-        public int KillAdb(IPEndPoint address)
+        public void KillAdb(IPEndPoint address)
         {
-            byte[] request = FormAdbRequest("host:kill");
-            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            using (IAdbSocket socket = SocketFactory.Create(address))
             {
-                socket.Connect(address);
-                socket.Blocking = true;
-                if (!Write(socket, request))
-                {
-                    throw new IOException("failed asking to kill adb");
-                }
+                socket.SendAdbRequest("host:kill");
 
-                var resp = ReadAdbResponse(socket, false);
-                if (!resp.IOSuccess || !resp.Okay)
-                {
-                    Log.e(TAG, "Got timeout or unhappy response from ADB req: " + resp.Message);
-                    socket.Close();
-                    return -1;
-                }
-
-                return 0;
+                // The host will immediately close the connection after the kill
+                // command has been sent; no need to read the response.
             }
         }
 
@@ -235,55 +174,6 @@ namespace Managed.Adb
 
                 return int.Parse(version, NumberStyles.HexNumber);
             }
-        }
-
-        /// <summary>
-        /// Creates and connects a new pass-through socket, from the host to a port on the device.
-        /// </summary>
-        /// <param name="endpoint">The endpoint.</param>
-        /// <param name="device">the device to connect to. Can be null in which case the connection will be
-        /// to the first available device.</param>
-        /// <param name="pid">the process pid to connect to.</param>
-        /// <returns>
-        /// The Socket
-        /// </returns>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// failed submitting request to ADB
-        /// or
-        /// connection request rejected:  + resp.Message
-        /// </exception>
-        public Socket CreatePassThroughConnection(IPEndPoint endpoint, IDevice device, int pid)
-        {
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
-            {
-                socket.Connect(endpoint);
-                socket.NoDelay = true;
-
-                // if the device is not -1, then we first tell adb we're looking to
-                // talk to a specific device
-                this.SetDevice(socket, device);
-
-                byte[] req = this.CreateJdwpForwardRequest(pid);
-
-                if (!Write(socket, req))
-                {
-                    throw new AdbException("failed submitting request to ADB");
-                }
-
-                AdbResponse resp = ReadAdbResponse(socket, false /* readDiagString */);
-                if (!resp.Okay)
-                {
-                    throw new AdbException("connection request rejected: " + resp.Message);
-                }
-            }
-            catch (AdbException ioe)
-            {
-                socket.Close();
-                throw ioe;
-            }
-
-            return socket;
         }
 
         /// <summary>
@@ -1292,21 +1182,6 @@ namespace Managed.Adb
 
                 return 0;
             }
-        }
-
-        /// <summary>
-        /// Creates a port forwarding request to a jdwp process.
-        /// </summary>
-        /// <param name="pid">
-        /// The jdwp process pid on the device.
-        /// </param>
-        /// <returns>
-        /// An array containing <c>####jwdp:{pid}</c>.
-        /// </returns>
-        private byte[] CreateJdwpForwardRequest(int pid)
-        {
-            string req = string.Format("jdwp:{0}", pid);
-            return FormAdbRequest(req);
         }
 
         /// <summary>

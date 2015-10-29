@@ -50,6 +50,28 @@ namespace Managed.Adb.Tests
         }
 
         [TestMethod]
+        public void KillAdbTest()
+        {
+            var responses = new AdbResponse[] { };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                "host:kill"
+            };
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () =>
+                {
+                    AdbHelper.Instance.KillAdb(this.endPoint);
+                });
+        }
+
+        [TestMethod]
         public void GetAdbVersionTest()
         {
             var responses = new AdbResponse[]
