@@ -85,6 +85,10 @@ namespace Managed.Adb
             }
         }
 
+        /// <summary>
+        /// Gets or sets an instance of the <see cref="IAdbSocketFactory"/> that is used
+        /// to create new <see cref="IAdbSocket"/> objects.
+        /// </summary>
         public static IAdbSocketFactory SocketFactory
         { get; set; } = new AdbSocketFactory();
 
@@ -711,29 +715,15 @@ namespace Managed.Adb
         /// <gist id="a8acf10d48370d138247" />
         public List<Device> GetDevices(IPEndPoint address)
         {
-            // -l will return additional data
-            using (var socket = this.ExecuteRawSocketCommand(address, "host:devices-l"))
+            using (IAdbSocket socket = SocketFactory.Create(address))
             {
-                byte[] reply = new byte[4];
+                socket.SendAdbRequest("host:devices-l");
+                socket.ReadAdbResponse(false);
+                var reply = socket.ReadString();
 
-                if (!Read(socket, reply))
-                {
-                    Log.e(TAG, "error in getting data length");
-                    return null;
-                }
-
-                string lenHex = reply.GetString(Encoding.Default);
-                int len = int.Parse(lenHex, System.Globalization.NumberStyles.HexNumber);
-
-                reply = new byte[len];
-                if (!Read(socket, reply))
-                {
-                    Log.e(TAG, "error in getting data");
-                    return null;
-                }
+                string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
                 List<Device> s = new List<Device>();
-                string[] data = reply.GetString(Encoding.Default).Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                 data.ForEach(item =>
                 {
                     var device = Device.CreateFromAdbData(item);

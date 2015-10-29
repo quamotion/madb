@@ -54,13 +54,7 @@ namespace Managed.Adb.Tests
         {
             var responses = new AdbResponse[]
             {
-                new AdbResponse()
-                {
-                    IOSuccess = true,
-                    Okay = true,
-                    Message = string.Empty,
-                    Timeout = false
-                }
+                AdbResponse.OK
             };
 
             var responseMessages = new string[]
@@ -86,6 +80,47 @@ namespace Managed.Adb.Tests
 
             // Make sure and the correct value is returned.
             Assert.AreEqual(32, version);
+        }
+
+        [TestMethod]
+        public void GetDevicesTest()
+        {
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[]
+            {
+                "169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"
+            };
+
+            var requests = new string[]
+            {
+                "host:devices-l"
+            };
+
+            List<Device> devices = null;
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () =>
+                {
+                    devices = AdbHelper.Instance.GetDevices(endPoint);
+                });
+
+            // Make sure and the correct value is returned.
+            Assert.IsNotNull(devices);
+            Assert.AreEqual(1, devices.Count);
+
+            var device = devices.Single();
+            
+            Assert.AreEqual("169.254.109.177:5555", device.SerialNumber);
+            Assert.AreEqual(DeviceState.Online, device.State);
+            Assert.AreEqual("5__KitKat__4_4__XXHDPI_Phone", device.Model);
+            Assert.AreEqual("donatello", device.DeviceProperty);
         }
 
         /// <summary>

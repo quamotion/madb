@@ -22,6 +22,15 @@ namespace Managed.Adb
             this.Message = string.Empty;
         }
 
+        public static AdbResponse OK
+        { get; } = new AdbResponse()
+        {
+            IOSuccess = true,
+            Okay = true,
+            Message = string.Empty,
+            Timeout = false
+        };
+
         /// <summary>
         /// Gets or sets a value indicating whether the IO communication was a success.
         /// </summary>
