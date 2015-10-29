@@ -24,9 +24,8 @@ namespace Managed.Adb
         void SendFileRequest(string command, string path, SyncService.FileMode mode);
         void SendSyncRequest(string command, int value);
 
-        Socket Socket
-        {
-            get;
-        }
+        void Send(byte[] data, int length, int timeout);
+
+        void Read(byte[] data, int length, int timeout);
     }
 }

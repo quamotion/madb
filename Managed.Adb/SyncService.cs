@@ -437,7 +437,7 @@ namespace Managed.Adb
                 // now write it
                 try
                 {
-                    AdbHelper.Write(this.Channel.Socket, DataBuffer, readCount + 8, timeOut);
+                    this.Channel.Send(DataBuffer, readCount + 8, timeOut);
                 }
                 catch (IOException e)
                 {
@@ -465,12 +465,12 @@ namespace Managed.Adb
                 msg = CreateRequest(DONE, (int)time);
 
                 // and send it.
-                AdbHelper.Write(this.Channel.Socket, msg, -1, timeOut);
+                this.Channel.Send(msg, -1, timeOut);
 
                 // read the result, in a byte array containing 2 ints
                 // (id, size)
                 byte[] result = new byte[8];
-                AdbHelper.Read(this.Channel.Socket, result, -1 /* full length */, timeOut);
+                this.Channel.Read(result, -1 /* full length */, timeOut);
 
                 if (!CheckResult(result, OKAY.GetBytes()))
                 {
@@ -479,7 +479,7 @@ namespace Managed.Adb
                         // read some error message...
                         int len = result.Swap32bitFromArray(4);
 
-                        AdbHelper.Read(this.Channel.Socket, DataBuffer, len, timeOut);
+                        this.Channel.Read(DataBuffer, len, timeOut);
 
                         // output the result?
                         string message = DataBuffer.GetString(0, len);
@@ -584,11 +584,11 @@ namespace Managed.Adb
                 msg = CreateFileRequest(RECV.GetBytes(), remotePathContent);
 
                 // and send it.
-                AdbHelper.Write(this.Channel.Socket, msg, -1, timeOut);
+                this.Channel.Send(msg, -1, timeOut);
 
                 // read the result, in a byte array containing 2 ints
                 // (id, size)
-                AdbHelper.Read(this.Channel.Socket, pullResult, -1, timeOut);
+                this.Channel.Read(pullResult, -1, timeOut);
 
                 // check we have the proper data back
                 if (CheckResult(pullResult, DATA.GetBytes()) == false &&
@@ -659,10 +659,10 @@ namespace Managed.Adb
                     try
                     {
                         // now read the length we received
-                        AdbHelper.Read(this.Channel.Socket, data, length, timeOut);
+                        this.Channel.Read(data, length, timeOut);
 
                         // get the header for the next packet.
-                        AdbHelper.Read(this.Channel.Socket, pullResult, -1, timeOut);
+                        this.Channel.Read(pullResult, -1, timeOut);
                     }
                     catch (IOException e)
                     {
@@ -737,12 +737,12 @@ namespace Managed.Adb
                 // create the stat request message.
                 byte[] msg = CreateFileRequest(STAT, path);
 
-                AdbHelper.Write(this.Channel.Socket, msg, -1 /* full length */, DdmPreferences.Timeout);
+                this.Channel.Send(msg, -1 /* full length */, DdmPreferences.Timeout);
 
                 // read the result, in a byte array containing 4 ints
                 // (id, mode, size, time)
                 byte[] statResult = new byte[16];
-                AdbHelper.Read(this.Channel.Socket, statResult, -1 /* full length */, DdmPreferences.Timeout);
+                this.Channel.Read(statResult, -1 /* full length */, DdmPreferences.Timeout);
 
                 // check we have the proper data back
                 if (CheckResult(statResult, Encoding.Default.GetBytes(STAT)) == false)

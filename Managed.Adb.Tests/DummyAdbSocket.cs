@@ -80,5 +80,15 @@ namespace Managed.Adb.Tests
         {
             throw new NotImplementedException();
         }
+
+        public void Send(byte[] data, int length, int timeout)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Read(byte[] data, int length, int timeout)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

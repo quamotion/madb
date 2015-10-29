@@ -120,6 +120,16 @@ namespace Managed.Adb
             }
         }
 
+        public virtual void Send(byte[] data, int length, int timeout)
+        {
+            AdbHelper.Write(this.socket, data, length, timeout);
+        }
+
+        public virtual void Read(byte[] data, int length, int timeout)
+        {
+            AdbHelper.Read(this.socket, data, length, timeout);
+        }
+
         public Socket Socket
         {
             get;
