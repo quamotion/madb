@@ -6,6 +6,8 @@ namespace Managed.Adb
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
@@ -14,8 +16,6 @@ namespace Managed.Adb
     using Managed.Adb.Exceptions;
     using Managed.Adb.Logs;
     using MoreLinq;
-    using System.Diagnostics;
-    using System.Globalization;
 
     /// <summary>
     /// <para>

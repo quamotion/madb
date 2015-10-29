@@ -97,7 +97,7 @@ namespace Managed.Adb
                     try
                     {
                         var i = int.Parse(match.Groups[1].Value);
-                        this.BatteryInfo.Status = i.ToEnum<BatteryInfo.StatusTypes>();
+                        this.BatteryInfo.Status = (BatteryInfo.StatusTypes)i;
                     }
                     catch (FormatException)
                     {
@@ -111,7 +111,7 @@ namespace Managed.Adb
                     try
                     {
                         var i = int.Parse(match.Groups[1].Value);
-                        this.BatteryInfo.Health = i.ToEnum<BatteryInfo.HealthTypes>();
+                        this.BatteryInfo.Health = (BatteryInfo.HealthTypes)i;
                     }
                     catch (FormatException)
                     {

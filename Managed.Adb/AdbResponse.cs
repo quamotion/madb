@@ -53,5 +53,31 @@ namespace Managed.Adb
         /// The message.
         /// </value>
         public string Message { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as AdbResponse;
+
+            if (other == null)
+            {
+                return false;
+            }
+
+            return other.IOSuccess == this.IOSuccess
+                && string.Equals(other.Message, this.Message, StringComparison.OrdinalIgnoreCase)
+                && other.Okay == this.Okay
+                && other.Timeout == this.Timeout;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = (hash * 23) + this.IOSuccess.GetHashCode();
+            hash = (hash * 23) + this.Message == null ? 0 : this.Message.GetHashCode();
+            hash = (hash * 23) + this.Okay.GetHashCode();
+            hash = (hash * 23) + this.Timeout.GetHashCode();
+
+            return hash;
+        }
     }
 }

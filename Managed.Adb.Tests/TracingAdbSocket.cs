@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Net;
 
 namespace Managed.Adb.Tests
 {
-    internal class DummyAdbSocket : IAdbSocket, IDummyAdbSocket
+    internal class TracingAdbSocket : AdbSocket, IDummyAdbSocket
     {
+        public TracingAdbSocket(IPEndPoint endPoint) : base(endPoint)
+        {
+        }
+
         public Queue<AdbResponse> Responses
         {
             get;
@@ -16,28 +19,30 @@ namespace Managed.Adb.Tests
 
         public List<string> Requests
         { get; } = new List<string>();
-
-        public void Dispose()
-        {
-        }
-
+        
         public void Read(byte[] data)
         {
+            base.Read(data);
         }
 
         public AdbResponse ReadAdbResponse(bool readDiagString)
         {
-            return this.Responses.Dequeue();
+            var response = base.ReadAdbResponse(readDiagString);
+            this.Responses.Enqueue(response);
+            return response;
         }
 
         public string ReadString()
         {
-            return this.ResponseMessages.Dequeue();
+            var value = base.ReadString();
+            this.ResponseMessages.Enqueue(value);
+            return value;
         }
 
         public void SendAdbRequest(string request)
         {
             this.Requests.Add(request);
+            base.SendAdbRequest(request);
         }
     }
 }

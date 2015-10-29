@@ -24,36 +24,143 @@ namespace Managed.Adb.Tests
             CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0012tcp:1981:127.0.0.1\n"), AdbHelper.CreateAdbForwardRequest("127.0.0.1", 1981));
         }
 
-        DummyAdbSocketFactory factory;
-        DummyAdbSocket socket;
+        IAdbSocketFactory factory;
+        IDummyAdbSocket socket;
         IPEndPoint endPoint;
+
+        bool integrationTest = true;
 
         [TestInitialize]
         public void Initialize()
         {
-            this.factory = new DummyAdbSocketFactory();
-            this.socket = factory.Socket;
+            // Use the tracing adb socket factory to run the tests on an actual device.
+            // use the dummy socket factory to run unit tests.
+            if (integrationTest)
+            {
+                this.factory = new TracingAdbSocketFactory();
+            }
+            else
+            {
+                this.factory = new DummyAdbSocketFactory();
+            }
+
+            this.socket = (IDummyAdbSocket)factory.Create(AndroidDebugBridge.SocketAddress);
             AdbHelper.SocketFactory = factory;
-            this.endPoint = new IPEndPoint(IPAddress.Loopback, 1);
+            this.endPoint = AndroidDebugBridge.SocketAddress;
         }
 
         [TestMethod]
         public void GetAdbVersionTest()
         {
-            socket.Responses.Enqueue(new AdbResponse());
-            socket.ResponseMessages.Enqueue("000f");
-            var version = AdbHelper.Instance.GetAdbVersion(endPoint);
+            var responses = new AdbResponse[]
+            {
+                new AdbResponse()
+                {
+                    IOSuccess = true,
+                    Okay = true,
+                    Message = string.Empty,
+                    Timeout = false
+                }
+            };
 
-            // Make sure the messages were read
-            Assert.AreEqual(0, socket.ResponseMessages.Count);
-            Assert.AreEqual(0, socket.Responses.Count);
+            var responseMessages = new string[]
+            {
+                "0020"
+            };
 
-            // Make sure a request was sent
-            Assert.AreEqual(1, socket.Requests.Count);
-            Assert.AreEqual("host:version", socket.Requests[0]);
+            var requests = new string[]
+            {
+                "host:version"
+            };
 
-            // ... and the correct value is returned.
-            Assert.AreEqual(15, version);
+            int version = 0;
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                () =>
+                {
+                    version = AdbHelper.Instance.GetAdbVersion(endPoint);
+                });
+
+            // Make sure and the correct value is returned.
+            Assert.AreEqual(32, version);
+        }
+
+        /// <summary>
+        /// <para>
+        /// Runs an ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the trafic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">
+        /// The <see cref="AdbResponse"/> messages that the ADB sever should send.
+        /// </param>
+        /// <param name="responseMessages">
+        /// The messages that should follow the <paramref name="responses"/>.
+        /// </param>
+        /// <param name="requests">
+        /// The requests the client should send.
+        /// </param>
+        /// <param name="test">
+        /// The test to run.
+        /// </param>
+        private void RunTest(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            Action test)
+        {
+            // If we are running unit tests, we need to mock all the responses
+            // that are sent by the device. Do that now.
+            if (!integrationTest)
+            {
+                foreach (var response in responses)
+                {
+                    socket.Responses.Enqueue(response);
+                }
+
+                foreach (var responseMessage in responseMessages)
+                {
+                    socket.ResponseMessages.Enqueue(responseMessage);
+                }
+            }
+
+            test();
+
+            if (!integrationTest)
+            {
+                // If we are running unit tests, we need to make sure all messages
+                // were read, and the correct request was sent.
+
+                // Make sure the messages were read
+                Assert.AreEqual(0, socket.ResponseMessages.Count);
+                Assert.AreEqual(0, socket.Responses.Count);
+
+                // Make sure a request was sent
+                Assert.AreEqual(1, socket.Requests.Count);
+                Assert.AreEqual("host:version", socket.Requests[0]);
+            }
+            else
+            {
+                // Make sure the traffic sent on the wire matches the traffic
+                // we have defined in our unit test.
+                CollectionAssert.AreEqual(requests.ToList(), socket.Requests);
+                CollectionAssert.AreEqual(responses.ToList(), socket.Responses);
+                CollectionAssert.AreEqual(responseMessages.ToList(), socket.ResponseMessages);
+            }
         }
     }
 }

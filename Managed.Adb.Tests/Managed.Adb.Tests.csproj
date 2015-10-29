@@ -71,9 +71,12 @@
     <Compile Include="DummyAdbSocket.cs" />
     <Compile Include="DummyAdbSocketFactory.cs" />
     <Compile Include="DummyDevice.cs" />
+    <Compile Include="IDummyAdbSocket.cs" />
     <Compile Include="LinkResolverReceiverTests.cs" />
     <Compile Include="LinuxPathTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TracingAdbSocket.cs" />
+    <Compile Include="TracingAdbSocketFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="madb.xunit" />
