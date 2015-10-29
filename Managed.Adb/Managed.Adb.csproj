@@ -149,7 +149,6 @@
     <Compile Include="Receivers\LinkResolverReceiver.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogLevel.cs" />
-    <Compile Include="MountPoint.cs" />
     <Compile Include="Logs\LogReceiver.cs" />
     <Compile Include="Receivers\MultilineReceiver.cs" />
     <Compile Include="Receivers\NullOutputReceiver.cs" />

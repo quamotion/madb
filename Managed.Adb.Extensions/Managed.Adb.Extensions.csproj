@@ -63,6 +63,7 @@
     <Compile Include="IDevice.cs" />
     <Compile Include="IFileListingService.cs" />
     <Compile Include="IFileSystem.cs" />
+    <Compile Include="MountPoint.cs" />
     <Compile Include="PackageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Receivers\BatteryReceiver.cs" />

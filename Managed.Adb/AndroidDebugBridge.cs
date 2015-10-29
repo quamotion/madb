@@ -123,11 +123,6 @@ namespace Managed.Adb
         private static AndroidDebugBridge instance;
 
         /// <summary>
-        ///
-        /// </summary>
-        private static bool clientSupport;
-
-        /// <summary>
         /// Gets or sets the socket address.
         /// </summary>
         /// <value>The socket address.</value>

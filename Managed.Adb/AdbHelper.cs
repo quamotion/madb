@@ -43,14 +43,14 @@ namespace Managed.Adb
         private const string TAG = "AdbHelper";
 
         /// <summary>
-        /// The default time to wait in the milliseconds.
-        /// </summary>
-        private const int WaitTime = 5;
-
-        /// <summary>
         /// The default port to use when connecting to a device over TCP/IP.
         /// </summary>
         private const int DefaultPort = 5555;
+
+        /// <summary>
+        /// The default time to wait in the milliseconds.
+        /// </summary>
+        private const int WaitTime = 5;
 
         /// <summary>
         /// The singleton instance of the <see cref="AdbHelper"/> class.
@@ -305,10 +305,10 @@ namespace Managed.Adb
         ///         <c>jdwp:&lt;pid&gt;</c>: JDWP thread on VM process &lt;pid&gt; on device.
         ///     </item>
         /// </list>
+        /// </param>
         /// <param name="allowRebind">
         /// If set to <see langword="true"/>, the request will fail if there is already a forward
         /// connection from <paramref name="local"/>.
-        /// </param>
         /// </param>
         public void CreateForward(IPEndPoint endPoint, DeviceData device, string local, string remote, bool allowRebind)
         {
@@ -644,287 +644,6 @@ namespace Managed.Adb
         // reverse:<forward-command>: not implemented
 
         /// <summary>
-        /// Write until all data in "data" is written or the connection fails or times out.
-        /// </summary>
-        /// <param name="socket">The socket to write to.</param>
-        /// <param name="data">The data to send.</param>
-        /// <returns>
-        /// Returns <see langword="true"/> if all data was written; otherwise,
-        /// <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// This uses the default time out value.
-        /// </remarks>
-        public static bool Write(Socket socket, byte[] data)
-        {
-            try
-            {
-                Write(socket, data, -1, DdmPreferences.Timeout);
-            }
-            catch (IOException e)
-            {
-                Log.e(TAG, e);
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Write until all data in <paramref name="data"/> is written, the optional <paramref name="length"/> is reached,
-        /// the <paramref name="timeout"/> expires, or the connection fails.
-        /// </summary>
-        /// <param name="socket">The socket to write the data to.</param>
-        /// <param name="data">The data to send.</param>
-        /// <param name="length">The length to write or -1 to send the whole buffer.</param>
-        /// <param name="timeout">The timeout value. A timeout of zero means "wait forever".</param>
-        /// <exception cref="AdbException">
-        /// channel EOF
-        /// or
-        /// timeout
-        /// </exception>
-        public static void Write(Socket socket, byte[] data, int length, int timeout)
-        {
-            int numWaits = 0;
-            int count = -1;
-
-            try
-            {
-                count = socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
-                if (count < 0)
-                {
-                    throw new AdbException("channel EOF");
-                }
-                else if (count == 0)
-                {
-                    // TODO: need more accurate timeout?
-                    if (timeout != 0 && numWaits * WaitTime > timeout)
-                    {
-                        throw new AdbException("timeout");
-                    }
-
-                    // non-blocking spin
-                    Thread.Sleep(WaitTime);
-                    numWaits++;
-                }
-                else
-                {
-                    numWaits = 0;
-                }
-            }
-            catch (SocketException sex)
-            {
-                Log.e(TAG, sex);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Reads the response from ADB after a command.
-        /// </summary>
-        /// <param name="socket">The socket channel that is connected to adb.</param>
-        /// <param name="readDiagString">
-        /// if <see langword="true"/>, we're expecting an <c>OKAY</c> response to be
-        /// followed by a diagnostic string. Otherwise, we only expect the
-        /// diagnostic string to follow a <c>FAIL</c>.</param>
-        /// <returns>
-        /// A <see cref="AdbResponse"/> that represents the response received from ADB.
-        /// </returns>
-        public static AdbResponse ReadAdbResponse(Socket socket, bool readDiagString)
-        {
-            AdbResponse resp = new AdbResponse();
-
-            byte[] reply = new byte[4];
-            if (!Read(socket, reply))
-            {
-                return resp;
-            }
-
-            resp.IOSuccess = true;
-
-            if (IsOkay(reply))
-            {
-                resp.Okay = true;
-            }
-            else
-            {
-                readDiagString = true; // look for a reason after the FAIL
-                resp.Okay = false;
-            }
-
-            // not a loop -- use "while" so we can use "break"
-            while (readDiagString)
-            {
-                // length string is in next 4 bytes
-                byte[] lenBuf = new byte[4];
-                if (!Read(socket, lenBuf))
-                {
-                    Log.w(TAG, "Expected diagnostic string not found");
-                    break;
-                }
-
-                string lenStr = ReplyToString(lenBuf);
-
-                int len;
-                try
-                {
-                    len = int.Parse(lenStr, System.Globalization.NumberStyles.HexNumber);
-                }
-                catch (FormatException)
-                {
-                    Log.e(TAG, "Expected digits, got '{0}' : {1} {2} {3} {4}", lenBuf[0], lenBuf[1], lenBuf[2], lenBuf[3]);
-                    Log.e(TAG, "reply was {0}", ReplyToString(reply));
-                    break;
-                }
-
-                byte[] msg = new byte[len];
-                if (!Read(socket, msg))
-                {
-                    Log.e(TAG, "Failed reading diagnostic string, len={0}", len);
-                    break;
-                }
-
-                resp.Message = ReplyToString(msg);
-                Log.e(TAG, "Got reply '{0}', diag='{1}'", ReplyToString(reply), resp.Message);
-
-                break;
-            }
-
-            return resp;
-        }
-
-        /// <summary>
-        /// Reads from the socket until the array is filled, or no more data is coming (because
-        /// the socket closed or the timeout expired).
-        /// </summary>
-        /// <param name="socket">
-        /// The opened socket to read from. It must be in non-blocking mode for timeouts to work.
-        /// </param>
-        /// <param name="data">
-        /// The buffer to store the read data into.</param>
-        /// <returns>
-        /// <see langword="true"/> if the data was read successfully; otherwise,
-        /// <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// This uses the default time out value.
-        /// </remarks>
-        public static bool Read(Socket socket, byte[] data)
-        {
-            try
-            {
-                Read(socket, data, -1, DdmPreferences.Timeout);
-            }
-            catch (AdbException e)
-            {
-                Log.e(TAG, e);
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Reads from the socket until the array is filled, the optional <paramref name="length"/>
-        /// is reached, or no more data is coming (because the socket closed or the
-        /// timeout expired). After <paramref name="timeout"/> milliseconds since the
-        /// previous successful read, this will return whether or not new data has
-        /// been found.
-        /// </summary>
-        /// <param name="socket">
-        /// The opened socket to read from. It must be in non-blocking
-        /// mode for timeouts to work
-        /// </param>
-        /// <param name="data">
-        /// The buffer to store the read data into.
-        /// </param>
-        /// <param name="length">
-        /// The length to read or -1 to fill the data buffer completely
-        /// </param>
-        /// <param name="timeout">
-        /// The timeout value in ms. A timeout of zero means "wait forever".
-        /// </param>
-        /// <exception cref="AdbException">
-        /// EOF
-        /// or
-        /// No Data to read: exception.Message
-        /// </exception>
-        public static void Read(Socket socket, byte[] data, int length, int timeout)
-        {
-            int expLen = length != -1 ? length : data.Length;
-            int count = -1;
-            int totalRead = 0;
-
-            while (count != 0 && totalRead < expLen)
-            {
-                try
-                {
-                    int left = expLen - totalRead;
-                    int buflen = left < socket.ReceiveBufferSize ? left : socket.ReceiveBufferSize;
-
-                    byte[] buffer = new byte[buflen];
-                    socket.ReceiveBufferSize = expLen;
-                    count = socket.Receive(buffer, buflen, SocketFlags.None);
-                    if (count < 0)
-                    {
-                        Log.e(TAG, "read: channel EOF");
-                        throw new AdbException("EOF");
-                    }
-                    else if (count == 0)
-                    {
-                        Log.i(TAG, "DONE with Read");
-                    }
-                    else
-                    {
-                        Array.Copy(buffer, 0, data, totalRead, count);
-                        totalRead += count;
-                    }
-                }
-                catch (SocketException sex)
-                {
-                    throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Determines whether the specified reply is okay.
-        /// </summary>
-        /// <param name="reply">The reply.</param>
-        /// <returns>
-        ///   <see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.
-        /// </returns>
-        public static bool IsOkay(byte[] reply)
-        {
-            return reply.GetString().Equals("OKAY");
-        }
-
-        /// <summary>
-        /// Converts an ADB reply to a string.
-        /// </summary>
-        /// <param name="reply">
-        /// A <see cref="byte"/> array that represents the ADB reply.
-        /// </param>
-        /// <returns>
-        /// A <see cref="string"/> that represents the ADB reply.
-        /// </returns>
-        public static string ReplyToString(byte[] reply)
-        {
-            string result;
-            try
-            {
-                result = Encoding.Default.GetString(reply);
-            }
-            catch (DecoderFallbackException uee)
-            {
-                Log.e(TAG, uee);
-                result = string.Empty;
-            }
-
-            return result;
-        }
-
-        /// <summary>
         /// Executes a shell command on the remote device
         /// </summary>
         /// <param name="endPoint">The end point.</param>
@@ -1075,18 +794,14 @@ namespace Managed.Adb
         /// <param name="address">
         /// The IP address of the remote device.
         /// </param>
-        /// <returns>
-        /// <c>0</c> if the operation completed successfully; otherwise,
-        /// <c>-1</c>.
-        /// </returns>
-        public int Connect(IPEndPoint adbEndpoint, IPAddress address)
+        public void Connect(IPEndPoint adbEndpoint, IPAddress address)
         {
             if (address == null)
             {
-                throw new ArgumentNullException("address");
+                throw new ArgumentNullException(nameof(address));
             }
 
-            return this.Connect(adbEndpoint, new IPEndPoint(address, DefaultPort));
+            this.Connect(adbEndpoint, new IPEndPoint(address, DefaultPort));
         }
 
         /// <summary>
@@ -1098,18 +813,14 @@ namespace Managed.Adb
         /// <param name="host">
         /// The host address of the remote device.
         /// </param>
-        /// <returns>
-        /// <c>0</c> if the operation completed successfully; otherwise,
-        /// <c>-1</c>.
-        /// </returns>
-        public int Connect(IPEndPoint adbEndpoint, string host)
+        public void Connect(IPEndPoint adbEndpoint, string host)
         {
             if (string.IsNullOrEmpty(host))
             {
                 throw new ArgumentNullException("host");
             }
 
-            return this.Connect(adbEndpoint, new DnsEndPoint(host, DefaultPort));
+            this.Connect(adbEndpoint, new DnsEndPoint(host, DefaultPort));
         }
 
         /// <summary>
@@ -1121,18 +832,14 @@ namespace Managed.Adb
         /// <param name="endpoint">
         /// The IP endpoint at which the <c>adb</c> server on the device is running.
         /// </param>
-        /// <returns>
-        /// <c>0</c> if the operation completed successfully; otherwise,
-        /// <c>-1</c>.
-        /// </returns>
-        public int Connect(IPEndPoint adbEndpoint, IPEndPoint endpoint)
+        public void Connect(IPEndPoint adbEndpoint, IPEndPoint endpoint)
         {
             if (endpoint == null)
             {
-                throw new ArgumentNullException("endpoint");
+                throw new ArgumentNullException(nameof(endpoint));
             }
 
-            return this.Connect(adbEndpoint, new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port));
+            this.Connect(adbEndpoint, new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port));
         }
 
         /// <summary>
@@ -1144,37 +851,12 @@ namespace Managed.Adb
         /// <param name="endpoint">
         /// The DNS endpoint at which the <c>adb</c> server on the device is running.
         /// </param>
-        /// <returns>
-        /// <c>0</c> if the operation completed successfully; otherwise,
-        /// <c>-1</c>.
-        /// </returns>
-        public int Connect(IPEndPoint adbEndpoint, DnsEndPoint endpoint)
+        public void Connect(IPEndPoint adbEndpoint, DnsEndPoint endpoint)
         {
-            if (endpoint == null)
+            using (IAdbSocket socket = SocketFactory.Create(adbEndpoint))
             {
-                throw new ArgumentNullException("endpoint");
-            }
-
-            byte[] request = FormAdbRequest(string.Format("host:connect:{0}:{1}", endpoint.Host, endpoint.Port));
-
-            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
-            {
-                socket.Connect(adbEndpoint);
-                socket.Blocking = true;
-                if (!Write(socket, request))
-                {
-                    throw new IOException("failed submitting request to  adb");
-                }
-
-                var resp = ReadAdbResponse(socket, false);
-                if (!resp.IOSuccess || !resp.Okay)
-                {
-                    Log.e(TAG, "Got timeout or unhappy response from ADB req: " + resp.Message);
-                    socket.Close();
-                    return -1;
-                }
-
-                return 0;
+                socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
+                var response = socket.ReadAdbResponse(false);
             }
         }
 
