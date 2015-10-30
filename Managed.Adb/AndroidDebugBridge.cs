@@ -4,15 +4,13 @@
 
 namespace Managed.Adb
 {
+    using Exceptions;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Net;
-    using System.Text;
     using System.Text.RegularExpressions;
-    using System.Threading;
 
     /// <summary>
     /// The android debug bridge
@@ -25,41 +23,34 @@ namespace Managed.Adb
         private const string TAG = "AndroidDebugBridge";
 
         /// <summary>
-        /// Occurs when [bridge changed].
+        /// Occurs when the status of the Android Debug Bridge has changed.
         /// </summary>
         /// <ignore>true</ignore>
         public event EventHandler<AndroidDebugBridgeEventArgs> BridgeChanged;
 
         /// <summary>
-        /// Occurs when [device changed].
+        /// Occurs when the status of one of the connected devices has changed.
         /// </summary>
-        /// <ignore>true</ignore>
         public event EventHandler<DeviceDataEventArgs> DeviceChanged;
 
         /// <summary>
-        /// Occurs when [device connected].
+        /// Occurs when a device has connected to the Android Debug Bridge.
         /// </summary>
-        /// <ignore>true</ignore>
         public event EventHandler<DeviceDataEventArgs> DeviceConnected;
 
         /// <summary>
-        /// Occurs when [device disconnected].
+        /// Occurs when a device has disconnected from the Android Debug Bridge.
         /// </summary>
-        /// <ignore>true</ignore>
         public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
-        /*
-         * Minimum and maximum version of adb supported. This correspond to
-         * ADB_SERVER_VERSION found in //device/tools/adb/adb.h
-         */
-
         /// <summary>
-        ///
+        /// The minum version of adb that is supported.
         /// </summary>
         private const int ADB_VERSION_MICRO_MIN = 20;
 
         /// <summary>
-        ///
+        /// The maximum version of adb that is supported. A value of <c>-1</c> indicates that all
+        /// future versions of adb are supported.
         /// </summary>
         private const int ADB_VERSION_MICRO_MAX = -1;
 
@@ -68,24 +59,6 @@ namespace Managed.Adb
         /// </summary>
         private const string ADB_VERSION_PATTERN = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
-#if LINUX
-		/// <summary>
-		/// The ADB executive
-		/// </summary>
-		public const String ADB = "adb";
-		/// <summary>
-		/// The DDMS executive
-		/// </summary>
-		public const String DDMS = "monitor";
-		/// <summary>
-		/// The hierarchy viewer
-		/// </summary>
-		public const String HIERARCHYVIEWER = "hierarchyviewer";
-		/// <summary>
-		/// The AAPT executive
-		/// </summary>
-		public const String AAPT = "aapt";
-#else
         /// <summary>
         /// The ADB executive
         /// </summary>
@@ -97,25 +70,9 @@ namespace Managed.Adb
         public const string DDMS = "monitor.bat";
 
         /// <summary>
-        /// The hierarchy viewer
-        /// </summary>
-        public const string HIERARCHYVIEWER = "hierarchyviewer.bat";
-
-        /// <summary>
-        /// The AAPT executive
-        /// </summary>
-        public const string AAPT = "aapt.exe";
-
-#endif
-
-        // Where to find the ADB bridge.
-
-        /// <summary>
         /// The default ADB bridge port
         /// </summary>
         public const int ADB_PORT = 5037;
-
-        #region statics
 
         /// <summary>
         ///
@@ -129,73 +86,20 @@ namespace Managed.Adb
         public static IPEndPoint SocketAddress { get; private set; }
 
         /// <summary>
-        /// Gets or sets the host address.
-        /// </summary>
-        /// <value>The host address.</value>
-        public static IPAddress HostAddress { get; private set; }
-
-        /// <summary>
         /// Initializes static members of the <see cref="AndroidDebugBridge"/> class.
         /// </summary>
         static AndroidDebugBridge()
         {
             // built-in local address/port for ADB.
-            try
-            {
-                HostAddress = IPAddress.Loopback;
-
-                SocketAddress = new IPEndPoint(HostAddress, ADB_PORT);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-            }
+            SocketAddress = new IPEndPoint(IPAddress.Loopback, ADB_PORT);
         }
-
-        /*
-         * Initializes the <code>ddm</code> library.
-         * <p/>This must be called once <b>before</b> any call to
-         * {@link #createBridge(String, boolean)}.
-         * <p>The library can be initialized in 2 ways:
-         * <ul>
-         * <li>Mode 1: <var>clientSupport</var> == <see langword="true"/>.<br>The library monitors the
-         * devices and the applications running on them. It will connect to each application, as a
-         * debugger of sort, to be able to interact with them through JDWP packets.</li>
-         * <li>Mode 2: <var>clientSupport</var> == <code>false</code>.<br>The library only monitors
-         * devices. The applications are left untouched, letting other tools built on
-         * <code>ddmlib</code> to connect a debugger to them.</li>
-         * </ul>
-         * <p/><b>Only one tool can run in mode 1 at the same time.</b>
-         * <p/>Note that mode 1 does not prevent debugging of applications running on devices. Mode 1
-         * lets debuggers connect to <code>ddmlib</code> which acts as a proxy between the debuggers and
-         * the applications to debug. See {@link Client#getDebuggerListenPort()}.
-         * <p/>The preferences of <code>ddmlib</code> should also be initialized with whatever default
-         * values were changed from the default values.
-         * <p/>When the application quits, {@link #terminate()} should be called.
-         * @param clientSupport Indicates whether the library should enable the monitoring and
-         * interaction with applications running on the devices.
-         * @see AndroidDebugBridge#createBridge(String, boolean)
-         * @see DdmPreferences
-         */
 
         /// <summary>
         /// Initializes the <code>ddm</code> library.
         /// <para>This must be called once <b>before</b> any call to CreateBridge.</para>
         /// </summary>
-        /// <param name="clientSupport">if set to <see langword="true"/> [client support].</param>
-        public static void Initialize(bool clientSupport)
+        public static void Initialize()
         {
-            ClientSupport = clientSupport;
-
-            /*MonitorThread monitorThread = MonitorThread.createInstance ( );
-            monitorThread.start ( );
-
-            HandleHello.register ( monitorThread );
-            HandleAppName.register ( monitorThread );
-            HandleTest.register ( monitorThread );
-            HandleThread.register ( monitorThread );
-            HandleHeap.register ( monitorThread );
-            HandleWait.register ( monitorThread );
-            HandleProfiling.register ( monitorThread );*/
         }
 
         /// <summary>
@@ -209,11 +113,6 @@ namespace Managed.Adb
                 Instance.DeviceMonitor.Stop();
                 Instance.DeviceMonitor = null;
             }
-
-            /*MonitorThread monitorThread = MonitorThread.getInstance ( );
-            if ( monitorThread != null ) {
-                monitorThread.quit ( );
-            }*/
         }
 
         /// <summary>
@@ -240,14 +139,6 @@ namespace Managed.Adb
         {
             get { return Instance; }
         }
-
-        /// <summary>
-        /// Gets a value indicating whether there is client support.
-        /// </summary>
-        /// <value>
-        ///   <see langword="true"/> if there is client support; otherwise, <see langword="false"/>.
-        /// </value>
-        public static bool ClientSupport { get; private set; }
 
         /// <summary>
         /// Creates a {@link AndroidDebugBridge} that is not linked to any particular executable.
@@ -332,17 +223,6 @@ namespace Managed.Adb
                 instance = null;
             }
         }
-
-        /// <summary>
-        /// Gets the lock.
-        /// </summary>
-        /// <returns></returns>
-        public static object GetLock()
-        {
-            return Instance;
-        }
-
-        #endregion
 
         #region constructors
 
@@ -567,38 +447,26 @@ namespace Managed.Adb
                 return;
             }
 
-            try
+            Log.d(DDMS, string.Format("Checking '{0} version'", AdbOsLocation));
+
+            List<string> errorOutput = new List<string>();
+            List<string> stdOutput = new List<string>();
+            this.RunAdbProcess("version", errorOutput, stdOutput);
+
+            // check both stdout and stderr
+            bool versionFound = false;
+            foreach (string line in stdOutput)
             {
-                Log.d(DDMS, string.Format("Checking '{0} version'", AdbOsLocation));
-
-                ProcessStartInfo psi = new ProcessStartInfo(AdbOsLocation, "version");
-                psi.WindowStyle = ProcessWindowStyle.Hidden;
-                psi.CreateNoWindow = true;
-                psi.UseShellExecute = false;
-                psi.RedirectStandardError = true;
-                psi.RedirectStandardOutput = true;
-
-                List<string> errorOutput = new List<string>();
-                List<string> stdOutput = new List<string>();
-                using (Process proc = Process.Start(psi))
+                versionFound = this.ScanVersionLine(line);
+                if (versionFound)
                 {
-                    int status = this.GrabProcessOutput(proc, errorOutput, stdOutput, true /* waitForReaders */);
-                    if (status != 0)
-                    {
-                        StringBuilder builder = new StringBuilder("'adb version' failed!");
-                        builder.AppendLine(string.Empty);
-                        foreach (string error in errorOutput)
-                        {
-                            builder.AppendLine(error);
-                        }
-
-                        Log.LogAndDisplay(LogLevel.Error, "adb", builder.ToString());
-                    }
+                    break;
                 }
+            }
 
-                // check both stdout and stderr
-                bool versionFound = false;
-                foreach (string line in stdOutput)
+            if (!versionFound)
+            {
+                foreach (string line in errorOutput)
                 {
                     versionFound = this.ScanVersionLine(line);
                     if (versionFound)
@@ -606,28 +474,12 @@ namespace Managed.Adb
                         break;
                     }
                 }
-
-                if (!versionFound)
-                {
-                    foreach (string line in errorOutput)
-                    {
-                        versionFound = this.ScanVersionLine(line);
-                        if (versionFound)
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                if (!versionFound)
-                {
-                    // if we get here, we failed to parse the output.
-                    Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to parse the output of 'adb version'");
-                }
             }
-            catch (IOException e)
+
+            if (!versionFound)
             {
-                Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to get the adb version: " + e.Message);
+                // if we get here, we failed to parse the output.
+                Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to parse the output of 'adb version'");
             }
         }
 
@@ -676,7 +528,7 @@ namespace Managed.Adb
         /// Starts the adb host side server.
         /// </summary>
         /// <returns>true if success</returns>
-        private bool StartAdb()
+        private void StartAdb()
         {
             if (string.IsNullOrEmpty(AdbOsLocation))
             {
@@ -684,196 +536,79 @@ namespace Managed.Adb
                 return false;
             }
 
-            int status = -1;
-
-            try
-            {
-                string command = "start-server";
-                Log.d(DDMS, string.Format("Launching '{0} {1}' to ensure ADB is running.", AdbOsLocation, command));
-                ProcessStartInfo psi = new ProcessStartInfo(AdbOsLocation, command);
-                psi.CreateNoWindow = true;
-                psi.WindowStyle = ProcessWindowStyle.Hidden;
-                psi.UseShellExecute = false;
-                psi.RedirectStandardError = true;
-                psi.RedirectStandardOutput = true;
-
-                using (Process proc = Process.Start(psi))
-                {
-                    List<string> errorOutput = new List<string>();
-                    List<string> stdOutput = new List<string>();
-                    status = this.GrabProcessOutput(proc, errorOutput, stdOutput, false /* waitForReaders */);
-                }
-            }
-            catch (IOException ioe)
-            {
-                Log.d(DDMS, "Unable to run 'adb': {0}", ioe.Message);
-            }
-            catch (ThreadInterruptedException ie)
-            {
-                Log.d(DDMS, "Unable to run 'adb': {0}", ie.Message);
-            }
-            catch (Exception e)
-            {
-                Log.e(DDMS, e);
-            }
-
-            if (status != 0)
-            {
-                Log.w(DDMS, "'adb start-server' failed -- run manually if necessary");
-                return false;
-            }
-
-            Log.d(DDMS, "'adb start-server' succeeded");
-            return true;
+            this.RunAdbProcess("start-server", null, null);
         }
 
         /// <summary>
         /// Stops the adb host side server.
         /// </summary>
         /// <returns>true if success</returns>
-        private bool StopAdb()
+        private void StopAdb()
         {
             if (string.IsNullOrEmpty(AdbOsLocation))
             {
-                Log.e(ADB, "Cannot stop adb when AndroidDebugBridge is created without the location of adb.");
-                return false;
+                throw new InvalidOperationException("Cannot stop adb when AndroidDebugBridge is created without the location of adb.");
             }
 
-            int status = -1;
-
-            try
-            {
-                string command = "kill-server";
-                ProcessStartInfo psi = new ProcessStartInfo(AdbOsLocation, command);
-                psi.CreateNoWindow = true;
-                psi.WindowStyle = ProcessWindowStyle.Hidden;
-                psi.UseShellExecute = false;
-                psi.RedirectStandardError = true;
-                psi.RedirectStandardOutput = true;
-
-                using (Process proc = Process.Start(psi))
-                {
-                    proc.WaitForExit();
-                    status = proc.ExitCode;
-                }
-            }
-            catch (IOException)
-            {
-                // we'll return false;
-            }
-            catch (Exception)
-            {
-                // we'll return false;
-            }
-
-            if (status != 0)
-            {
-                Log.w(DDMS, "'adb kill-server' failed -- run manually if necessary");
-                return false;
-            }
-
-            Log.d(DDMS, "'adb kill-server' succeeded");
-            return true;
+            this.RunAdbProcess("kill-server", null, null);
         }
 
         /// <summary>
         /// Get the stderr/stdout outputs of a process and return when the process is done.
         /// Both <b>must</b> be read or the process will block on windows.
         /// </summary>
-        /// <param name="process">The process to get the ouput from</param>
         /// <param name="errorOutput">The array to store the stderr output. cannot be null.</param>
         /// <param name="stdOutput">The array to store the stdout output. cannot be null.</param>
-        /// <param name="waitforReaders">if true, this will wait for the reader threads.</param>
         /// <returns>the process return code.</returns>
-        private int GrabProcessOutput(Process process, List<string> errorOutput, List<string> stdOutput, bool waitforReaders)
+        private void RunAdbProcess(string command, List<string> errorOutput, List<string> stdOutput)
         {
             if (errorOutput == null)
             {
-                throw new ArgumentNullException("errorOutput");
+                throw new ArgumentNullException(nameof(errorOutput));
             }
 
             if (stdOutput == null)
             {
-                throw new ArgumentNullException("stdOutput");
+                throw new ArgumentNullException(nameof(stdOutput));
             }
 
-            // read the lines as they come. if null is returned, it's
-            // because the process finished
-            Thread t1 = new Thread(new ThreadStart(delegate
+            int status;
+
+            ProcessStartInfo psi = new ProcessStartInfo(AdbOsLocation, command);
+            psi.CreateNoWindow = true;
+            psi.WindowStyle = ProcessWindowStyle.Hidden;
+            psi.UseShellExecute = false;
+            psi.RedirectStandardError = true;
+            psi.RedirectStandardOutput = true;
+
+            using (Process process = Process.Start(psi))
             {
-                // create a buffer to read the stdoutput
-                try
-                {
-                    using (StreamReader sr = process.StandardError)
-                    {
-                        while (!sr.EndOfStream)
-                        {
-                            string line = sr.ReadLine();
-                            if (!string.IsNullOrEmpty(line))
-                            {
-                                Log.e(ADB, line);
-                                errorOutput.Add(line);
-                            }
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    // do nothing.
-                }
-            }));
+                var standardErrorString = process.StandardError.ReadToEnd();
+                var standardOutputString = process.StandardOutput.ReadToEnd();
 
-            Thread t2 = new Thread(new ThreadStart(delegate
-            {
-                // create a buffer to read the std output
-                try
+                if (errorOutput != null)
                 {
-                    using (StreamReader sr = process.StandardOutput)
-                    {
-                        while (!sr.EndOfStream)
-                        {
-                            string line = sr.ReadLine();
-                            if (!string.IsNullOrEmpty(line))
-                            {
-                                stdOutput.Add(line);
-                            }
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                    // do nothing.
-                }
-            }));
-
-            t1.Start();
-            t2.Start();
-
-            // it looks like on windows process#waitFor() can return
-            // before the thread have filled the arrays, so we wait for both threads and the
-            // process itself.
-            if (waitforReaders)
-            {
-                try
-                {
-                    t1.Join();
-                }
-                catch (ThreadInterruptedException)
-                {
+                    errorOutput.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
                 }
 
-                try
+                if (stdOutput != null)
                 {
-                    t2.Join();
+                    stdOutput.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
                 }
-                catch (ThreadInterruptedException)
+
+                // get the return code from the process
+                if (!process.WaitForExit(5000))
                 {
+                    process.Kill();
                 }
+
+                status = process.ExitCode;
             }
 
-            // get the return code from the process
-            process.WaitForExit();
-            return process.ExitCode;
+            if (status != 0)
+            {
+                throw new AdbException($"The adb process returned error code {status} when running command {command}");
+            }
         }
         #endregion
 
