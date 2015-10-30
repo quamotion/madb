@@ -438,7 +438,7 @@ namespace Managed.Adb.IO
                 sb = string.Format("{0}{1}", sb, DirectorySeparatorChar);
             }
 
-            sb = sb.Replace("//", new byte[] { (byte)DirectorySeparatorChar }.GetString());
+            sb = sb.Replace("//", new string(new char[] { DirectorySeparatorChar }));
 
             return sb;
         }

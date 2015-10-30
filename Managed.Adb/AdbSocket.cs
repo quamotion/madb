@@ -75,7 +75,7 @@ namespace Managed.Adb
         /// </returns>
         public static bool IsOkay(byte[] reply)
         {
-            return reply.GetString().Equals("OKAY");
+            return AdbHelper.Encoding.GetString(reply).Equals("OKAY");
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Close/*'/>
@@ -118,8 +118,8 @@ namespace Managed.Adb
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendFileRequest/*'/>
         public virtual void SendFileRequest(string command, string path, SyncService.FileMode mode)
         {
-            byte[] commandContent = command.GetBytes(AdbHelper.Encoding);
-            byte[] pathContent = path.GetBytes(AdbHelper.Encoding);
+            byte[] commandContent = AdbHelper.Encoding.GetBytes(command);
+            byte[] pathContent = AdbHelper.Encoding.GetBytes(path);
 
             byte[] request = SyncService.CreateSendFileRequest(commandContent, pathContent, mode);
             this.Send(request, -1, DdmPreferences.Timeout);
@@ -140,14 +140,14 @@ namespace Managed.Adb
             this.Read(reply);
 
             // Convert the bytes to a hex string
-            string lenHex = reply.GetString(AdbHelper.DefaultEncoding);
+            string lenHex = AdbHelper.Encoding.GetString(reply);
             int len = int.Parse(lenHex, NumberStyles.HexNumber);
 
             // And get the string
             reply = new byte[len];
             this.Read(reply);
 
-            string value = reply.GetString(AdbHelper.DefaultEncoding);
+            string value = AdbHelper.Encoding.GetString(reply);
             return value;
         }
 

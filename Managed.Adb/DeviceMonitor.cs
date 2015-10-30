@@ -115,14 +115,14 @@ namespace Managed.Adb
                     this.Socket.Read(reply, int.MaxValue);
 
                     // Convert the bytes to a hex string
-                    string lenHex = reply.GetString(AdbHelper.DefaultEncoding);
+                    string lenHex = AdbHelper.Encoding.GetString(reply);
                     int len = int.Parse(lenHex, NumberStyles.HexNumber);
 
                     // And get the string
                     reply = new byte[len];
                     this.Socket.Read(reply);
 
-                    string value = reply.GetString(AdbHelper.DefaultEncoding);
+                    string value = AdbHelper.Encoding.GetString(reply);
 
                     this.ProcessIncomingDeviceData(value);
                 }

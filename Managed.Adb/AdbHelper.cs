@@ -496,7 +496,7 @@ namespace Managed.Adb
                             if (rcvr == null || !rcvr.ParsesErrors)
                             {
                                 string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                string sdata = data.GetString(0, count, AdbHelper.DefaultEncoding);
+                                string sdata = AdbHelper.Encoding.GetString(data);
 
                                 var sdataTrimmed = sdata.Trim();
                                 if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))

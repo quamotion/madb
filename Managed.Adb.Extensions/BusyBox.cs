@@ -199,7 +199,7 @@ namespace Managed.Adb {
 				Match match = null;
 				int state = 0;
 				foreach ( var line in lines ) {
-					if ( line.IsNullOrWhiteSpace ( ) ) {
+					if ( string.IsNullOrEmpty(line) ) {
 						continue;
 					}
 					switch ( state ) {

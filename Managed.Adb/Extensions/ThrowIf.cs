@@ -5,15 +5,24 @@
 namespace Managed.Adb
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Text;
 
-    /// <ignore>true</ignore>
     public static partial class ManagedAdbExtenstions
     {
-        public static void ThrowIfNull<T>(this T argument, string name) where T : class
+        /// <summary>
+        /// Throws an <see cref="ArgumentNullException"/> if <paramref name="argument"/> is
+        /// <see langword="null"/>.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The argument type.
+        /// </typeparam>
+        /// <param name="argument">
+        /// The argument value.
+        /// </param>
+        /// <param name="name">
+        /// The name of the argument.
+        /// </param>
+        public static void ThrowIfNull<T>(this T argument, string name)
+            where T : class
         {
             if (argument == null)
             {
@@ -21,6 +30,16 @@ namespace Managed.Adb
             }
         }
 
+        /// <summary>
+        /// Throws an <see cref="ArgumentNullException"/> if a <see cref="string"/> is <see langword="null"/>
+        /// or empty.
+        /// </summary>
+        /// <param name="argument">
+        /// The string value.
+        /// </param>
+        /// <param name="name">
+        /// The name of the parameter.
+        /// </param>
         public static void ThrowIfNullOrEmpty(this string argument, string name)
         {
             if (string.IsNullOrEmpty(argument))
@@ -29,6 +48,16 @@ namespace Managed.Adb
             }
         }
 
+        /// <summary>
+        /// Throws a <see cref="ArgumentNullException"/> if <paramref name="argument"/>
+        /// is <see langword="null"/>, empty or only contains whitespace.
+        /// </summary>
+        /// <param name="argument">
+        /// The <see cref="string"/> to inspect.
+        /// </param>
+        /// <param name="name">
+        /// The name of the parameter.
+        /// </param>
         public static void ThrowIfNullOrWhiteSpace(this string argument, string name)
         {
             if (string.IsNullOrEmpty(argument) || string.IsNullOrEmpty(argument.Trim()))

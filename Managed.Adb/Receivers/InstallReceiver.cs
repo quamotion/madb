@@ -49,7 +49,7 @@ namespace Managed.Adb
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            this.ErrorMessage = string.IsNullOrEmpty(msg) || msg.IsNullOrWhiteSpace() ? UNKNOWN_ERROR : msg;
+                            this.ErrorMessage = string.IsNullOrWhiteSpace(msg) ? UNKNOWN_ERROR : msg;
                         }
 
                         this.Success = false;

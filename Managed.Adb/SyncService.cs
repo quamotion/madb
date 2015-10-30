@@ -401,7 +401,7 @@ namespace Managed.Adb
                 DataBuffer = new byte[SYNC_DATA_MAX + 8];
             }
 
-            byte[] bDATA = DATA.GetBytes();
+            byte[] bDATA = Encoding.Default.GetBytes(DATA);
             Array.Copy(bDATA, 0, DataBuffer, 0, bDATA.Length);
 
             // look while there is something to read
@@ -472,9 +472,9 @@ namespace Managed.Adb
                 byte[] result = new byte[8];
                 this.Channel.Read(result, -1 /* full length */, timeOut);
 
-                if (!CheckResult(result, OKAY.GetBytes()))
+                if (!CheckResult(result, Encoding.Default.GetBytes(OKAY)))
                 {
-                    if (CheckResult(result, FAIL.GetBytes()))
+                    if (CheckResult(result, Encoding.Default.GetBytes(FAIL)))
                     {
                         // read some error message...
                         int len = result.Swap32bitFromArray(4);
@@ -482,7 +482,7 @@ namespace Managed.Adb
                         this.Channel.Read(DataBuffer, len, timeOut);
 
                         // output the result?
-                        string message = DataBuffer.GetString(0, len);
+                        string message = AdbHelper.Encoding.GetString(DataBuffer, 0, len);
                         Log.e("ddms", "transfer error: " + message);
                         return new SyncResult(ErrorCodeHelper.RESULT_UNKNOWN_ERROR, message);
                     }
@@ -573,7 +573,7 @@ namespace Managed.Adb
 
             try
             {
-                byte[] remotePathContent = remotePath.GetBytes(AdbHelper.DefaultEncoding);
+                byte[] remotePathContent = AdbHelper.Encoding.GetBytes(remotePath);
 
                 if (remotePathContent.Length > REMOTE_PATH_MAX_LENGTH)
                 {
@@ -581,7 +581,7 @@ namespace Managed.Adb
                 }
 
                 // create the full request message
-                msg = CreateFileRequest(RECV.GetBytes(), remotePathContent);
+                msg = CreateFileRequest(Encoding.Default.GetBytes(RECV), remotePathContent);
 
                 // and send it.
                 this.Channel.Send(msg, -1, timeOut);
@@ -591,8 +591,8 @@ namespace Managed.Adb
                 this.Channel.Read(pullResult, -1, timeOut);
 
                 // check we have the proper data back
-                if (CheckResult(pullResult, DATA.GetBytes()) == false &&
-                                CheckResult(pullResult, DONE.GetBytes()) == false)
+                if (CheckResult(pullResult, Encoding.Default.GetBytes(DATA)) == false &&
+                                CheckResult(pullResult, Encoding.Default.GetBytes(DONE)) == false)
                 {
                     return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR);
                 }
@@ -637,12 +637,12 @@ namespace Managed.Adb
                     }
 
                     // if we're done, we stop the loop
-                    if (CheckResult(pullResult, DONE.GetBytes()))
+                    if (CheckResult(pullResult, Encoding.Default.GetBytes(DONE)))
                     {
                         break;
                     }
 
-                    if (CheckResult(pullResult, DATA.GetBytes()) == false)
+                    if (CheckResult(pullResult, Encoding.Default.GetBytes(DATA)) == false)
                     {
                         // hmm there's an error
                         return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR);
