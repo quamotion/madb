@@ -18,11 +18,6 @@ namespace Managed.Adb
     public sealed class AndroidDebugBridge
     {
         /// <summary>
-        /// Logging tag
-        /// </summary>
-        private const string TAG = "AndroidDebugBridge";
-
-        /// <summary>
         /// Occurs when the status of the Android Debug Bridge has changed.
         /// </summary>
         /// <ignore>true</ignore>
@@ -46,33 +41,22 @@ namespace Managed.Adb
         /// <summary>
         /// The minum version of adb that is supported.
         /// </summary>
-        private const int ADB_VERSION_MICRO_MIN = 20;
-
-        /// <summary>
-        /// The maximum version of adb that is supported. A value of <c>-1</c> indicates that all
-        /// future versions of adb are supported.
-        /// </summary>
-        private const int ADB_VERSION_MICRO_MAX = -1;
+        private static readonly Version RequiredAdbVersion = new Version(1, 0, 20);
 
         /// <summary>
         /// The regex pattern for getting the adb version
         /// </summary>
-        private const string ADB_VERSION_PATTERN = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
+        private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
         /// <summary>
-        /// The ADB executive
+        /// The tag to use when logging.
         /// </summary>
-        public const string ADB = "adb.exe";
-
-        /// <summary>
-        /// The DDMS executive
-        /// </summary>
-        public const string DDMS = "monitor.bat";
+        public const string Tag = nameof(AndroidDebugBridge);
 
         /// <summary>
         /// The default ADB bridge port
         /// </summary>
-        public const int ADB_PORT = 5037;
+        public const int AdbPort = 5037;
 
         /// <summary>
         ///
@@ -91,15 +75,7 @@ namespace Managed.Adb
         static AndroidDebugBridge()
         {
             // built-in local address/port for ADB.
-            SocketAddress = new IPEndPoint(IPAddress.Loopback, ADB_PORT);
-        }
-
-        /// <summary>
-        /// Initializes the <code>ddm</code> library.
-        /// <para>This must be called once <b>before</b> any call to CreateBridge.</para>
-        /// </summary>
-        public static void Initialize()
-        {
+            SocketAddress = new IPEndPoint(IPAddress.Loopback, AdbPort);
         }
 
         /// <summary>
@@ -130,14 +106,6 @@ namespace Managed.Adb
 
                 return instance;
             }
-        }
-
-        /// <summary>
-        /// Gets an instance of <see cref="AndroidDebugBridge"/>.
-        /// </summary>
-        public static AndroidDebugBridge Bridge
-        {
-            get { return Instance; }
         }
 
         /// <summary>
@@ -189,7 +157,7 @@ namespace Managed.Adb
                 else
                 {
                     // stop the current server
-                    Log.i(TAG, "Stopping Current Instance");
+                    Log.i(Tag, "Stopping Current Instance");
                     instance.Stop();
                 }
             }
@@ -224,8 +192,6 @@ namespace Managed.Adb
             }
         }
 
-        #region constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AndroidDebugBridge"/> class.
         /// </summary>
@@ -241,7 +207,7 @@ namespace Managed.Adb
 
             if (!File.Exists(osLocation))
             {
-                Log.e(TAG, string.Format("unable to locate adb in the specified location: {0}", osLocation));
+                Log.e(Tag, string.Format("unable to locate adb in the specified location: {0}", osLocation));
                 throw new FileNotFoundException("unable to locate adb in the specified location");
             }
 
@@ -257,14 +223,10 @@ namespace Managed.Adb
         {
         }
 
-        #endregion
-
-        #region Event "Raisers"
-
         /// <summary>
-        /// Raises the <see cref="E:BridgeChanged"/> event.
+        /// Raises the <see cref="BridgeChanged"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="Managed.Adb.AndroidDebugBridgeEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="AndroidDebugBridgeEventArgs"/> instance containing the event data.</param>
         internal void OnBridgeChanged(AndroidDebugBridgeEventArgs e)
         {
             if (this.BridgeChanged != null)
@@ -274,9 +236,9 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Raises the <see cref="E:DeviceChanged"/> event.
+        /// Raises the <see cref="DeviceChanged"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
         internal void OnDeviceChanged(DeviceDataEventArgs e)
         {
             if (this.DeviceChanged != null)
@@ -286,9 +248,9 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Raises the <see cref="E:DeviceConnected"/> event.
+        /// Raises the <see cref="DeviceConnected"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
         internal void OnDeviceConnected(DeviceDataEventArgs e)
         {
             if (this.DeviceConnected != null)
@@ -298,9 +260,9 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Raises the <see cref="E:DeviceDisconnected"/> event.
+        /// Raises the <see cref="DeviceDisconnected"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="Managed.Adb.DeviceEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
         internal void OnDeviceDisconnected(DeviceDataEventArgs e)
         {
             if (this.DeviceDisconnected != null)
@@ -308,40 +270,37 @@ namespace Managed.Adb
                 this.DeviceDisconnected(this, e);
             }
         }
-        #endregion
-
-        #region public methods
 
         /// <summary>
         /// Starts the debug bridge.
         /// </summary>
         /// <returns><see langword="true"/> if success.</returns>
-        public bool Start()
+        public void Start()
         {
-            if (string.IsNullOrEmpty(AdbOsLocation) || !this.VersionCheck || !this.StartAdb())
+            if (string.IsNullOrEmpty(AdbOsLocation) || !this.VersionCheck)
             {
-                return false;
+                throw new InvalidOperationException();
             }
+
+            this.StartAdb();
 
             this.Started = true;
 
             // now that the bridge is connected, we start the underlying services.
             this.DeviceMonitor = new DeviceMonitor(AdbHelper.SocketFactory.Create(AndroidDebugBridge.SocketAddress));
             this.DeviceMonitor.Start();
-
-            return true;
         }
 
         /// <summary>
         /// Kills the debug bridge, and the adb host server.
         /// </summary>
         /// <returns><see langword="true"/> if success.</returns>
-        public bool Stop()
+        public void Stop()
         {
             // if we haven't started we return false;
             if (!this.Started)
             {
-                return false;
+                return;
             }
 
             // kill the monitoring services
@@ -351,51 +310,43 @@ namespace Managed.Adb
                 this.DeviceMonitor = null;
             }
 
-            if (!this.StopAdb())
-            {
-                return false;
-            }
+            this.StopAdb();
 
             this.Started = false;
-            return true;
         }
 
         /// <summary>
         /// Restarts adb, but not the services around it.
         /// </summary>
         /// <returns><see langword="true"/> if success.</returns>
-        public bool Restart()
+        public void Restart()
         {
             if (string.IsNullOrEmpty(AdbOsLocation))
             {
-                Log.e(ADB, "Cannot restart adb when AndroidDebugBridge is created without the location of adb.");
-                return false;
+                Log.e(Tag, "Cannot restart adb when AndroidDebugBridge is created without the location of adb.");
+                throw new InvalidOperationException("Cannot restart adb when AndroidDebugBridge is created without the location of adb.");
             }
 
             if (!this.VersionCheck)
             {
-                Log.LogAndDisplay(LogLevel.Error, ADB, "Attempting to restart adb, but version check failed!");
-                return false;
+                Log.LogAndDisplay(LogLevel.Error, Tag, "Attempting to restart adb, but version check failed!");
+                throw new InvalidOperationException("Attempting to restart adb, but version check failed!");
             }
 
             lock (this)
             {
                 this.StopAdb();
 
-                bool restart = this.StartAdb();
+                this.StartAdb();
 
-                if (restart && this.DeviceMonitor == null)
+                if (this.DeviceMonitor == null)
                 {
                     this.DeviceMonitor = new DeviceMonitor(AdbHelper.SocketFactory.Create(AndroidDebugBridge.SocketAddress));
                     this.DeviceMonitor.Start();
                 }
 
-                return restart;
             }
         }
-        #endregion
-
-        #region public properties
 
         /// <summary>
         /// Gets or Sets the adb location on the OS.
@@ -429,9 +380,6 @@ namespace Managed.Adb
         /// Gets the result of the version check
         /// </summary>
         private bool VersionCheck { get; set; }
-        #endregion
-
-        #region private methods
 
         /// <summary>
         /// Queries adb for its version number and checks it against #MIN_VERSION_NUMBER and MAX_VERSION_NUMBER
@@ -443,85 +391,69 @@ namespace Managed.Adb
 
             if (string.IsNullOrEmpty(AdbOsLocation))
             {
-                Log.w(TAG, "AdbOsLocation is Empty");
+                Log.w(Tag, "AdbOsLocation is Empty");
                 return;
             }
 
-            Log.d(DDMS, string.Format("Checking '{0} version'", AdbOsLocation));
+            Log.d(Tag, string.Format("Checking '{0} version'", AdbOsLocation));
 
             List<string> errorOutput = new List<string>();
             List<string> stdOutput = new List<string>();
             this.RunAdbProcess("version", errorOutput, stdOutput);
+            var version = GetAdbVersion(errorOutput, stdOutput);
 
-            // check both stdout and stderr
-            bool versionFound = false;
-            foreach (string line in stdOutput)
+            // check only the micro version for now.
+            if (version < RequiredAdbVersion)
             {
-                versionFound = this.ScanVersionLine(line);
-                if (versionFound)
-                {
-                    break;
-                }
+                string message = $"Required minimum version of adb: {RequiredAdbVersion}. Current version is {version}";
+                Log.LogAndDisplay(LogLevel.Error, Tag, message);
+                throw new AdbException(message);
             }
 
-            if (!versionFound)
-            {
-                foreach (string line in errorOutput)
-                {
-                    versionFound = this.ScanVersionLine(line);
-                    if (versionFound)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            if (!versionFound)
-            {
-                // if we get here, we failed to parse the output.
-                Log.LogAndDisplay(LogLevel.Error, ADB, "Failed to parse the output of 'adb version'");
-            }
+            this.VersionCheck = true;
         }
 
-        /// <summary>
-        /// Scans a line resulting from 'adb version' for a potential version number.
-        /// </summary>
-        /// <param name="line">The line to scan.</param>
-        /// <returns><see langword="true"/> if a version number was found (whether it is acceptable or not).</returns>
-        /// <remarks>If a version number is found, it checks the version number against what is expected
-        /// by this version of ddms.</remarks>
-        private bool ScanVersionLine(string line)
+        static internal Version GetAdbVersion(List<string> standardOutput, List<string> standardError)
         {
-            if (!string.IsNullOrEmpty(line))
+            var outputVersion = GetAdbVersion(standardOutput);
+
+            if (outputVersion != null)
             {
-                Match matcher = Regex.Match(line, ADB_VERSION_PATTERN);
+                return outputVersion;
+            }
+
+            var errorVersion = GetAdbVersion(standardError);
+
+            if (errorVersion != null)
+            {
+                return errorVersion;
+            }
+
+            throw new AdbException("Failed to retrieve the ADB version number");
+        }
+
+        static internal Version GetAdbVersion(List<string> output)
+        {
+            foreach (var line in output)
+            {
+                // Skip empty lines
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+
+                Match matcher = Regex.Match(line, AdbVersionPattern);
                 if (matcher.Success)
                 {
                     int majorVersion = int.Parse(matcher.Groups[1].Value);
                     int minorVersion = int.Parse(matcher.Groups[2].Value);
                     int microVersion = int.Parse(matcher.Groups[3].Value);
 
-                    // check only the micro version for now.
-                    if (microVersion < ADB_VERSION_MICRO_MIN)
-                    {
-                        string message = $"Required minimum version of adb: {majorVersion}.{minorVersion}.{ADB_VERSION_MICRO_MIN}. Current version is {majorVersion}.{minorVersion}.{microVersion}";
-                        Log.LogAndDisplay(LogLevel.Error, ADB, message);
-                    }
-                    else if (ADB_VERSION_MICRO_MAX != -1 && microVersion > ADB_VERSION_MICRO_MAX)
-                    {
-                        string message = $"Required maximum version of adb: {majorVersion}.{minorVersion}.{ADB_VERSION_MICRO_MAX}. Current version is {majorVersion}.{minorVersion}.{microVersion}";
-                        Log.LogAndDisplay(LogLevel.Error, ADB, message);
-                    }
-                    else
-                    {
-                        this.VersionCheck = true;
-                    }
-
-                    return true;
+                    return new Version(majorVersion, minorVersion, microVersion);
                 }
             }
 
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -532,8 +464,8 @@ namespace Managed.Adb
         {
             if (string.IsNullOrEmpty(AdbOsLocation))
             {
-                Log.e(ADB, "Cannot start adb when AndroidDebugBridge is created without the location of adb.");
-                return false;
+                Log.e(Tag, "Cannot start adb when AndroidDebugBridge is created without the location of adb.");
+                throw new InvalidOperationException("Cannot start adb when AndroidDebugBridge is created without the location of adb.");
             }
 
             this.RunAdbProcess("start-server", null, null);
@@ -610,7 +542,5 @@ namespace Managed.Adb
                 throw new AdbException($"The adb process returned error code {status} when running command {command}");
             }
         }
-        #endregion
-
     }
 }

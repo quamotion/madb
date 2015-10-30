@@ -1,37 +1,31 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
-using MoreLinq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Managed.Adb.Tests {
+namespace Managed.Adb.Tests
+{
     [TestClass]
-	public class AndroidDebugBridgeTests {
+    public class AndroidDebugBridgeTests
+    {
+        [TestInitialize]
+        public void Initialize()
+        {
+            AndroidDebugBridge.AdbOsLocation = @"c:\program files (x86)\quamotion\ext\adk\platform-tools\adb.exe";
+        }
 
         [TestMethod]
-        [TestCategory("IntegrationTest")]
-		public void CreateBridgeTest ( ) {
-			try {
-				AndroidDebugBridge adb = CreateBridge ( @"d:\android\android-sdk\platform-tools\adb.exe" );
-				bool result = adb.Start ( );
-				Assert.IsTrue ( result, "Failed to start ADB" );
-				
-				adb.Devices.ForEach ( d => {
-					Console.WriteLine ( "{0}\t{1}", d.Serial, d.State );
-				} );
+        public void StartAdbTest()
+        {
+            List<string> standardOutput = new List<string>();
+            List<string> standardError = new List<string>();
 
-				adb.Stop ( );
-			} catch ( Exception ex ) {
-				Console.WriteLine ( ex.ToString ( ) );
-				throw;
-			}
-		}
+            standardOutput.Add("Android Debug Bridge version 1.0.32");
+            standardOutput.Add("");
 
-		private AndroidDebugBridge CreateBridge ( String location ) {
-			AndroidDebugBridge adb = AndroidDebugBridge.CreateBridge ( location, false );
-			return adb;
-		}
-	}
+            var version = AndroidDebugBridge.GetAdbVersion(standardOutput, standardError);
+            Assert.AreEqual(new Version("1.0.32"), version);
+        }
+    }
 }
