@@ -14,22 +14,6 @@ namespace Managed.Adb
     public static partial class ManagedAdbExtenstions
     {
         /// <summary>
-        /// Formats the string with the specified arguments
-        /// </summary>
-        /// <param name="s">The string.</param>
-        /// <param name="args">The arguments.</param>
-        /// <returns>The newly formatted string.</returns>
-        public static string With(this string s, params object[] args)
-        {
-            return string.Format(s, args);
-        }
-
-        public static string ToArgumentSafe(this string s)
-        {
-            return "{0}{1}{0}".With(s.Contains(" ") ? "\"" : string.Empty, s);
-        }
-
-        /// <summary>
         /// Gets the bytes from a string.
         /// </summary>
         /// <param name="str">The string.</param>
@@ -73,22 +57,6 @@ namespace Managed.Adb
             StringBuilder hex = new StringBuilder(2);
             hex.AppendFormat("{0:x2}", b);
             return hex.ToString();
-        }
-
-        /// <summary>
-        /// Converts a byte to the Hex value
-        /// </summary>
-        /// <param name="byteArray">The byte array.</param>
-        /// <returns></returns>
-        public static string ToHex(this byte[] byteArray)
-        {
-            StringBuilder hex = new StringBuilder(byteArray.Length * 2);
-            foreach (byte b in byteArray)
-            {
-                hex.AppendFormat("{0} ", b.ToHex());
-            }
-
-            return hex.ToString().Trim();
         }
 
         /// <summary>
@@ -173,17 +141,6 @@ namespace Managed.Adb
         public static bool IsNullOrWhiteSpace(this string source)
         {
             return string.IsNullOrEmpty(source) || string.IsNullOrEmpty(source.Trim());
-        }
-
-        /// <summary>
-        /// Matches the specified source.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="pattern">The pattern.</param>
-        /// <returns></returns>
-        public static Match Match(this string source, string pattern)
-        {
-            return Match(source, pattern, RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
         }
 
         /// <summary>

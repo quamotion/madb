@@ -4,11 +4,7 @@
 
 namespace Managed.Adb
 {
-    using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Text;
 
     /// <ignore>true</ignore>
     public static partial class ManagedAdbExtenstions
@@ -35,18 +31,6 @@ namespace Managed.Adb
         public static bool IsDirectory(this FileSystemInfo fsi)
         {
             return (fsi.Attributes & FileAttributes.Directory) == FileAttributes.Directory;
-        }
-
-        /// <summary>
-        /// Determines whether the specified path is file.
-        /// </summary>
-        /// <param name="path">The path.</param>
-        /// <returns>
-        ///   <see langword="true"/> if the specified path is file; otherwise, <see langword="false"/>.
-        /// </returns>
-        public static bool IsFile(string path)
-        {
-            return File.Exists(path) && !IsDirectory(path);
         }
 
         /// <summary>
