@@ -16,7 +16,6 @@ namespace Managed.Adb
     using System.Threading;
     using Managed.Adb.Exceptions;
     using Managed.Adb.Logs;
-    using MoreLinq;
 
     /// <summary>
     /// <para>
@@ -201,14 +200,7 @@ namespace Managed.Adb
 
                 string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-                List<DeviceData> s = new List<DeviceData>();
-                data.ForEach(item =>
-                {
-                    var device = DeviceData.CreateFromAdbData(item);
-                    s.Add(device);
-                });
-
-                return s;
+                return data.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
             }
         }
 

@@ -28,7 +28,7 @@ namespace Managed.Adb.Tests
             // the same socket.
         }
 
-        public void Read(byte[] data)
+        public override void Read(byte[] data)
         {
             base.Read(data);
         }

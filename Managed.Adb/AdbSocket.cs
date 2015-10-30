@@ -5,30 +5,54 @@
 namespace Managed.Adb
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
-    using Managed.Adb.Exceptions;
     using System.Threading;
+    using Exceptions;
 
+    /// <summary>
+    /// <para>
+    /// Implements a client for the Android Debug Bridge client-server protocol. Using the client, you
+    /// can send messages to and receive messages from the Android Debug Bridge.
+    /// </para>
+    /// <para>
+    /// The <see cref="AdbSocket"/> class implements the raw messaging protocol; that is,
+    /// sending and receiving messages. For interacting with the services the Android Debug
+    /// Bridge exposes, use the <see cref="AdbHelper"/>.
+    /// </para>
+    /// <para>
+    /// For more information about the protocol that is implemented here, see chapter
+    /// II Protocol Details, section 1. Client &lt;-&gt;Server protocol at
+    /// <see href="https://android.googlesource.com/platform/system/core/+/master/adb/OVERVIEW.TXT"/>.
+    /// </para>
+    /// </summary>
     public class AdbSocket : IAdbSocket, IDisposable
     {
-        /// <summary>
-        /// Logging tag
-        /// </summary>
-        private const string TAG = nameof(AdbSocket);
-
-        private Socket socket;
-
         /// <summary>
         /// The default time to wait in the milliseconds.
         /// </summary>
         private const int WaitTime = 5;
 
+        /// <summary>
+        /// Logging tag
+        /// </summary>
+        private const string TAG = nameof(AdbSocket);
+
+        /// <summary>
+        /// The underlying TCP socket that manages the connection with the ADB server.
+        /// </summary>
+        private Socket socket;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbSocket"/> class.
+        /// </summary>
+        /// <param name="endPoint">
+        /// The <see cref="IPEndPoint"/> at which the Android Debug Bridge is listening
+        /// for clients.
+        /// </param>
         public AdbSocket(IPEndPoint endPoint)
         {
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -36,30 +60,46 @@ namespace Managed.Adb
             this.socket.Blocking = true;
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Connected/*'/>
         public bool Connected
         {
             get { return this.socket.Connected; }
         }
 
+        /// <summary>
+        /// Determines whether the specified reply is okay.
+        /// </summary>
+        /// <param name="reply">The reply.</param>
+        /// <returns>
+        ///   <see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.
+        /// </returns>
+        public static bool IsOkay(byte[] reply)
+        {
+            return reply.GetString().Equals("OKAY");
+        }
+
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Close/*'/>
         public void Close()
         {
             this.socket.Close();
         }
 
+        /// <summary>
+        /// Releases all resources used by the current instance of the <see cref="AdbSocket"/>
+        /// class.
+        /// </summary>
         public virtual void Dispose()
         {
             this.socket.Dispose();
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte/*'/>
         public virtual void Read(byte[] data)
         {
-            if (!this.ReadInner(data))
-            {
-                this.socket.Close();
-                throw new AdbException($"An error occurred while reading {data.Length} bytes of data");
-            }
+            this.Read(data, -1, DdmPreferences.Timeout);
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int/*'/>
         public virtual int Read(byte[] data, int timeout)
         {
             int currentTimeout = this.socket.ReceiveTimeout;
@@ -75,21 +115,24 @@ namespace Managed.Adb
             }
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendFileRequest/*'/>
         public virtual void SendFileRequest(string command, string path, SyncService.FileMode mode)
         {
             byte[] commandContent = command.GetBytes(AdbHelper.Encoding);
             byte[] pathContent = path.GetBytes(AdbHelper.Encoding);
 
             byte[] request = SyncService.CreateSendFileRequest(commandContent, pathContent, mode);
-            this.Write(request, -1, DdmPreferences.Timeout);
+            this.Send(request, -1, DdmPreferences.Timeout);
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest/*'/>
         public virtual void SendSyncRequest(string command, int value)
         {
             var msg = SyncService.CreateRequest(command, value);
-            this.Write(msg, -1, DdmPreferences.Timeout);
+            this.Send(msg, -1, DdmPreferences.Timeout);
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadString/*'/>
         public virtual string ReadString()
         {
             // The first 4 bytes contain the length of the string
@@ -108,6 +151,7 @@ namespace Managed.Adb
             return value;
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAdbResponse/*'/>
         public virtual AdbResponse ReadAdbResponse(bool readDiagString)
         {
             var response = this.ReadAdbResponseInner(readDiagString);
@@ -121,6 +165,7 @@ namespace Managed.Adb
             return response;
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendAdbRequest/*'/>
         public virtual void SendAdbRequest(string request)
         {
             byte[] data = AdbHelper.FormAdbRequest(request);
@@ -131,62 +176,8 @@ namespace Managed.Adb
             }
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Send_byte_int_int/*'/>
         public virtual void Send(byte[] data, int length, int timeout)
-        {
-            this.Write(data, length, timeout);
-        }
-
-        public virtual void Read(byte[] data, int length, int timeout)
-        {
-            this.Read(data, length, timeout);
-        }
-
-        public Socket Socket
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Write until all data in "data" is written or the connection fails or times out.
-        /// </summary>
-        /// <param name="socket">The socket to write to.</param>
-        /// <param name="data">The data to send.</param>
-        /// <returns>
-        /// Returns <see langword="true"/> if all data was written; otherwise,
-        /// <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// This uses the default time out value.
-        /// </remarks>
-        protected bool Write(byte[] data)
-        {
-            try
-            {
-                this.Write(data, -1, DdmPreferences.Timeout);
-            }
-            catch (IOException e)
-            {
-                Log.e(TAG, e);
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Write until all data in <paramref name="data"/> is written, the optional <paramref name="length"/> is reached,
-        /// the <paramref name="timeout"/> expires, or the connection fails.
-        /// </summary>
-        /// <param name="socket">The socket to write the data to.</param>
-        /// <param name="data">The data to send.</param>
-        /// <param name="length">The length to write or -1 to send the whole buffer.</param>
-        /// <param name="timeout">The timeout value. A timeout of zero means "wait forever".</param>
-        /// <exception cref="AdbException">
-        /// channel EOF
-        /// or
-        /// timeout
-        /// </exception>
-        protected void Write(byte[] data, int length, int timeout)
         {
             int numWaits = 0;
             int count = -1;
@@ -222,137 +213,8 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        /// Reads the response from ADB after a command.
-        /// </summary>
-        /// <param name="socket">The socket channel that is connected to adb.</param>
-        /// <param name="readDiagString">
-        /// if <see langword="true"/>, we're expecting an <c>OKAY</c> response to be
-        /// followed by a diagnostic string. Otherwise, we only expect the
-        /// diagnostic string to follow a <c>FAIL</c>.</param>
-        /// <returns>
-        /// A <see cref="AdbResponse"/> that represents the response received from ADB.
-        /// </returns>
-        protected AdbResponse ReadAdbResponseInner(bool readDiagString)
-        {
-            AdbResponse resp = new AdbResponse();
-
-            byte[] reply = new byte[4];
-            if (!this.ReadInner(reply))
-            {
-                return resp;
-            }
-
-            resp.IOSuccess = true;
-
-            if (IsOkay(reply))
-            {
-                resp.Okay = true;
-            }
-            else
-            {
-                readDiagString = true; // look for a reason after the FAIL
-                resp.Okay = false;
-            }
-
-            // not a loop -- use "while" so we can use "break"
-            while (readDiagString)
-            {
-                // length string is in next 4 bytes
-                byte[] lenBuf = new byte[4];
-                if (!ReadInner(lenBuf))
-                {
-                    Log.w(TAG, "Expected diagnostic string not found");
-                    break;
-                }
-
-                string lenStr = this.ReplyToString(lenBuf);
-
-                int len;
-                try
-                {
-                    len = int.Parse(lenStr, System.Globalization.NumberStyles.HexNumber);
-                }
-                catch (FormatException)
-                {
-                    Log.e(TAG, "Expected digits, got '{0}' : {1} {2} {3} {4}", lenBuf[0], lenBuf[1], lenBuf[2], lenBuf[3]);
-                    Log.e(TAG, "reply was {0}", this.ReplyToString(reply));
-                    break;
-                }
-
-                byte[] msg = new byte[len];
-                if (!ReadInner(msg))
-                {
-                    Log.e(TAG, "Failed reading diagnostic string, len={0}", len);
-                    break;
-                }
-
-                resp.Message = this.ReplyToString(msg);
-                Log.e(TAG, "Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
-
-                break;
-            }
-
-            return resp;
-        }
-
-        /// <summary>
-        /// Reads from the socket until the array is filled, or no more data is coming (because
-        /// the socket closed or the timeout expired).
-        /// </summary>
-        /// <param name="socket">
-        /// The opened socket to read from. It must be in non-blocking mode for timeouts to work.
-        /// </param>
-        /// <param name="data">
-        /// The buffer to store the read data into.</param>
-        /// <returns>
-        /// <see langword="true"/> if the data was read successfully; otherwise,
-        /// <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// This uses the default time out value.
-        /// </remarks>
-        protected bool ReadInner(byte[] data)
-        {
-            try
-            {
-                Read(this.socket, data, -1, DdmPreferences.Timeout);
-            }
-            catch (AdbException e)
-            {
-                Log.e(TAG, e);
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Reads from the socket until the array is filled, the optional <paramref name="length"/>
-        /// is reached, or no more data is coming (because the socket closed or the
-        /// timeout expired). After <paramref name="timeout"/> milliseconds since the
-        /// previous successful read, this will return whether or not new data has
-        /// been found.
-        /// </summary>
-        /// <param name="socket">
-        /// The opened socket to read from. It must be in non-blocking
-        /// mode for timeouts to work
-        /// </param>
-        /// <param name="data">
-        /// The buffer to store the read data into.
-        /// </param>
-        /// <param name="length">
-        /// The length to read or -1 to fill the data buffer completely
-        /// </param>
-        /// <param name="timeout">
-        /// The timeout value in ms. A timeout of zero means "wait forever".
-        /// </param>
-        /// <exception cref="AdbException">
-        /// EOF
-        /// or
-        /// No Data to read: exception.Message
-        /// </exception>
-        public static void Read(Socket socket, byte[] data, int length, int timeout)
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int_int/*'/>
+        public void Read(byte[] data, int length, int timeout)
         {
             int expLen = length != -1 ? length : data.Length;
             int count = -1;
@@ -363,11 +225,11 @@ namespace Managed.Adb
                 try
                 {
                     int left = expLen - totalRead;
-                    int buflen = left < socket.ReceiveBufferSize ? left : socket.ReceiveBufferSize;
+                    int buflen = left < this.socket.ReceiveBufferSize ? left : this.socket.ReceiveBufferSize;
 
                     byte[] buffer = new byte[buflen];
-                    socket.ReceiveBufferSize = expLen;
-                    count = socket.Receive(buffer, buflen, SocketFlags.None);
+                    this.socket.ReceiveBufferSize = expLen;
+                    count = this.socket.Receive(buffer, buflen, SocketFlags.None);
                     if (count < 0)
                     {
                         Log.e(TAG, "read: channel EOF");
@@ -391,15 +253,71 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Determines whether the specified reply is okay.
+        /// Write until all data in "data" is written or the connection fails or times out.
         /// </summary>
-        /// <param name="reply">The reply.</param>
+        /// <param name="data">The data to send.</param>
         /// <returns>
-        ///   <see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.
+        /// Returns <see langword="true"/> if all data was written; otherwise,
+        /// <see langword="false"/>.
         /// </returns>
-        public static bool IsOkay(byte[] reply)
+        /// <remarks>
+        /// This uses the default time out value.
+        /// </remarks>
+        protected bool Write(byte[] data)
         {
-            return reply.GetString().Equals("OKAY");
+            try
+            {
+                this.Send(data, -1, DdmPreferences.Timeout);
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Reads the response from ADB after a command.
+        /// </summary>
+        /// <param name="readDiagString">
+        /// if <see langword="true"/>, we're expecting an <c>OKAY</c> response to be
+        /// followed by a diagnostic string. Otherwise, we only expect the
+        /// diagnostic string to follow a <c>FAIL</c>.</param>
+        /// <returns>
+        /// A <see cref="AdbResponse"/> that represents the response received from ADB.
+        /// </returns>
+        protected AdbResponse ReadAdbResponseInner(bool readDiagString)
+        {
+            AdbResponse resp = new AdbResponse();
+
+            byte[] reply = new byte[4];
+            this.Read(reply);
+
+            resp.IOSuccess = true;
+
+            if (IsOkay(reply))
+            {
+                resp.Okay = true;
+            }
+            else
+            {
+                readDiagString = true; // look for a reason after the FAIL
+                resp.Okay = false;
+            }
+
+            // not a loop -- use "while" so we can use "break"
+            while (readDiagString)
+            {
+                var message = this.ReadString();
+                resp.Message = message;
+                Log.e(TAG, "Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
+
+                break;
+            }
+
+            return resp;
         }
 
         /// <summary>
