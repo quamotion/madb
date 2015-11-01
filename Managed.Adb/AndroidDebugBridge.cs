@@ -18,6 +18,71 @@ namespace Managed.Adb
     public sealed class AndroidDebugBridge
     {
         /// <summary>
+        /// The tag to use when logging.
+        /// </summary>
+        public const string Tag = nameof(AndroidDebugBridge);
+
+        /// <summary>
+        /// The default ADB bridge port
+        /// </summary>
+        public const int AdbPort = 5037;
+
+        /// <summary>
+        /// The regex pattern for getting the adb version
+        /// </summary>
+        private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
+
+        /// <summary>
+        /// The minum version of adb that is supported.
+        /// </summary>
+        private static readonly Version RequiredAdbVersion = new Version(1, 0, 20);
+
+        /// <summary>
+        ///
+        /// </summary>
+        private static AndroidDebugBridge instance;
+
+        /// <summary>
+        /// Initializes static members of the <see cref="AndroidDebugBridge"/> class.
+        /// </summary>
+        static AndroidDebugBridge()
+        {
+            // built-in local address/port for ADB.
+            SocketAddress = new IPEndPoint(IPAddress.Loopback, AdbPort);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AndroidDebugBridge"/> class.
+        /// </summary>
+        /// <param name="osLocation">the location of the command line tool</param>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="FileNotFoundException"></exception>
+        private AndroidDebugBridge(string osLocation)
+        {
+            if (string.IsNullOrEmpty(osLocation))
+            {
+                throw new ArgumentException();
+            }
+
+            if (!File.Exists(osLocation))
+            {
+                Log.e(Tag, string.Format("unable to locate adb in the specified location: {0}", osLocation));
+                throw new FileNotFoundException("unable to locate adb in the specified location");
+            }
+
+            AdbOsLocation = osLocation;
+
+            this.CheckAdbVersion();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AndroidDebugBridge"/> class.
+        /// </summary>
+        private AndroidDebugBridge()
+        {
+        }
+
+        /// <summary>
         /// Occurs when the status of the Android Debug Bridge has changed.
         /// </summary>
         /// <ignore>true</ignore>
@@ -39,57 +104,10 @@ namespace Managed.Adb
         public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
         /// <summary>
-        /// The minum version of adb that is supported.
-        /// </summary>
-        private static readonly Version RequiredAdbVersion = new Version(1, 0, 20);
-
-        /// <summary>
-        /// The regex pattern for getting the adb version
-        /// </summary>
-        private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
-
-        /// <summary>
-        /// The tag to use when logging.
-        /// </summary>
-        public const string Tag = nameof(AndroidDebugBridge);
-
-        /// <summary>
-        /// The default ADB bridge port
-        /// </summary>
-        public const int AdbPort = 5037;
-
-        /// <summary>
-        ///
-        /// </summary>
-        private static AndroidDebugBridge instance;
-
-        /// <summary>
         /// Gets or sets the socket address.
         /// </summary>
         /// <value>The socket address.</value>
         public static IPEndPoint SocketAddress { get; private set; }
-
-        /// <summary>
-        /// Initializes static members of the <see cref="AndroidDebugBridge"/> class.
-        /// </summary>
-        static AndroidDebugBridge()
-        {
-            // built-in local address/port for ADB.
-            SocketAddress = new IPEndPoint(IPAddress.Loopback, AdbPort);
-        }
-
-        /// <summary>
-        /// Terminates the ddm library. This must be called upon application termination.
-        /// </summary>
-        public static void Terminate()
-        {
-            // kill the monitoring services
-            if (Instance != null && Instance.DeviceMonitor != null)
-            {
-                Instance.DeviceMonitor.Stop();
-                Instance.DeviceMonitor = null;
-            }
-        }
 
         /// <summary>
         /// Gets an instance of <see cref="AndroidDebugBridge"/>.
@@ -105,6 +123,52 @@ namespace Managed.Adb
                 }
 
                 return instance;
+            }
+        }
+
+        /// <summary>
+        /// Gets or Sets the adb location on the OS.
+        /// </summary>
+        /// <value>The adb location on the OS.</value>
+        public static string AdbOsLocation { get; set; }
+
+        /// <summary>
+        /// Gets the devices.
+        /// </summary>
+        /// <value>The devices.</value>
+        public IList<DeviceData> Devices
+        {
+            get
+            {
+                return AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress);
+            }
+        }
+
+        /// <summary>
+        /// Gets the device monitor
+        /// </summary>
+        public DeviceMonitor DeviceMonitor { get; private set; }
+
+        /// <summary>
+        /// Gets if the adb host has started
+        /// </summary>
+        private bool Started { get; set; }
+
+        /// <summary>
+        /// Gets the result of the version check
+        /// </summary>
+        private bool VersionCheck { get; set; }
+
+        /// <summary>
+        /// Terminates the ddm library. This must be called upon application termination.
+        /// </summary>
+        public static void Terminate()
+        {
+            // kill the monitoring services
+            if (Instance != null && Instance.DeviceMonitor != null)
+            {
+                Instance.DeviceMonitor.Stop();
+                Instance.DeviceMonitor = null;
             }
         }
 
@@ -193,85 +257,6 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AndroidDebugBridge"/> class.
-        /// </summary>
-        /// <param name="osLocation">the location of the command line tool</param>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="FileNotFoundException"></exception>
-        private AndroidDebugBridge(string osLocation)
-        {
-            if (string.IsNullOrEmpty(osLocation))
-            {
-                throw new ArgumentException();
-            }
-
-            if (!File.Exists(osLocation))
-            {
-                Log.e(Tag, string.Format("unable to locate adb in the specified location: {0}", osLocation));
-                throw new FileNotFoundException("unable to locate adb in the specified location");
-            }
-
-            AdbOsLocation = osLocation;
-
-            this.CheckAdbVersion();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AndroidDebugBridge"/> class.
-        /// </summary>
-        private AndroidDebugBridge()
-        {
-        }
-
-        /// <summary>
-        /// Raises the <see cref="BridgeChanged"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="AndroidDebugBridgeEventArgs"/> instance containing the event data.</param>
-        internal void OnBridgeChanged(AndroidDebugBridgeEventArgs e)
-        {
-            if (this.BridgeChanged != null)
-            {
-                this.BridgeChanged(this, e);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="DeviceChanged"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceChanged(DeviceDataEventArgs e)
-        {
-            if (this.DeviceChanged != null)
-            {
-                this.DeviceChanged(this, e);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="DeviceConnected"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceConnected(DeviceDataEventArgs e)
-        {
-            if (this.DeviceConnected != null)
-            {
-                this.DeviceConnected(this, e);
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="DeviceDisconnected"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceDisconnected(DeviceDataEventArgs e)
-        {
-            if (this.DeviceDisconnected != null)
-            {
-                this.DeviceDisconnected(this, e);
-            }
-        }
-
-        /// <summary>
         /// Starts the debug bridge.
         /// </summary>
         /// <returns><see langword="true"/> if success.</returns>
@@ -344,42 +329,99 @@ namespace Managed.Adb
                     this.DeviceMonitor = new DeviceMonitor(AdbHelper.SocketFactory.Create(AndroidDebugBridge.SocketAddress));
                     this.DeviceMonitor.Start();
                 }
-
             }
         }
 
-        /// <summary>
-        /// Gets or Sets the adb location on the OS.
-        /// </summary>
-        /// <value>The adb location on the OS.</value>
-        public static string AdbOsLocation { get; set; }
-
-        /// <summary>
-        /// Gets the devices.
-        /// </summary>
-        /// <value>The devices.</value>
-        public IList<DeviceData> Devices
+        internal static Version GetAdbVersion(List<string> standardOutput, List<string> standardError)
         {
-            get
+            var outputVersion = GetAdbVersion(standardOutput);
+
+            if (outputVersion != null)
             {
-                return AdbHelper.Instance.GetDevices(AndroidDebugBridge.SocketAddress);
+                return outputVersion;
+            }
+
+            var errorVersion = GetAdbVersion(standardError);
+
+            if (errorVersion != null)
+            {
+                return errorVersion;
+            }
+
+            throw new AdbException("Failed to retrieve the ADB version number");
+        }
+
+        internal static Version GetAdbVersion(List<string> output)
+        {
+            foreach (var line in output)
+            {
+                // Skip empty lines
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+
+                Match matcher = Regex.Match(line, AdbVersionPattern);
+                if (matcher.Success)
+                {
+                    int majorVersion = int.Parse(matcher.Groups[1].Value);
+                    int minorVersion = int.Parse(matcher.Groups[2].Value);
+                    int microVersion = int.Parse(matcher.Groups[3].Value);
+
+                    return new Version(majorVersion, minorVersion, microVersion);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="BridgeChanged"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="AndroidDebugBridgeEventArgs"/> instance containing the event data.</param>
+        internal void OnBridgeChanged(AndroidDebugBridgeEventArgs e)
+        {
+            if (this.BridgeChanged != null)
+            {
+                this.BridgeChanged(this, e);
             }
         }
 
         /// <summary>
-        /// Gets the device monitor
+        /// Raises the <see cref="DeviceChanged"/> event.
         /// </summary>
-        public DeviceMonitor DeviceMonitor { get; private set; }
+        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
+        internal void OnDeviceChanged(DeviceDataEventArgs e)
+        {
+            if (this.DeviceChanged != null)
+            {
+                this.DeviceChanged(this, e);
+            }
+        }
 
         /// <summary>
-        /// Gets if the adb host has started
+        /// Raises the <see cref="DeviceConnected"/> event.
         /// </summary>
-        private bool Started { get; set; }
+        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
+        internal void OnDeviceConnected(DeviceDataEventArgs e)
+        {
+            if (this.DeviceConnected != null)
+            {
+                this.DeviceConnected(this, e);
+            }
+        }
 
         /// <summary>
-        /// Gets the result of the version check
+        /// Raises the <see cref="DeviceDisconnected"/> event.
         /// </summary>
-        private bool VersionCheck { get; set; }
+        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
+        internal void OnDeviceDisconnected(DeviceDataEventArgs e)
+        {
+            if (this.DeviceDisconnected != null)
+            {
+                this.DeviceDisconnected(this, e);
+            }
+        }
 
         /// <summary>
         /// Queries adb for its version number and checks it against #MIN_VERSION_NUMBER and MAX_VERSION_NUMBER
@@ -413,49 +455,6 @@ namespace Managed.Adb
             this.VersionCheck = true;
         }
 
-        static internal Version GetAdbVersion(List<string> standardOutput, List<string> standardError)
-        {
-            var outputVersion = GetAdbVersion(standardOutput);
-
-            if (outputVersion != null)
-            {
-                return outputVersion;
-            }
-
-            var errorVersion = GetAdbVersion(standardError);
-
-            if (errorVersion != null)
-            {
-                return errorVersion;
-            }
-
-            throw new AdbException("Failed to retrieve the ADB version number");
-        }
-
-        static internal Version GetAdbVersion(List<string> output)
-        {
-            foreach (var line in output)
-            {
-                // Skip empty lines
-                if (string.IsNullOrEmpty(line))
-                {
-                    continue;
-                }
-
-                Match matcher = Regex.Match(line, AdbVersionPattern);
-                if (matcher.Success)
-                {
-                    int majorVersion = int.Parse(matcher.Groups[1].Value);
-                    int minorVersion = int.Parse(matcher.Groups[2].Value);
-                    int microVersion = int.Parse(matcher.Groups[3].Value);
-
-                    return new Version(majorVersion, minorVersion, microVersion);
-                }
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Starts the adb host side server.
         /// </summary>
@@ -486,32 +485,46 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Get the stderr/stdout outputs of a process and return when the process is done.
-        /// Both <b>must</b> be read or the process will block on windows.
+        /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
+        /// and reads the standard output and standard error output.
         /// </summary>
-        /// <param name="errorOutput">The array to store the stderr output. cannot be null.</param>
-        /// <param name="stdOutput">The array to store the stdout output. cannot be null.</param>
-        /// <returns>the process return code.</returns>
-        private void RunAdbProcess(string command, List<string> errorOutput, List<string> stdOutput)
+        /// <param name="command">
+        /// The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.
+        /// </param>
+        /// <param name="errorOutput">
+        /// A list in which to store the standard error output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard
+        /// error.
+        /// </param>
+        /// <param name="standardOutput">
+        /// A list in which to store the standard output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard
+        /// output.
+        /// </param>
+        /// <remarks>
+        /// <para>
+        /// The path to <c>adb.exe</c> is retrieved from the <see cref="AdbOsLocation"/> property.
+        /// </para>
+        /// <para>
+        /// Use this command only for <c>adb</c> commands that return immediately, such as
+        /// <c>adb version</c>. This operation times out after 5 seconds.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="AdbException">
+        /// The process exited with an exit code other than <c>0</c>.
+        /// </exception>
+        private void RunAdbProcess(string command, List<string> errorOutput, List<string> standardOutput)
         {
-            if (errorOutput == null)
-            {
-                throw new ArgumentNullException(nameof(errorOutput));
-            }
-
-            if (stdOutput == null)
-            {
-                throw new ArgumentNullException(nameof(stdOutput));
-            }
-
             int status;
 
-            ProcessStartInfo psi = new ProcessStartInfo(AdbOsLocation, command);
-            psi.CreateNoWindow = true;
-            psi.WindowStyle = ProcessWindowStyle.Hidden;
-            psi.UseShellExecute = false;
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardOutput = true;
+            ProcessStartInfo psi = new ProcessStartInfo(AdbOsLocation, command)
+            {
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
 
             using (Process process = Process.Start(psi))
             {
@@ -523,9 +536,9 @@ namespace Managed.Adb
                     errorOutput.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
                 }
 
-                if (stdOutput != null)
+                if (standardOutput != null)
                 {
-                    stdOutput.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+                    standardOutput.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
                 }
 
                 // get the return code from the process
