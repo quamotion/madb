@@ -22,7 +22,7 @@ namespace Managed.Adb
         /// <summary>
         /// Logging tag
         /// </summary>
-        private const string TAG = "DeviceMonitor";
+        private const string Tag = nameof(DeviceMonitor);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
@@ -49,44 +49,37 @@ namespace Managed.Adb
         public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
         /// <summary>
-        /// Gets the devices.
+        /// Gets the devices that are currently connected to the Android Debug Bridge.
         /// </summary>
         public IList<DeviceData> Devices { get; private set; }
 
-        public IAdbSocket Socket { get; private set; }
-
         /// <summary>
-        /// Gets a value indicating whether this instance is monitoring.
+        /// Gets the <see cref="IAdbSocket"/> that represents the connection to the
+        /// Android Debug Bridge.
         /// </summary>
-        /// <value>
-        /// 	<see langword="true"/> if this instance is monitoring; otherwise, <see langword="false"/>.
-        /// </value>
-        public bool IsMonitoring { get; private set; }
+        public IAdbSocket Socket { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is running.
         /// </summary>
         /// <value>
-        /// 	<see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.
+        /// <see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.
         /// </value>
         public bool IsRunning { get; private set; }
 
-        /// <summary>
-        /// Gets or sets the main adb connection.
-        /// </summary>
-        /// <value>
-        /// The main adb connection.
-        /// </value>
-        private Socket MainAdbConnection { get; set; }
+        Thread monitorThread;
 
         /// <summary>
         /// Starts the monitoring
         /// </summary>
         public void Start()
         {
-            Thread t = new Thread(new ThreadStart(this.DeviceMonitorLoop));
-            t.Name = "Device List Monitor";
-            t.Start();
+            if (this.monitorThread == null)
+            {
+                this.monitorThread = new Thread(new ThreadStart(this.DeviceMonitorLoop));
+                this.monitorThread.Name = "Device List Monitor";
+                this.monitorThread.Start();
+            }
         }
 
         /// <summary>
@@ -94,18 +87,22 @@ namespace Managed.Adb
         /// </summary>
         public void Dispose()
         {
-            this.IsRunning = false;
+            // Signal the monitor thread to stop.
+            if (this.monitorThread != null)
+            {
+                this.IsRunning = false;
 
-            // wakeup the main loop thread by closing the main connection to adb.
-            try
-            {
-                if (this.MainAdbConnection != null)
-                {
-                    this.MainAdbConnection.Close();
-                }
+                // Wait for the monitor thread to stop.
+                this.monitorThread.Join();
+
+                this.monitorThread = null;
             }
-            catch (IOException)
+
+            // Close the connection to adb
+            if (this.Socket != null)
             {
+                this.Socket.Dispose();
+                this.Socket = null;
             }
         }
 
@@ -113,7 +110,7 @@ namespace Managed.Adb
         /// Raises the <see cref="DeviceChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceChanged(DeviceDataEventArgs e)
+        protected void OnDeviceChanged(DeviceDataEventArgs e)
         {
             if (this.DeviceChanged != null)
             {
@@ -125,7 +122,7 @@ namespace Managed.Adb
         /// Raises the <see cref="DeviceConnected"/> event.
         /// </summary>
         /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceConnected(DeviceDataEventArgs e)
+        protected void OnDeviceConnected(DeviceDataEventArgs e)
         {
             if (this.DeviceConnected != null)
             {
@@ -137,7 +134,7 @@ namespace Managed.Adb
         /// Raises the <see cref="DeviceDisconnected"/> event.
         /// </summary>
         /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        internal void OnDeviceDisconnected(DeviceDataEventArgs e)
+        protected void OnDeviceDisconnected(DeviceDataEventArgs e)
         {
             if (this.DeviceDisconnected != null)
             {
@@ -179,7 +176,7 @@ namespace Managed.Adb
                 }
                 catch (Exception ex)
                 {
-                    Log.e(TAG, ex);
+                    Log.e(Tag, ex);
                 }
             }
             while (this.IsRunning);
@@ -205,7 +202,7 @@ namespace Managed.Adb
                 }
                 catch (ArgumentException ae)
                 {
-                    Log.e(TAG, ae);
+                    Log.e(Tag, ae);
                 }
             });
 
