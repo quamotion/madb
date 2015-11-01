@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Managed.Adb.Exceptions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -48,7 +49,14 @@ namespace Managed.Adb.Tests
 
         public AdbResponse ReadAdbResponse(bool readDiagString)
         {
-            return this.Responses.Dequeue();
+            var response = this.Responses.Dequeue();
+
+            if (!response.Okay)
+            {
+                throw new AdbException(response.Message, response);
+            }
+
+            return response;
         }
 
         public string ReadString()

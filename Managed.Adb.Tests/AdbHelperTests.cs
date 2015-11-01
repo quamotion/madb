@@ -178,6 +178,7 @@ namespace Managed.Adb.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void ExecuteRemoteCommandTest()
         {
             var device = new DeviceData()
