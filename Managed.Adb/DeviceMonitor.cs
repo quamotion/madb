@@ -34,6 +34,21 @@ namespace Managed.Adb
         }
 
         /// <summary>
+        /// Occurs when the status of one of the connected devices has changed.
+        /// </summary>
+        public event EventHandler<DeviceDataEventArgs> DeviceChanged;
+
+        /// <summary>
+        /// Occurs when a device has connected to the Android Debug Bridge.
+        /// </summary>
+        public event EventHandler<DeviceDataEventArgs> DeviceConnected;
+
+        /// <summary>
+        /// Occurs when a device has disconnected from the Android Debug Bridge.
+        /// </summary>
+        public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
+
+        /// <summary>
         /// Gets the devices.
         /// </summary>
         public IList<DeviceData> Devices { get; private set; }
@@ -91,6 +106,42 @@ namespace Managed.Adb
             }
             catch (IOException)
             {
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DeviceChanged"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
+        internal void OnDeviceChanged(DeviceDataEventArgs e)
+        {
+            if (this.DeviceChanged != null)
+            {
+                this.DeviceChanged(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DeviceConnected"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
+        internal void OnDeviceConnected(DeviceDataEventArgs e)
+        {
+            if (this.DeviceConnected != null)
+            {
+                this.DeviceConnected(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DeviceDisconnected"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
+        internal void OnDeviceDisconnected(DeviceDataEventArgs e)
+        {
+            if (this.DeviceDisconnected != null)
+            {
+                this.DeviceDisconnected(this, e);
             }
         }
 

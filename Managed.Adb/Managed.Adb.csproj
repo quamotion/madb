@@ -113,7 +113,6 @@
     <Compile Include="AdbServer.cs" />
     <Compile Include="AdbSocket.cs" />
     <Compile Include="AdbSocketFactory.cs" />
-    <Compile Include="AndroidDebugBridge.cs" />
     <Compile Include="ColorData.cs" />
     <Compile Include="DeviceData.cs" />
     <Compile Include="DeviceDataEventArgs.cs" />
