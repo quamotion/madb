@@ -19,8 +19,19 @@ namespace Managed.Adb.Tests
             private set;
         }
 
+        public Exception Exception
+        {
+            get;
+            set;
+        }
+
         public IAdbSocket Create(IPEndPoint endPoint)
         {
+            if(this.Exception != null)
+            {
+                throw this.Exception;
+            }
+
             return this.Socket;
         }
     }

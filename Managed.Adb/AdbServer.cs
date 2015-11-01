@@ -51,7 +51,7 @@ namespace Managed.Adb
         ///  one with no server application running.
         /// </remarks>
         /// <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/>
-        private const int ConnectionRefused = 10061;
+        internal const int ConnectionRefused = 10061;
 
         /// <summary>
         /// Gets or sets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server is listening..
