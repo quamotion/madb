@@ -8,11 +8,18 @@ namespace Managed.Adb
     using System;
     using System.Net;
 
+    /// <summary>
+    /// Provides extension methods for the <see cref="IAdbClient"/> interface. Provides overloads
+    /// for commonly used funtions.
+    /// </summary>
     public static class AdbClientExtensions
     {
         /// <summary>
         ///  Creates a port forwarding between a local and a remote port.
         /// </summary>
+        /// <param name="client">
+        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
+        /// </param>
         /// <param name="device">
         /// The device to which to forward the connections.
         /// </param>
@@ -22,7 +29,6 @@ namespace Managed.Adb
         /// <param name="remotePort">
         /// The remote port to forward to
         /// </param>
-        /// 
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
         /// failed to submit the forward command.
         /// or
@@ -36,6 +42,9 @@ namespace Managed.Adb
         /// <summary>
         /// Forwards a remote Unix socket to a local TCP socket.
         /// </summary>
+        /// <param name="client">
+        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
+        /// </param>
         /// <param name="device">
         /// The device to which to forward the connections.
         /// </param>
@@ -45,7 +54,6 @@ namespace Managed.Adb
         /// <param name="remoteSocket">
         /// The remote Unix socket.
         /// </param>
-        /// 
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
         /// The client failed to submit the forward command.
         /// </exception>
@@ -60,6 +68,9 @@ namespace Managed.Adb
         /// <summary>
         /// Executes a shell command on the remote device
         /// </summary>
+        /// <param name="client">
+        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
+        /// </param>
         /// <param name="command">The command to execute</param>
         /// <param name="device">The device to execute on</param>
         /// <param name="rcvr">The shell output receiver</param>
@@ -71,6 +82,9 @@ namespace Managed.Adb
         /// <summary>
         /// Runs the Event log service on the Device, and provides its output to the LogReceiver.
         /// </summary>
+        /// <param name="client">
+        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
+        /// </param>
         /// <param name="device">The device.</param>
         /// <param name="rcvr">The RCVR.</param>
         public static void RunEventLogService(this IAdbClient client, DeviceData device, LogReceiver rcvr)
@@ -81,6 +95,9 @@ namespace Managed.Adb
         /// <summary>
         /// Reboots the specified adb socket address.
         /// </summary>
+        /// <param name="client">
+        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
+        /// </param>
         /// <param name="device">The device.</param>
         public static void Reboot(this IAdbClient client, DeviceData device)
         {
@@ -90,6 +107,9 @@ namespace Managed.Adb
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
+        /// <param name="client">
+        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
+        /// </param>
         /// <param name="address">
         /// The IP address of the remote device.
         /// </param>
@@ -106,6 +126,9 @@ namespace Managed.Adb
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
+        /// <param name="client">
+        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
+        /// </param>
         /// <param name="host">
         /// The host address of the remote device.
         /// </param>
@@ -122,6 +145,9 @@ namespace Managed.Adb
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
+        /// <param name="client">
+        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
+        /// </param>
         /// <param name="endpoint">
         /// The IP endpoint at which the <c>adb</c> server on the device is running.
         /// </param>

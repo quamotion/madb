@@ -1,4 +1,4 @@
-﻿// <copyright file="AdbHelper.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+﻿// <copyright file="AdbClient.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
@@ -17,13 +17,8 @@ namespace Managed.Adb
     using System.Threading;
 
     /// <summary>
-    /// <para>
-    /// The Android Debug Bridge Helper class, to handle requests and connections to adb.
-    /// </para>
-    /// <para>
-    /// <seealso cref="AndroidDebugBridge"/> is the public API to connection to adb, while <see cref="AdbClient"/>
-    /// does the low level stuff.
-    /// </para>
+    /// Implements the <see cref="IAdbClient"/> interface, and allows you to interact with the
+    /// adb server and devices that are connected to that adb server.
     /// </summary>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
@@ -36,14 +31,14 @@ namespace Managed.Adb
         public const string DefaultEncoding = "ISO-8859-1";
 
         /// <summary>
-        /// Logging tag
-        /// </summary>
-        private const string Tag = nameof(AdbClient);
-
-        /// <summary>
         /// The default port to use when connecting to a device over TCP/IP.
         /// </summary>
         public const int DefaultPort = 5555;
+
+        /// <summary>
+        /// Logging tag
+        /// </summary>
+        private const string Tag = nameof(AdbClient);
 
         /// <summary>
         /// The default time to wait in the milliseconds.
@@ -55,6 +50,12 @@ namespace Managed.Adb
         /// </summary>
         private static AdbClient instance = null;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbClient"/> class.
+        /// </summary>
+        /// <param name="endPoint">
+        /// The <see cref="IPEndPoint"/> at which the adb server is listening.
+        /// </param>
         public AdbClient(IPEndPoint endPoint)
         {
             if (endPoint == null)
@@ -94,6 +95,9 @@ namespace Managed.Adb
         public static IAdbSocketFactory SocketFactory
         { get; set; } = new AdbSocketFactory();
 
+        /// <summary>
+        /// Gets or sets the <see cref="IPEndPoint"/> at which the adb server is listening.
+        /// </summary>
         public IPEndPoint EndPoint
         {
             get;
@@ -424,7 +428,7 @@ namespace Managed.Adb
                 return imageParams;
             }
         }
-        
+
         /// <include file='IAdbClient.xml' path='/IAdbClient/RunLogService/*'/>
         public void RunLogService(DeviceData device, string logName, LogReceiver receiver)
         {

@@ -8,6 +8,10 @@ namespace Managed.Adb
     using System.Collections.Generic;
     using System.Net;
 
+    /// <summary>
+    /// A common interface for any class that allows you to interact with the
+    /// adb server and devices that are connected to that adb server.
+    /// </summary>
     public interface IAdbClient
     {
         // The individual services are listed in the same order as
