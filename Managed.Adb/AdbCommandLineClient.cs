@@ -14,7 +14,7 @@ namespace Managed.Adb
     /// <summary>
     /// Provides methods for interacting with the <c>adb.exe</c> command line client.
     /// </summary>
-    public static class AdbCommandLineClient
+    public class AdbCommandLineClient : IAdbCommandLineClient
     {
         /// <summary>
         /// The tag to use when logging.
@@ -27,17 +27,62 @@ namespace Managed.Adb
         private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
+        /// </summary>
+        /// <param name="adbPath">
+        /// The path to the <c>adb.exe</c> executable.
+        /// </param>
+        public AdbCommandLineClient(string adbPath)
+        {
+            if (string.IsNullOrWhiteSpace(adbPath))
+            {
+                throw new ArgumentNullException(nameof(adbPath));
+            }
+
+            if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentOutOfRangeException(nameof(adbPath));
+            }
+
+            if (!File.Exists(adbPath))
+            {
+                throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
+        /// </summary>
+        protected AdbCommandLineClient()
+        {
+        }
+
+        /// <summary>
+        /// Gets the path to the <c>adb.exe</c> executable.
+        /// </summary>
+        public string AdbPath
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
         /// </summary>
-        public static Version GetVersion(string path)
+        public Version GetVersion()
         {
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = new List<string>();
 
-            RunAdbProcess(path, "version", null, standardOutput);
+            this.RunAdbProcess("version", null, standardOutput);
 
             // Parse the output to get the version.
             var version = GetVersionFromOutput(standardOutput);
+
+            if (version == null)
+            {
+                throw new AdbException($"The version of the adb executable at {this.AdbPath} could not be determined.");
+            }
 
             if (version < AdbServer.RequiredAdbVersion)
             {
@@ -52,12 +97,9 @@ namespace Managed.Adb
         /// <summary>
         /// Starts the adb server by running the <c>adb start-server</c> command.
         /// </summary>
-        /// <param name="path">
-        /// The path to the <c>adb.exe</c> executable.
-        /// </param>
-        public static void StartServer(string path)
+        public void StartServer()
         {
-            RunAdbProcess(path, "start-server", null, null);
+            this.RunAdbProcess("start-server", null, null);
         }
 
         /// <summary>
@@ -99,9 +141,6 @@ namespace Managed.Adb
         /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
         /// and reads the standard output and standard error output.
         /// </summary>
-        /// <param name="adbPath">
-        /// The path to the <c>adb.exe</c> program.
-        /// </param>
         /// <param name="command">
         /// The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.
         /// </param>
@@ -124,10 +163,8 @@ namespace Managed.Adb
         /// <exception cref="AdbException">
         /// The process exited with an exit code other than <c>0</c>.
         /// </exception>
-        private static void RunAdbProcess(string adbPath, string command, List<string> errorOutput, List<string> standardOutput)
+        protected virtual void RunAdbProcess(string command, List<string> errorOutput, List<string> standardOutput)
         {
-            GuardAdbPath(adbPath);
-
             if (command == null)
             {
                 throw new ArgumentNullException(nameof(command));
@@ -135,7 +172,7 @@ namespace Managed.Adb
 
             int status;
 
-            ProcessStartInfo psi = new ProcessStartInfo(adbPath, command)
+            ProcessStartInfo psi = new ProcessStartInfo(this.AdbPath, command)
             {
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
@@ -171,31 +208,6 @@ namespace Managed.Adb
             if (status != 0)
             {
                 throw new AdbException($"The adb process returned error code {status} when running command {command}");
-            }
-        }
-
-        /// <summary>
-        /// Throws an exception if the <paramref name="adbPath"/> parameter contains an invalid
-        /// value.
-        /// </summary>
-        /// <param name="adbPath">
-        /// The path to the <c>adb.exe</c> executable.
-        /// </param>
-        private static void GuardAdbPath(string adbPath)
-        {
-            if (string.IsNullOrWhiteSpace(adbPath))
-            {
-                throw new ArgumentNullException(nameof(adbPath));
-            }
-
-            if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ArgumentOutOfRangeException(nameof(adbPath));
-            }
-
-            if (!File.Exists(adbPath))
-            {
-                throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
             }
         }
     }

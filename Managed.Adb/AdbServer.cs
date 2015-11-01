@@ -34,6 +34,9 @@ namespace Managed.Adb
         /// </summary>
         public static readonly Version RequiredAdbVersion = new Version(1, 0, 20);
 
+        public static Func<string, IAdbCommandLineClient> AdbCommandLineClientFactory
+        { get; set; } = (path) => new AdbCommandLineClient(path);
+
         /// <summary>
         /// The tag to use when logging.
         /// </summary>
@@ -95,9 +98,11 @@ namespace Managed.Adb
             var serverStatus = GetStatus();
             Version commandLineVersion = null;
 
+            var commandLineClient = AdbCommandLineClientFactory(adbPath);
+
             if (adbPath != null)
             {
-                commandLineVersion = AdbCommandLineClient.GetVersion(adbPath);
+                commandLineVersion = commandLineClient.GetVersion();
             }
 
             // If the server is running, and no adb path is provided, check if we have the minimum
@@ -127,12 +132,12 @@ namespace Managed.Adb
                 serverStatus.IsRunning = false;
                 serverStatus.Version = null;
 
-                AdbCommandLineClient.StartServer(adbPath);
+                commandLineClient.StartServer();
                 return StartServerResult.RestartedOutdatedDaemon;
             }
             else if (!serverStatus.IsRunning)
             {
-                AdbCommandLineClient.StartServer(adbPath);
+                commandLineClient.StartServer();
                 return StartServerResult.Started;
             }
             else

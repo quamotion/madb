@@ -125,6 +125,7 @@
     <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="FilePermissions.cs" />
     <Compile Include="ForwardData.cs" />
+    <Compile Include="IAdbCommandLineClient.cs" />
     <Compile Include="IAdbSocket.cs" />
     <Compile Include="IAdbSocketFactory.cs" />
     <Compile Include="ISyncService.cs" />
