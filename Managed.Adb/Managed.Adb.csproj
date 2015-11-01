@@ -129,6 +129,7 @@
     <Compile Include="IAdbCommandLineClient.cs" />
     <Compile Include="IAdbSocket.cs" />
     <Compile Include="IAdbSocketFactory.cs" />
+    <Compile Include="IDeviceMonitor.cs" />
     <Compile Include="ISyncService.cs" />
     <Compile Include="Logs\ILogListener.cs" />
     <Compile Include="Logs\LogEntry.cs" />
@@ -194,6 +195,7 @@
     <Content Include="IAdbSocket.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="IDeviceMonitor.xml" />
     <Content Include="ISyncService.xml" />
   </ItemGroup>
   <ItemGroup>

@@ -8,16 +8,14 @@ namespace Managed.Adb
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
-    using System.Net.Sockets;
     using System.Threading;
 
     /// <summary>
     /// A Device monitor. This connects to the Android Debug Bridge and get device and
     /// debuggable process information from it.
     /// </summary>
-    public class DeviceMonitor : IDisposable
+    public class DeviceMonitor : IDeviceMonitor, IDisposable
     {
         /// <summary>
         /// Logging tag
@@ -25,32 +23,34 @@ namespace Managed.Adb
         private const string Tag = nameof(DeviceMonitor);
 
         /// <summary>
+        /// The thread that monitors the <see cref="Socket"/> and waits for device notifications.
+        /// </summary>
+        private Thread monitorThread;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
         /// </summary>
+        /// <param name="socket">
+        /// The <see cref="IAdbSocket"/> that manages the connection with the adb server.
+        /// </param>
         public DeviceMonitor(IAdbSocket socket)
         {
             this.Socket = socket;
             this.Devices = new List<DeviceData>();
+
+            this.Start();
         }
 
-        /// <summary>
-        /// Occurs when the status of one of the connected devices has changed.
-        /// </summary>
+        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceChanged/*'/>
         public event EventHandler<DeviceDataEventArgs> DeviceChanged;
 
-        /// <summary>
-        /// Occurs when a device has connected to the Android Debug Bridge.
-        /// </summary>
+        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceConnected/*'/>
         public event EventHandler<DeviceDataEventArgs> DeviceConnected;
 
-        /// <summary>
-        /// Occurs when a device has disconnected from the Android Debug Bridge.
-        /// </summary>
+        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceDisconnected/*'/>
         public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
-        /// <summary>
-        /// Gets the devices that are currently connected to the Android Debug Bridge.
-        /// </summary>
+        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Devices/*'/>
         public IList<DeviceData> Devices { get; private set; }
 
         /// <summary>
@@ -67,12 +67,10 @@ namespace Managed.Adb
         /// </value>
         public bool IsRunning { get; private set; }
 
-        Thread monitorThread;
-
         /// <summary>
         /// Starts the monitoring
         /// </summary>
-        public void Start()
+        private void Start()
         {
             if (this.monitorThread == null)
             {
@@ -231,10 +229,12 @@ namespace Managed.Adb
                     if (existingDevice == null)
                     {
                         this.Devices.Add(device);
+                        this.OnDeviceConnected(new DeviceDataEventArgs(device));
                     }
                     else
                     {
                         existingDevice.State = device.State;
+                        this.OnDeviceChanged(new DeviceDataEventArgs(existingDevice));
                     }
                 }
 
@@ -242,6 +242,7 @@ namespace Managed.Adb
                 foreach (var device in this.Devices.Where(d => !list.Any(e => e.Serial == d.Serial)).ToArray())
                 {
                     this.Devices.Remove(device);
+                    this.OnDeviceDisconnected(new DeviceDataEventArgs(device));
                 }
             }
         }
