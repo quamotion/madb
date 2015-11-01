@@ -4,9 +4,10 @@
 
 namespace Managed.Adb
 {
+    using Managed.Adb.Exceptions;
+    using Managed.Adb.Logs;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -14,8 +15,6 @@ namespace Managed.Adb
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
-    using Managed.Adb.Exceptions;
-    using Managed.Adb.Logs;
 
     /// <summary>
     /// <para>
@@ -29,7 +28,7 @@ namespace Managed.Adb
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso>
-    public class AdbClient
+    public class AdbClient : IAdbClient
     {
         /// <summary>
         /// The default encoding
@@ -39,12 +38,12 @@ namespace Managed.Adb
         /// <summary>
         /// Logging tag
         /// </summary>
-        private const string TAG = "AdbHelper";
+        private const string Tag = nameof(AdbClient);
 
         /// <summary>
         /// The default port to use when connecting to a device over TCP/IP.
         /// </summary>
-        private const int DefaultPort = 5555;
+        public const int DefaultPort = 5555;
 
         /// <summary>
         /// The default time to wait in the milliseconds.
@@ -142,22 +141,7 @@ namespace Managed.Adb
             return FormAdbRequest(request);
         }
 
-        // The individual services are listed in the same order as
-        // https://android.googlesource.com/platform/system/core/+/master/adb/SERVICES.TXT
-
-        /// <summary>
-        /// Ask the ADB server for its internal version number.
-        /// </summary>
-        /// 
-        /// <returns>
-        /// The ADB version number.
-        /// </returns>
-        /// <exception cref="IOException">
-        /// An error occurred connecting to ADB
-        /// </exception>
-        /// <exception cref="AdbException">
-        /// An error occurred connecting to ADB
-        /// </exception>
+        /// <include file='IAdbClient.xml' path='/IAdbClient/GetAdbVersion/*'/>
         public int GetAdbVersion()
         {
             using (var socket = SocketFactory.Create(this.EndPoint))
@@ -170,13 +154,7 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        /// Ask the ADB server to quit immediately. This is used when the
-        /// ADB client detects that an obsolete server is running after an
-        /// upgrade.
-        /// </summary>
-        /// 
-        /// <exception cref="System.IO.IOException">failed asking to kill adb</exception>
+        /// <include file='IAdbClient.xml' path='/IAdbClient/KillAdb/*'/>
         public void KillAdb()
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
@@ -188,11 +166,7 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        /// Gets the devices that are available for communication.
-        /// </summary>
-        /// 
-        /// <returns>A list of devices that are connected.</returns>
+        /// <include file='IAdbClient.xml' path='/IAdbClient/GetDevices/*'/>
         public List<DeviceData> GetDevices()
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
@@ -206,10 +180,6 @@ namespace Managed.Adb
                 return data.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
             }
         }
-
-        // host:track-devices is implemented by the DeviceMonitor.
-
-        // host:emulator is not implemented
 
         /// <summary>
         /// Ask to switch the connection to the device/emulator identified by
@@ -253,56 +223,7 @@ namespace Managed.Adb
             }
         }
 
-        // host:transport-usb is not implemented
-        // host:transport-local is not implemented
-        // host:transport-any is not implemented
-
-        // <host-prefix>:get-product is not implemented
-        // <host-prefix>:get-serialno is not implemented
-        // <host-prefix>:get-devpath is not implemented
-        // <host-prefix>:get-state is not implemented
-
-        /// <summary>
-        /// Asks the ADB server to forward local connections from <paramref name="local"/>
-        /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
-        /// </summary>
-        /// <param name="device">
-        /// The device to which to forward the connections.
-        /// </param>
-        /// <param name="local">
-        /// <para>
-        /// The local address to forward. This value can be in one of:
-        /// </para>
-        /// <list type="ordered">
-        ///     <item>
-        ///         <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
-        ///     </item>
-        ///     <item>
-        ///         <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt;
-        ///     </item>
-        /// </list>
-        /// </param>
-        /// <param name="remote">
-        /// <para>
-        /// The remote address to forward. This value can be in one of:
-        /// </para>
-        /// <list type="ordered">
-        ///     <item>
-        ///         <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
-        ///     </item>
-        ///     <item>
-        ///         <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt; on device
-        ///     </item>
-        ///     <item>
-        ///         <c>jdwp:&lt;pid&gt;</c>: JDWP thread on VM process &lt;pid&gt; on device.
-        ///     </item>
-        /// </list>
-        /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if there is already a forward
-        /// connection from <paramref name="local"/>.
-        /// </param>
-        /// 
+        /// <include file='IAdbClient.xml' path='/IAdbClient/CreateForward/*'/>
         public void CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
@@ -314,63 +235,7 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        ///  Creates a port forwarding between a local and a remote port.
-        /// </summary>
-        /// <param name="device">
-        /// The device to which to forward the connections.
-        /// </param>
-        /// <param name="localPort">
-        /// The local port to forward.
-        /// </param>
-        /// <param name="remotePort">
-        /// The remote port to forward to
-        /// </param>
-        /// 
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// failed to submit the forward command.
-        /// or
-        /// Device rejected command:  + resp.Message
-        /// </exception>
-        public void CreateForward(DeviceData device, int localPort, int remotePort)
-        {
-            this.CreateForward(device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
-        }
-
-        /// <summary>
-        /// Forwards a remote Unix socket to a local TCP socket.
-        /// </summary>
-        /// <param name="device">
-        /// The device to which to forward the connections.
-        /// </param>
-        /// <param name="localPort">
-        /// The local port to forward.
-        /// </param>
-        /// <param name="remoteSocket">
-        /// The remote Unix socket.
-        /// </param>
-        /// 
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// The client failed to submit the forward command.
-        /// </exception>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// The device rejected command. The error message will include the error message provided by the device.
-        /// </exception>
-        public void CreateForward(DeviceData device, int localPort, string remoteSocket)
-        {
-            this.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
-        }
-
-        /// <summary>
-        /// Remove a port forwarding between a local and a remote port.
-        /// </summary>
-        /// <param name="device">
-        /// The device on which to remove the port forwarding
-        /// </param>
-        /// <param name="localPort">
-        /// Specification of the local port that was forwarded
-        /// </param>
-        /// 
+        /// <include file='IAdbClient.xml' path='/IAdbClient/RemoveForward/*'/>
         public void RemoveForward(DeviceData device, int localPort)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
@@ -380,13 +245,7 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        /// Removes all forwards for a given device.
-        /// </summary>
-        /// <param name="device">
-        /// The device on which to remove the port forwarding
-        /// </param>
-        /// 
+        /// <include file='IAdbClient.xml' path='/IAdbClient/RemoveAllForwards/*'/>
         public void RemoveAllForwards(DeviceData device)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
@@ -396,16 +255,7 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        /// List all existing forward connections from this server.
-        /// </summary>
-        /// <param name="device">
-        /// The device for which to list the existing foward connections.
-        /// </param>
-        /// 
-        /// <returns>
-        /// A <see cref="ForwardData"/> entry for each existing forward connection.
-        /// </returns>
+        /// <include file='IAdbClient.xml' path='/IAdbClient/ListForward/*'/>
         public IEnumerable<ForwardData> ListForward(DeviceData device)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
@@ -421,32 +271,7 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        /// Executes the remote command.
-        /// </summary>
-        /// <param name="command">
-        /// The command to execute.
-        /// </param>
-        /// <param name="device">
-        /// The device on which to execute the command.
-        /// </param>
-        /// <param name="rcvr">
-        /// A <see cref="IShellOutputReceiver"/> that receives the command output. Set to <see langword="null"/>
-        /// if you are not interested in the output.
-        /// </param>
-        /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
-        /// 
-        /// <exception cref="System.OperationCanceledException"></exception>
-        /// <exception cref="System.IO.FileNotFoundException">
-        /// </exception>
-        /// <exception cref="Managed.Adb.Exceptions.UnknownOptionException"></exception>
-        /// <exception cref="Managed.Adb.Exceptions.CommandAbortingException"></exception>
-        /// <exception cref="Managed.Adb.Exceptions.PermissionDeniedException"></exception>
-        /// <exception cref="Managed.Adb.Exceptions.ShellCommandUnresponsiveException"></exception>
-        /// <exception cref="AdbException">failed submitting shell command</exception>
-        /// <exception cref="UnknownOptionException"></exception>
-        /// <exception cref="CommandAbortingException"></exception>
-        /// <exception cref="PermissionDeniedException"></exception>
+        /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
         public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
@@ -464,7 +289,7 @@ namespace Managed.Adb
                     {
                         if (rcvr != null && rcvr.IsCancelled)
                         {
-                            Log.w(TAG, "execute: cancelled");
+                            Log.w(Tag, "execute: cancelled");
                             throw new OperationCanceledException();
                         }
 
@@ -474,7 +299,7 @@ namespace Managed.Adb
                         {
                             // we're at the end, we flush the output
                             rcvr.Flush();
-                            Log.w(TAG, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count);
+                            Log.w(Tag, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count);
                             break;
                         }
                         else
@@ -490,27 +315,27 @@ namespace Managed.Adb
                                 var sdataTrimmed = sdata.Trim();
                                 if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))
                                 {
-                                    Log.w(TAG, "The remote execution returned: '{0}: not found'", cmd[0]);
+                                    Log.w(Tag, "The remote execution returned: '{0}: not found'", cmd[0]);
                                     throw new FileNotFoundException(string.Format("The remote execution returned: '{0}: not found'", cmd[0]));
                                 }
 
                                 if (sdataTrimmed.EndsWith("No such file or directory"))
                                 {
-                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
+                                    Log.w(Tag, "The remote execution returned: {0}", sdataTrimmed);
                                     throw new FileNotFoundException(string.Format("The remote execution returned: {0}", sdataTrimmed));
                                 }
 
                                 // for "unknown options"
                                 if (sdataTrimmed.Contains("Unknown option"))
                                 {
-                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
+                                    Log.w(Tag, "The remote execution returned: {0}", sdataTrimmed);
                                     throw new UnknownOptionException(sdataTrimmed);
                                 }
 
                                 // for "aborting" commands
                                 if (sdataTrimmed.IsMatch("Aborting.$"))
                                 {
-                                    Log.w(TAG, "The remote execution returned: {0}", sdataTrimmed);
+                                    Log.w(Tag, "The remote execution returned: {0}", sdataTrimmed);
                                     throw new CommandAbortingException(sdataTrimmed);
                                 }
 
@@ -518,7 +343,7 @@ namespace Managed.Adb
                                 // cmd: applet not found
                                 if (sdataTrimmed.IsMatch("applet not found$") && cmd.Length > 1)
                                 {
-                                    Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
+                                    Log.w(Tag, "The remote execution returned: '{0}'", sdataTrimmed);
                                     throw new FileNotFoundException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
                                 }
 
@@ -526,7 +351,7 @@ namespace Managed.Adb
                                 // workitem: 16822
                                 if (sdataTrimmed.IsMatch("(permission|access) denied$"))
                                 {
-                                    Log.w(TAG, "The remote execution returned: '{0}'", sdataTrimmed);
+                                    Log.w(Tag, "The remote execution returned: '{0}'", sdataTrimmed);
                                     throw new PermissionDeniedException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
                                 }
                             }
@@ -550,26 +375,7 @@ namespace Managed.Adb
             }
         }
 
-        // shell: not implemented
-        // remount: not implemented
-        // dev:<path> not implemented
-        // tcp:<port> not implemented
-        // tcp:<port>:<server-name> not implemented
-        // local:<path> not implemented
-        // localreserved:<path> not implemented
-        // localabstract:<path> not implemented
-
-        /// <summary>
-        /// Gets the frame buffer from the specified end point.
-        /// </summary>
-        /// <param name="device">The device.</param>
-        /// 
-        /// <returns>Returns the RawImage.</returns>
-        /// <exception cref="Managed.Adb.Exceptions.AdbException">
-        /// failed asking for frame buffer
-        /// or
-        /// failed nudging
-        /// </exception>
+        /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
         public RawImage GetFrameBuffer(DeviceData device)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
@@ -605,12 +411,12 @@ namespace Managed.Adb
                     // fill the RawImage with the header
                     if (imageParams.ReadHeader(version, reader) == false)
                     {
-                        Log.w(TAG, "Unsupported protocol: " + version);
+                        Log.w(Tag, "Unsupported protocol: " + version);
                         return null;
                     }
                 }
 
-                Log.d(TAG, $"image params: bpp={imageParams.Bpp}, size={imageParams.Size}, width={imageParams.Width}, height={imageParams.Height}");
+                Log.d(Tag, $"image params: bpp={imageParams.Bpp}, size={imageParams.Size}, width={imageParams.Width}, height={imageParams.Height}");
 
                 reply = new byte[imageParams.Size];
                 socket.Read(reply);
@@ -618,48 +424,9 @@ namespace Managed.Adb
                 return imageParams;
             }
         }
-
-        // jdwp:<pid>: not implemented
-        // track-jdwp: not implemented
-        // sync: not implemented
-        // reverse:<forward-command>: not implemented
-
-        /// <summary>
-        /// Executes a shell command on the remote device
-        /// </summary>
-        /// <param name="command">The command to execute</param>
-        /// <param name="device">The device to execute on</param>
-        /// <param name="rcvr">The shell output receiver</param>
-        /// 
-        /// <exception cref="FileNotFoundException">Throws if the result is 'command': not found</exception>
-        /// <exception cref="IOException">Throws if there is a problem reading / writing to the socket</exception>
-        /// <exception cref="OperationCanceledException">Throws if the execution was canceled</exception>
-        /// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
-        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr)
-        {
-            this.ExecuteRemoteCommand(command, device, rcvr, int.MaxValue);
-        }
-
-        /// <summary>
-        /// Runs the Event log service on the Device, and provides its output to the LogReceiver.
-        /// </summary>
-        /// <param name="device">The device.</param>
-        /// <param name="rcvr">The RCVR.</param>
-        /// 
-        public void RunEventLogService(DeviceData device, LogReceiver rcvr)
-        {
-            this.RunLogService(device, "events", rcvr);
-        }
-
-        /// <summary>
-        /// Runs the Event log service on the Device, and provides its output to the LogReceiver.
-        /// </summary>
-        /// <param name="device">The device.</param>
-        /// <param name="logName">Name of the log.</param>
-        /// <param name="rcvr">The RCVR.</param>
-        /// 
-        /// <exception cref="AdbException">failed asking for log</exception>
-        public void RunLogService(DeviceData device, string logName, LogReceiver rcvr)
+        
+        /// <include file='IAdbClient.xml' path='/IAdbClient/RunLogService/*'/>
+        public void RunLogService(DeviceData device, string logName, LogReceiver receiver)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
@@ -674,7 +441,7 @@ namespace Managed.Adb
                     while (true)
                     {
                         int count;
-                        if (rcvr != null && rcvr.IsCancelled)
+                        if (receiver != null && receiver.IsCancelled)
                         {
                             break;
                         }
@@ -700,10 +467,10 @@ namespace Managed.Adb
                         {
                             ms.Write(buffer, offset, count);
                             offset += count;
-                            if (rcvr != null)
+                            if (receiver != null)
                             {
                                 var d = ms.ToArray();
-                                rcvr.ParseNewData(d, 0, d.Length);
+                                receiver.ParseNewData(d, 0, d.Length);
                             }
                         }
                     }
@@ -711,22 +478,7 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        /// Reboots the specified adb socket address.
-        /// </summary>
-        /// <param name="device">The device.</param>
-        /// 
-        public void Reboot(DeviceData device)
-        {
-            this.Reboot(string.Empty, device);
-        }
-
-        /// <summary>
-        /// Reboots the specified device in to the specified mode.
-        /// </summary>
-        /// <param name="into">The into.</param>
-        /// <param name="device">The device.</param>
-        /// 
+        /// <include file='IAdbClient.xml' path='/IAdbClient/Reboot/*'/>
         public void Reboot(string into, DeviceData device)
         {
             var request = $"reboot:{into}";
@@ -738,64 +490,7 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        /// Connect to a device via TCP/IP.
-        /// </summary>
-        /// <param name="address">
-        /// The IP address of the remote device.
-        /// </param>
-        /// 
-        public void Connect(IPAddress address)
-        {
-            if (address == null)
-            {
-                throw new ArgumentNullException(nameof(address));
-            }
-
-            this.Connect(new IPEndPoint(address, DefaultPort));
-        }
-
-        /// <summary>
-        /// Connect to a device via TCP/IP.
-        /// </summary>
-        /// <param name="host">
-        /// The host address of the remote device.
-        /// </param>
-        /// 
-        public void Connect(string host)
-        {
-            if (string.IsNullOrEmpty(host))
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            this.Connect(new DnsEndPoint(host, DefaultPort));
-        }
-
-        /// <summary>
-        /// Connect to a device via TCP/IP.
-        /// </summary>
-        /// <param name="endpoint">
-        /// The IP endpoint at which the <c>adb</c> server on the device is running.
-        /// </param>
-        /// 
-        public void Connect(IPEndPoint endpoint)
-        {
-            if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
-
-            this.Connect(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port));
-        }
-
-        /// <summary>
-        /// Connect to a device via TCP/IP.
-        /// </summary>
-        /// <param name="endpoint">
-        /// The DNS endpoint at which the <c>adb</c> server on the device is running.
-        /// </param>
-        /// 
+        /// <include file='IAdbClient.xml' path='/IAdbClient/Connect/*'/>
         public void Connect(DnsEndPoint endpoint)
         {
             if (endpoint == null)

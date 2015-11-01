@@ -106,6 +106,7 @@
     <Compile Include="..\Shared\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AdbClientExtensions.cs" />
     <Compile Include="AdbCommandLineClient.cs" />
     <Compile Include="AdbServerStatus.cs" />
     <Compile Include="AdbClient.cs" />
@@ -189,6 +190,7 @@
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="IAdbClient.xml" />
     <Content Include="IAdbSocket.xml">
       <SubType>Designer</SubType>
     </Content>
