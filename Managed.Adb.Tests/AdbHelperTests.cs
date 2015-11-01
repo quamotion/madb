@@ -45,9 +45,9 @@ namespace Managed.Adb.Tests
                 this.factory = new DummyAdbSocketFactory();
             }
 
-            this.socket = (IDummyAdbSocket)factory.Create(AndroidDebugBridge.SocketAddress);
+            this.socket = (IDummyAdbSocket)factory.Create(AdbServer.SocketAddress);
             AdbHelper.SocketFactory = factory;
-            this.endPoint = AndroidDebugBridge.SocketAddress;
+            this.endPoint = AdbServer.SocketAddress;
         }
 
         [TestMethod]

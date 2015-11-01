@@ -17,7 +17,7 @@ namespace Managed.Adb
     /// A Device monitor. This connects to the Android Debug Bridge and get device and
     /// debuggable process information from it.
     /// </summary>
-    public class DeviceMonitor
+    public class DeviceMonitor : IDisposable
     {
         /// <summary>
         /// Logging tag
@@ -77,7 +77,7 @@ namespace Managed.Adb
         /// <summary>
         /// Stops the monitoring
         /// </summary>
-        public void Stop()
+        public void Dispose()
         {
             this.IsRunning = false;
 

@@ -476,7 +476,7 @@ namespace Managed.Adb
         /// <param name="into">The reboot state</param>
         public void Reboot(string into)
         {
-            AdbHelper.Instance.Reboot(into, AndroidDebugBridge.SocketAddress, this.DeviceData);
+            AdbHelper.Instance.Reboot(into, AdbServer.SocketAddress, this.DeviceData);
         }
 
         /// <summary>
@@ -529,7 +529,7 @@ namespace Managed.Adb
         {
             get
             {
-                ISyncService syncService = new SyncService(AndroidDebugBridge.SocketAddress, this.DeviceData);
+                ISyncService syncService = new SyncService(AdbServer.SocketAddress, this.DeviceData);
                 try
                 {
                     syncService.Open();
@@ -551,7 +551,7 @@ namespace Managed.Adb
         {
             get
             {
-                return AdbHelper.Instance.GetFrameBuffer(AndroidDebugBridge.SocketAddress, this.DeviceData);
+                return AdbHelper.Instance.GetFrameBuffer(AdbServer.SocketAddress, this.DeviceData);
             }
         }
 
@@ -584,7 +584,7 @@ namespace Managed.Adb
         /// <param name="commandArgs">The command args.</param>
         public void ExecuteShellCommand(string command, IShellOutputReceiver receiver, params object[] commandArgs)
         {
-            AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this.DeviceData, receiver);
+            AdbHelper.Instance.ExecuteRemoteCommand(AdbServer.SocketAddress, string.Format(command, commandArgs), this.DeviceData, receiver);
         }
 
         /// <summary>
@@ -596,7 +596,7 @@ namespace Managed.Adb
         /// <param name="commandArgs">The command args.</param>
         public void ExecuteShellCommand(string command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
         {
-            AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format(command, commandArgs), this.DeviceData, receiver);
+            AdbHelper.Instance.ExecuteRemoteCommand(AdbServer.SocketAddress, string.Format(command, commandArgs), this.DeviceData, receiver);
         }
 
         /// <summary>
@@ -640,7 +640,7 @@ namespace Managed.Adb
         /// <param name="commandArgs">The command args.</param>
         public void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
         {
-            AdbHelper.Instance.ExecuteRemoteCommand(AndroidDebugBridge.SocketAddress, string.Format("su -c \"{0}\"", command), this.DeviceData, receiver, int.MaxValue);
+            AdbHelper.Instance.ExecuteRemoteCommand(AdbServer.SocketAddress, string.Format("su -c \"{0}\"", command), this.DeviceData, receiver, int.MaxValue);
         }
 
         /// <summary>
@@ -649,7 +649,7 @@ namespace Managed.Adb
         /// <param name="receiver">The receiver.</param>
         public void RunEventLogService(LogReceiver receiver)
         {
-            AdbHelper.Instance.RunEventLogService(AndroidDebugBridge.SocketAddress, this.DeviceData, receiver);
+            AdbHelper.Instance.RunEventLogService(AdbServer.SocketAddress, this.DeviceData, receiver);
         }
 
         /// <summary>
@@ -659,7 +659,7 @@ namespace Managed.Adb
         /// <param name="receiver">The receiver.</param>
         public void RunLogService(string logname, LogReceiver receiver)
         {
-            AdbHelper.Instance.RunLogService(AndroidDebugBridge.SocketAddress, this.DeviceData, logname, receiver);
+            AdbHelper.Instance.RunLogService(AdbServer.SocketAddress, this.DeviceData, logname, receiver);
         }
 
         /// <summary>
@@ -672,7 +672,7 @@ namespace Managed.Adb
         {
             try
             {
-                AdbHelper.Instance.CreateForward(AndroidDebugBridge.SocketAddress, this.DeviceData, localPort, remotePort);
+                AdbHelper.Instance.CreateForward(AdbServer.SocketAddress, this.DeviceData, localPort, remotePort);
                 return true;
             }
             catch (IOException e)
@@ -691,7 +691,7 @@ namespace Managed.Adb
         {
             try
             {
-                AdbHelper.Instance.RemoveForward(AndroidDebugBridge.SocketAddress, this.DeviceData, localPort);
+                AdbHelper.Instance.RemoveForward(AdbServer.SocketAddress, this.DeviceData, localPort);
                 return true;
             }
             catch (IOException e)

@@ -106,12 +106,14 @@
     <Compile Include="..\Shared\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AdbCommandLineClient.cs" />
+    <Compile Include="AdbServerStatus.cs" />
     <Compile Include="AdbHelper.cs" />
     <Compile Include="AdbResponse.cs" />
+    <Compile Include="AdbServer.cs" />
     <Compile Include="AdbSocket.cs" />
     <Compile Include="AdbSocketFactory.cs" />
     <Compile Include="AndroidDebugBridge.cs" />
-    <Compile Include="AndroidDebugBridgeEventArgs.cs" />
     <Compile Include="ColorData.cs" />
     <Compile Include="DeviceData.cs" />
     <Compile Include="DeviceDataEventArgs.cs" />
@@ -157,6 +159,7 @@
     <Compile Include="Receivers\NullOutputReceiver.cs" />
     <Compile Include="NullSyncProgressMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StartServerResult.cs" />
     <Compile Include="SyncResult.cs" />
     <Compile Include="SyncService.cs" />
     <Compile Include="TransportType.cs" />

@@ -205,7 +205,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="device">The device.</param>
         public SyncService(DeviceData device)
-            : this(AndroidDebugBridge.SocketAddress, device)
+            : this(AdbServer.SocketAddress, device)
         {
         }
 

@@ -33,7 +33,7 @@ namespace Managed.Adb.Tests {
 
 
 		private Device GetFirstDevice ( ) {
-			List<DeviceData> devices = AdbHelper.Instance.GetDevices ( AndroidDebugBridge.SocketAddress );
+			List<DeviceData> devices = AdbHelper.Instance.GetDevices (AdbServer.SocketAddress );
 			Assert.IsTrue ( devices.Count >= 1 );
 			return new Device(devices[0]);
 		}
