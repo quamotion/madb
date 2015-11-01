@@ -6,7 +6,7 @@ namespace Managed.Adb.Tests
     {
         public TracingAdbSocketFactory()
         {
-            this.Socket = new TracingAdbSocket(AdbServer.SocketAddress);
+            this.Socket = new TracingAdbSocket(AdbServer.EndPoint);
         }
 
         public IDummyAdbSocket Socket

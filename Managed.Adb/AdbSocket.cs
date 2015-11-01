@@ -21,7 +21,7 @@ namespace Managed.Adb
     /// <para>
     /// The <see cref="AdbSocket"/> class implements the raw messaging protocol; that is,
     /// sending and receiving messages. For interacting with the services the Android Debug
-    /// Bridge exposes, use the <see cref="AdbHelper"/>.
+    /// Bridge exposes, use the <see cref="AdbClient"/>.
     /// </para>
     /// <para>
     /// For more information about the protocol that is implemented here, see chapter
@@ -75,7 +75,7 @@ namespace Managed.Adb
         /// </returns>
         public static bool IsOkay(byte[] reply)
         {
-            return AdbHelper.Encoding.GetString(reply).Equals("OKAY");
+            return AdbClient.Encoding.GetString(reply).Equals("OKAY");
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Close/*'/>
@@ -118,8 +118,8 @@ namespace Managed.Adb
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendFileRequest/*'/>
         public virtual void SendFileRequest(string command, string path, SyncService.FileMode mode)
         {
-            byte[] commandContent = AdbHelper.Encoding.GetBytes(command);
-            byte[] pathContent = AdbHelper.Encoding.GetBytes(path);
+            byte[] commandContent = AdbClient.Encoding.GetBytes(command);
+            byte[] pathContent = AdbClient.Encoding.GetBytes(path);
 
             byte[] request = SyncService.CreateSendFileRequest(commandContent, pathContent, mode);
             this.Send(request, -1, DdmPreferences.Timeout);
@@ -140,14 +140,14 @@ namespace Managed.Adb
             this.Read(reply);
 
             // Convert the bytes to a hex string
-            string lenHex = AdbHelper.Encoding.GetString(reply);
+            string lenHex = AdbClient.Encoding.GetString(reply);
             int len = int.Parse(lenHex, NumberStyles.HexNumber);
 
             // And get the string
             reply = new byte[len];
             this.Read(reply);
 
-            string value = AdbHelper.Encoding.GetString(reply);
+            string value = AdbClient.Encoding.GetString(reply);
             return value;
         }
 
@@ -168,7 +168,7 @@ namespace Managed.Adb
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendAdbRequest/*'/>
         public virtual void SendAdbRequest(string request)
         {
-            byte[] data = AdbHelper.FormAdbRequest(request);
+            byte[] data = AdbClient.FormAdbRequest(request);
 
             if (!this.Write(data))
             {

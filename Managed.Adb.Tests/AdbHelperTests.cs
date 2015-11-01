@@ -14,15 +14,15 @@ namespace Managed.Adb.Tests
         [TestMethod]
         public void FormAdbRequestTest()
         {
-            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0009host:kill\n"), AdbHelper.FormAdbRequest("host:kill"));
-            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("000Chost:version\n"), AdbHelper.FormAdbRequest("host:version"));
+            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0009host:kill\n"), AdbClient.FormAdbRequest("host:kill"));
+            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("000Chost:version\n"), AdbClient.FormAdbRequest("host:version"));
         }
 
         [TestMethod]
         public void CreateAdbForwardRequestTest()
         {
-            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0008tcp:1984\n"), AdbHelper.CreateAdbForwardRequest(null, 1984));
-            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0012tcp:1981:127.0.0.1\n"), AdbHelper.CreateAdbForwardRequest("127.0.0.1", 1981));
+            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0008tcp:1984\n"), AdbClient.CreateAdbForwardRequest(null, 1984));
+            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0012tcp:1981:127.0.0.1\n"), AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
         }
 
         IAdbSocketFactory factory;
@@ -45,9 +45,9 @@ namespace Managed.Adb.Tests
                 this.factory = new DummyAdbSocketFactory();
             }
 
-            this.socket = (IDummyAdbSocket)factory.Create(AdbServer.SocketAddress);
-            AdbHelper.SocketFactory = factory;
-            this.endPoint = AdbServer.SocketAddress;
+            this.socket = (IDummyAdbSocket)factory.Create(AdbServer.EndPoint);
+            AdbClient.SocketFactory = factory;
+            this.endPoint = AdbServer.EndPoint;
         }
 
         [TestMethod]
@@ -68,7 +68,7 @@ namespace Managed.Adb.Tests
                 requests,
                 () =>
                 {
-                    AdbHelper.Instance.KillAdb(this.endPoint);
+                    AdbClient.Instance.KillAdb();
                 });
         }
 
@@ -98,7 +98,7 @@ namespace Managed.Adb.Tests
                 requests,
                 () =>
                 {
-                    version = AdbHelper.Instance.GetAdbVersion(endPoint);
+                    version = AdbClient.Instance.GetAdbVersion();
                 });
 
             // Make sure and the correct value is returned.
@@ -131,7 +131,7 @@ namespace Managed.Adb.Tests
                 requests,
                 () =>
                 {
-                    devices = AdbHelper.Instance.GetDevices(endPoint);
+                    devices = AdbClient.Instance.GetDevices();
                 });
 
             // Make sure and the correct value is returned.
@@ -173,7 +173,7 @@ namespace Managed.Adb.Tests
                 requests,
                 () =>
                 {
-                    AdbHelper.Instance.SetDevice(this.socket, device);
+                    AdbClient.Instance.SetDevice(this.socket, device);
                 });
         }
 
@@ -208,7 +208,7 @@ namespace Managed.Adb.Tests
                 requests,
                 () =>
                 {
-                    AdbHelper.Instance.ExecuteRemoteCommand(this.endPoint, "echo Hello, World", device, receiver);
+                    AdbClient.Instance.ExecuteRemoteCommand("echo Hello, World", device, receiver);
                 });
 
             Assert.AreEqual("Hello, World\r\n", receiver.ToString());
@@ -218,7 +218,7 @@ namespace Managed.Adb.Tests
         public void CreateForwardTest()
         {
             this.RunCreateForwardTest(
-                (device) => AdbHelper.Instance.CreateForward(this.endPoint, device, "tcp:1", "tcp:2", true),
+                (device) => AdbClient.Instance.CreateForward(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
         }
 
@@ -226,7 +226,7 @@ namespace Managed.Adb.Tests
         public void CreateTcpForwardTest()
         {
             this.RunCreateForwardTest(
-                (device) => AdbHelper.Instance.CreateForward(this.endPoint, device, 3, 4),
+                (device) => AdbClient.Instance.CreateForward(device, 3, 4),
                 "tcp:3;tcp:4");
         }
 
@@ -234,7 +234,7 @@ namespace Managed.Adb.Tests
         public void CreateSocketForwardTest()
         {
             this.RunCreateForwardTest(
-                (device) => AdbHelper.Instance.CreateForward(this.endPoint, device, 5, "/socket/1"),
+                (device) => AdbClient.Instance.CreateForward(device, 5, "/socket/1"),
                 "tcp:5;local:/socket/1");
         }
 
@@ -266,7 +266,7 @@ namespace Managed.Adb.Tests
                 requests,
                 () =>
                 {
-                    AdbHelper.Instance.CreateForward(this.endPoint, device, "tcp:1", "tcp:2", false);
+                    AdbClient.Instance.CreateForward(device, "tcp:1", "tcp:2", false);
                 });
         }
 
@@ -299,7 +299,7 @@ namespace Managed.Adb.Tests
                 responses,
                 responseMessages,
                 requests,
-                () => forwards = AdbHelper.Instance.ListForward(this.endPoint, device).ToArray());
+                () => forwards = AdbClient.Instance.ListForward(device).ToArray());
 
             Assert.IsNotNull(forwards);
             Assert.AreEqual(3, forwards.Length);
@@ -333,7 +333,7 @@ namespace Managed.Adb.Tests
                 responses,
                 responseMessages,
                 requests,
-                () => AdbHelper.Instance.RemoveForward(this.endPoint, device, 1));
+                () => AdbClient.Instance.RemoveForward(device, 1));
         }
 
         [TestMethod]
@@ -361,14 +361,14 @@ namespace Managed.Adb.Tests
                 responses,
                 responseMessages,
                 requests,
-                () => AdbHelper.Instance.RemoveAllForwards(this.endPoint, device));
+                () => AdbClient.Instance.RemoveAllForwards(device));
         }
 
         [TestMethod]
         public void ConnectIPAddressTest()
         {
             this.RunConnectTest(
-                () => AdbHelper.Instance.Connect(this.endPoint, IPAddress.Loopback),
+                () => AdbClient.Instance.Connect(IPAddress.Loopback),
                 "127.0.0.1:5555");
         }
 
@@ -376,7 +376,7 @@ namespace Managed.Adb.Tests
         public void ConnectDnsEndpointTest()
         {
             this.RunConnectTest(
-                () => AdbHelper.Instance.Connect(this.endPoint, new DnsEndPoint("localhost", 1234)),
+                () => AdbClient.Instance.Connect(new DnsEndPoint("localhost", 1234)),
                 "localhost:1234");
         }
 
@@ -384,7 +384,7 @@ namespace Managed.Adb.Tests
         public void ConnectIPEndpointTest()
         {
             this.RunConnectTest(
-                () => AdbHelper.Instance.Connect(this.endPoint, new IPEndPoint(IPAddress.Loopback, 4321)),
+                () => AdbClient.Instance.Connect(new IPEndPoint(IPAddress.Loopback, 4321)),
                 "127.0.0.1:4321");
         }
 
@@ -392,7 +392,7 @@ namespace Managed.Adb.Tests
         public void ConnectHostEndpointTest()
         {
             this.RunConnectTest(
-                () => AdbHelper.Instance.Connect(this.endPoint, "localhost"),
+                () => AdbClient.Instance.Connect("localhost"),
                 "localhost:5555");
         }
 
@@ -400,28 +400,28 @@ namespace Managed.Adb.Tests
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConnectIPAddressNullTest()
         {
-            AdbHelper.Instance.Connect(this.endPoint, (IPAddress)null);
+            AdbClient.Instance.Connect((IPAddress)null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConnectDnsEndpointNullTest()
         {
-            AdbHelper.Instance.Connect(this.endPoint, (DnsEndPoint)null);
+            AdbClient.Instance.Connect((DnsEndPoint)null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConnectIPEndpointNullTest()
         {
-            AdbHelper.Instance.Connect(this.endPoint, (IPEndPoint)null);
+            AdbClient.Instance.Connect((IPEndPoint)null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConnectHostEndpointNullTest()
         {
-            AdbHelper.Instance.Connect(this.endPoint, (string)null);
+            AdbClient.Instance.Connect((string)null);
         }
 
         public void RunConnectTest(Action test, string connectString)

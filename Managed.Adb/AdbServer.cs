@@ -56,7 +56,7 @@ namespace Managed.Adb
         /// <summary>
         /// Gets or sets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server is listening..
         /// </summary>
-        public static IPEndPoint SocketAddress { get; } = new IPEndPoint(IPAddress.Loopback, AdbServerPort);
+        public static IPEndPoint EndPoint { get; } = new IPEndPoint(IPAddress.Loopback, AdbServerPort);
 
         /// <summary>
         /// Starts the adb server if it was not previously running.
@@ -128,7 +128,7 @@ namespace Managed.Adb
                 && ((serverStatus.Version < RequiredAdbVersion)
                      || ((serverStatus.Version < commandLineVersion) && restartServerIfNewer)))
             {
-                AdbHelper.Instance.KillAdb(SocketAddress);
+                AdbClient.Instance.KillAdb();
                 serverStatus.IsRunning = false;
                 serverStatus.Version = null;
 
@@ -158,7 +158,7 @@ namespace Managed.Adb
             // Try to connect to a running instance of the adb server
             try
             {
-                int versionCode = AdbHelper.Instance.GetAdbVersion(SocketAddress);
+                int versionCode = AdbClient.Instance.GetAdbVersion();
 
                 return new AdbServerStatus()
                 {

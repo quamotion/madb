@@ -205,7 +205,7 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="device">The device.</param>
         public SyncService(DeviceData device)
-            : this(AdbServer.SocketAddress, device)
+            : this(AdbServer.EndPoint, device)
         {
         }
 
@@ -258,10 +258,10 @@ namespace Managed.Adb
 
             try
             {
-                this.Channel = AdbHelper.SocketFactory.Create(this.Address);
+                this.Channel = AdbClient.SocketFactory.Create(this.Address);
 
                 // target a specific device
-                AdbHelper.Instance.SetDevice(this.Channel, this.Device);
+                AdbClient.Instance.SetDevice(this.Channel, this.Device);
 
                 this.Channel.SendAdbRequest("sync:");
                 var resp = this.Channel.ReadAdbResponse(false);
@@ -482,7 +482,7 @@ namespace Managed.Adb
                         this.Channel.Read(DataBuffer, len, timeOut);
 
                         // output the result?
-                        string message = AdbHelper.Encoding.GetString(DataBuffer, 0, len);
+                        string message = AdbClient.Encoding.GetString(DataBuffer, 0, len);
                         Log.e("ddms", "transfer error: " + message);
                         return new SyncResult(ErrorCodeHelper.RESULT_UNKNOWN_ERROR, message);
                     }
@@ -573,7 +573,7 @@ namespace Managed.Adb
 
             try
             {
-                byte[] remotePathContent = AdbHelper.Encoding.GetBytes(remotePath);
+                byte[] remotePathContent = AdbClient.Encoding.GetBytes(remotePath);
 
                 if (remotePathContent.Length > REMOTE_PATH_MAX_LENGTH)
                 {

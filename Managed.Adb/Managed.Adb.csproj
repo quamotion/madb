@@ -108,7 +108,7 @@
     </Compile>
     <Compile Include="AdbCommandLineClient.cs" />
     <Compile Include="AdbServerStatus.cs" />
-    <Compile Include="AdbHelper.cs" />
+    <Compile Include="AdbClient.cs" />
     <Compile Include="AdbResponse.cs" />
     <Compile Include="AdbServer.cs" />
     <Compile Include="AdbSocket.cs" />
@@ -124,6 +124,7 @@
     <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="FilePermissions.cs" />
     <Compile Include="ForwardData.cs" />
+    <Compile Include="IAdbClient.cs" />
     <Compile Include="IAdbCommandLineClient.cs" />
     <Compile Include="IAdbSocket.cs" />
     <Compile Include="IAdbSocketFactory.cs" />

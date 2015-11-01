@@ -22,14 +22,14 @@ namespace Managed.Adb
     /// The Android Debug Bridge Helper class, to handle requests and connections to adb.
     /// </para>
     /// <para>
-    /// <seealso cref="AndroidDebugBridge"/> is the public API to connection to adb, while <see cref="AdbHelper"/>
+    /// <seealso cref="AndroidDebugBridge"/> is the public API to connection to adb, while <see cref="AdbClient"/>
     /// does the low level stuff.
     /// </para>
     /// </summary>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso>
-    public class AdbHelper
+    public class AdbClient
     {
         /// <summary>
         /// The default encoding
@@ -52,15 +52,18 @@ namespace Managed.Adb
         private const int WaitTime = 5;
 
         /// <summary>
-        /// The singleton instance of the <see cref="AdbHelper"/> class.
+        /// The singleton instance of the <see cref="AdbClient"/> class.
         /// </summary>
-        private static AdbHelper instance = null;
+        private static AdbClient instance = null;
 
-        /// <summary>
-        /// Prevents a default instance of the <see cref="AdbHelper"/> class from being created.
-        /// </summary>
-        private AdbHelper()
+        public AdbClient(IPEndPoint endPoint)
         {
+            if (endPoint == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            this.EndPoint = endPoint;
         }
 
         /// <summary>
@@ -72,13 +75,13 @@ namespace Managed.Adb
         /// <summary>
         /// Gets an instance of the AdbHelper.
         /// </summary>
-        public static AdbHelper Instance
+        public static AdbClient Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = new AdbHelper();
+                    instance = new AdbClient(AdbServer.EndPoint);
                 }
 
                 return instance;
@@ -91,6 +94,12 @@ namespace Managed.Adb
         /// </summary>
         public static IAdbSocketFactory SocketFactory
         { get; set; } = new AdbSocketFactory();
+
+        public IPEndPoint EndPoint
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Create an ASCII string preceded by four hex digits. The opening "####"
@@ -139,9 +148,7 @@ namespace Managed.Adb
         /// <summary>
         /// Ask the ADB server for its internal version number.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
+        /// 
         /// <returns>
         /// The ADB version number.
         /// </returns>
@@ -151,9 +158,9 @@ namespace Managed.Adb
         /// <exception cref="AdbException">
         /// An error occurred connecting to ADB
         /// </exception>
-        public int GetAdbVersion(IPEndPoint endPoint)
+        public int GetAdbVersion()
         {
-            using (var socket = SocketFactory.Create(endPoint))
+            using (var socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest("host:version");
                 var response = socket.ReadAdbResponse(false);
@@ -168,13 +175,11 @@ namespace Managed.Adb
         /// ADB client detects that an obsolete server is running after an
         /// upgrade.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
+        /// 
         /// <exception cref="System.IO.IOException">failed asking to kill adb</exception>
-        public void KillAdb(IPEndPoint endPoint)
+        public void KillAdb()
         {
-            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest("host:kill");
 
@@ -186,13 +191,11 @@ namespace Managed.Adb
         /// <summary>
         /// Gets the devices that are available for communication.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
+        /// 
         /// <returns>A list of devices that are connected.</returns>
-        public List<DeviceData> GetDevices(IPEndPoint endPoint)
+        public List<DeviceData> GetDevices()
         {
-            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest("host:devices-l");
                 socket.ReadAdbResponse(false);
@@ -263,9 +266,6 @@ namespace Managed.Adb
         /// Asks the ADB server to forward local connections from <paramref name="local"/>
         /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
         /// <param name="device">
         /// The device to which to forward the connections.
         /// </param>
@@ -302,9 +302,10 @@ namespace Managed.Adb
         /// If set to <see langword="true"/>, the request will fail if there is already a forward
         /// connection from <paramref name="local"/>.
         /// </param>
-        public void CreateForward(IPEndPoint endPoint, DeviceData device, string local, string remote, bool allowRebind)
+        /// 
+        public void CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
-            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 string rebind = allowRebind ? string.Empty : "norebind:";
 
@@ -316,9 +317,6 @@ namespace Managed.Adb
         /// <summary>
         ///  Creates a port forwarding between a local and a remote port.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
         /// <param name="device">
         /// The device to which to forward the connections.
         /// </param>
@@ -328,22 +326,20 @@ namespace Managed.Adb
         /// <param name="remotePort">
         /// The remote port to forward to
         /// </param>
+        /// 
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
         /// failed to submit the forward command.
         /// or
         /// Device rejected command:  + resp.Message
         /// </exception>
-        public void CreateForward(IPEndPoint endPoint, DeviceData device, int localPort, int remotePort)
+        public void CreateForward(DeviceData device, int localPort, int remotePort)
         {
-            this.CreateForward(endPoint, device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
+            this.CreateForward(device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
         }
 
         /// <summary>
         /// Forwards a remote Unix socket to a local TCP socket.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
         /// <param name="device">
         /// The device to which to forward the connections.
         /// </param>
@@ -353,32 +349,31 @@ namespace Managed.Adb
         /// <param name="remoteSocket">
         /// The remote Unix socket.
         /// </param>
+        /// 
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
         /// The client failed to submit the forward command.
         /// </exception>
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
         /// The device rejected command. The error message will include the error message provided by the device.
         /// </exception>
-        public void CreateForward(IPEndPoint endPoint, DeviceData device, int localPort, string remoteSocket)
+        public void CreateForward(DeviceData device, int localPort, string remoteSocket)
         {
-            this.CreateForward(endPoint, device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
+            this.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
         }
 
         /// <summary>
         /// Remove a port forwarding between a local and a remote port.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
         /// <param name="device">
         /// The device on which to remove the port forwarding
         /// </param>
         /// <param name="localPort">
         /// Specification of the local port that was forwarded
         /// </param>
-        public void RemoveForward(IPEndPoint endPoint, DeviceData device, int localPort)
+        /// 
+        public void RemoveForward(DeviceData device, int localPort)
         {
-            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
                 var response = socket.ReadAdbResponse(false);
@@ -388,15 +383,13 @@ namespace Managed.Adb
         /// <summary>
         /// Removes all forwards for a given device.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
         /// <param name="device">
         /// The device on which to remove the port forwarding
         /// </param>
-        public void RemoveAllForwards(IPEndPoint endPoint, DeviceData device)
+        /// 
+        public void RemoveAllForwards(DeviceData device)
         {
-            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
                 var response = socket.ReadAdbResponse(false);
@@ -406,18 +399,16 @@ namespace Managed.Adb
         /// <summary>
         /// List all existing forward connections from this server.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
         /// <param name="device">
         /// The device for which to list the existing foward connections.
         /// </param>
+        /// 
         /// <returns>
         /// A <see cref="ForwardData"/> entry for each existing forward connection.
         /// </returns>
-        public IEnumerable<ForwardData> ListForward(IPEndPoint endPoint, DeviceData device)
+        public IEnumerable<ForwardData> ListForward(DeviceData device)
         {
-            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
                 var response = socket.ReadAdbResponse(false);
@@ -433,9 +424,6 @@ namespace Managed.Adb
         /// <summary>
         /// Executes the remote command.
         /// </summary>
-        /// <param name="endPoint">
-        /// The endpoint at which the Android Debug Bridge is listening.
-        /// </param>
         /// <param name="command">
         /// The command to execute.
         /// </param>
@@ -447,6 +435,7 @@ namespace Managed.Adb
         /// if you are not interested in the output.
         /// </param>
         /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
+        /// 
         /// <exception cref="System.OperationCanceledException"></exception>
         /// <exception cref="System.IO.FileNotFoundException">
         /// </exception>
@@ -458,9 +447,9 @@ namespace Managed.Adb
         /// <exception cref="UnknownOptionException"></exception>
         /// <exception cref="CommandAbortingException"></exception>
         /// <exception cref="PermissionDeniedException"></exception>
-        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
         {
-            using (IAdbSocket socket = SocketFactory.Create(endPoint))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 this.SetDevice(socket, device);
                 socket.SendAdbRequest($"shell:{command}");
@@ -496,7 +485,7 @@ namespace Managed.Adb
                             if (rcvr == null || !rcvr.ParsesErrors)
                             {
                                 string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                string sdata = AdbHelper.Encoding.GetString(data);
+                                string sdata = AdbClient.Encoding.GetString(data);
 
                                 var sdataTrimmed = sdata.Trim();
                                 if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))
@@ -573,17 +562,17 @@ namespace Managed.Adb
         /// <summary>
         /// Gets the frame buffer from the specified end point.
         /// </summary>
-        /// <param name="adbSockAddr">The adb sock addr.</param>
         /// <param name="device">The device.</param>
+        /// 
         /// <returns>Returns the RawImage.</returns>
         /// <exception cref="Managed.Adb.Exceptions.AdbException">
         /// failed asking for frame buffer
         /// or
         /// failed nudging
         /// </exception>
-        public RawImage GetFrameBuffer(IPEndPoint adbSockAddr, DeviceData device)
+        public RawImage GetFrameBuffer(DeviceData device)
         {
-            using (IAdbSocket socket = SocketFactory.Create(adbSockAddr))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 RawImage imageParams = new RawImage();
                 socket.SendAdbRequest($"host-serial:{device.Serial}:framebuffer:");
@@ -638,41 +627,41 @@ namespace Managed.Adb
         /// <summary>
         /// Executes a shell command on the remote device
         /// </summary>
-        /// <param name="endPoint">The socket end point</param>
         /// <param name="command">The command to execute</param>
         /// <param name="device">The device to execute on</param>
         /// <param name="rcvr">The shell output receiver</param>
+        /// 
         /// <exception cref="FileNotFoundException">Throws if the result is 'command': not found</exception>
         /// <exception cref="IOException">Throws if there is a problem reading / writing to the socket</exception>
         /// <exception cref="OperationCanceledException">Throws if the execution was canceled</exception>
         /// <exception cref="EndOfStreamException">Throws if the Socket.Receice ever returns -1</exception>
-        public void ExecuteRemoteCommand(IPEndPoint endPoint, string command, DeviceData device, IShellOutputReceiver rcvr)
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr)
         {
-            this.ExecuteRemoteCommand(endPoint, command, device, rcvr, int.MaxValue);
+            this.ExecuteRemoteCommand(command, device, rcvr, int.MaxValue);
         }
 
         /// <summary>
         /// Runs the Event log service on the Device, and provides its output to the LogReceiver.
         /// </summary>
-        /// <param name="address">The address.</param>
         /// <param name="device">The device.</param>
         /// <param name="rcvr">The RCVR.</param>
-        public void RunEventLogService(IPEndPoint address, DeviceData device, LogReceiver rcvr)
+        /// 
+        public void RunEventLogService(DeviceData device, LogReceiver rcvr)
         {
-            this.RunLogService(address, device, "events", rcvr);
+            this.RunLogService(device, "events", rcvr);
         }
 
         /// <summary>
         /// Runs the Event log service on the Device, and provides its output to the LogReceiver.
         /// </summary>
-        /// <param name="address">The address.</param>
         /// <param name="device">The device.</param>
         /// <param name="logName">Name of the log.</param>
         /// <param name="rcvr">The RCVR.</param>
+        /// 
         /// <exception cref="AdbException">failed asking for log</exception>
-        public void RunLogService(IPEndPoint address, DeviceData device, string logName, LogReceiver rcvr)
+        public void RunLogService(DeviceData device, string logName, LogReceiver rcvr)
         {
-            using (IAdbSocket socket = SocketFactory.Create(address))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest($"log:{logName}");
                 var response = socket.ReadAdbResponse(false);
@@ -725,24 +714,24 @@ namespace Managed.Adb
         /// <summary>
         /// Reboots the specified adb socket address.
         /// </summary>
-        /// <param name="adbSocketAddress">The adb socket address.</param>
         /// <param name="device">The device.</param>
-        public void Reboot(IPEndPoint adbSocketAddress, DeviceData device)
+        /// 
+        public void Reboot(DeviceData device)
         {
-            this.Reboot(string.Empty, adbSocketAddress, device);
+            this.Reboot(string.Empty, device);
         }
 
         /// <summary>
         /// Reboots the specified device in to the specified mode.
         /// </summary>
         /// <param name="into">The into.</param>
-        /// <param name="adbSockAddr">The adb sock addr.</param>
         /// <param name="device">The device.</param>
-        public void Reboot(string into, IPEndPoint adbSockAddr, DeviceData device)
+        /// 
+        public void Reboot(string into, DeviceData device)
         {
             var request = $"reboot:{into}";
 
-            using (IAdbSocket socket = SocketFactory.Create(adbSockAddr))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest(request);
                 var response = socket.ReadAdbResponse(false);
@@ -752,77 +741,69 @@ namespace Managed.Adb
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="adbEndpoint">
-        /// The socket where the <c>adb</c> server is listening.
-        /// </param>
         /// <param name="address">
         /// The IP address of the remote device.
         /// </param>
-        public void Connect(IPEndPoint adbEndpoint, IPAddress address)
+        /// 
+        public void Connect(IPAddress address)
         {
             if (address == null)
             {
                 throw new ArgumentNullException(nameof(address));
             }
 
-            this.Connect(adbEndpoint, new IPEndPoint(address, DefaultPort));
+            this.Connect(new IPEndPoint(address, DefaultPort));
         }
 
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="adbEndpoint">
-        /// The socket where the <c>adb</c> server is listening.
-        /// </param>
         /// <param name="host">
         /// The host address of the remote device.
         /// </param>
-        public void Connect(IPEndPoint adbEndpoint, string host)
+        /// 
+        public void Connect(string host)
         {
             if (string.IsNullOrEmpty(host))
             {
                 throw new ArgumentNullException(nameof(host));
             }
 
-            this.Connect(adbEndpoint, new DnsEndPoint(host, DefaultPort));
+            this.Connect(new DnsEndPoint(host, DefaultPort));
         }
 
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="adbEndpoint">
-        /// The socket where the <c>adb</c> server is listening.
-        /// </param>
         /// <param name="endpoint">
         /// The IP endpoint at which the <c>adb</c> server on the device is running.
         /// </param>
-        public void Connect(IPEndPoint adbEndpoint, IPEndPoint endpoint)
+        /// 
+        public void Connect(IPEndPoint endpoint)
         {
             if (endpoint == null)
             {
                 throw new ArgumentNullException(nameof(endpoint));
             }
 
-            this.Connect(adbEndpoint, new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port));
+            this.Connect(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port));
         }
 
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="adbEndpoint">
-        /// The socket where the <c>adb</c> server is listening.
-        /// </param>
         /// <param name="endpoint">
         /// The DNS endpoint at which the <c>adb</c> server on the device is running.
         /// </param>
-        public void Connect(IPEndPoint adbEndpoint, DnsEndPoint endpoint)
+        /// 
+        public void Connect(DnsEndPoint endpoint)
         {
             if (endpoint == null)
             {
                 throw new ArgumentNullException(nameof(endpoint));
             }
 
-            using (IAdbSocket socket = SocketFactory.Create(adbEndpoint))
+            using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
                 var response = socket.ReadAdbResponse(false);

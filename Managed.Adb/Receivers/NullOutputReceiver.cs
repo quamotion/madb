@@ -80,7 +80,7 @@ namespace Managed.Adb
         ///     <see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.
         /// </value>
         /// <remarks>
-        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbHelper"/>
+        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbClient"/>
         /// will detect common error messages and throw an exception.
         /// </remarks>
         public bool ParsesErrors

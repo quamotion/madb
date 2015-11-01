@@ -22,7 +22,7 @@ namespace Managed.Adb.Tests
             this.socket = this.socketFactory.Socket;
 
             this.commandLineClient = new DummyAdbCommandLineClient();
-            AdbHelper.SocketFactory = this.socketFactory;
+            AdbClient.SocketFactory = this.socketFactory;
             AdbServer.AdbCommandLineClientFactory = (version) => this.commandLineClient;
         }
 
