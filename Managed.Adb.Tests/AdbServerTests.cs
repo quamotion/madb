@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Managed.Adb.Exceptions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,6 +69,112 @@ namespace Managed.Adb.Tests
             this.socketFactory.Exception = new Exception();
 
             var status = AdbServer.GetStatus();
+        }
+
+        [TestMethod]
+        public void StartServerAlreadyRunningTest()
+        {
+            this.socket.Responses.Enqueue(AdbResponse.OK);
+            this.socket.ResponseMessages.Enqueue("0020");
+
+            var result = AdbServer.StartServer(null, false);
+
+            Assert.AreEqual(StartServerResult.AlreadyRunning, result);
+
+            Assert.AreEqual(1, this.socket.Requests.Count);
+            Assert.AreEqual("host:version", this.socket.Requests[0]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AdbException))]
+        public void StartServerOutdatedRunningNoExecutableTest()
+        {
+            this.socket.Responses.Enqueue(AdbResponse.OK);
+            this.socket.ResponseMessages.Enqueue("0010");
+
+            var result = AdbServer.StartServer(null, false);
+
+            Assert.AreEqual(1, this.socket.Requests.Count);
+            Assert.AreEqual("host:version", this.socket.Requests[0]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AdbException))]
+        public void StartServerNotRunningNoExecutableTest()
+        {
+            this.socketFactory.Exception = new SocketException(AdbServer.ConnectionRefused);
+
+            var result = AdbServer.StartServer(null, false);
+        }
+
+        [TestMethod]
+        public void StartServerOutdatedRunningTest()
+        {
+            this.socket.Responses.Enqueue(AdbResponse.OK);
+            this.socket.ResponseMessages.Enqueue("0010");
+
+            this.commandLineClient.Version = new Version(1, 0, 32);
+
+            Assert.IsFalse(this.commandLineClient.ServerStarted);
+
+            var result = AdbServer.StartServer("adb.exe", false);
+
+            Assert.IsTrue(this.commandLineClient.ServerStarted);
+
+            Assert.AreEqual(2, this.socket.Requests.Count);
+            Assert.AreEqual("host:version", this.socket.Requests[0]);
+            Assert.AreEqual("host:kill", this.socket.Requests[1]);
+        }
+
+        [TestMethod]
+        public void StartServerNotRunningTest()
+        {
+            this.socketFactory.Exception = new SocketException(AdbServer.ConnectionRefused);
+
+            this.commandLineClient.Version = new Version(1, 0, 32);
+
+            Assert.IsFalse(this.commandLineClient.ServerStarted);
+
+            var result = AdbServer.StartServer("adb.exe", false);
+
+            Assert.IsTrue(this.commandLineClient.ServerStarted);
+        }
+
+        [TestMethod]
+        public void StartServerIntermediateRestartRequestedRunningTest()
+        {
+            this.socket.Responses.Enqueue(AdbResponse.OK);
+            this.socket.ResponseMessages.Enqueue("001f");
+
+            this.commandLineClient.Version = new Version(1, 0, 32);
+
+            Assert.IsFalse(this.commandLineClient.ServerStarted);
+
+            var result = AdbServer.StartServer("adb.exe", true);
+
+            Assert.IsTrue(this.commandLineClient.ServerStarted);
+
+            Assert.AreEqual(2, this.socket.Requests.Count);
+            Assert.AreEqual("host:version", this.socket.Requests[0]);
+            Assert.AreEqual("host:kill", this.socket.Requests[1]);
+        }
+
+        [TestMethod]
+        public void StartServerIntermediateRestartNotRequestedRunningTest()
+        {
+            this.socket.Responses.Enqueue(AdbResponse.OK);
+            this.socket.ResponseMessages.Enqueue("001f");
+
+            this.commandLineClient.Version = new Version(1, 0, 32);
+
+            Assert.IsFalse(this.commandLineClient.ServerStarted);
+
+            var result = AdbServer.StartServer("adb.exe", false);
+
+            Assert.IsFalse(this.commandLineClient.ServerStarted);
+
+            Assert.AreEqual(1, this.socket.Requests.Count);
+            Assert.AreEqual("host:version", this.socket.Requests[0]);
         }
     }
 }
