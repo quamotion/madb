@@ -180,7 +180,7 @@ namespace Managed.Adb
                 }
                 else
                 {
-                    Assert.AreEqual(0, this.Socket.SyncRequests);
+                    Assert.AreEqual(0, this.Socket.SyncRequests.Count);
                 }
             }
             else
