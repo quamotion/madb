@@ -60,27 +60,5 @@ namespace Managed.Adb
 
             return v;
         }
-
-        /// <summary>
-        /// Reads a signed 64 bit integer from an array coming from a device.
-        /// </summary>
-        /// <param name="value">the array containing the int</param>
-        /// <param name="offset">the offset in the array at which the int starts</param>
-        /// <remarks>Array length must be at least offset + 8</remarks>
-        /// <returns>the integer read from the array</returns>
-        public static long Swap64bitFromArray(this byte[] value, int offset)
-        {
-            long v = 0;
-            v |= ((long)value[offset]) & 0x00000000000000FFL;
-            v |= (((long)value[offset + 1]) & 0x00000000000000FFL) << 8;
-            v |= (((long)value[offset + 2]) & 0x00000000000000FFL) << 16;
-            v |= (((long)value[offset + 3]) & 0x00000000000000FFL) << 24;
-            v |= (((long)value[offset + 4]) & 0x00000000000000FFL) << 32;
-            v |= (((long)value[offset + 5]) & 0x00000000000000FFL) << 40;
-            v |= (((long)value[offset + 6]) & 0x00000000000000FFL) << 48;
-            v |= (((long)value[offset + 7]) & 0x00000000000000FFL) << 56;
-
-            return v;
-        }
     }
 }

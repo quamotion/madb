@@ -4,6 +4,7 @@
 
 namespace Managed.Adb
 {
+    using Exceptions;
     using System;
     using System.Globalization;
     using System.IO;
@@ -11,7 +12,7 @@ namespace Managed.Adb
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
-    using Exceptions;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// <para>
@@ -99,6 +100,12 @@ namespace Managed.Adb
             this.Read(data, -1, DdmPreferences.Timeout);
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/AsyncRead_byte/*'/>
+        public virtual Task ReadAsync(byte[] data)
+        {
+            return this.ReadAsync(data, -1);
+        }
+
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int/*'/>
         public virtual int Read(byte[] data, int timeout)
         {
@@ -146,6 +153,25 @@ namespace Managed.Adb
             // And get the string
             reply = new byte[len];
             this.Read(reply);
+
+            string value = AdbClient.Encoding.GetString(reply);
+            return value;
+        }
+
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadStringAsync/*'/>
+        public virtual async Task<string> ReadStringAsync()
+        {
+            // The first 4 bytes contain the length of the string
+            var reply = new byte[4];
+            await this.ReadAsync(reply);
+
+            // Convert the bytes to a hex string
+            string lenHex = AdbClient.Encoding.GetString(reply);
+            int len = int.Parse(lenHex, NumberStyles.HexNumber);
+
+            // And get the string
+            reply = new byte[len];
+            await this.ReadAsync(reply);
 
             string value = AdbClient.Encoding.GetString(reply);
             return value;
@@ -211,6 +237,48 @@ namespace Managed.Adb
                 Log.e(TAG, sex);
                 throw;
             }
+        }
+
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAsync_byte_int/*'/>
+        public virtual async Task<int> ReadAsync(byte[] data, int length)
+        {
+            int expLen = length != -1 ? length : data.Length;
+            int count = -1;
+            int totalRead = 0;
+
+            while (count != 0 && totalRead < expLen)
+            {
+                try
+                {
+                    int left = expLen - totalRead;
+                    int buflen = left < this.socket.ReceiveBufferSize ? left : this.socket.ReceiveBufferSize;
+
+                    byte[] buffer = new byte[buflen];
+                    this.socket.ReceiveBufferSize = expLen;
+                    count = await this.socket.ReceiveAsync(buffer, 0, buflen, SocketFlags.None);
+
+                    if (count < 0)
+                    {
+                        Log.e(TAG, "read: channel EOF");
+                        throw new AdbException("EOF");
+                    }
+                    else if (count == 0)
+                    {
+                        Log.i(TAG, "DONE with Read");
+                    }
+                    else
+                    {
+                        Array.Copy(buffer, 0, data, totalRead, count);
+                        totalRead += count;
+                    }
+                }
+                catch (SocketException sex)
+                {
+                    throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
+                }
+            }
+
+            return totalRead;
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int_int/*'/>

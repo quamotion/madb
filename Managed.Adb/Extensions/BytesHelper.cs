@@ -9,7 +9,6 @@ namespace Managed.Adb
     using System.Linq;
     using System.Text;
 
-    /// <ignore>true</ignore>
     public static partial class ManagedAdbExtenstions
     {
         /// <summary>

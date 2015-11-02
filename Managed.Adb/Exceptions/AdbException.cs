@@ -24,20 +24,43 @@ namespace Managed.Adb.Exceptions
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbException"/> class.
+        /// Initializes a new instance of the <see cref="AdbException"/> class with the
+        /// specified error message.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="message">
+        /// The message that describes the error.
+        /// </param>
         public AdbException(string message)
             : base(message)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbException"/> class with the
+        /// specified client error message and adb error message.
+        /// </summary>
+        /// <param name="message">
+        /// The message that describes the error on the client side.
+        /// </param>
+        /// <param name="adbError">
+        /// The raw error message that was sent by adb.
+        /// </param>
         public AdbException(string message, string adbError)
             : base(message)
         {
             this.AdbError = adbError;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbException"/> class with the
+        /// specified client error message and <see cref="AdbResponse"/>
+        /// </summary>
+        /// <param name="message">
+        /// The message that describes the error on the client side.
+        /// </param>
+        /// <param name="response">
+        /// The <see cref="AdbResponse"/> that was sent by adb.
+        /// </param>
         public AdbException(string message, AdbResponse response)
             : base(message)
         {
@@ -65,12 +88,18 @@ namespace Managed.Adb.Exceptions
         {
         }
 
+        /// <summary>
+        /// Gets the error message that was sent by adb.
+        /// </summary>
         public string AdbError
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Gets the response that was sent by adb.
+        /// </summary>
         public AdbResponse Response
         {
             get;

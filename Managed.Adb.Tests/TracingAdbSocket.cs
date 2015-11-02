@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Managed.Adb.Tests
 {
@@ -9,6 +10,12 @@ namespace Managed.Adb.Tests
     {
         public TracingAdbSocket(IPEndPoint endPoint) : base(endPoint)
         {
+        }
+
+        public bool DoDispose
+        {
+            get;
+            set;
         }
 
         public Queue<AdbResponse> Responses
@@ -24,8 +31,10 @@ namespace Managed.Adb.Tests
 
         public override void Dispose()
         {
-            // Don't dispose the underlying socket. The tests always re-use
-            // the same socket.
+            if(this.DoDispose)
+            {
+                base.Dispose();
+            }
         }
 
         public override void Read(byte[] data)
@@ -61,6 +70,13 @@ namespace Managed.Adb.Tests
         public override string ReadString()
         {
             var value = base.ReadString();
+            this.ResponseMessages.Enqueue(value);
+            return value;
+        }
+
+        public async override Task<string> ReadStringAsync()
+        {
+            var value = await base.ReadStringAsync();
             this.ResponseMessages.Enqueue(value);
             return value;
         }

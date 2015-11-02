@@ -4,9 +4,12 @@ namespace Managed.Adb.Tests
 {
     internal class TracingAdbSocketFactory : IAdbSocketFactory
     {
-        public TracingAdbSocketFactory()
+        public TracingAdbSocketFactory(bool doDispose)
         {
-            this.Socket = new TracingAdbSocket(AdbServer.EndPoint);
+            this.Socket = new TracingAdbSocket(AdbServer.EndPoint)
+            {
+                DoDispose = doDispose
+            };
         }
 
         public IDummyAdbSocket Socket

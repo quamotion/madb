@@ -23,6 +23,9 @@ namespace Managed.Adb
         event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
         /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Devices/*'/>
-        IList<DeviceData> Devices { get; }
+        IReadOnlyCollection<DeviceData> Devices { get; }
+
+        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Start/*'/>
+        void Start();
     }
 }

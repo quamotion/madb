@@ -34,14 +34,6 @@ namespace Managed.Adb
         /// </summary>
         public static readonly Version RequiredAdbVersion = new Version(1, 0, 20);
 
-        public static Func<string, IAdbCommandLineClient> AdbCommandLineClientFactory
-        { get; set; } = (path) => new AdbCommandLineClient(path);
-
-        /// <summary>
-        /// The tag to use when logging.
-        /// </summary>
-        private const string Tag = nameof(AdbServer);
-
         /// <summary>
         /// The error code that is returned by the <see cref="SocketException"/> when the connection is refused.
         /// </summary>
@@ -52,6 +44,19 @@ namespace Managed.Adb
         /// </remarks>
         /// <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/>
         internal const int ConnectionRefused = 10061;
+
+        /// <summary>
+        /// The tag to use when logging.
+        /// </summary>
+        private const string Tag = nameof(AdbServer);
+
+        /// <summary>
+        /// Gets or sets a function that returns a new instance of a class that implements the
+        /// <see cref="IAdbCommandLineClient"/> interface, that can be used to interact with the
+        /// <c>adb.exe</c> command line client.
+        /// </summary>
+        public static Func<string, IAdbCommandLineClient> AdbCommandLineClientFactory
+        { get; set; } = (path) => new AdbCommandLineClient(path);
 
         /// <summary>
         /// Gets or sets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server is listening..

@@ -22,6 +22,9 @@ namespace Managed.Adb
             this.Message = string.Empty;
         }
 
+        /// <summary>
+        /// Represents the OK response sent by ADB.
+        /// </summary>
         public static AdbResponse OK
         { get; } = new AdbResponse()
         {
@@ -30,17 +33,6 @@ namespace Managed.Adb
             Message = string.Empty,
             Timeout = false
         };
-
-        public static AdbResponse FromError(string message)
-        {
-            return new AdbResponse()
-            {
-                IOSuccess = true,
-                Message = message,
-                Okay = false,
-                Timeout = false
-            };
-        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the IO communication was a success.
@@ -74,6 +66,38 @@ namespace Managed.Adb
         /// </value>
         public string Message { get; set; }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="AdbResponse"/> class, based on an
+        /// error message returned by adb.
+        /// </summary>
+        /// <param name="message">
+        /// The error message returned by adb.
+        /// </param>
+        /// <returns>
+        /// A new <see cref="AdbResponse"/> object that represents the error.
+        /// </returns>
+        public static AdbResponse FromError(string message)
+        {
+            return new AdbResponse()
+            {
+                IOSuccess = true,
+                Message = message,
+                Okay = false,
+                Timeout = false
+            };
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="object"/> is equal to the current
+        /// <see cref="AdbResponse"/> object.
+        /// </summary>
+        /// <param name="obj">
+        /// The <see cref="object"/> to compare with the current <see cref="AdbResponse"/> object.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the specified object is equal to the current object;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool Equals(object obj)
         {
             var other = obj as AdbResponse;
@@ -89,6 +113,12 @@ namespace Managed.Adb
                 && other.Timeout == this.Timeout;
         }
 
+        /// <summary>
+        /// Gets the hash code for the current <see cref="AdbResponse"/>.
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current <see cref="AdbResponse"/>.
+        /// </returns>
         public override int GetHashCode()
         {
             int hash = 17;
@@ -98,6 +128,25 @@ namespace Managed.Adb
             hash = (hash * 23) + this.Timeout.GetHashCode();
 
             return hash;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="string"/> that represents the current <see cref="AdbResponse"/>.
+        /// </summary>
+        /// <returns>
+        /// <c>OK</c> if the response is an OK response, or <c>Error: {Message}</c> if the
+        /// response indicates an error.
+        /// </returns>
+        public override string ToString()
+        {
+            if (this.Equals(AdbResponse.OK))
+            {
+                return "OK";
+            }
+            else
+            {
+                return $"Error: {this.Message}";
+            }
         }
     }
 }

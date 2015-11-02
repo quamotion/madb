@@ -4,8 +4,10 @@
 
 namespace Managed.Adb
 {
-    using System;
     using Managed.Adb.Exceptions;
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Provides a common interface for any class that acts as a client for the
@@ -39,6 +41,9 @@ namespace Managed.Adb
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadString/*'/>
         string ReadString();
+
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadStringAsync/*'/>
+        Task<string> ReadStringAsync();
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Close/*'/>
         void Close();

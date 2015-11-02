@@ -23,4 +23,10 @@
       Gets the devices that are currently connected to the Android Debug Bridge.
     </summary>
   </Devices>
+
+  <Start>
+    <summary>
+      Starts the monitoring
+    </summary>
+  </Start>
 </DeviceMonitor>

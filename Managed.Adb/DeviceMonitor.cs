@@ -7,7 +7,6 @@ namespace Managed.Adb
     using MoreLinq;
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using System.Threading;
 
@@ -22,6 +21,10 @@ namespace Managed.Adb
         /// </summary>
         private const string Tag = nameof(DeviceMonitor);
 
+        private readonly List<DeviceData> devices;
+
+        private readonly ManualResetEvent firstDeviceListParsed = new ManualResetEvent(false);
+
         /// <summary>
         /// The thread that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
@@ -35,10 +38,14 @@ namespace Managed.Adb
         /// </param>
         public DeviceMonitor(IAdbSocket socket)
         {
-            this.Socket = socket;
-            this.Devices = new List<DeviceData>();
+            if (socket == null)
+            {
+                throw new ArgumentNullException(nameof(socket));
+            }
 
-            this.Start();
+            this.Socket = socket;
+            this.devices = new List<DeviceData>();
+            this.Devices = this.devices.AsReadOnly();
         }
 
         /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceChanged/*'/>
@@ -51,7 +58,7 @@ namespace Managed.Adb
         public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
         /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Devices/*'/>
-        public IList<DeviceData> Devices { get; private set; }
+        public IReadOnlyCollection<DeviceData> Devices { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IAdbSocket"/> that represents the connection to the
@@ -67,16 +74,20 @@ namespace Managed.Adb
         /// </value>
         public bool IsRunning { get; private set; }
 
-        /// <summary>
-        /// Starts the monitoring
-        /// </summary>
-        private void Start()
+        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Start/*'/>
+        public void Start()
         {
             if (this.monitorThread == null)
             {
+                this.firstDeviceListParsed.Reset();
+
                 this.monitorThread = new Thread(new ThreadStart(this.DeviceMonitorLoop));
-                this.monitorThread.Name = "Device List Monitor";
+                this.monitorThread.Name = "Managed.Adb - Device List Monitor";
                 this.monitorThread.Start();
+
+                // Wait for the worker thread to have read the first list
+                // of devices.
+                this.firstDeviceListParsed.WaitOne();
             }
         }
 
@@ -85,7 +96,16 @@ namespace Managed.Adb
         /// </summary>
         public void Dispose()
         {
-            // Signal the monitor thread to stop.
+            // Close the connection to adb.
+            // This will also cause the socket to disconnect, and the
+            // monitor thread to cancel out (because an ObjectDisposedException is thrown
+            // on the GetString method and subsequently Socket.Connected = false and Socket = null).
+            if (this.Socket != null)
+            {
+                this.Socket.Dispose();
+                this.Socket = null;
+            }
+
             if (this.monitorThread != null)
             {
                 this.IsRunning = false;
@@ -94,13 +114,6 @@ namespace Managed.Adb
                 this.monitorThread.Join();
 
                 this.monitorThread = null;
-            }
-
-            // Close the connection to adb
-            if (this.Socket != null)
-            {
-                this.Socket.Dispose();
-                this.Socket = null;
             }
         }
 
@@ -155,29 +168,17 @@ namespace Managed.Adb
             {
                 try
                 {
-                    // read the length of the incoming message
-                    // The first 4 bytes contain the length of the string
-                    var reply = new byte[4];
-                    this.Socket.Read(reply, int.MaxValue);
-
-                    // Convert the bytes to a hex string
-                    string lenHex = AdbClient.Encoding.GetString(reply);
-                    int len = int.Parse(lenHex, NumberStyles.HexNumber);
-
-                    // And get the string
-                    reply = new byte[len];
-                    this.Socket.Read(reply);
-
-                    string value = AdbClient.Encoding.GetString(reply);
-
+                    var value = this.Socket.ReadStringAsync().Result;
                     this.ProcessIncomingDeviceData(value);
+
+                    this.firstDeviceListParsed.Set();
                 }
                 catch (Exception ex)
                 {
                     Log.e(Tag, ex);
                 }
             }
-            while (this.IsRunning);
+            while (this.Socket != null && this.Socket.Connected);
         }
 
         /// <summary>
@@ -228,7 +229,7 @@ namespace Managed.Adb
 
                     if (existingDevice == null)
                     {
-                        this.Devices.Add(device);
+                        this.devices.Add(device);
                         this.OnDeviceConnected(new DeviceDataEventArgs(device));
                     }
                     else
@@ -241,7 +242,7 @@ namespace Managed.Adb
                 // Remove devices
                 foreach (var device in this.Devices.Where(d => !list.Any(e => e.Serial == d.Serial)).ToArray())
                 {
-                    this.Devices.Remove(device);
+                    this.devices.Remove(device);
                     this.OnDeviceDisconnected(new DeviceDataEventArgs(device));
                 }
             }

@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Managed.Adb.Tests
 {
@@ -62,6 +64,11 @@ namespace Managed.Adb.Tests
         public string ReadString()
         {
             return this.ResponseMessages.Dequeue();
+        }
+
+        public Task<string> ReadStringAsync()
+        {
+            return Task.FromResult(this.ReadString());
         }
 
         public void SendAdbRequest(string request)

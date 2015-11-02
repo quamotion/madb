@@ -54,6 +54,39 @@
       This uses the default time out value.
     </remarks>
   </Read_byte>
+
+  <ReadAsync_byte>
+    <summary>
+      Asynchronously reads from the socket until the array is filled, or no more data is coming (because
+      the socket closed or the timeout expired).
+    </summary>
+    <param name="data">
+      The buffer to store the read data into.
+    </param>
+    <returns>
+      A <see cref="Task"/> that represents the asynchronous operation.
+    </returns>
+    <remarks>
+      This uses the default time out value.
+    </remarks>
+  </ReadAsync_byte>
+
+  <ReadAsync_byte_int>
+    <summary>
+      Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
+    </summary>
+    <param name="data">
+      An array of type <see cref="byte"/> that is the storage location for the received data.
+    </param>
+    <param name="length">
+      The number of bytes to receive.
+    </param>
+    <returns>
+      A <see cref="Task"/> that represents the asynchronous operation. The result value of the
+      task contains the number of bytes received.
+    </returns>
+  </ReadAsync_byte_int>
+  
   <Read_byte_int>
     <summary>
       Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
@@ -77,6 +110,16 @@
       The <see cref="string"/> received from the <see cref="IAdbSocket"/>.
     </returns>
   </ReadString>
+
+  <ReadStringAsync>
+    <summary>
+      Asynchronously reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance.
+    </summary>
+    <returns>
+      A <see cref="Task"/> that represents the asynchronous operation. The return value
+      of the task is the <see cref="string"/> received from the <see cref="IAdbSocket"/>.
+    </returns>
+  </ReadStringAsync>
 
   <SendFileRequest>
     <summary>

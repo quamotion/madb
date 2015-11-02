@@ -2,7 +2,7 @@
 
 namespace Managed.Adb.Tests
 {
-    internal interface IDummyAdbSocket : IAdbSocket
+    public interface IDummyAdbSocket : IAdbSocket
     {
         Queue<AdbResponse> Responses
         { get; }

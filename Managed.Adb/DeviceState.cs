@@ -1,30 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿// <copyright file="DeviceState.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
 
 namespace Managed.Adb
 {
-
     /// <summary>
-    ///
+    /// Defines the state of an Android device connected to the Android Debug Bridge.
     /// </summary>
+    /// <seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/adb.h"/>
+    /// <seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/transport.cpp"/>
     public enum DeviceState
     {
         /// <summary>
-        /// The device is in recovery mode.
+        /// The instance is not connected to adb or is not responding.
         /// </summary>
-        Recovery,
+        Offline = 0,
 
         /// <summary>
         /// The device is in bootloader mode
         /// </summary>
         BootLoader,
-
-        /// <summary>
-        /// The instance is not connected to adb or is not responding.
-        /// </summary>
-        Offline,
 
         /// <summary>
         /// The instance is now connected to the adb server. Note that this state does not imply that the Android system is
@@ -34,18 +29,33 @@ namespace Managed.Adb
         Online,
 
         /// <summary>
-        /// The device is in download mode.
+        /// The device is the adb host.
         /// </summary>
-        Download,
+        Host,
 
         /// <summary>
-        /// The device state is unknown.
+        /// The device is in recovery mode.
         /// </summary>
-        Unknown,
+        Recovery,
+
+        /// <summary>
+        /// Insufficient permissions to communicate with the device.
+        /// </summary>
+        NoPermissions,
+
+        /// <summary>
+        /// The device is in sideload mode.
+        /// </summary>
+        Sideload,
 
         /// <summary>
         /// The device is connected to adb, but adb is not authorized for remote debugging of this device.
         /// </summary>
-        Unauthorized
+        Unauthorized,
+
+        /// <summary>
+        /// The device state is unknown.
+        /// </summary>
+        Unknown
     }
 }

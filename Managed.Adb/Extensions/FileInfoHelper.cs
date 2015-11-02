@@ -6,7 +6,6 @@ namespace Managed.Adb
 {
     using System.IO;
 
-    /// <ignore>true</ignore>
     public static partial class ManagedAdbExtenstions
     {
         /// <summary>
