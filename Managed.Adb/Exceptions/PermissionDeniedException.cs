@@ -10,6 +10,9 @@ namespace Managed.Adb.Exceptions
     using System.Runtime.Serialization;
     using System.Text;
 
+    /// <summary>
+    /// The exception that is thrown when the permission to a resource was denied.
+    /// </summary>
     public class PermissionDeniedException : Exception
     {
         /// <summary>

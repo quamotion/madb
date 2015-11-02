@@ -13,41 +13,6 @@ namespace Managed.Adb.Extensions.Tests
     [TestClass]
     public class AdbHelperIntegrationTests : BaseDeviceTests
     {
-
-        public class FileSyncProgressMonitor : ISyncProgressMonitor
-        {
-
-            public void Start(long totalWork)
-            {
-                Console.WriteLine("Starting Transfer");
-                this.TotalWork = this.Remaining = totalWork;
-                Transfered = 0;
-            }
-
-            public void Stop()
-            {
-                IsCanceled = true;
-            }
-
-            public bool IsCanceled { get; private set; }
-
-            public void StartSubTask(String source, String destination)
-            {
-                Console.WriteLine("Syncing {0} -> {1}", source, destination);
-            }
-
-            public void Advance(long work)
-            {
-                Transfered += work;
-                Remaining -= work;
-                Console.WriteLine("Transfered {0} of {1} - {2} remaining", Transfered, TotalWork, Remaining);
-            }
-
-            public long TotalWork { get; set; }
-            public long Remaining { get; set; }
-            public long Transfered { get; set; }
-        }
-
         [TestMethod]
         [TestCategory("IntegrationTest")]
         public void FileListingServiceTest()

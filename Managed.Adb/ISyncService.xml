@@ -1,134 +1,74 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <SyncService>
-  <PushFile>
+  <Push>
     <summary>
-      Push a single file.
+      Pushes (uploads) a file to the remote device.
     </summary>
-    <param name="local">
-      the local filepath.
+    <param name="stream">
+      A <see cref="Stream"/> that contains the contents of the file.
     </param>
-    <param name="remote">
-      The remote filepath.
+    <param name="remotePath">
+      The path, on the device, to which to push the file.
     </param>
-    <param name="monitor">
-      The progress monitor. Cannot be null.
+    <param name="permissions">
+      The permission octet that contains the permissions of the newly created file on the device.
     </param>
-    <returns>
-      a SyncResult object with a code and an optional message.
-    </returns>
-    <exception cref="System.ArgumentNullException">
-      monitor;Monitor cannot be null
-    </exception>
-    <exception cref="ArgumentNullException">
-      Throws if monitor is null
-    </exception>
-  </PushFile>
+    <param name="progress">
+      A <see cref="IProgress{T}"/> that can be used to monitor the progress of the push operation.
+    </param>
+    <param name="cancellationToken">
+      A <see cref="CancellationToken"/> that can be used to cancel the task.
+    </param>
+  </Push>
 
   <Pull>
     <summary>
-      Pulls file(s) or folder(s).
+      Pulls (downloads) a file from the remote device.
     </summary>
-    <param name="entries">the remote item(s) to pull</param>
-    <param name="localPath">
-      The local destination. If the entries count is &gt; 1 or if the unique entry is a
-      folder, this should be a folder.
+    <param name="remotePath">
+      The path, on the device, of the file to pull.
     </param>
-    <param name="monitor">The progress monitor. Cannot be null.</param>
-    <returns>
-      a SyncResult object with a code and an optional message.
-    </returns>
-    <exception cref="System.ArgumentNullException">monitor;Monitor cannot be null</exception>
+    <param name="stream">
+      A <see cref="Stream"/> that will receive the contents of the file.
+    </param>
+    <param name="progress">
+      A <see cref="IProgress{T}"/> that can be used to monitor the progress of the pull operation.
+    </param>
+    <param name="cancellationToken">
+      A <see cref="CancellationToken"/> that can be used to cancel the task.
+    </param>
   </Pull>
 
-  <Push>
+  <Stat>
     <summary>
-      Push several files.
+      Returns information about a file on the device.
     </summary>
-    <param name="local">
-      An array of local files to push
-    </param>
-    <param name="remote">
-      the remote FileEntry representing a directory.
-    </param>
-    <param name="monitor">
-      The progress monitor. Cannot be null.
+    <param name="remotePath">
+      The path of the file on the device.
     </param>
     <returns>
-      a SyncResult object with a code and an optional message.
+      A <see cref="FileStatistics"/> object that contains information about the file.
     </returns>
-    <exception cref="System.ArgumentNullException">
-      Monitor cannot be null
-    </exception>
-    <gist id="380b3c149499bf31e49d" />
-  </Push>
+  </Stat>
 
-  <PullFile>
+  <GetDirectoryListing>
     <summary>
-      Pulls a single file.
+      Lists the contents of a directory on the device.
     </summary>
-    <param name="remote">
-      remote the remote file
-    </param>
-    <param name="localFilename">
-      The local destination.
-    </param>
-    <param name="monitor">
-      The progress monitor. Cannot be null.
+    <param name="remotePath">
+      The path to the directory on the device.
     </param>
     <returns>
-      a SyncResult object with a code and an optional message.
+      For each child item of the directory, a <see cref="FileStatistics"/> object
+      with information of the item.
     </returns>
-    <exception cref="System.ArgumentNullException">
-      monitor;Monitor cannot be null
-    </exception>
-    <exception cref="ArgumentNullException">
-      Throws if monitor is null
-    </exception>
-    <gist id="39fdc76b6f394b9bdf88" />
-  </PullFile>
+  </GetDirectoryListing>
 
-  <PullFile2>
-    <summary>
-      Pulls a single file.
-      <para>
-        Because this method just deals with a String for the remote file instead of FileEntry,
-        the size of the file being pulled is unknown and the ISyncProgressMonitor will not properly
-        show the progress
-        </para>
-    </summary>
-    <param name="remoteFilepath">
-      the full path to the remote file
-    </param>
-    <param name="localFilename">
-      The local destination.
-    </param>
-    <param name="monitor">
-      The progress monitor. Cannot be null.
-    </param>
-    <returns>
-      a SyncResult object with a code and an optional message.
-      </returns>
-    <exception cref="System.ArgumentNullException">
-      monitor;Monitor cannot be null
-    </exception>
-    <exception cref="ArgumentNullException">
-      Throws if monitor is null
-    </exception>
-    <gist id="9021e6c39ee20a6e122b" />
-  </PullFile2>
-  
-  <Close>
-    <summary>
-      Closes this connection.
-      </summary>
-  </Close>
-
-  <open>
+  <Open>
     <summary>
       Opens this connection.
-      </summary>
-    <returns></returns>
-  </open>
+    </summary>
+  </Open>
 
   <IsOpen>
     <summary>
@@ -138,10 +78,4 @@
       <see langword="true"/> if this instance is open; otherwise, <see langword="false"/>.
     </value>
   </IsOpen>
-
-  <NullProgressMonitor>
-    <summary>
-      NullProgressMonitor.
-    </summary>
-  </NullProgressMonitor>
 </SyncService>

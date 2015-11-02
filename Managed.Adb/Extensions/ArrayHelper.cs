@@ -13,21 +13,6 @@ namespace Managed.Adb
     public static partial class ManagedAdbExtenstions
     {
         /// <summary>
-        /// Swaps an unsigned value around, and puts the result in an array that can be sent to a device.
-        /// </summary>
-        /// <param name="value">The value to swap.</param>
-        /// <param name="dest">the destination array</param>
-        /// <param name="offset">offset the offset in the array where to put the swapped value.</param>
-        /// <remarks>Array length must be at least offset + 4</remarks>
-        public static void Swap32bitsToArray(this int value, byte[] dest, int offset)
-        {
-            dest[offset] = (byte)(value & 0x000000FF);
-            dest[offset + 1] = (byte)((value & 0x0000FF00) >> 8);
-            dest[offset + 2] = (byte)((value & 0x00FF0000) >> 16);
-            dest[offset + 3] = (byte)((value & 0xFF000000) >> 24);
-        }
-
-        /// <summary>
         /// Reads a signed 32 bit integer from an array coming from a device.
         /// </summary>
         /// <param name="value">the array containing the int</param>

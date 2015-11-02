@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -59,13 +61,17 @@
     <Compile Include="BusyBox.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="DeviceEventArgs.cs" />
+    <Compile Include="Exceptions\PackageInstallationException.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileListingService.cs" />
+    <Compile Include="FilePermission.cs" />
+    <Compile Include="FilePermissions.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="IBusyBox.cs" />
     <Compile Include="IDevice.cs" />
     <Compile Include="IFileListingService.cs" />
     <Compile Include="IFileSystem.cs" />
+    <Compile Include="IO\LinuxPath.cs" />
     <Compile Include="MountPoint.cs" />
     <Compile Include="PackageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,9 +80,11 @@
     <Compile Include="Receivers\EnvironmentVariablesReceiver.cs" />
     <Compile Include="Receivers\GetPropReceiver.cs" />
     <Compile Include="Receivers\IListingReceiver.cs" />
+    <Compile Include="Receivers\InstallReceiver.cs" />
     <Compile Include="Receivers\ListingServiceReceiver.cs" />
     <Compile Include="Receivers\MountPointReceiver.cs" />
     <Compile Include="Receivers\PackageManagerReceiver.cs" />
+    <Compile Include="ThrowIf.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Managd.Adb.snk" />

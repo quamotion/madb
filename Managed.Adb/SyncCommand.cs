@@ -4,6 +4,10 @@
 
 namespace Managed.Adb
 {
+    /// <summary>
+    /// Defines a command that can be sent to, or a response that can be received from,
+    /// the sync service.
+    /// </summary>
     public enum SyncCommand
     {
         /// <summary>
@@ -26,14 +30,29 @@ namespace Managed.Adb
         /// </summary>
         STAT,
 
+        /// <summary>
+        /// A directory entry.
+        /// </summary>
         DENT,
 
+        /// <summary>
+        /// The operation has failed.
+        /// </summary>
         FAIL,
 
+        /// <summary>
+        /// Marks the start of a data packet.
+        /// </summary>
         DATA,
 
+        /// <summary>
+        /// The server has acknowledged the request.
+        /// </summary>
         OKAY,
 
+        /// <summary>
+        /// The operation has completed.
+        /// </summary>
         DONE
     }
 }

@@ -21,6 +21,8 @@ namespace Managed.Adb
 
         private static ConsoleOutputReceiver instance = null;
 
+        private StringBuilder output = new StringBuilder();
+
         /// <summary>
         /// Gets the instance.
         /// </summary>
@@ -40,7 +42,16 @@ namespace Managed.Adb
             }
         }
 
-        private StringBuilder output = new StringBuilder();
+        /// <summary>
+        /// Gets a <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
+        /// </returns>
+        public override string ToString()
+        {
+            return this.output.ToString();
+        }
 
         /// <summary>
         /// Processes the new lines.
@@ -59,11 +70,6 @@ namespace Managed.Adb
 
                 Log.d(TAG, line);
             }
-        }
-
-        public override string ToString()
-        {
-            return this.output.ToString();
         }
     }
 }

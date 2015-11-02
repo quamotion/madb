@@ -5,15 +5,16 @@
 namespace Managed.Adb
 {
     using Exceptions;
-    using Managed.Adb.IO;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
-    using System.Net;
-    using System.Text;
     using System.Threading;
 
+    /// <summary>
+    /// Provides access to the sync service running on the Android device. Allows you to
+    /// list, download and upload files on the device.
+    /// </summary>
     public class SyncService : ISyncService, IDisposable
     {
         /// <summary>
@@ -21,74 +22,38 @@ namespace Managed.Adb
         /// </summary>
         private const string Tag = nameof(SyncService);
 
-        private const string RECV = "RECV";
-        private const string DATA = "DATA";
-        private const string DONE = "DONE";
+        /// <summary>
+        /// The maximum size of data to transfer between the device and the PC
+        /// in one block.
+        /// </summary>
+        private const int MaxBufferSize = 64 * 1024;
 
-        [Flags]
-        public enum FileMode
-        {
-            TypeMask = 0x8000,
-
-            /// <summary>
-            /// The unknown
-            /// </summary>
-            UNKNOWN = 0x0000,
-
-            /// <summary>
-            /// The socket
-            /// </summary>
-            Socket = 0xc000,
-
-            /// <summary>
-            /// The symbolic link
-            /// </summary>
-            SymbolicLink = 0xa000,
-
-            /// <summary>
-            /// The regular
-            /// </summary>
-            Regular = 0x8000,
-
-            /// <summary>
-            /// The block
-            /// </summary>
-            Block = 0x6000,
-
-            /// <summary>
-            /// The directory
-            /// </summary>
-            Directory = 0x4000,
-
-            /// <summary>
-            /// The character
-            /// </summary>
-            Character = 0x2000,
-
-            /// <summary>
-            /// The fifo
-            /// </summary>
-            FIFO = 0x1000
-        }
-
-        private const int SYNC_DATA_MAX = 64 * 1024;
-        private const int REMOTE_PATH_MAX_LENGTH = 1024;
-
-        public DeviceData Device
-        {
-            get;
-            private set;
-        }
+        /// <summary>
+        /// The maximum length of a path on the remote device.
+        /// </summary>
+        private const int MaxPathLength = 1024;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
-        /// <param name="device">The device.</param>
+        /// <param name="device">
+        /// The device on which to interact with the files.
+        /// </param>
         public SyncService(DeviceData device)
             : this(AdbClient.SocketFactory.Create(AdbServer.EndPoint), device)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SyncService"/> class.
+        /// </summary>
+        /// <param name="socket">
+        /// A <see cref="IAdbSocket"/> that enables to connection with the
+        /// adb server.
+        /// </param>
+        /// <param name="device">
+        /// The device on which to interact with the files.
+        /// </param>
         public SyncService(IAdbSocket socket, DeviceData device)
         {
             this.Socket = socket;
@@ -96,14 +61,19 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Gets the address.
+        /// Gets or sets the device on which the file operations are being executed.
         /// </summary>
-        /// <value>
-        /// The address.
-        /// </value>
-        public IPEndPoint Address { get; private set; }
+        public DeviceData Device
+        {
+            get;
+            private set;
+        }
 
-        private IAdbSocket Socket { get; set; }
+        /// <summary>
+        /// Gets the <see cref="IAdbSocket"/> that enables the connection with the
+        /// adb server.
+        /// </summary>
+        public IAdbSocket Socket { get; private set; }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
         public bool IsOpen
@@ -124,8 +94,6 @@ namespace Managed.Adb
 
             try
             {
-                this.Socket = AdbClient.SocketFactory.Create(this.Address);
-
                 // target a specific device
                 AdbClient.Instance.SetDevice(this.Socket, this.Device);
 
@@ -134,30 +102,14 @@ namespace Managed.Adb
             }
             catch (IOException)
             {
-                this.Close();
+                this.Dispose();
                 throw;
             }
 
             return;
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Close/*'/>
-        public void Close()
-        {
-            if (this.Socket != null)
-            {
-                try
-                {
-                    this.Socket.Close();
-                }
-                catch (IOException)
-                {
-                }
-
-                this.Socket = null;
-            }
-        }
-
+        /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
         public void Push(Stream stream, string remotePath, int permissions, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (stream == null)
@@ -170,16 +122,16 @@ namespace Managed.Adb
                 throw new ArgumentNullException(nameof(remotePath));
             }
 
-            if (remotePath.Length > REMOTE_PATH_MAX_LENGTH)
+            if (remotePath.Length > MaxPathLength)
             {
-                throw new ArgumentOutOfRangeException(nameof(remotePath), $"The remote path {remotePath} exceeds the maximum path size {REMOTE_PATH_MAX_LENGTH}");
+                throw new ArgumentOutOfRangeException(nameof(remotePath), $"The remote path {remotePath} exceeds the maximum path size {MaxPathLength}");
             }
 
             this.Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permissions);
 
             // create the buffer used to read.
             // we read max SYNC_DATA_MAX.
-            byte[] buffer = new byte[SYNC_DATA_MAX];
+            byte[] buffer = new byte[MaxBufferSize];
 
             // look while there is something to read
             while (true)
@@ -188,7 +140,7 @@ namespace Managed.Adb
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // read up to SYNC_DATA_MAX
-                int read = stream.Read(buffer, 0, SYNC_DATA_MAX);
+                int read = stream.Read(buffer, 0, MaxBufferSize);
 
                 if (read == 0)
                 {
@@ -235,7 +187,7 @@ namespace Managed.Adb
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            byte[] buffer = new byte[SYNC_DATA_MAX];
+            byte[] buffer = new byte[MaxBufferSize];
 
             this.Socket.SendSyncRequest(SyncCommand.RECV, remoteFilepath);
 
@@ -264,9 +216,9 @@ namespace Managed.Adb
 
                 int size = BitConverter.ToInt32(reply, 0);
 
-                if (size > SYNC_DATA_MAX)
+                if (size > MaxBufferSize)
                 {
-                    throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {SYNC_DATA_MAX}");
+                    throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {MaxBufferSize}");
                 }
 
                 // now read the length we received
@@ -275,15 +227,11 @@ namespace Managed.Adb
             }
         }
 
-        /// <summary>
-        /// Returns the mode of the remote file.
-        /// </summary>
-        /// <param name="path">the remote file</param>
-        /// <returns>the mode if all went well; otherwise, FileMode.UNKNOWN</returns>
-        public FileStatistics Stat(string path)
+        /// <include file='.\ISyncService.xml' path='/SyncService/Stat/*'/>
+        public FileStatistics Stat(string remotePath)
         {
             // create the stat request message.
-            this.Socket.SendSyncRequest(SyncCommand.STAT, path);
+            this.Socket.SendSyncRequest(SyncCommand.STAT, remotePath);
 
             if (this.Socket.ReadSyncResponse() != SyncCommand.STAT)
             {
@@ -293,36 +241,20 @@ namespace Managed.Adb
             // read the result, in a byte array containing 3 ints
             // (mode, size, time)
             FileStatistics value = new FileStatistics();
-            value.Path = path;
+            value.Path = remotePath;
 
             this.ReadStatistics(value);
 
             return value;
         }
 
-        private void ReadStatistics(FileStatistics value)
-        {
-            byte[] statResult = new byte[12];
-            this.Socket.Read(statResult);
-
-            if (!BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(statResult, 0, 4);
-                Array.Reverse(statResult, 4, 4);
-                Array.Reverse(statResult, 8, 4);
-            }
-
-            value.FileMode = (FileMode)BitConverter.ToInt32(statResult, 0);
-            value.Size = BitConverter.ToInt32(statResult, 4);
-            value.Time = ManagedAdbExtenstions.Epoch.AddSeconds(BitConverter.ToInt32(statResult, 8)).ToLocalTime();
-        }
-
-        public IEnumerable<FileStatistics> GetDirectoryListing(string path)
+        /// <include file='.\ISyncService.xml' path='/SyncService/GetDirectoryListing/*'/>
+        public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
             Collection<FileStatistics> value = new Collection<FileStatistics>();
 
             // create the stat request message.
-            this.Socket.SendSyncRequest(SyncCommand.LIST, path);
+            this.Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
 
             while (true)
             {
@@ -352,7 +284,28 @@ namespace Managed.Adb
         /// </summary>
         public void Dispose()
         {
-            this.Close();
+            if (this.Socket != null)
+            {
+                this.Socket.Dispose();
+                this.Socket = null;
+            }
+        }
+
+        private void ReadStatistics(FileStatistics value)
+        {
+            byte[] statResult = new byte[12];
+            this.Socket.Read(statResult);
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(statResult, 0, 4);
+                Array.Reverse(statResult, 4, 4);
+                Array.Reverse(statResult, 8, 4);
+            }
+
+            value.FileMode = (UnixFileMode)BitConverter.ToInt32(statResult, 0);
+            value.Size = BitConverter.ToInt32(statResult, 4);
+            value.Time = ManagedAdbExtenstions.Epoch.AddSeconds(BitConverter.ToInt32(statResult, 8)).ToLocalTime();
         }
     }
 }

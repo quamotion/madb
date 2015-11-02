@@ -6,6 +6,9 @@ namespace Managed.Adb
 {
     using System;
 
+    /// <summary>
+    /// The event arguments that are passed when a device event occurs.
+    /// </summary>
     public class DeviceDataEventArgs : EventArgs
     {
         /// <summary>

@@ -89,7 +89,13 @@ namespace Managed.Adb
         /// </value>
         public bool CanDelete { get; private set; }
 
-        public string ToString()
+        /// <summary>
+        /// Gets a <see cref="string"/> that represents the current <see cref="FilePermission"/> object.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="string"/> that represents the current <see cref="FilePermission"/> object.
+        /// </returns>
+        public override string ToString()
         {
             StringBuilder perm = new StringBuilder();
             return perm.AppendFormat("{0}", this.CanRead ? "r" : "-").AppendFormat("{0}", this.CanWrite ? "w" : "-").AppendFormat("{0}", this.CanExecute ? this.CanDelete ? "x" : "t" : "-").ToString();

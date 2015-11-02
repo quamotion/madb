@@ -86,7 +86,7 @@
       task contains the number of bytes received.
     </returns>
   </ReadAsync_byte_int>
-  
+
   <Read_byte_int>
     <summary>
       Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
@@ -110,6 +110,16 @@
       The <see cref="string"/> received from the <see cref="IAdbSocket"/>.
     </returns>
   </ReadString>
+
+  <ReadSyncString>
+    <summary>
+      Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
+      the connection is in sync mode.
+    </summary>
+    <returns>
+      The <see cref="string"/> received from the <see cref="IAdbSocket"/>.
+    </returns>
+  </ReadSyncString>
 
   <ReadStringAsync>
     <summary>
@@ -135,18 +145,6 @@
       The mode of the file.
     </param>
   </SendFileRequest>
-
-  <SendSyncRequest>
-    <summary>
-      Sends a sync request.
-    </summary>
-    <param name="command">
-      The command to send.
-    </param>
-    <param name="value">
-      The command value.
-    </param>
-  </SendSyncRequest>
 
   <Send_byte_int_int>
     <summary>
@@ -186,4 +184,53 @@
       No Data to read: exception.Message
     </exception>
   </Read_byte_int_int>
+
+  <SendSyncRequest_SyncCommand_string_int>
+    <summary>
+      Sends a sync request to the device.
+    </summary>
+    <param name="command">
+      The command to send.
+    </param>
+    <param name="path">
+      The path of the file on which the command should operate.
+    </param>
+    <param name="permissions">
+      If the command is a <see cref="SyncCommand.SEND"/> command, the permissions
+      to assign to the newly created file.
+    </param>
+  </SendSyncRequest_SyncCommand_string_int>
+
+  <SendSyncRequest_SyncCommand_string>
+    <summary>
+      Sends a sync request to the device.
+    </summary>
+    <param name="command">
+      The command to send.
+    </param>
+    <param name="path">
+      The path of the file on which the command should operate.
+    </param>
+  </SendSyncRequest_SyncCommand_string>
+
+  <SendSyncRequest_SyncCommand_int>
+    <summary>
+      Sends a sync request to the device.
+    </summary>
+    <param name="command">
+      The command to send.
+    </param>
+    <param name="length">
+      The length of the data packet that follows.
+    </param>
+  </SendSyncRequest_SyncCommand_int>
+
+  <ReadSyncResponse>
+    <summary>
+      Reads the response to a sync command.
+    </summary>
+    <returns>
+      The response that was sent by the device.
+    </returns>
+  </ReadSyncResponse>
 </IAdbSocket>

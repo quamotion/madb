@@ -24,12 +24,16 @@ namespace Managed.Adb
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Send_byte_int_int/*'/>
         void Send(byte[] data, int length, int timeout);
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string_int/*'/>
         void SendSyncRequest(SyncCommand command, string path, int permissions);
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest/*'/>
         void SendSyncRequest(SyncCommand command, int length);
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string/*'/>
         void SendSyncRequest(SyncCommand command, string path);
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadSyncResponse/*'/>
         SyncCommand ReadSyncResponse();
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAdbResponse/*'/>
@@ -44,6 +48,7 @@ namespace Managed.Adb
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadString/*'/>
         string ReadString();
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadSyncString/*'/>
         string ReadSyncString();
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadStringAsync/*'/>

@@ -109,6 +109,32 @@ namespace Managed.Adb
         /// </value>
         public byte[] Data { get; set; }
 
+        /// <summary>
+        /// Returns the size of the header for a specific version of the framebuffer adb protocol.
+        /// </summary>
+        /// <param name="version">
+        /// The version of the protocol
+        /// </param>
+        /// <returns>
+        /// The number of int that makes up the header.
+        /// </returns>
+        public static int GetHeaderSize(int version)
+        {
+            switch (version)
+            {
+                case 16: // compatibility mode
+                    return 3; // size, width, height
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    return 12; // bpp, size, width, height, 4*(length, offset)
+            }
+
+            return 0;
+        }
+
         /**
          * Reads the header of a RawImage from a {@link ByteBuffer}.
          * <p/>The way the data is sent over adb is defined in system/core/adb/framebuffer_service.c
@@ -165,32 +191,13 @@ namespace Managed.Adb
             return true;
         }
 
-        /**
-         * Returns the size of the header for a specific version of the framebuffer adb protocol.
-         * @param version the version of the protocol
-         * @return the number of int that makes up the header.
-         */
-        public static int GetHeaderSize(int version)
-        {
-            switch (version)
-            {
-                case 16: // compatibility mode
-                    return 3; // size, width, height
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    return 12; // bpp, size, width, height, 4*(length, offset)
-            }
-
-            return 0;
-        }
-
-        /**
-         * Returns a rotated version of the image
-         * The image is rotated counter-clockwise.
-         */
+        /// <summary>
+        /// Returns a rotated version of the image.
+        /// The image is rotated counter-clockwise.
+        /// </summary>
+        /// <returns>
+        /// A rotated version of the image.
+        /// </returns>
         public RawImage GetRotated()
         {
             RawImage rotated = new RawImage();
@@ -220,7 +227,8 @@ namespace Managed.Adb
                 for (int x = 0; x < w; x++)
                 {
                     Array.Copy(
-                        this.Data, ((y * w) + x) * byteCount,
+                        this.Data,
+                        ((y * w) + x) * byteCount,
                         rotated.Data,
                         (((w - x - 1) * h) + y) * byteCount,
                         byteCount);

@@ -78,8 +78,6 @@
     <Compile Include="DummyAdbSocket.cs" />
     <Compile Include="DummyAdbSocketFactory.cs" />
     <Compile Include="IDummyAdbSocket.cs" />
-    <Compile Include="LinkResolverReceiverTests.cs" />
-    <Compile Include="LinuxPathTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketBasedTests.cs" />
     <Compile Include="SyncServiceTests.cs" />

@@ -122,11 +122,13 @@ namespace Managed.Adb
             }
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string_int/*'/>
         public virtual void SendSyncRequest(SyncCommand command, string path, int permissions)
         {
             this.SendSyncRequest(command, $"{path},{permissions}");
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string/*'/>
         public virtual void SendSyncRequest(SyncCommand command, string path)
         {
             if (path == null)
@@ -140,6 +142,7 @@ namespace Managed.Adb
             this.Write(pathBytes);
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest/*'/>
         public virtual void SendSyncRequest(SyncCommand command, int length)
         {
             // The message structure is:
@@ -160,6 +163,7 @@ namespace Managed.Adb
             this.Write(lengthBytes);
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadSyncResponse/*'/>
         public virtual SyncCommand ReadSyncResponse()
         {
             byte[] data = new byte[4];
@@ -187,6 +191,7 @@ namespace Managed.Adb
             return value;
         }
 
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadSyncString/*'/>
         public virtual string ReadSyncString()
         {
             // The first 4 bytes contain the length of the string

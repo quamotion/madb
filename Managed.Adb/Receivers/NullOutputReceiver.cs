@@ -4,16 +4,16 @@
 
 namespace Managed.Adb
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     /// <summary>
-    ///
+    /// An implementation of the <see cref="IShellOutputReceiver"/> that does not do anything.
     /// </summary>
     public sealed class NullOutputReceiver : IShellOutputReceiver
     {
+        /// <summary>
+        /// Backing field for the <see cref="Instance"/> property.
+        /// </summary>
+        private static NullOutputReceiver instance = null;
+
         /// <summary>
         /// Prevents a default instance of the <see cref="NullOutputReceiver" /> class from being created.
         /// </summary>
@@ -21,8 +21,6 @@ namespace Managed.Adb
         {
             this.IsCancelled = false;
         }
-
-        private static NullOutputReceiver instance = null;
 
         /// <summary>
         /// Gets the instance.
@@ -41,28 +39,6 @@ namespace Managed.Adb
 
                 return instance;
             }
-        }
-
-        /// <summary>
-        /// Adds the output.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="length">The length.</param>
-        public void AddOutput(byte[] data, int offset, int length)
-        {
-            // do nothing
-        }
-
-        /// <summary>
-        /// Flushes the output.
-        /// </summary>
-        /// <remarks>
-        /// This should always be called at the end of the "process" in order to indicate that the data is ready to be processed further if needed.
-        /// </remarks>
-        public void Flush()
-        {
-            // do nothing
         }
 
         /// <summary>
@@ -89,6 +65,28 @@ namespace Managed.Adb
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Adds the output.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
+        public void AddOutput(byte[] data, int offset, int length)
+        {
+            // do nothing
+        }
+
+        /// <summary>
+        /// Flushes the output.
+        /// </summary>
+        /// <remarks>
+        /// This should always be called at the end of the "process" in order to indicate that the data is ready to be processed further if needed.
+        /// </remarks>
+        public void Flush()
+        {
+            // do nothing
         }
     }
 }

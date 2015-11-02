@@ -6,13 +6,15 @@ namespace Managed.Adb
 {
     public static class DdmPreferences
     {
-        public static LogLevel.LogLevelInfo DEFAULT_LOG_LEVEL
-        { get; } = Managed.Adb.LogLevel.Error;
-
-        /** Default timeout values for adb connection (milliseconds) */
+        /// <summary>
+        /// Default timeout values for adb connection (milliseconds)
+        /// </summary>
         public const int DEFAULT_TIMEOUT = 5000; // standard delay, in ms
 
         private static LogLevel.LogLevelInfo logLevel;
+
+        public static LogLevel.LogLevelInfo DEFAULT_LOG_LEVEL
+        { get; } = Managed.Adb.LogLevel.Error;
 
         static DdmPreferences()
         {
@@ -32,7 +34,7 @@ namespace Managed.Adb
             set
             {
                 logLevel = value;
-                Log.Level = value ;
+                Log.Level = value;
             }
         }
     }

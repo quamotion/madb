@@ -4,13 +4,14 @@
 
 namespace Managed.Adb.Exceptions
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
+    /// <summary>
+    /// The exception that is thrown when a shell command becomes unresponsive.
+    /// </summary>
     public class ShellCommandUnresponsiveException : AdbException
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ShellCommandUnresponsiveException"/> class.
+        /// </summary>
         public ShellCommandUnresponsiveException()
             : base("The shell command has become unresponsive")
         {

@@ -1,20 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// <copyright file="FileStatistics.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
 
 namespace Managed.Adb
 {
+    using System;
+
+    /// <summary>
+    /// Contains information about a file on the remote device.
+    /// </summary>
     public class FileStatistics
     {
+        /// <summary>
+        /// Gets or sets the path of the file.
+        /// </summary>
         public string Path
         {
             get;
             set;
         }
 
-        public SyncService.FileMode FileMode
+        /// <summary>
+        /// Gets or sets the <see cref="UnixFileMode"/> attributes of the file.
+        /// </summary>
+        public UnixFileMode FileMode
         {
             get;
             set;

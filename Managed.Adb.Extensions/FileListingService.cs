@@ -207,39 +207,39 @@ namespace Managed.Adb {
         /// </summary>
         /// <param name="mode">the file mode flags</param>
         /// <returns></returns>
-        private static FileTypes GetFileType(SyncService.FileMode mode)
+        private static FileTypes GetFileType(UnixFileMode mode)
         {
-            if ((mode & SyncService.FileMode.Socket) == SyncService.FileMode.Socket)
+            if ((mode & UnixFileMode.Socket) == UnixFileMode.Socket)
             {
                 return FileListingService.FileTypes.Socket;
             }
 
-            if ((mode & SyncService.FileMode.SymbolicLink) == SyncService.FileMode.SymbolicLink)
+            if ((mode & UnixFileMode.SymbolicLink) == UnixFileMode.SymbolicLink)
             {
                 return FileListingService.FileTypes.Link;
             }
 
-            if ((mode & SyncService.FileMode.Regular) == SyncService.FileMode.Regular)
+            if ((mode & UnixFileMode.Regular) == UnixFileMode.Regular)
             {
                 return FileListingService.FileTypes.File;
             }
 
-            if ((mode & SyncService.FileMode.Block) == SyncService.FileMode.Block)
+            if ((mode & UnixFileMode.Block) == UnixFileMode.Block)
             {
                 return FileListingService.FileTypes.Block;
             }
 
-            if ((mode & SyncService.FileMode.Directory) == SyncService.FileMode.Directory)
+            if ((mode & UnixFileMode.Directory) == UnixFileMode.Directory)
             {
                 return FileListingService.FileTypes.Directory;
             }
 
-            if ((mode & SyncService.FileMode.Character) == SyncService.FileMode.Character)
+            if ((mode & UnixFileMode.Character) == UnixFileMode.Character)
             {
                 return FileListingService.FileTypes.Character;
             }
 
-            if ((mode & SyncService.FileMode.FIFO) == SyncService.FileMode.FIFO)
+            if ((mode & UnixFileMode.FIFO) == UnixFileMode.FIFO)
             {
                 return FileListingService.FileTypes.FIFO;
             }
