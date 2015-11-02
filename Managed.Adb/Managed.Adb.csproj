@@ -124,6 +124,7 @@
     <Compile Include="Exceptions\UnknownOptionException.cs" />
     <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="FilePermissions.cs" />
+    <Compile Include="FileStatistics.cs" />
     <Compile Include="ForwardData.cs" />
     <Compile Include="IAdbClient.cs" />
     <Compile Include="IAdbCommandLineClient.cs" />
@@ -164,6 +165,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketExtensions.cs" />
     <Compile Include="StartServerResult.cs" />
+    <Compile Include="SyncCommand.cs" />
+    <Compile Include="SyncCommandConverter.cs" />
     <Compile Include="SyncResult.cs" />
     <Compile Include="SyncService.cs" />
     <Compile Include="TransportType.cs" />

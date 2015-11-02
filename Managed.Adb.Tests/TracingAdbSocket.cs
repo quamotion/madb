@@ -1,6 +1,7 @@
 ﻿using Managed.Adb.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -26,12 +27,25 @@ namespace Managed.Adb.Tests
         public Queue<string> ResponseMessages
         { get; } = new Queue<string>();
 
+        public Queue<SyncCommand> SyncResponses
+        {
+            get;
+        } = new Queue<SyncCommand>();
+
+        public Queue<byte[]> SyncData
+        {
+            get;
+        } = new Queue<byte[]>();
+
         public List<string> Requests
         { get; } = new List<string>();
 
+        public List<Tuple<SyncCommand, string>> SyncRequests
+        { get; } = new List<Tuple<SyncCommand, string>>();
+
         public override void Dispose()
         {
-            if(this.DoDispose)
+            if (this.DoDispose)
             {
                 base.Dispose();
             }
@@ -39,7 +53,14 @@ namespace Managed.Adb.Tests
 
         public override void Read(byte[] data)
         {
+            StackTrace trace = new StackTrace(false);
+
             base.Read(data);
+
+            if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                this.SyncData.Enqueue(data);
+            }
         }
 
         public override AdbResponse ReadAdbResponse(bool readDiagString)
@@ -51,7 +72,7 @@ namespace Managed.Adb.Tests
             {
                 response = base.ReadAdbResponse(readDiagString);
             }
-            catch(AdbException ex)
+            catch (AdbException ex)
             {
                 exception = ex;
                 response = ex.Response;
@@ -59,7 +80,7 @@ namespace Managed.Adb.Tests
 
             this.Responses.Enqueue(response);
 
-            if(exception != null)
+            if (exception != null)
             {
                 throw exception;
             }
@@ -85,6 +106,19 @@ namespace Managed.Adb.Tests
         {
             this.Requests.Add(request);
             base.SendAdbRequest(request);
+        }
+
+        public override void SendSyncRequest(SyncCommand command, string path)
+        {
+            this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, path));
+            base.SendSyncRequest(command, path);
+        }
+
+        public override SyncCommand ReadSyncResponse()
+        {
+            var response = base.ReadSyncResponse();
+            this.SyncResponses.Enqueue(response);
+            return response;
         }
     }
 }

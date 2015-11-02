@@ -13,7 +13,7 @@ namespace Managed.Adb
         /// Gets EPOCH time
         /// </summary>
         public static DateTime Epoch
-        { get; } = new DateTime(1970, 1, 1);
+        { get; } = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
         /// Gets epoch time.

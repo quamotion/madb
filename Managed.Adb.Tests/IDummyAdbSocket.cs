@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Managed.Adb.Tests
 {
@@ -11,6 +12,15 @@ namespace Managed.Adb.Tests
         { get; }
 
         List<string> Requests
+        { get; }
+
+        Queue<SyncCommand> SyncResponses
+        { get; }
+
+        Queue<byte[]> SyncData
+        { get; }
+
+        List<Tuple<SyncCommand, string>> SyncRequests
         { get; }
     }
 }

@@ -82,6 +82,7 @@
     <Compile Include="LinuxPathTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketBasedTests.cs" />
+    <Compile Include="SyncServiceTests.cs" />
     <Compile Include="TracingAdbSocket.cs" />
     <Compile Include="TracingAdbSocketFactory.cs" />
   </ItemGroup>

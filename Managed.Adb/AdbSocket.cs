@@ -132,6 +132,42 @@ namespace Managed.Adb
             this.Send(request, -1, DdmPreferences.Timeout);
         }
 
+        public virtual void SendSyncRequest(SyncCommand command, string path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            // The message structure is:
+            // First four bytes: command
+            // Next four bytes: length of the path
+            // Final four bytes: path
+            byte[] commandBytes = SyncCommandConverter.GetBytes(command);
+
+            byte[] lengthBytes = BitConverter.GetBytes(path.Length);
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                // Convert from big endian to little endian
+                Array.Reverse(lengthBytes);
+            }
+
+            byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
+
+            this.Write(commandBytes);
+            this.Write(lengthBytes);
+            this.Write(pathBytes);
+        }
+
+        public virtual SyncCommand ReadSyncResponse()
+        {
+            byte[] data = new byte[4];
+            this.Read(data);
+
+            return SyncCommandConverter.GetCommand(data);
+        }
+
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest/*'/>
         public virtual void SendSyncRequest(string command, int value)
         {

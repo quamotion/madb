@@ -20,11 +20,24 @@ namespace Managed.Adb.Tests
             get;
         } = new Queue<AdbResponse>();
 
+        public Queue<SyncCommand> SyncResponses
+        {
+            get;
+        } = new Queue<SyncCommand>();
+
+        public Queue<byte[]> SyncData
+        {
+            get;
+        } = new Queue<byte[]>();
+
         public Queue<string> ResponseMessages
         { get; } = new Queue<string>();
 
         public List<string> Requests
         { get; } = new List<string>();
+
+        public List<Tuple<SyncCommand, string>> SyncRequests
+        { get; } = new List<Tuple<SyncCommand, string>>();
 
         public bool Connected
         {
@@ -47,6 +60,12 @@ namespace Managed.Adb.Tests
 
         public void Read(byte[] data)
         {
+            var actual = this.SyncData.Dequeue();
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                data[i] = actual[i];
+            }
         }
 
         public AdbResponse ReadAdbResponse(bool readDiagString)
@@ -104,6 +123,16 @@ namespace Managed.Adb.Tests
         public void Read(byte[] data, int length, int timeout)
         {
             throw new NotImplementedException();
+        }
+
+        public void SendSyncRequest(SyncCommand command, string path)
+        {
+            this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, path));
+        }
+
+        public SyncCommand ReadSyncResponse()
+        {
+            return this.SyncResponses.Dequeue();
         }
     }
 }

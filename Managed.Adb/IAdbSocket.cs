@@ -30,6 +30,10 @@ namespace Managed.Adb
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest/*'/>
         void SendSyncRequest(string command, int value);
 
+        void SendSyncRequest(SyncCommand command, string path);
+
+        SyncCommand ReadSyncResponse();
+
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAdbResponse/*'/>
         AdbResponse ReadAdbResponse(bool readDiagString);
 

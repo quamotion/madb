@@ -106,6 +106,18 @@ namespace Managed.Adb
             IEnumerable<string> requests,
             Action test)
         {
+            RunTest(responses, responseMessages, requests, null, null, null, test);
+        }
+
+        protected void RunTest(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            IEnumerable<Tuple<SyncCommand, string>> syncRequests,
+            IEnumerable<SyncCommand> syncResponses,
+            IEnumerable<byte[]> syncData,
+            Action test)
+        {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
             if (!this.IntegrationTest)
@@ -118,6 +130,22 @@ namespace Managed.Adb
                 foreach (var responseMessage in responseMessages)
                 {
                     this.Socket.ResponseMessages.Enqueue(responseMessage);
+                }
+
+                if (syncResponses != null)
+                {
+                    foreach (var syncResponse in syncResponses)
+                    {
+                        this.Socket.SyncResponses.Enqueue(syncResponse);
+                    }
+                }
+
+                if (syncData != null)
+                {
+                    foreach (var syncDatum in syncData)
+                    {
+                        this.Socket.SyncData.Enqueue(syncDatum);
+                    }
                 }
             }
 
@@ -140,17 +168,63 @@ namespace Managed.Adb
                 // Make sure the messages were read
                 Assert.AreEqual(0, this.Socket.ResponseMessages.Count);
                 Assert.AreEqual(0, this.Socket.Responses.Count);
+                Assert.AreEqual(0, this.Socket.SyncResponses.Count);
+                Assert.AreEqual(0, this.Socket.SyncData.Count);
 
                 // Make sure a request was sent
                 CollectionAssert.AreEqual(requests.ToList(), this.Socket.Requests);
+
+                if (syncRequests != null)
+                {
+                    CollectionAssert.AreEqual(syncRequests.ToList(), this.Socket.SyncRequests);
+                }
+                else
+                {
+                    Assert.AreEqual(0, this.Socket.SyncRequests);
+                }
             }
             else
             {
                 // Make sure the traffic sent on the wire matches the traffic
                 // we have defined in our unit test.
                 CollectionAssert.AreEqual(requests.ToList(), this.Socket.Requests);
+
+                if (syncRequests != null)
+                {
+                    CollectionAssert.AreEqual(syncRequests.ToList(), this.Socket.SyncRequests);
+                }
+                else
+                {
+                    Assert.AreEqual(0, this.Socket.SyncRequests.Count);
+                }
+
                 CollectionAssert.AreEqual(responses.ToList(), this.Socket.Responses);
                 CollectionAssert.AreEqual(responseMessages.ToList(), this.Socket.ResponseMessages);
+
+                if (syncResponses != null)
+                {
+                    CollectionAssert.AreEqual(syncResponses.ToList(), this.Socket.SyncResponses);
+                }
+                else
+                {
+                    Assert.AreEqual(0, this.Socket.SyncResponses);
+                }
+
+                if (syncData != null)
+                {
+                    var list = syncData.ToList();
+
+                    Assert.AreEqual(list.Count, this.Socket.SyncData.Count);
+
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        CollectionAssert.AreEqual(list[i], this.Socket.SyncData.ToList()[i]);
+                    }
+                }
+                else
+                {
+                    Assert.AreEqual(0, this.Socket.SyncData);
+                }
             }
 
             if (exception != null)
@@ -167,6 +241,19 @@ namespace Managed.Adb
         protected static IEnumerable<string> ResponseMessages(params string[] requests)
         {
             return requests;
+        }
+
+        protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path)
+        {
+            yield return new Tuple<SyncCommand, string>(command, path);
+        }
+
+        protected static IEnumerable<AdbResponse> OkResponses(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                yield return AdbResponse.OK;
+            }
         }
     }
 }

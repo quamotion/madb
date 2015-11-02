@@ -4,21 +4,20 @@
 
 namespace Managed.Adb
 {
+    using Exceptions;
+    using Managed.Adb.IO;
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Net;
-    using System.Net.Sockets;
     using System.Text;
-    using Managed.Adb.IO;
 
     public class SyncService : ISyncService, IDisposable
     {
         /// <summary>
         /// Logging tag
         /// </summary>
-        private const string TAG = "SyncService";
+        private const string Tag = nameof(SyncService);
 
         private const string OKAY = "OKAY";
         private const string FAIL = "FAIL";
@@ -33,51 +32,52 @@ namespace Managed.Adb
         [Flags]
         public enum FileMode
         {
+            TypeMask = 0x8000,
+
             /// <summary>
             /// The unknown
             /// </summary>
-            UNKNOWN = 0x0000, // unknown
+            UNKNOWN = 0x0000,
 
             /// <summary>
             /// The socket
             /// </summary>
-            Socket = 0xc000, // type: socket
+            Socket = 0xc000,
 
             /// <summary>
             /// The symbolic link
             /// </summary>
-            SymbolicLink = 0xa000, // type: symbolic link
+            SymbolicLink = 0xa000,
 
             /// <summary>
             /// The regular
             /// </summary>
-            Regular = 0x8000, // type: regular file
+            Regular = 0x8000,
 
             /// <summary>
             /// The block
             /// </summary>
-            Block = 0x6000, // type: block device
+            Block = 0x6000,
 
             /// <summary>
             /// The directory
             /// </summary>
-            Directory = 0x4000, // type: directory
+            Directory = 0x4000,
 
             /// <summary>
             /// The character
             /// </summary>
-            Character = 0x2000, // type: character device
+            Character = 0x2000,
 
             /// <summary>
             /// The fifo
             /// </summary>
-            FIFO = 0x1000  // type: fifo
+            FIFO = 0x1000
         }
 
         private const int SYNC_DATA_MAX = 64 * 1024;
         private const int REMOTE_PATH_MAX_LENGTH = 1024;
 
-        #region static members
         static SyncService()
         {
             NullProgressMonitor = new NullSyncProgressMonitor();
@@ -164,9 +164,18 @@ namespace Managed.Adb
         private static byte[] CreateFileRequest(byte[] command, byte[] path)
         {
             byte[] array = new byte[8 + path.Length];
-
             Array.Copy(command, 0, array, 0, 4);
-            path.Length.Swap32bitsToArray(array, 4);
+
+            byte[] length = BitConverter.GetBytes(path.Length);
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                // Convert from big endian to little endian
+                Array.Reverse(length);
+            }
+
+            Array.Copy(length, 0, command, 4, 4);
+
             Array.Copy(path, 0, array, 8, path.Length);
 
             return array;
@@ -198,7 +207,6 @@ namespace Managed.Adb
 
             return array;
         }
-        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
@@ -219,6 +227,11 @@ namespace Managed.Adb
             this.Address = address;
             this.Device = device;
             this.Open();
+        }
+
+        public SyncService(IAdbSocket socket)
+        {
+            this.Channel = socket;
         }
 
         /// <summary>
@@ -357,7 +370,7 @@ namespace Managed.Adb
             byte[] msg;
 
             int timeOut = DdmPreferences.Timeout;
-            Log.i(TAG, "Remote File: {0}", remotePath);
+            Log.i(Tag, "Remote File: {0}", remotePath);
             try
             {
                 if (remotePath.Length > REMOTE_PATH_MAX_LENGTH)
@@ -599,12 +612,12 @@ namespace Managed.Adb
             }
             catch (EncoderFallbackException e)
             {
-                Log.e(TAG, e);
+                Log.e(Tag, e);
                 return new SyncResult(ErrorCodeHelper.RESULT_REMOTE_PATH_ENCODING, e);
             }
             catch (IOException e)
             {
-                Log.e(TAG, e);
+                Log.e(Tag, e);
                 return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR, e);
             }
 
@@ -666,7 +679,7 @@ namespace Managed.Adb
                     }
                     catch (IOException e)
                     {
-                        Log.e(TAG, e);
+                        Log.e(Tag, e);
                         return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR, e);
                     }
 
@@ -689,7 +702,7 @@ namespace Managed.Adb
                 }
                 catch (IOException e)
                 {
-                    Log.e(TAG, e);
+                    Log.e(Tag, e);
                     return new SyncResult(ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e);
                 }
             }
@@ -730,34 +743,35 @@ namespace Managed.Adb
         /// </summary>
         /// <param name="path">the remote file</param>
         /// <returns>the mode if all went well; otherwise, FileMode.UNKNOWN</returns>
-        private FileMode ReadMode(string path)
+        public FileStatistics Stat(string path)
         {
-            try
+            // create the stat request message.
+            this.Channel.SendSyncRequest(SyncCommand.STAT, path);
+
+            if (this.Channel.ReadSyncResponse() != SyncCommand.STAT)
             {
-                // create the stat request message.
-                byte[] msg = CreateFileRequest(STAT, path);
-
-                this.Channel.Send(msg, -1 /* full length */, DdmPreferences.Timeout);
-
-                // read the result, in a byte array containing 4 ints
-                // (id, mode, size, time)
-                byte[] statResult = new byte[16];
-                this.Channel.Read(statResult, -1 /* full length */, DdmPreferences.Timeout);
-
-                // check we have the proper data back
-                if (CheckResult(statResult, Encoding.Default.GetBytes(STAT)) == false)
-                {
-                    return FileMode.UNKNOWN;
-                }
-
-                // we return the mode (2nd int in the array)
-                return (FileMode)statResult.Swap32bitFromArray(4);
+                throw new AdbException($"The server returned an invalid sync response.");
             }
-            catch (IOException e)
+
+            // read the result, in a byte array containing 3 ints
+            // (mode, size, time)
+            FileStatistics value = new FileStatistics();
+
+            byte[] statResult = new byte[12];
+            this.Channel.Read(statResult);
+
+            if (!BitConverter.IsLittleEndian)
             {
-                Log.w("SyncService", e);
-                return FileMode.UNKNOWN;
+                Array.Reverse(statResult, 0, 4);
+                Array.Reverse(statResult, 4, 4);
+                Array.Reverse(statResult, 8, 4);
             }
+
+            value.FileMode = (FileMode)BitConverter.ToInt32(statResult, 0);
+            value.Size = BitConverter.ToInt32(statResult, 4);
+            value.Time = ManagedAdbExtenstions.Epoch.AddSeconds(BitConverter.ToInt32(statResult, 8)).ToLocalTime();
+
+            return value;
         }
 
         /// <summary>
