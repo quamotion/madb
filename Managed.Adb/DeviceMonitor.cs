@@ -4,7 +4,6 @@
 
 namespace Managed.Adb
 {
-    using MoreLinq;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -21,8 +20,16 @@ namespace Managed.Adb
         /// </summary>
         private const string Tag = nameof(DeviceMonitor);
 
+        /// <summary>
+        /// The list of devices currently connected to the Android Debug Bridge.
+        /// </summary>
         private readonly List<DeviceData> devices;
 
+        /// <summary>
+        /// When the <see cref="Start"/> method is called, this <see cref="ManualResetEvent"/>
+        /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoop"/>
+        /// has processed the first list of devices.
+        /// </summary>
         private readonly ManualResetEvent firstDeviceListParsed = new ManualResetEvent(false);
 
         /// <summary>
@@ -188,30 +195,15 @@ namespace Managed.Adb
         {
             List<DeviceData> list = new List<DeviceData>();
 
-            string[] devices = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-            devices.ForEach(d =>
-            {
-                try
-                {
-                    var dv = DeviceData.CreateFromAdbData(d);
-                    if (dv != null)
-                    {
-                        list.Add(dv);
-                    }
-                }
-                catch (ArgumentException ae)
-                {
-                    Log.e(Tag, ae);
-                }
-            });
+            string[] deviceValues = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            // now merge the new devices with the old ones.
-            this.UpdateDevices(list);
+            List<DeviceData> devices = deviceValues.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
+            this.UpdateDevices(devices);
         }
 
-        private void UpdateDevices(List<DeviceData> list)
+        private void UpdateDevices(List<DeviceData> devices)
         {
-            lock (this.Devices)
+            lock (this.devices)
             {
                 // For each device in the current list, we look for a matching the new list.
                 // * if we find it, we update the current object with whatever new information
@@ -223,7 +215,7 @@ namespace Managed.Adb
                 // add them to the list, and start monitoring them.
 
                 // Add or update existing devices
-                foreach (var device in list)
+                foreach (var device in devices)
                 {
                     var existingDevice = this.Devices.SingleOrDefault(d => d.Serial == device.Serial);
 
@@ -240,7 +232,7 @@ namespace Managed.Adb
                 }
 
                 // Remove devices
-                foreach (var device in this.Devices.Where(d => !list.Any(e => e.Serial == d.Serial)).ToArray())
+                foreach (var device in this.Devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
                 {
                     this.devices.Remove(device);
                     this.OnDeviceDisconnected(new DeviceDataEventArgs(device));
