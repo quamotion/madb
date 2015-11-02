@@ -122,14 +122,9 @@ namespace Managed.Adb
             }
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendFileRequest/*'/>
-        public virtual void SendFileRequest(string command, string path, SyncService.FileMode mode)
+        public virtual void SendSyncRequest(SyncCommand command, string path, int permissions)
         {
-            byte[] commandContent = AdbClient.Encoding.GetBytes(command);
-            byte[] pathContent = AdbClient.Encoding.GetBytes(path);
-
-            byte[] request = SyncService.CreateSendFileRequest(commandContent, pathContent, mode);
-            this.Send(request, -1, DdmPreferences.Timeout);
+            this.SendSyncRequest(command, $"{path},{permissions}");
         }
 
         public virtual void SendSyncRequest(SyncCommand command, string path)
@@ -139,13 +134,21 @@ namespace Managed.Adb
                 throw new ArgumentNullException(nameof(path));
             }
 
+            this.SendSyncRequest(command, path.Length);
+
+            byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
+            this.Write(pathBytes);
+        }
+
+        public virtual void SendSyncRequest(SyncCommand command, int length)
+        {
             // The message structure is:
             // First four bytes: command
             // Next four bytes: length of the path
-            // Final four bytes: path
+            // Final bytes: path
             byte[] commandBytes = SyncCommandConverter.GetBytes(command);
 
-            byte[] lengthBytes = BitConverter.GetBytes(path.Length);
+            byte[] lengthBytes = BitConverter.GetBytes(length);
 
             if (!BitConverter.IsLittleEndian)
             {
@@ -153,11 +156,8 @@ namespace Managed.Adb
                 Array.Reverse(lengthBytes);
             }
 
-            byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
-
             this.Write(commandBytes);
             this.Write(lengthBytes);
-            this.Write(pathBytes);
         }
 
         public virtual SyncCommand ReadSyncResponse()
@@ -166,13 +166,6 @@ namespace Managed.Adb
             this.Read(data);
 
             return SyncCommandConverter.GetCommand(data);
-        }
-
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest/*'/>
-        public virtual void SendSyncRequest(string command, int value)
-        {
-            var msg = SyncService.CreateRequest(command, value);
-            this.Send(msg, -1, DdmPreferences.Timeout);
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadString/*'/>
@@ -185,6 +178,27 @@ namespace Managed.Adb
             // Convert the bytes to a hex string
             string lenHex = AdbClient.Encoding.GetString(reply);
             int len = int.Parse(lenHex, NumberStyles.HexNumber);
+
+            // And get the string
+            reply = new byte[len];
+            this.Read(reply);
+
+            string value = AdbClient.Encoding.GetString(reply);
+            return value;
+        }
+
+        public virtual string ReadSyncString()
+        {
+            // The first 4 bytes contain the length of the string
+            var reply = new byte[4];
+            this.Read(reply);
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(reply);
+            }
+
+            int len = BitConverter.ToInt32(reply, 0);
 
             // And get the string
             reply = new byte[len];

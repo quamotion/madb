@@ -17,6 +17,7 @@ namespace Managed.Adb
     using Managed.Adb.Exceptions;
     using Managed.Adb.IO;
     using Managed.Adb.Logs;
+    using System.Threading;
 
     /// <summary>
     /// Represents an Android device.
@@ -529,7 +530,7 @@ namespace Managed.Adb
         {
             get
             {
-                ISyncService syncService = new SyncService(AdbServer.EndPoint, this.DeviceData);
+                ISyncService syncService = new SyncService(this.DeviceData);
                 try
                 {
                     syncService.Open();
@@ -815,11 +816,10 @@ namespace Managed.Adb
                 {
                     string message = string.Format("Uploading file onto device '{0}'", this.SerialNumber);
                     Log.d(LOG_TAG, message);
-                    SyncResult result = sync.PushFile(localFilePath, remoteFilePath, Managed.Adb.SyncService.NullProgressMonitor);
 
-                    if (result.Code != ErrorCodeHelper.RESULT_OK)
+                    using (Stream stream = File.OpenRead(localFilePath))
                     {
-                        throw new IOException(string.Format("Unable to upload file: {0}", result.Message));
+                        sync.Push(stream, remoteFilePath, 644, null, CancellationToken.None);
                     }
                 }
                 else

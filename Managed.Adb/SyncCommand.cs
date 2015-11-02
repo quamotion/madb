@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// <copyright file="SyncCommand.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
 
 namespace Managed.Adb
 {
@@ -26,6 +24,16 @@ namespace Managed.Adb
         /// <summary>
         /// Stat a file
         /// </summary>
-        STAT
+        STAT,
+
+        DENT,
+
+        FAIL,
+
+        DATA,
+
+        OKAY,
+
+        DONE
     }
 }

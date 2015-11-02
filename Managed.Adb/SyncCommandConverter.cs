@@ -1,39 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// <copyright file="SyncCommandConverter.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
 
 namespace Managed.Adb
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public static class SyncCommandConverter
     {
+        private static readonly Dictionary<SyncCommand, string> values = new Dictionary<SyncCommand, string>();
+
+        static SyncCommandConverter()
+        {
+            values.Add(SyncCommand.DATA, "DATA");
+            values.Add(SyncCommand.DENT, "DENT");
+            values.Add(SyncCommand.DONE, "DONE");
+            values.Add(SyncCommand.FAIL, "FAIL");
+            values.Add(SyncCommand.LIST, "LIST");
+            values.Add(SyncCommand.OKAY, "OKAY");
+            values.Add(SyncCommand.RECV, "RECV");
+            values.Add(SyncCommand.SEND, "SEND");
+            values.Add(SyncCommand.STAT, "STAT");
+        }
+
         public static byte[] GetBytes(SyncCommand command)
         {
-            string commandText = null;
-
-            switch (command)
+            if (!values.ContainsKey(command))
             {
-                case SyncCommand.LIST:
-                    commandText = "LIST";
-                    break;
-
-                case SyncCommand.RECV:
-                    commandText = "RECV";
-                    break;
-
-                case SyncCommand.SEND:
-                    commandText = "SEND";
-                    break;
-
-                case SyncCommand.STAT:
-                    commandText = "STAT";
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(command));
+                throw new ArgumentOutOfRangeException(nameof(command), $"{command} is not a valid sync command");
             }
 
+            string commandText = values[command];
             byte[] commandBytes = AdbClient.Encoding.GetBytes(commandText);
 
             return commandBytes;
@@ -53,26 +52,14 @@ namespace Managed.Adb
 
             string commandText = AdbClient.Encoding.GetString(value);
 
-            if (string.Equals(commandText, "LIST", StringComparison.OrdinalIgnoreCase))
+            var key = values.Where(d => string.Equals(commandText, commandText, StringComparison.OrdinalIgnoreCase)).Select(d => new SyncCommand?(d.Key)).SingleOrDefault();
+
+            if (key == null)
             {
-                return SyncCommand.LIST;
+                throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command");
             }
-            else if (string.Equals(commandText, "RECV", StringComparison.OrdinalIgnoreCase))
-            {
-                return SyncCommand.RECV;
-            }
-            else if (string.Equals(commandText, "SEND", StringComparison.OrdinalIgnoreCase))
-            {
-                return SyncCommand.SEND;
-            }
-            else if (string.Equals(commandText, "STAT", StringComparison.OrdinalIgnoreCase))
-            {
-                return SyncCommand.STAT;
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(value));
-            }
+
+            return key.Value;
         }
     }
 }

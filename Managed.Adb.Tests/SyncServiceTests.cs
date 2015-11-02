@@ -1,9 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Managed.Adb.Tests
 {
@@ -17,7 +12,7 @@ namespace Managed.Adb.Tests
             // (and to build/validate the test cases), set to false to use the mocked
             // adb sockets.
             // In release mode, this flag is ignored and the mocked adb sockets are always used.
-            base.Initialize(integrationTest: false, doDispose: false);
+            base.Initialize(integrationTest: true, doDispose: false);
         }
 
         [TestMethod]
@@ -40,7 +35,7 @@ namespace Managed.Adb.Tests
                 new byte[][] { new byte[] { 160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0 } },
                 () =>
                 {
-                    using (SyncService service = new SyncService(device))
+                    using (SyncService service = new SyncService(this.Socket, device))
                     {
                         value = service.Stat("/fstab.donatello");
                     }
@@ -50,6 +45,19 @@ namespace Managed.Adb.Tests
             Assert.AreEqual(SyncService.FileMode.Regular, value.FileMode & SyncService.FileMode.TypeMask);
             Assert.AreEqual(597, value.Size);
             Assert.AreEqual(ManagedAdbExtenstions.Epoch.ToLocalTime(), value.Time);
+        }
+
+        [TestMethod]
+        public void GetListingTest()
+        {
+            DeviceData device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            SyncService service = new SyncService(device);
+            var entries = service.GetDirectoryListing("/storage");
         }
     }
 }

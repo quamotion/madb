@@ -77,7 +77,6 @@
     <Compile Include="Receivers\ListingServiceReceiver.cs" />
     <Compile Include="Receivers\MountPointReceiver.cs" />
     <Compile Include="Receivers\PackageManagerReceiver.cs" />
-    <Compile Include="SyncServiceExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Managd.Adb.snk" />

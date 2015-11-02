@@ -8,6 +8,12 @@ namespace Managed.Adb
 {
     public class FileStatistics
     {
+        public string Path
+        {
+            get;
+            set;
+        }
+
         public SyncService.FileMode FileMode
         {
             get;

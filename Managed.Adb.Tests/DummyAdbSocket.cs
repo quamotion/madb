@@ -85,6 +85,11 @@ namespace Managed.Adb.Tests
             return this.ResponseMessages.Dequeue();
         }
 
+        public string ReadSyncString()
+        {
+            return this.ResponseMessages.Dequeue();
+        }
+
         public Task<string> ReadStringAsync()
         {
             return Task.FromResult(this.ReadString());
@@ -103,11 +108,6 @@ namespace Managed.Adb.Tests
         public void Close()
         {
             this.Connected = false;
-        }
-
-        public void SendFileRequest(string command, string path, SyncService.FileMode mode)
-        {
-            throw new NotImplementedException();
         }
 
         public void SendSyncRequest(string command, int value)
@@ -133,6 +133,16 @@ namespace Managed.Adb.Tests
         public SyncCommand ReadSyncResponse()
         {
             return this.SyncResponses.Dequeue();
+        }
+
+        public void SendSyncRequest(SyncCommand command, int length)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendSyncRequest(SyncCommand command, string path, int permissions)
+        {
+            throw new NotImplementedException();
         }
     }
 }
