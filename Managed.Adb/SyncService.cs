@@ -58,6 +58,8 @@ namespace Managed.Adb
         {
             this.Socket = socket;
             this.Device = device;
+
+            this.Open();
         }
 
         /// <summary>
@@ -87,26 +89,11 @@ namespace Managed.Adb
         /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
         public void Open()
         {
-            if (this.IsOpen)
-            {
-                return;
-            }
+            // target a specific device
+            AdbClient.Instance.SetDevice(this.Socket, this.Device);
 
-            try
-            {
-                // target a specific device
-                AdbClient.Instance.SetDevice(this.Socket, this.Device);
-
-                this.Socket.SendAdbRequest("sync:");
-                var resp = this.Socket.ReadAdbResponse(false);
-            }
-            catch (IOException)
-            {
-                this.Dispose();
-                throw;
-            }
-
-            return;
+            this.Socket.SendAdbRequest("sync:");
+            var resp = this.Socket.ReadAdbResponse(false);
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
