@@ -85,6 +85,9 @@
     <Compile Include="TracingAdbSocketFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="fstab.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="madb.xunit" />
     <None Include="Managd.Adb.snk" />
     <None Include="packages.config" />

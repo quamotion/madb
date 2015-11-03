@@ -337,7 +337,7 @@ namespace Managed.Adb
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int_int/*'/>
-        public void Read(byte[] data, int length, int timeout)
+        public virtual void Read(byte[] data, int length, int timeout)
         {
             int expLen = length != -1 ? length : data.Length;
             int count = -1;

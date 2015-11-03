@@ -1,4 +1,5 @@
 ﻿using Managed.Adb.Exceptions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -122,7 +123,14 @@ namespace Managed.Adb.Tests
 
         public void Read(byte[] data, int length, int timeout)
         {
-            throw new NotImplementedException();
+            var actual = this.SyncData.Dequeue();
+
+            Assert.AreEqual(actual.Length, length);
+
+            for (int i = 0; i < length; i++)
+            {
+                data[i] = actual[i];
+            }
         }
 
         public void SendSyncRequest(SyncCommand command, string path)

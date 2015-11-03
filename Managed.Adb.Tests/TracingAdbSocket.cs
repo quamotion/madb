@@ -1,5 +1,6 @@
 ﻿using Managed.Adb.Exceptions;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -60,6 +61,18 @@ namespace Managed.Adb.Tests
             if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
             {
                 this.SyncData.Enqueue(data);
+            }
+        }
+
+        public override void Read(byte[] data, int length, int timeout)
+        {
+            StackTrace trace = new StackTrace(false);
+
+            base.Read(data, length, timeout);
+
+            if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                this.SyncData.Enqueue(data.Take(length).ToArray());
             }
         }
 

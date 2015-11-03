@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Managed.Adb.Tests
 {
@@ -107,6 +109,42 @@ namespace Managed.Adb.Tests
             Assert.AreEqual((UnixFileMode)16749, emulated.FileMode);
             Assert.AreEqual(0, emulated.Size);
             Assert.AreEqual(new DateTime(2015, 11, 3, 10, 47, 4), emulated.Time);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"fstab.bin")]
+        public void PullTest()
+        {
+            DeviceData device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            MemoryStream stream = new MemoryStream();
+            var content = File.ReadAllBytes("fstab.bin");
+
+            this.RunTest(
+                OkResponses(2),
+                ResponseMessages(),
+                Requests("host:transport:169.254.109.177:5555", "sync:"),
+                SyncRequests(SyncCommand.RECV, "/fstab.donatello"),
+                new SyncCommand[] { SyncCommand.DATA, SyncCommand.DONE },
+                new byte[][]
+                {
+                    new byte[] {85, 2, 0, 0},
+                    content
+                },
+                () =>
+                {
+                    using (SyncService service = new SyncService(device))
+                    {
+                        service.Pull("/fstab.donatello", stream, null, CancellationToken.None);
+                    }
+                });
+
+            // Make sure the data that has been sent to the stream is the expected data
+            CollectionAssert.AreEqual(content, stream.ToArray());
         }
     }
 }
