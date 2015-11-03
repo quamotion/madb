@@ -106,7 +106,7 @@ namespace Managed.Adb
             IEnumerable<string> requests,
             Action test)
         {
-            RunTest(responses, responseMessages, requests, null, null, null, test);
+            RunTest(responses, responseMessages, requests, null, null, null, null, test);
         }
 
         protected void RunTest(
@@ -115,7 +115,8 @@ namespace Managed.Adb
             IEnumerable<string> requests,
             IEnumerable<Tuple<SyncCommand, string>> syncRequests,
             IEnumerable<SyncCommand> syncResponses,
-            IEnumerable<byte[]> syncData,
+            IEnumerable<byte[]> syncDataReceived,
+            IEnumerable<byte[]> syncDataSent,
             Action test)
         {
             // If we are running unit tests, we need to mock all the responses
@@ -140,11 +141,11 @@ namespace Managed.Adb
                     }
                 }
 
-                if (syncData != null)
+                if (syncDataReceived != null)
                 {
-                    foreach (var syncDatum in syncData)
+                    foreach (var syncDatum in syncDataReceived)
                     {
-                        this.Socket.SyncData.Enqueue(syncDatum);
+                        this.Socket.SyncDataReceived.Enqueue(syncDatum);
                     }
                 }
             }
@@ -169,7 +170,7 @@ namespace Managed.Adb
                 Assert.AreEqual(0, this.Socket.ResponseMessages.Count);
                 Assert.AreEqual(0, this.Socket.Responses.Count);
                 Assert.AreEqual(0, this.Socket.SyncResponses.Count);
-                Assert.AreEqual(0, this.Socket.SyncData.Count);
+                Assert.AreEqual(0, this.Socket.SyncDataReceived.Count);
 
                 // Make sure a request was sent
                 CollectionAssert.AreEqual(requests.ToList(), this.Socket.Requests);
@@ -181,6 +182,15 @@ namespace Managed.Adb
                 else
                 {
                     Assert.AreEqual(0, this.Socket.SyncRequests.Count);
+                }
+
+                if (syncDataSent != null)
+                {
+                    AssertEqual(syncDataSent.ToList(), this.Socket.SyncDataSent.ToList());
+                }
+                else
+                {
+                    Assert.AreEqual(0, this.Socket.SyncDataSent.Count);
                 }
             }
             else
@@ -210,20 +220,22 @@ namespace Managed.Adb
                     Assert.AreEqual(0, this.Socket.SyncResponses);
                 }
 
-                if (syncData != null)
+                if (syncDataReceived != null)
                 {
-                    var list = syncData.ToList();
-
-                    Assert.AreEqual(list.Count, this.Socket.SyncData.Count);
-
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        CollectionAssert.AreEqual(list[i], this.Socket.SyncData.ToList()[i]);
-                    }
+                    AssertEqual(syncDataReceived.ToList(), this.Socket.SyncDataReceived.ToList());
                 }
                 else
                 {
-                    Assert.AreEqual(0, this.Socket.SyncData);
+                    Assert.AreEqual(0, this.Socket.SyncDataReceived.Count);
+                }
+
+                if (syncDataSent != null)
+                {
+                    AssertEqual(syncDataSent.ToList(), this.Socket.SyncDataSent.ToList());
+                }
+                else
+                {
+                    Assert.AreEqual(0, this.Socket.SyncDataSent.Count);
                 }
             }
 
@@ -248,11 +260,28 @@ namespace Managed.Adb
             yield return new Tuple<SyncCommand, string>(command, path);
         }
 
+        protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2, SyncCommand command3, string path3)
+        {
+            yield return new Tuple<SyncCommand, string>(command, path);
+            yield return new Tuple<SyncCommand, string>(command2, path2);
+            yield return new Tuple<SyncCommand, string>(command3, path3);
+        }
+
         protected static IEnumerable<AdbResponse> OkResponses(int count)
         {
             for (int i = 0; i < count; i++)
             {
                 yield return AdbResponse.OK;
+            }
+        }
+
+        private void AssertEqual(IList<byte[]> expected, IList<byte[]> actual)
+        {
+            Assert.AreEqual(expected.Count, actual.Count);
+
+            for (int i = 0; i < expected.Count; i++)
+            {
+                CollectionAssert.AreEqual(expected[i], actual[i]);
             }
         }
     }

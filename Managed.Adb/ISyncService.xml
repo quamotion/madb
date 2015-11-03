@@ -13,6 +13,9 @@
     <param name="permissions">
       The permission octet that contains the permissions of the newly created file on the device.
     </param>
+    <param name="timestamp">
+      The time at which the file was last modified.
+    </param>
     <param name="progress">
       A <see cref="IProgress{T}"/> that can be used to monitor the progress of the push operation.
     </param>

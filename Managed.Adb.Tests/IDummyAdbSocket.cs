@@ -17,7 +17,10 @@ namespace Managed.Adb.Tests
         Queue<SyncCommand> SyncResponses
         { get; }
 
-        Queue<byte[]> SyncData
+        Queue<byte[]> SyncDataReceived
+        { get; }
+
+        Queue<byte[]> SyncDataSent
         { get; }
 
         List<Tuple<SyncCommand, string>> SyncRequests

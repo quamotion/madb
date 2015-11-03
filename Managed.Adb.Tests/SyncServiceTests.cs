@@ -38,6 +38,7 @@ namespace Managed.Adb.Tests
                 SyncRequests(SyncCommand.STAT, "/fstab.donatello"),
                 new SyncCommand[] { SyncCommand.STAT },
                 new byte[][] { new byte[] { 160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0 } },
+                null,
                 () =>
                 {
                     using (SyncService service = new SyncService(this.Socket, device))
@@ -76,6 +77,7 @@ namespace Managed.Adb.Tests
                     new byte[] { 255, 161, 0, 0, 24, 0, 0, 0, 152, 130, 56, 86 },
                     new byte[] { 109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86 }
                 },
+                null,
                 () =>
                 {
                     using (SyncService service = new SyncService(device))
@@ -135,9 +137,10 @@ namespace Managed.Adb.Tests
                     new byte[] {85, 2, 0, 0},
                     content
                 },
+                null,
                 () =>
                 {
-                    using (SyncService service = new SyncService(device))
+                    using (SyncService service = new SyncService(this.Socket, device))
                     {
                         service.Pull("/fstab.donatello", stream, null, CancellationToken.None);
                     }
@@ -145,6 +148,42 @@ namespace Managed.Adb.Tests
 
             // Make sure the data that has been sent to the stream is the expected data
             CollectionAssert.AreEqual(content, stream.ToArray());
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"fstab.bin")]
+        public void PushTest()
+        {
+            DeviceData device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            Stream stream = File.OpenRead("fstab.bin");
+            var content = File.ReadAllBytes("fstab.bin");
+
+            this.RunTest(
+                OkResponses(2),
+                ResponseMessages(),
+                Requests("host:transport:169.254.109.177:5555", "sync:"),
+                SyncRequests(
+                    SyncCommand.SEND, "/sdcard/test,644",
+                    SyncCommand.DATA, "597",
+                    SyncCommand.DONE, "1446505200"),
+                new SyncCommand[] { SyncCommand.OKAY },
+                null,
+                new byte[][]
+                {
+                    content
+                },
+                () =>
+                {
+                    using (SyncService service = new SyncService(this.Socket, device))
+                    {
+                        service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 3), null, CancellationToken.None);
+                    }
+                });
         }
     }
 }

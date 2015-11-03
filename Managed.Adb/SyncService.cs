@@ -97,7 +97,7 @@ namespace Managed.Adb
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
-        public void Push(Stream stream, string remotePath, int permissions, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (stream == null)
             {
@@ -142,7 +142,7 @@ namespace Managed.Adb
             }
 
             // create the DONE message
-            int time = (int)(DateTime.Now.CurrentTimeMillis() / 1000d);
+            int time = (int)(timestamp.ToUniversalTime().CurrentTimeMillis() / 1000d);
             this.Socket.SendSyncRequest(SyncCommand.DONE, time);
 
             // read the result, in a byte array containing 2 ints

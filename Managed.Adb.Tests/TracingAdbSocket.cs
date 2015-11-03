@@ -33,7 +33,12 @@ namespace Managed.Adb.Tests
             get;
         } = new Queue<SyncCommand>();
 
-        public Queue<byte[]> SyncData
+        public Queue<byte[]> SyncDataReceived
+        {
+            get;
+        } = new Queue<byte[]>();
+
+        public Queue<byte[]> SyncDataSent
         {
             get;
         } = new Queue<byte[]>();
@@ -60,7 +65,7 @@ namespace Managed.Adb.Tests
 
             if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
             {
-                this.SyncData.Enqueue(data);
+                this.SyncDataReceived.Enqueue(data);
             }
         }
 
@@ -72,7 +77,7 @@ namespace Managed.Adb.Tests
 
             if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
             {
-                this.SyncData.Enqueue(data.Take(length).ToArray());
+                this.SyncDataReceived.Enqueue(data.Take(length).ToArray());
             }
         }
 
@@ -134,11 +139,35 @@ namespace Managed.Adb.Tests
             base.SendSyncRequest(command, path);
         }
 
+        public override void SendSyncRequest(SyncCommand command, int length)
+        {
+            StackTrace trace = new StackTrace(false);
+
+            if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
+            }
+
+            base.SendSyncRequest(command, length);
+        }
+
         public override SyncCommand ReadSyncResponse()
         {
             var response = base.ReadSyncResponse();
             this.SyncResponses.Enqueue(response);
             return response;
+        }
+
+        public override void Send(byte[] data, int length, int timeout)
+        {
+            StackTrace trace = new StackTrace(false);
+
+            base.Send(data, length, timeout);
+
+            if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                this.SyncDataSent.Enqueue(data.Take(length).ToArray());
+            }
         }
     }
 }

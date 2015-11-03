@@ -18,7 +18,7 @@ namespace Managed.Adb
         bool IsOpen { get; }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
-        void Push(Stream stream, string remotePath, int permissions, IProgress<int> progress, CancellationToken cancellationToken);
+        void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken);
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Pull/*'/>
         void Pull(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken);

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Managed.Adb.Tests
 {
@@ -26,7 +27,12 @@ namespace Managed.Adb.Tests
             get;
         } = new Queue<SyncCommand>();
 
-        public Queue<byte[]> SyncData
+        public Queue<byte[]> SyncDataReceived
+        {
+            get;
+        } = new Queue<byte[]>();
+
+        public Queue<byte[]> SyncDataSent
         {
             get;
         } = new Queue<byte[]>();
@@ -61,7 +67,7 @@ namespace Managed.Adb.Tests
 
         public void Read(byte[] data)
         {
-            var actual = this.SyncData.Dequeue();
+            var actual = this.SyncDataReceived.Dequeue();
 
             for (int i = 0; i < data.Length; i++)
             {
@@ -118,12 +124,12 @@ namespace Managed.Adb.Tests
 
         public void Send(byte[] data, int length, int timeout)
         {
-            throw new NotImplementedException();
+            this.SyncDataSent.Enqueue(data.Take(length).ToArray());
         }
 
         public void Read(byte[] data, int length, int timeout)
         {
-            var actual = this.SyncData.Dequeue();
+            var actual = this.SyncDataReceived.Dequeue();
 
             Assert.AreEqual(actual.Length, length);
 
@@ -145,12 +151,12 @@ namespace Managed.Adb.Tests
 
         public void SendSyncRequest(SyncCommand command, int length)
         {
-            throw new NotImplementedException();
+            this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
         }
 
         public void SendSyncRequest(SyncCommand command, string path, int permissions)
         {
-            throw new NotImplementedException();
+            this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, $"{path},{permissions}"));
         }
     }
 }
