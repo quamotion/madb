@@ -171,7 +171,7 @@ namespace Managed.Adb.Tests
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
                 SyncRequests(
                     SyncCommand.SEND, "/sdcard/test,644",
-                    SyncCommand.DATA, "597",
+                    SyncCommand.DATA, "605",
                     SyncCommand.DONE, "1446505200"),
                 new SyncCommand[] { SyncCommand.OKAY },
                 null,
@@ -183,7 +183,7 @@ namespace Managed.Adb.Tests
                 {
                     using (SyncService service = new SyncService(this.Socket, device))
                     {
-                        service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 3), null, CancellationToken.None);
+                        service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, CancellationToken.None);
                     }
                 });
         }
