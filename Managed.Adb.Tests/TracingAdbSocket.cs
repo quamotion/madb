@@ -95,6 +95,13 @@ namespace Managed.Adb.Tests
             return value;
         }
 
+        public override string ReadSyncString()
+        {
+            var value = base.ReadSyncString();
+            this.ResponseMessages.Enqueue(value);
+            return value;
+        }
+
         public async override Task<string> ReadStringAsync()
         {
             var value = await base.ReadStringAsync();

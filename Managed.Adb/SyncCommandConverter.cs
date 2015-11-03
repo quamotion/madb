@@ -80,7 +80,7 @@ namespace Managed.Adb
 
             string commandText = AdbClient.Encoding.GetString(value);
 
-            var key = Values.Where(d => string.Equals(commandText, commandText, StringComparison.OrdinalIgnoreCase)).Select(d => new SyncCommand?(d.Key)).SingleOrDefault();
+            var key = Values.Where(d => string.Equals(d.Value, commandText, StringComparison.OrdinalIgnoreCase)).Select(d => new SyncCommand?(d.Key)).SingleOrDefault();
 
             if (key == null)
             {

@@ -46,5 +46,16 @@ namespace Managed.Adb
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets a <see cref="string"/> that represents the current <see cref="FileStatistics"/> object.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Path"/> of the current <see cref="FileStatistics"/> object.
+        /// </returns>
+        public override string ToString()
+        {
+            return this.Path;
+        }
     }
 }

@@ -1,4 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Managed.Adb.Tests
 {
@@ -12,7 +15,7 @@ namespace Managed.Adb.Tests
             // (and to build/validate the test cases), set to false to use the mocked
             // adb sockets.
             // In release mode, this flag is ignored and the mocked adb sockets are always used.
-            base.Initialize(integrationTest: true, doDispose: false);
+            base.Initialize(integrationTest: false, doDispose: false);
         }
 
         [TestMethod]
@@ -56,8 +59,54 @@ namespace Managed.Adb.Tests
                 State = DeviceState.Online
             };
 
-            SyncService service = new SyncService(device);
-            var entries = service.GetDirectoryListing("/storage");
+            List<FileStatistics> value = null;
+
+            this.RunTest(
+                OkResponses(2),
+                ResponseMessages(".", "..", "sdcard0", "emulated"),
+                Requests("host:transport:169.254.109.177:5555", "sync:"),
+                SyncRequests(SyncCommand.LIST, "/storage"),
+                new SyncCommand[] { SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DONE },
+                new byte[][]
+                {
+                    new byte[] { 233, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86 },
+                    new byte[] { 237, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86 },
+                    new byte[] { 255, 161, 0, 0, 24, 0, 0, 0, 152, 130, 56, 86 },
+                    new byte[] { 109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86 }
+                },
+                () =>
+                {
+                    using (SyncService service = new SyncService(device))
+                    {
+                        value = service.GetDirectoryListing("/storage").ToList();
+                    }
+                });
+
+            Assert.AreEqual(4, value.Count);
+
+            var dir = value[0];
+            Assert.AreEqual(".", dir.Path);
+            Assert.AreEqual((UnixFileMode)16873, dir.FileMode);
+            Assert.AreEqual(0, dir.Size);
+            Assert.AreEqual(new DateTime(2015, 11, 3, 10, 47, 4), dir.Time);
+
+            var parentDir = value[1];
+            Assert.AreEqual("..", parentDir.Path);
+            Assert.AreEqual((UnixFileMode)16877, parentDir.FileMode);
+            Assert.AreEqual(0, parentDir.Size);
+            Assert.AreEqual(new DateTime(2015, 11, 3, 10, 47, 4), parentDir.Time);
+
+            var sdcard0 = value[2];
+            Assert.AreEqual("sdcard0", sdcard0.Path);
+            Assert.AreEqual((UnixFileMode)41471, sdcard0.FileMode);
+            Assert.AreEqual(24, sdcard0.Size);
+            Assert.AreEqual(new DateTime(2015, 11, 3, 10, 47, 4), sdcard0.Time);
+
+            var emulated = value[3];
+            Assert.AreEqual("emulated", emulated.Path);
+            Assert.AreEqual((UnixFileMode)16749, emulated.FileMode);
+            Assert.AreEqual(0, emulated.Size);
+            Assert.AreEqual(new DateTime(2015, 11, 3, 10, 47, 4), emulated.Time);
         }
     }
 }
