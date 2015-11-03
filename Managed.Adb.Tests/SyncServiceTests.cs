@@ -88,29 +88,31 @@ namespace Managed.Adb.Tests
 
             Assert.AreEqual(4, value.Count);
 
+            var time = new DateTime(2015, 11, 3, 9, 47, 4, DateTimeKind.Utc).ToLocalTime();
+
             var dir = value[0];
             Assert.AreEqual(".", dir.Path);
             Assert.AreEqual((UnixFileMode)16873, dir.FileMode);
             Assert.AreEqual(0, dir.Size);
-            Assert.AreEqual(new DateTime(2015, 11, 3, 10, 47, 4), dir.Time);
+            Assert.AreEqual(time, dir.Time);
 
             var parentDir = value[1];
             Assert.AreEqual("..", parentDir.Path);
             Assert.AreEqual((UnixFileMode)16877, parentDir.FileMode);
             Assert.AreEqual(0, parentDir.Size);
-            Assert.AreEqual(new DateTime(2015, 11, 3, 10, 47, 4), parentDir.Time);
+            Assert.AreEqual(time, parentDir.Time);
 
             var sdcard0 = value[2];
             Assert.AreEqual("sdcard0", sdcard0.Path);
             Assert.AreEqual((UnixFileMode)41471, sdcard0.FileMode);
             Assert.AreEqual(24, sdcard0.Size);
-            Assert.AreEqual(new DateTime(2015, 11, 3, 10, 47, 4), sdcard0.Time);
+            Assert.AreEqual(time, sdcard0.Time);
 
             var emulated = value[3];
             Assert.AreEqual("emulated", emulated.Path);
             Assert.AreEqual((UnixFileMode)16749, emulated.FileMode);
             Assert.AreEqual(0, emulated.Size);
-            Assert.AreEqual(new DateTime(2015, 11, 3, 10, 47, 4), emulated.Time);
+            Assert.AreEqual(time, emulated.Time);
         }
 
         [TestMethod]
