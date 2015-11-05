@@ -171,7 +171,7 @@ namespace Managed.Adb.Tests
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
                 SyncRequests(
                     SyncCommand.SEND, "/sdcard/test,644",
-                    SyncCommand.DATA, "605",
+                    SyncCommand.DATA, content.Length.ToString(),
                     SyncCommand.DONE, "1446505200"),
                 new SyncCommand[] { SyncCommand.OKAY },
                 null,
