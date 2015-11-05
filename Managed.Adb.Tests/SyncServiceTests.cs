@@ -50,7 +50,7 @@ namespace Managed.Adb.Tests
             Assert.IsNotNull(value);
             Assert.AreEqual(UnixFileMode.Regular, value.FileMode & UnixFileMode.TypeMask);
             Assert.AreEqual(597, value.Size);
-            Assert.AreEqual(ManagedAdbExtenstions.Epoch.ToLocalTime(), value.Time);
+            Assert.AreEqual(DateTimeHelper.Epoch.ToLocalTime(), value.Time);
         }
 
         [TestMethod]

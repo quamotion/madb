@@ -358,7 +358,7 @@ namespace Managed.Adb {
 
 
 			// at this point we need to refresh the viewer
-			entry.FetchTime = DateTime.Now.CurrentTimeMillis ( );
+			entry.FetchTime = DateTime.Now.ToUnixEpoch();
 			// sort the children and set them as the new children
 			entryList.Sort ( new FileEntry.FileEntryComparer ( ) );
 			entry.Children = entryList;

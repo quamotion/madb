@@ -7,7 +7,7 @@ namespace Managed.Adb
     using System;
 
     /// <ignore>true</ignore>
-    public static partial class ManagedAdbExtenstions
+    public static class DateTimeHelper
     {
         /// <summary>
         /// Gets EPOCH time
@@ -26,23 +26,13 @@ namespace Managed.Adb
         }
 
         /// <summary>
-        /// Currents the time millis.
-        /// </summary>
-        /// <param name="dateTime">The date time.</param>
-        /// <returns></returns>
-        public static long CurrentTimeMillis(this DateTime dateTime)
-        {
-            return (long)(dateTime.ToUniversalTime() - Epoch).TotalMilliseconds;
-        }
-
-        /// <summary>
         /// Converts a DateTime to Unix Epoch
         /// </summary>
         /// <param name="date">The date.</param>
         /// <returns></returns>
         public static long ToUnixEpoch(this DateTime date)
         {
-            TimeSpan t = date - Epoch;
+            TimeSpan t = date.ToUniversalTime() - Epoch;
             long epoch = (long)t.TotalSeconds;
             return epoch;
         }

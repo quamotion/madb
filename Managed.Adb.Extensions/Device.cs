@@ -819,7 +819,7 @@ namespace Managed.Adb
 
                     using (Stream stream = File.OpenRead(localFilePath))
                     {
-                        sync.Push(stream, remoteFilePath, 644, null, CancellationToken.None);
+                        sync.Push(stream, remoteFilePath, 644, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
                     }
                 }
                 else

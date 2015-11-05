@@ -142,7 +142,7 @@ namespace Managed.Adb
             }
 
             // create the DONE message
-            int time = (int)(timestamp.ToUniversalTime().CurrentTimeMillis() / 1000d);
+            int time = (int)timestamp.ToUnixEpoch();
             this.Socket.SendSyncRequest(SyncCommand.DONE, time);
 
             // read the result, in a byte array containing 2 ints
@@ -292,7 +292,7 @@ namespace Managed.Adb
 
             value.FileMode = (UnixFileMode)BitConverter.ToInt32(statResult, 0);
             value.Size = BitConverter.ToInt32(statResult, 4);
-            value.Time = ManagedAdbExtenstions.Epoch.AddSeconds(BitConverter.ToInt32(statResult, 8)).ToLocalTime();
+            value.Time = DateTimeHelper.Epoch.AddSeconds(BitConverter.ToInt32(statResult, 8)).ToLocalTime();
         }
     }
 }
