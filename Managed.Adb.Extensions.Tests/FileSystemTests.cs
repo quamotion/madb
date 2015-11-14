@@ -51,11 +51,11 @@ namespace Managed.Adb.Tests {
 
             var vendor = fileSystem.ResolveLink ( "/vendor" );
 			Assert.AreEqual ( vendor, "/system/vendor" );
-			Console.WriteLine ( "/vendor -> {0}".With ( vendor ) );
+			Console.WriteLine ( $"/vendor -> {vendor}");
 
 			var nonsymlink = fileSystem.ResolveLink ( "/system" );
 			Assert.AreEqual ( nonsymlink, "/system" );
-			Console.WriteLine ( "/system -> {0}".With ( nonsymlink ) );
+			Console.WriteLine ( $"/system -> {nonsymlink}");
 
 
 			var legacy = "/storage/emulated/legacy";
@@ -64,7 +64,7 @@ namespace Managed.Adb.Tests {
 			var sdcard = fileSystem.ResolveLink ( "/sdcard" );
 			// depending on the version of android
 			Assert.IsTrue ( sdcard.Equals ( legacy ) || sdcard.Equals ( sdcard0 ) );
-			Console.WriteLine ( "/sdcard -> {0}".With ( sdcard ) );
+			Console.WriteLine ( $"/sdcard -> {sdcard}");
 
 		}
 	}

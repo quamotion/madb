@@ -129,7 +129,7 @@ namespace Managed.Adb {
 			command.ThrowIfNullOrWhiteSpace ( "command" );
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
 			Log.d ( "executing: {0}", cmd );
-			AdbHelper.Instance.ExecuteRemoteCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
+			AdbClient.Instance.ExecuteRemoteCommand(cmd, this.Device.DeviceData, receiver);
 		}
 
         /// <include file='.\BusyBox.xml' path='/BusyBox/ExecuteRootShellCommand/*'/>
@@ -137,7 +137,7 @@ namespace Managed.Adb {
 			command.ThrowIfNullOrWhiteSpace ( "command" );
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
 			Log.d ( "executing (su): {0}", cmd );
-			AdbHelper.Instance.ExecuteRemoteRootCommand ( AndroidDebugBridge.SocketAddress, cmd, this.Device, receiver );
+            Device.ExecuteRootShellCommand(cmd, receiver );
 		}
 
         /// <include file='.\BusyBox.xml' path='/BusyBox/Device/*'/>
@@ -199,7 +199,7 @@ namespace Managed.Adb {
 				Match match = null;
 				int state = 0;
 				foreach ( var line in lines ) {
-					if ( line.IsNullOrWhiteSpace ( ) ) {
+					if ( string.IsNullOrEmpty(line) ) {
 						continue;
 					}
 					switch ( state ) {

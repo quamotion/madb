@@ -87,7 +87,7 @@ namespace Managed.Adb {
 				String date2 = m.Groups[6].Value.Trim ( );
 				String date3 = m.Groups[7].Value.Trim ( );
 
-				DateTime date = DateTime.Now.GetEpoch ( );
+				DateTime date = DateTimeHelper.Epoch;
 				String time = m.Groups[8].Value.Trim();
 				if ( String.IsNullOrEmpty ( time ) ) {
 					time = date.ToString ( "HH:mm" );

@@ -1,43 +1,35 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="ISyncService.cs" company="Quamotion">
-//     Copyright (c) 2015 Quamotion. All rights reserved.
+﻿// <copyright file="ISyncService.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
-//-----------------------------------------------------------------------
 
 namespace Managed.Adb
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using System.Text;
+    using System.Threading;
 
     /// <summary>
     /// Interface containing methods for file synchronisation.
     /// </summary>
     public interface ISyncService : IDisposable
     {
-        Device Device { get; }
+        /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
+        bool IsOpen { get; }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/PushFile/*'/>
-        SyncResult PushFile(string local, string remote, ISyncProgressMonitor monitor);
+        /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
+        void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken);
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
-        SyncResult PullFile(string remoteFilepath, string localFilename, ISyncProgressMonitor monitor);
+        /// <include file='.\ISyncService.xml' path='/SyncService/Pull/*'/>
+        void Pull(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken);
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Close/*'/>
-        void Close();
+        /// <include file='.\ISyncService.xml' path='/SyncService/Stat/*'/>
+        FileStatistics Stat(string remotePath);
+
+        /// <include file='.\ISyncService.xml' path='/SyncService/GetDirectoryListing/*'/>
+        IEnumerable<FileStatistics> GetDirectoryListing(string remotePath);
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
-        bool Open();
-
-        /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
-        bool IsOpen {get; }
-
-        SyncResult DoPush(IEnumerable<FileSystemInfo> files, string remotePath, ISyncProgressMonitor monitor);
-
-        SyncResult DoPullFile(string remotePath, string localPath, ISyncProgressMonitor monitor);
-
-        long GetTotalLocalFileSize(IEnumerable<FileSystemInfo> fsis);
+        void Open();
     }
 }

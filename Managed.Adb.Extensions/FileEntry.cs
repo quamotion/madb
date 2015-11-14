@@ -255,7 +255,7 @@ namespace Managed.Adb
                     return true;
                 }
 
-                long current = DateTime.Now.CurrentTimeMillis();
+                long current = DateTime.Now.ToUnixEpoch();
                 if (current - FetchTime > FileListingService.REFRESH_TEST)
                 {
                     return true;

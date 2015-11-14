@@ -4,16 +4,16 @@
 
 namespace Managed.Adb
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     /// <summary>
-    ///
+    /// An implementation of the <see cref="IShellOutputReceiver"/> that does not do anything.
     /// </summary>
     public sealed class NullOutputReceiver : IShellOutputReceiver
     {
+        /// <summary>
+        /// Backing field for the <see cref="Instance"/> property.
+        /// </summary>
+        private static NullOutputReceiver instance = null;
+
         /// <summary>
         /// Prevents a default instance of the <see cref="NullOutputReceiver" /> class from being created.
         /// </summary>
@@ -21,8 +21,6 @@ namespace Managed.Adb
         {
             this.IsCancelled = false;
         }
-
-        private static NullOutputReceiver instance = null;
 
         /// <summary>
         /// Gets the instance.
@@ -40,6 +38,32 @@ namespace Managed.Adb
                 }
 
                 return instance;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is cancelled.
+        /// </summary>
+        /// <value>
+        /// <see langword="true"/> if this instance is cancelled; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool IsCancelled { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the receiver parses error messages.
+        /// </summary>
+        /// <value>
+        ///     <see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.
+        /// </value>
+        /// <remarks>
+        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbClient"/>
+        /// will detect common error messages and throw an exception.
+        /// </remarks>
+        public bool ParsesErrors
+        {
+            get
+            {
+                return false;
             }
         }
 
@@ -63,32 +87,6 @@ namespace Managed.Adb
         public void Flush()
         {
             // do nothing
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is cancelled.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> if this instance is cancelled; otherwise, <see langword="false"/>.
-        /// </value>
-        public bool IsCancelled { get; private set; }
-
-        /// <summary>
-        /// Gets a value indicating whether the receiver parses error messages.
-        /// </summary>
-        /// <value>
-        ///     <see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.
-        /// </value>
-        /// <remarks>
-        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbHelper"/>
-        /// will detect common error messages and throw an exception.
-        /// </remarks>
-        public bool ParsesErrors
-        {
-            get
-            {
-                return false;
-            }
         }
     }
 }

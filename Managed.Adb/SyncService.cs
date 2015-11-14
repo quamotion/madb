@@ -4,468 +4,132 @@
 
 namespace Managed.Adb
 {
+    using Exceptions;
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Text;
-    using Managed.Adb.IO;
+    using System.Threading;
 
+    /// <summary>
+    /// Provides access to the sync service running on the Android device. Allows you to
+    /// list, download and upload files on the device.
+    /// </summary>
     public class SyncService : ISyncService, IDisposable
     {
         /// <summary>
         /// Logging tag
         /// </summary>
-        private const string TAG = "SyncService";
-
-        private const string OKAY = "OKAY";
-        private const string FAIL = "FAIL";
-        private const string STAT = "STAT";
-        private const string RECV = "RECV";
-        private const string DATA = "DATA";
-        private const string DONE = "DONE";
-        private const string SEND = "SEND";
-        private const string LIST = "LIST";
-        private const string DENT = "DENT";
-
-        [Flags]
-        public enum FileMode
-        {
-            /// <summary>
-            /// The unknown
-            /// </summary>
-            UNKNOWN = 0x0000, // unknown
-
-            /// <summary>
-            /// The socket
-            /// </summary>
-            Socket = 0xc000, // type: socket
-
-            /// <summary>
-            /// The symbolic link
-            /// </summary>
-            SymbolicLink = 0xa000, // type: symbolic link
-
-            /// <summary>
-            /// The regular
-            /// </summary>
-            Regular = 0x8000, // type: regular file
-
-            /// <summary>
-            /// The block
-            /// </summary>
-            Block = 0x6000, // type: block device
-
-            /// <summary>
-            /// The directory
-            /// </summary>
-            Directory = 0x4000, // type: directory
-
-            /// <summary>
-            /// The character
-            /// </summary>
-            Character = 0x2000, // type: character device
-
-            /// <summary>
-            /// The fifo
-            /// </summary>
-            FIFO = 0x1000  // type: fifo
-        }
-
-        /*private const int S_ISOCK = 0xc000; // type: symbolic link
-        private const int S_IFLNK = 0xa000; // type: symbolic link
-        private const int S_IFREG = 0x8000; // type: regular file
-        private const int S_IFBLK = 0x6000; // type: block device
-        private const int S_IFDIR = 0x4000; // type: directory
-        private const int S_IFCHR = 0x2000; // type: character device
-        private const int S_IFIFO = 0x1000; // type: fifo
-
-        private const int S_ISUID = 0x0800; // set-uid bit
-        private const int S_ISGID = 0x0400; // set-gid bit
-        private const int S_ISVTX = 0x0200; // sticky bit
-        private const int S_IRWXU = 0x01C0; // user permissions
-        private const int S_IRUSR = 0x0100; // user: read;
-        private const int S_IWUSR = 0x0080; // user: write;
-        private const int S_IXUSR = 0x0040; // user: execute;
-        private const int S_IRWXG = 0x0038; // group permissions
-        private const int S_IRGRP = 0x0020; // group: read;
-        private const int S_IWGRP = 0x0010; // group: write;
-        private const int S_IXGRP = 0x0008; // group: execute;
-        private const int S_IRWXO = 0x0007; // other permissions
-        private const int S_IROTH = 0x0004; // other: read;
-        private const int S_IWOTH = 0x0002; // other: write;
-        private const int S_IXOTH = 0x0001; // other: execute;*/
-
-        private const int SYNC_DATA_MAX = 64 * 1024;
-        private const int REMOTE_PATH_MAX_LENGTH = 1024;
-
-        #region static members
-        static SyncService()
-        {
-            NullProgressMonitor = new NullSyncProgressMonitor();
-        }
+        private const string Tag = nameof(SyncService);
 
         /// <summary>
-        /// Gets the null progress monitor.
+        /// The maximum size of data to transfer between the device and the PC
+        /// in one block.
         /// </summary>
-        /// <value>
-        /// The null progress monitor.
-        /// </value>
-        public static NullSyncProgressMonitor NullProgressMonitor { get; private set; }
-
-        private static byte[] DataBuffer { get; set; }
+        private const int MaxBufferSize = 64 * 1024;
 
         /// <summary>
-        /// Checks the result array starts with the provided code
+        /// The maximum length of a path on the remote device.
         /// </summary>
-        /// <param name="result">The result array to check</param>
-        /// <param name="code">The 4 byte code.</param>
-        /// <returns>true if the code matches.</returns>
-        private static bool CheckResult(byte[] result, byte[] code)
-        {
-            if (result.Length >= code.Length)
-            {
-                for (int i = 0; i < code.Length; i++)
-                {
-                    if (result[i] != code[i])
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Create a command with a code and an int values
-        /// </summary>
-        /// <param name="command">the 4 byte command (STAT, RECV, ...).</param>
-        /// <param name="value"></param>
-        /// <returns>the byte[] to send to the device through adb</returns>
-        private static byte[] CreateRequest(string command, int value)
-        {
-            return CreateRequest(Encoding.Default.GetBytes(command), value);
-        }
-
-        /// <summary>
-        /// Create a command with a code and an int values
-        /// </summary>
-        /// <param name="command">the 4 byte command (STAT, RECV, ...).</param>
-        /// <param name="value"></param>
-        /// <returns>the byte[] to send to the device through adb</returns>
-        private static byte[] CreateRequest(byte[] command, int value)
-        {
-            byte[] array = new byte[8];
-
-            Array.Copy(command, 0, array, 0, 4);
-            value.Swap32bitsToArray(array, 4);
-
-            return array;
-        }
-
-        /// <summary>
-        /// Creates the data array for a file request. This creates an array with a 4 byte command + the remote file name.
-        /// </summary>
-        /// <param name="command">the 4 byte command (STAT, RECV, ...).</param>
-        /// <param name="path">The path, as a byte array, of the remote file on which to execute the command</param>
-        /// <returns>the byte[] to send to the device through adb</returns>
-        private static byte[] CreateFileRequest(string command, string path)
-        {
-            return CreateFileRequest(Encoding.Default.GetBytes(command), Encoding.Default.GetBytes(path));
-        }
-
-        /// <summary>
-        /// Creates the data array for a file request. This creates an array with a 4 byte command + the remote file name.
-        /// </summary>
-        /// <param name="command">the 4 byte command (STAT, RECV, ...).</param>
-        /// <param name="path">he path, as a byte array, of the remote file on which to execute the command</param>
-        /// <returns>the byte[] to send to the device through adb</returns>
-        private static byte[] CreateFileRequest(byte[] command, byte[] path)
-        {
-            byte[] array = new byte[8 + path.Length];
-
-            Array.Copy(command, 0, array, 0, 4);
-            path.Length.Swap32bitsToArray(array, 4);
-            Array.Copy(path, 0, array, 8, path.Length);
-
-            return array;
-        }
-
-        private static byte[] CreateSendFileRequest(string command, string path, FileMode mode)
-        {
-            return CreateSendFileRequest(Encoding.Default.GetBytes(command), Encoding.Default.GetBytes(path), mode);
-        }
-
-        private static byte[] CreateSendFileRequest(byte[] command, byte[] path, FileMode mode)
-        {
-            string modeString = string.Format(",{0}", (int)mode & 0777);
-            byte[] modeContent = null;
-            try
-            {
-                modeContent = Encoding.Default.GetBytes(modeString);
-            }
-            catch (EncoderFallbackException)
-            {
-                return null;
-            }
-
-            byte[] array = new byte[8 + path.Length + modeContent.Length];
-            Array.Copy(command, 0, array, 0, 4);
-            (path.Length + modeContent.Length).Swap32bitsToArray(array, 4);
-            Array.Copy(path, 0, array, 8, path.Length);
-            Array.Copy(modeContent, 0, array, 8 + path.Length, modeContent.Length);
-
-            return array;
-        }
-        #endregion
+        private const int MaxPathLength = 1024;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
-        /// <param name="device">The device.</param>
-        public SyncService(Device device)
-            : this(AndroidDebugBridge.SocketAddress, device)
+        /// <param name="device">
+        /// The device on which to interact with the files.
+        /// </param>
+        public SyncService(DeviceData device)
+            : this(AdbClient.SocketFactory.Create(AdbServer.EndPoint), device)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
-        /// <param name="address">The address.</param>
-        /// <param name="device">The device.</param>
-        public SyncService(IPEndPoint address, Device device)
+        /// <param name="socket">
+        /// A <see cref="IAdbSocket"/> that enables to connection with the
+        /// adb server.
+        /// </param>
+        /// <param name="device">
+        /// The device on which to interact with the files.
+        /// </param>
+        public SyncService(IAdbSocket socket, DeviceData device)
         {
-            this.Address = address;
+            this.Socket = socket;
             this.Device = device;
+
             this.Open();
         }
 
         /// <summary>
-        /// Gets the address.
+        /// Gets or sets the device on which the file operations are being executed.
         /// </summary>
-        /// <value>
-        /// The address.
-        /// </value>
-        public IPEndPoint Address { get; private set; }
+        public DeviceData Device
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
-        /// Gets the device.
+        /// Gets the <see cref="IAdbSocket"/> that enables the connection with the
+        /// adb server.
         /// </summary>
-        /// <value>
-        /// The device.
-        /// </value>
-        public Device Device { get; private set; }
-
-        private Socket Channel { get; set; }
+        public IAdbSocket Socket { get; private set; }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
         public bool IsOpen
         {
             get
             {
-                return this.Channel != null && this.Channel.Connected;
+                return this.Socket != null && this.Socket.Connected;
             }
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
-        public bool Open()
+        public void Open()
         {
-            if (this.IsOpen)
-            {
-                return true;
-            }
+            // target a specific device
+            AdbClient.Instance.SetDevice(this.Socket, this.Device);
 
-            try
-            {
-                this.Channel = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                this.Channel.Connect(this.Address);
-                this.Channel.Blocking = true;
-
-                // target a specific device
-                AdbHelper.Instance.SetDevice(this.Channel, this.Device);
-
-                byte[] request = AdbHelper.Instance.FormAdbRequest("sync:");
-                AdbHelper.Instance.Write(this.Channel, request, -1, DdmPreferences.Timeout);
-
-                AdbResponse resp = AdbHelper.Instance.ReadAdbResponse(this.Channel, false /* readDiagString */);
-
-                if (!resp.IOSuccess || !resp.Okay)
-                {
-                    Log.w("ddms:syncservice", "Got timeout or unhappy response from ADB sync req: {0}", resp.Message);
-                    this.Channel.Close();
-                    this.Channel = null;
-                    return false;
-                }
-            }
-            catch (IOException)
-            {
-                this.Close();
-                throw;
-            }
-
-            return true;
+            this.Socket.SendAdbRequest("sync:");
+            var resp = this.Socket.ReadAdbResponse(false);
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Close/*'/>
-        public void Close()
+        /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
+        public void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken)
         {
-            if (this.Channel != null)
+            if (stream == null)
             {
-                try
-                {
-                    this.Channel.Close();
-                }
-                catch (IOException)
-                {
-                }
-
-                this.Channel = null;
-            }
-        }
-
-        /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
-        public SyncResult PullFile(string remoteFilepath, string localFilename, ISyncProgressMonitor monitor)
-        {
-            if (monitor == null)
-            {
-                throw new ArgumentNullException("monitor", "Monitor cannot be null");
+                throw new ArgumentNullException(nameof(stream));
             }
 
-            long totalWork = 0;
-            monitor.Start(totalWork);
-
-            SyncResult result = this.DoPullFile(remoteFilepath, localFilename, monitor);
-
-            monitor.Stop();
-            return result;
-        }
-
-        /// <include file='.\ISyncService.xml' path='/SyncService/PushFile/*'/>
-        public SyncResult PushFile(string local, string remote, ISyncProgressMonitor monitor)
-        {
-            if (monitor == null)
+            if (remotePath == null)
             {
-                throw new ArgumentNullException("monitor", "Monitor cannot be null");
+                throw new ArgumentNullException(nameof(remotePath));
             }
 
-            FileInfo f = new FileInfo(local);
-            if (!f.Exists)
+            if (remotePath.Length > MaxPathLength)
             {
-                return new SyncResult(ErrorCodeHelper.RESULT_NO_LOCAL_FILE);
+                throw new ArgumentOutOfRangeException(nameof(remotePath), $"The remote path {remotePath} exceeds the maximum path size {MaxPathLength}");
             }
 
-            if (f.IsDirectory())
-            {
-                return new SyncResult(ErrorCodeHelper.RESULT_LOCAL_IS_DIRECTORY);
-            }
-
-            monitor.Start(f.Length);
-            SyncResult result = this.DoPushFile(local, remote, monitor);
-            monitor.Stop();
-
-            return result;
-        }
-
-        /// <summary>
-        /// Push a single file
-        /// </summary>
-        /// <param name="local">the local file to push</param>
-        /// <param name="remotePath">the remote file (length max is 1024)</param>
-        /// <param name="monitor">the monitor. The monitor must be started already.</param>
-        /// <returns>
-        /// a SyncResult object with a code and an optional message.
-        /// </returns>
-        /// <exception cref="System.ArgumentNullException">monitor;Monitor cannot be null</exception>
-        /// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
-        private SyncResult DoPushFile(string local, string remotePath, ISyncProgressMonitor monitor)
-        {
-            if (monitor == null)
-            {
-                throw new ArgumentNullException("monitor", "Monitor cannot be null");
-            }
-
-            FileStream fs = null;
-            byte[] msg;
-
-            int timeOut = DdmPreferences.Timeout;
-            Log.i(TAG, "Remote File: {0}", remotePath);
-            try
-            {
-                byte[] remotePathContent = remotePath.GetBytes(AdbHelper.DefaultEncoding);
-
-                if (remotePathContent.Length > REMOTE_PATH_MAX_LENGTH)
-                {
-                    return new SyncResult(ErrorCodeHelper.RESULT_REMOTE_PATH_LENGTH);
-                }
-
-                // this shouldn't happen but still...
-                if (!File.Exists(local))
-                {
-                    return new SyncResult(ErrorCodeHelper.RESULT_NO_LOCAL_FILE);
-                }
-
-                // create the stream to read the file
-                fs = new FileStream(local, System.IO.FileMode.Open, FileAccess.Read);
-
-                // create the header for the action
-                msg = CreateSendFileRequest(SEND.GetBytes(), remotePathContent, (FileMode)0644);
-            }
-            catch (EncoderFallbackException e)
-            {
-                return new SyncResult(ErrorCodeHelper.RESULT_REMOTE_PATH_ENCODING, e);
-            }
-            catch (FileNotFoundException e)
-            {
-                return new SyncResult(ErrorCodeHelper.RESULT_FILE_READ_ERROR, e);
-            }
-
-            // and send it. We use a custom try/catch block to make the difference between
-            // file and network IO exceptions.
-            try
-            {
-                AdbHelper.Instance.Write(this.Channel, msg, -1, timeOut);
-            }
-            catch (IOException e)
-            {
-                return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR, e);
-            }
+            this.Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permissions);
 
             // create the buffer used to read.
-            // we read max SYNC_DATA_MAX, but we need 2 4 bytes at the beginning.
-            if (DataBuffer == null)
-            {
-                DataBuffer = new byte[SYNC_DATA_MAX + 8];
-            }
-
-            byte[] bDATA = DATA.GetBytes();
-            Array.Copy(bDATA, 0, DataBuffer, 0, bDATA.Length);
+            // we read max SYNC_DATA_MAX.
+            byte[] buffer = new byte[MaxBufferSize];
 
             // look while there is something to read
             while (true)
             {
                 // check if we're canceled
-                if (monitor.IsCanceled)
-                {
-                    return new SyncResult(ErrorCodeHelper.RESULT_CANCELED);
-                }
+                cancellationToken.ThrowIfCancellationRequested();
 
                 // read up to SYNC_DATA_MAX
-                int readCount = 0;
-                try
-                {
-                    readCount = fs.Read(DataBuffer, 8, SYNC_DATA_MAX);
-                }
-                catch (IOException e)
-                {
-                    return new SyncResult(ErrorCodeHelper.RESULT_FILE_READ_ERROR, e);
-                }
+                int read = stream.Read(buffer, 0, MaxBufferSize);
 
-                if (readCount == 0)
+                if (read == 0)
                 {
                     // we reached the end of the file
                     break;
@@ -473,332 +137,133 @@ namespace Managed.Adb
 
                 // now send the data to the device
                 // first write the amount read
-                readCount.Swap32bitsToArray(DataBuffer, 4);
-
-                // now write it
-                try
-                {
-                    AdbHelper.Instance.Write(this.Channel, DataBuffer, readCount + 8, timeOut);
-                }
-                catch (IOException e)
-                {
-                    return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR, e);
-                }
-
-                // and advance the monitor
-                monitor.Advance(readCount);
+                this.Socket.SendSyncRequest(SyncCommand.DATA, read);
+                this.Socket.Send(buffer, read, -1);
             }
 
-            // close the local file
-            try
+            // create the DONE message
+            int time = (int)timestamp.ToUnixEpoch();
+            this.Socket.SendSyncRequest(SyncCommand.DONE, time);
+
+            // read the result, in a byte array containing 2 ints
+            // (id, size)
+            var result = this.Socket.ReadSyncResponse();
+
+            if (result == SyncCommand.FAIL)
             {
-                fs.Close();
+                var message = this.Socket.ReadSyncString();
+
+                throw new AdbException(message);
             }
-            catch (IOException e)
+            else if (result != SyncCommand.OKAY)
             {
-                return new SyncResult(ErrorCodeHelper.RESULT_FILE_READ_ERROR, e);
+                throw new AdbException($"The server sent an invali repsonse {result}");
             }
-
-            try
-            {
-                // create the DONE message
-                long time = DateTime.Now.CurrentTimeMillis() / 1000;
-                msg = CreateRequest(DONE, (int)time);
-
-                // and send it.
-                AdbHelper.Instance.Write(this.Channel, msg, -1, timeOut);
-
-                // read the result, in a byte array containing 2 ints
-                // (id, size)
-                byte[] result = new byte[8];
-                AdbHelper.Instance.Read(this.Channel, result, -1 /* full length */, timeOut);
-
-                if (!CheckResult(result, OKAY.GetBytes()))
-                {
-                    if (CheckResult(result, FAIL.GetBytes()))
-                    {
-                        // read some error message...
-                        int len = result.Swap32bitFromArray(4);
-
-                        AdbHelper.Instance.Read(this.Channel, DataBuffer, len, timeOut);
-
-                        // output the result?
-                        string message = DataBuffer.GetString(0, len);
-                        Log.e("ddms", "transfer error: " + message);
-                        return new SyncResult(ErrorCodeHelper.RESULT_UNKNOWN_ERROR, message);
-                    }
-
-                    return new SyncResult(ErrorCodeHelper.RESULT_UNKNOWN_ERROR);
-                }
-            }
-            catch (IOException e)
-            {
-                return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR, e);
-            }
-
-            return new SyncResult(ErrorCodeHelper.RESULT_OK);
         }
 
-        public SyncResult DoPush(IEnumerable<FileSystemInfo> files, string remotePath, ISyncProgressMonitor monitor)
+        /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
+        public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
         {
-            if (monitor == null)
+            if (remoteFilepath == null)
             {
-                throw new ArgumentNullException("monitor", "Monitor cannot be null");
+                throw new ArgumentNullException(nameof(remoteFilepath));
             }
 
-            // check if we're canceled
-            if (monitor.IsCanceled)
+            if (stream == null)
             {
-                return new SyncResult(ErrorCodeHelper.RESULT_CANCELED);
+                throw new ArgumentNullException(nameof(stream));
             }
 
-            foreach (FileSystemInfo f in files)
+            byte[] buffer = new byte[MaxBufferSize];
+
+            this.Socket.SendSyncRequest(SyncCommand.RECV, remoteFilepath);
+
+            while (true)
             {
-                // check if we're canceled
-                if (monitor.IsCanceled)
+                var response = this.Socket.ReadSyncResponse();
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (response == SyncCommand.DONE)
                 {
-                    return new SyncResult(ErrorCodeHelper.RESULT_CANCELED);
+                    break;
+                }
+                else if (response != SyncCommand.DATA)
+                {
+                    throw new AdbException($"The server sent an invalid response {response}");
                 }
 
-                // append the name of the directory/file to the remote path
-                string dest = LinuxPath.Combine(remotePath, f.Name);
-                if (f.Exists)
+                // The first 4 bytes contain the length of the data packet
+                var reply = new byte[4];
+                this.Socket.Read(reply);
+
+                if (!BitConverter.IsLittleEndian)
                 {
-                    if (f.IsDirectory())
-                    {
-                        DirectoryInfo fsiDir = f as DirectoryInfo;
-                        monitor.StartSubTask(f.FullName, dest);
-                        SyncResult result = this.DoPush(fsiDir.GetFileSystemInfos(), dest, monitor);
-
-                        if (result.Code != ErrorCodeHelper.RESULT_OK)
-                        {
-                            return result;
-                        }
-
-                        monitor.Advance(1);
-                    }
-                    else if (f.IsFile())
-                    {
-                        monitor.StartSubTask(f.FullName, dest);
-                        SyncResult result = this.DoPushFile(f.FullName, dest, monitor);
-                        if (result.Code != ErrorCodeHelper.RESULT_OK)
-                        {
-                            return result;
-                        }
-                    }
+                    Array.Reverse(reply);
                 }
-            }
 
-            return new SyncResult(ErrorCodeHelper.RESULT_OK);
+                int size = BitConverter.ToInt32(reply, 0);
+
+                if (size > MaxBufferSize)
+                {
+                    throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {MaxBufferSize}");
+                }
+
+                // now read the length we received
+                this.Socket.Read(buffer, size, -1);
+                stream.Write(buffer, 0, size);
+            }
         }
 
-        /// <summary>
-        /// Pulls a remote file
-        /// </summary>
-        /// <param name="remotePath">the remote file (length max is 1024)</param>
-        /// <param name="localPath">the local destination</param>
-        /// <param name="monitor">the monitor. The monitor must be started already.</param>
-        /// <returns>a SyncResult object with a code and an optional message.</returns>
-        /// <exception cref="ArgumentNullException">Throws if monitor is null</exception>
-        public SyncResult DoPullFile(string remotePath, string localPath, ISyncProgressMonitor monitor)
+        /// <include file='.\ISyncService.xml' path='/SyncService/Stat/*'/>
+        public FileStatistics Stat(string remotePath)
         {
-            if (monitor == null)
+            // create the stat request message.
+            this.Socket.SendSyncRequest(SyncCommand.STAT, remotePath);
+
+            if (this.Socket.ReadSyncResponse() != SyncCommand.STAT)
             {
-                throw new ArgumentNullException("monitor", "Monitor cannot be null");
+                throw new AdbException($"The server returned an invalid sync response.");
             }
 
-            byte[] msg = null;
-            byte[] pullResult = new byte[8];
+            // read the result, in a byte array containing 3 ints
+            // (mode, size, time)
+            FileStatistics value = new FileStatistics();
+            value.Path = remotePath;
 
-            int timeOut = DdmPreferences.Timeout;
+            this.ReadStatistics(value);
 
-            try
-            {
-                byte[] remotePathContent = remotePath.GetBytes(AdbHelper.DefaultEncoding);
-
-                if (remotePathContent.Length > REMOTE_PATH_MAX_LENGTH)
-                {
-                    return new SyncResult(ErrorCodeHelper.RESULT_REMOTE_PATH_LENGTH);
-                }
-
-                // create the full request message
-                msg = CreateFileRequest(RECV.GetBytes(), remotePathContent);
-
-                // and send it.
-                AdbHelper.Instance.Write(this.Channel, msg, -1, timeOut);
-
-                // read the result, in a byte array containing 2 ints
-                // (id, size)
-                AdbHelper.Instance.Read(this.Channel, pullResult, -1, timeOut);
-
-                // check we have the proper data back
-                if (CheckResult(pullResult, DATA.GetBytes()) == false &&
-                                CheckResult(pullResult, DONE.GetBytes()) == false)
-                {
-                    return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR);
-                }
-            }
-            catch (EncoderFallbackException e)
-            {
-                Log.e(TAG, e);
-                return new SyncResult(ErrorCodeHelper.RESULT_REMOTE_PATH_ENCODING, e);
-            }
-            catch (IOException e)
-            {
-                Log.e(TAG, e);
-                return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR, e);
-            }
-
-            // access the destination file
-            FileInfo f = new FileInfo(localPath);
-
-            // create the stream to write in the file. We use a new try/catch block to differentiate
-            // between file and network io exceptions.
-            FileStream fos = null;
-            try
-            {
-                fos = new FileStream(f.FullName, System.IO.FileMode.Create, FileAccess.Write);
-            }
-            catch (FileNotFoundException e)
-            {
-                return new SyncResult(ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e);
-            }
-
-            // the buffer to read the data
-            byte[] data = new byte[SYNC_DATA_MAX];
-            using (fos)
-            {
-                // loop to get data until we're done.
-                while (true)
-                {
-                    // check if we're canceled
-                    if (monitor.IsCanceled)
-                    {
-                        return new SyncResult(ErrorCodeHelper.RESULT_CANCELED);
-                    }
-
-                    // if we're done, we stop the loop
-                    if (CheckResult(pullResult, DONE.GetBytes()))
-                    {
-                        break;
-                    }
-
-                    if (CheckResult(pullResult, DATA.GetBytes()) == false)
-                    {
-                        // hmm there's an error
-                        return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR);
-                    }
-
-                    int length = pullResult.Swap32bitFromArray(4);
-                    if (length > SYNC_DATA_MAX)
-                    {
-                        // buffer overrun!
-                        // error and exit
-                        return new SyncResult(ErrorCodeHelper.RESULT_BUFFER_OVERRUN);
-                    }
-
-                    try
-                    {
-                        // now read the length we received
-                        AdbHelper.Instance.Read(this.Channel, data, length, timeOut);
-
-                        // get the header for the next packet.
-                        AdbHelper.Instance.Read(this.Channel, pullResult, -1, timeOut);
-                    }
-                    catch (IOException e)
-                    {
-                        Log.e(TAG, e);
-                        return new SyncResult(ErrorCodeHelper.RESULT_CONNECTION_ERROR, e);
-                    }
-
-                    // write the content in the file
-                    try
-                    {
-                        fos.Write(data, 0, length);
-                    }
-                    catch (IOException e)
-                    {
-                        return new SyncResult(ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e);
-                    }
-
-                    monitor.Advance(length);
-                }
-
-                try
-                {
-                    fos.Flush();
-                }
-                catch (IOException e)
-                {
-                    Log.e(TAG, e);
-                    return new SyncResult(ErrorCodeHelper.RESULT_FILE_WRITE_ERROR, e);
-                }
-            }
-
-            return new SyncResult(ErrorCodeHelper.RESULT_OK);
+            return value;
         }
 
-        /// <summary>
-        /// compute the recursive file size of all the files in the list. Folders have a weight of 1.
-        /// </summary>
-        /// <param name="files">The local files / folders</param>
-        /// <returns>The total number of bytes</returns>
-        /// <remarks>This does not check for circular links.</remarks>
-        public long GetTotalLocalFileSize(IEnumerable<FileSystemInfo> fsis)
+        /// <include file='.\ISyncService.xml' path='/SyncService/GetDirectoryListing/*'/>
+        public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
-            long count = 0;
+            Collection<FileStatistics> value = new Collection<FileStatistics>();
 
-            foreach (FileSystemInfo fsi in fsis)
+            // create the stat request message.
+            this.Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
+
+            while (true)
             {
-                if (fsi.Exists)
+                var response = this.Socket.ReadSyncResponse();
+
+                if (response == SyncCommand.DONE)
                 {
-                    if (fsi is DirectoryInfo)
-                    {
-                        return this.GetTotalLocalFileSize((fsi as DirectoryInfo).GetFileSystemInfos()) + 1;
-                    }
-                    else if (fsi is FileInfo)
-                    {
-                        count += (fsi as FileInfo).Length;
-                    }
+                    break;
                 }
-            }
-
-            return count;
-        }
-
-        /// <summary>
-        /// Returns the mode of the remote file.
-        /// </summary>
-        /// <param name="path">the remote file</param>
-        /// <returns>the mode if all went well; otherwise, FileMode.UNKNOWN</returns>
-        private FileMode ReadMode(string path)
-        {
-            try
-            {
-                // create the stat request message.
-                byte[] msg = CreateFileRequest(STAT, path);
-
-                AdbHelper.Instance.Write(this.Channel, msg, -1 /* full length */, DdmPreferences.Timeout);
-
-                // read the result, in a byte array containing 4 ints
-                // (id, mode, size, time)
-                byte[] statResult = new byte[16];
-                AdbHelper.Instance.Read(this.Channel, statResult, -1 /* full length */, DdmPreferences.Timeout);
-
-                // check we have the proper data back
-                if (CheckResult(statResult, Encoding.Default.GetBytes(STAT)) == false)
+                else if (response != SyncCommand.DENT)
                 {
-                    return FileMode.UNKNOWN;
+                    throw new AdbException($"The server returned an invalid sync response.");
                 }
 
-                // we return the mode (2nd int in the array)
-                return (FileMode)statResult.Swap32bitFromArray(4);
+                FileStatistics entry = new FileStatistics();
+                this.ReadStatistics(entry);
+                entry.Path = this.Socket.ReadSyncString();
+
+                value.Add(entry);
             }
-            catch (IOException e)
-            {
-                Log.w("SyncService", e);
-                return FileMode.UNKNOWN;
-            }
+
+            return value;
         }
 
         /// <summary>
@@ -806,7 +271,28 @@ namespace Managed.Adb
         /// </summary>
         public void Dispose()
         {
-            this.Close();
+            if (this.Socket != null)
+            {
+                this.Socket.Dispose();
+                this.Socket = null;
+            }
+        }
+
+        private void ReadStatistics(FileStatistics value)
+        {
+            byte[] statResult = new byte[12];
+            this.Socket.Read(statResult);
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(statResult, 0, 4);
+                Array.Reverse(statResult, 4, 4);
+                Array.Reverse(statResult, 8, 4);
+            }
+
+            value.FileMode = (UnixFileMode)BitConverter.ToInt32(statResult, 0);
+            value.Size = BitConverter.ToInt32(statResult, 4);
+            value.Time = DateTimeHelper.Epoch.AddSeconds(BitConverter.ToInt32(statResult, 8)).ToLocalTime();
         }
     }
 }

@@ -11,15 +11,17 @@ namespace Managed.Adb.Logs
 
     public class LogReceiver
     {
-        private const int ENTRY_HEADER_SIZE = 20; // 2*2 + 4*4; see LogEntry.
+        private const int EntryHeaderSize = 20; // 2*2 + 4*4; see LogEntry.
 
         public LogReceiver(ILogListener listener)
         {
             this.EntryDataOffset = 0;
-            this.EntryHeaderBuffer = new byte[ENTRY_HEADER_SIZE];
+            this.EntryHeaderBuffer = new byte[EntryHeaderSize];
             this.EntryHeaderOffset = 0;
             this.Listener = listener;
         }
+
+        public bool IsCancelled { get; private set; }
 
         private int EntryDataOffset { get; set; }
 
@@ -30,8 +32,6 @@ namespace Managed.Adb.Logs
         private LogEntry CurrentEntry { get; set; }
 
         private ILogListener Listener { get; set; }
-
-        public bool IsCancelled { get; private set; }
 
         public void Cancel()
         {
@@ -52,7 +52,7 @@ namespace Managed.Adb.Logs
                 // first check if we have no current entry.
                 if (this.CurrentEntry == null)
                 {
-                    if (this.EntryHeaderOffset + length < ENTRY_HEADER_SIZE)
+                    if (this.EntryHeaderOffset + length < EntryHeaderSize)
                     {
                         // if we don't have enough data to finish the header, save
                         // the data we have and return
@@ -67,7 +67,7 @@ namespace Managed.Adb.Logs
                         if (this.EntryHeaderOffset != 0)
                         {
                             // copy the rest of the entry header into the header buffer
-                            int size = ENTRY_HEADER_SIZE - this.EntryHeaderOffset;
+                            int size = EntryHeaderSize - this.EntryHeaderOffset;
                             Array.Copy(data, offset, this.EntryHeaderBuffer, this.EntryHeaderOffset, size);
 
                             // create the entry from the header buffer
@@ -88,8 +88,8 @@ namespace Managed.Adb.Logs
 
                             // adjust current offset and remaining length to the beginning
                             // of the entry data
-                            offset += ENTRY_HEADER_SIZE;
-                            length -= ENTRY_HEADER_SIZE;
+                            offset += EntryHeaderSize;
+                            length -= EntryHeaderSize;
                         }
                     }
                 }
@@ -136,7 +136,7 @@ namespace Managed.Adb.Logs
 
         private LogEntry CreateEntry(byte[] data, int offset)
         {
-            if (data.Length < offset + ENTRY_HEADER_SIZE)
+            if (data.Length < offset + EntryHeaderSize)
             {
                 throw new ArgumentException("Buffer not big enough to hold full LoggerEntry header");
             }

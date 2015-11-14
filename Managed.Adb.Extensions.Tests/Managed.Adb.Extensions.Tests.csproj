@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Managed.Adb.Extensions.Tests</RootNamespace>
     <AssemblyName>Managed.Adb.Extensions.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -16,6 +16,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,6 +41,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -54,10 +56,15 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AdbHelperIntegrationTests.cs" />
     <Compile Include="AdbHelperTests.cs" />
+    <Compile Include="BaseDeviceTests.cs" />
+    <Compile Include="BatteryInfoTests.cs" />
     <Compile Include="BusyBoxTests.cs" />
+    <Compile Include="DummyDevice.cs" />
     <Compile Include="FileEntryTests.cs" />
     <Compile Include="FileSystemTests.cs" />
+    <Compile Include="LinuxPathTests.cs" />
     <Compile Include="ListingServiceReceiverTests.cs" />
     <Compile Include="ListingServiceTests.cs" />
     <Compile Include="PackageManagerTests.cs" />

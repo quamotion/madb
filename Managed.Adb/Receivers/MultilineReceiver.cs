@@ -25,6 +25,14 @@ namespace Managed.Adb
         public const string ENCODING = "ISO-8859-1";
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
+        /// </summary>
+        public MultiLineReceiver()
+        {
+            this.Lines = new List<string>();
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether [trim lines].
         /// </summary>
         /// <value><see langword="true"/> if [trim lines]; otherwise, <see langword="false"/>.</value>
@@ -37,10 +45,18 @@ namespace Managed.Adb
         ///     <see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.
         /// </value>
         /// <remarks>
-        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbHelper"/>
+        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbClient"/>
         /// will detect common error messages and throw an exception.
         /// </remarks>
         public virtual bool ParsesErrors { get; protected set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is canceled.
+        /// </summary>
+        /// <value>
+        /// 	<see langword="true"/> if this instance is canceled; otherwise, <see langword="false"/>.
+        /// </value>
+        public virtual bool IsCancelled { get; protected set; }
 
         /// <summary>
         /// Gets or sets the unfinished line.
@@ -53,14 +69,6 @@ namespace Managed.Adb
         /// </summary>
         /// <value>The lines.</value>
         protected ICollection<string> Lines { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
-        /// </summary>
-        public MultiLineReceiver()
-        {
-            this.Lines = new List<string>();
-        }
 
         /// <summary>
         /// Adds the output.
@@ -156,14 +164,6 @@ namespace Managed.Adb
         {
             // Do nothing
         }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is canceled.
-        /// </summary>
-        /// <value>
-        /// 	<see langword="true"/> if this instance is canceled; otherwise, <see langword="false"/>.
-        /// </value>
-        public virtual bool IsCancelled { get; protected set; }
 
         /// <summary>
         /// Processes the new lines.

@@ -77,6 +77,30 @@ namespace Managed.Adb
         /// <value>The levels.</value>
         public static Dictionary<string, LogLevelInfo> Levels { get; private set; }
 
+        /// <summary>
+        /// Gets the values.
+        /// </summary>
+        /// <value>The values.</value>
+        public static Dictionary<string, LogLevelInfo>.ValueCollection Values
+        {
+            get
+            {
+                return Levels.Values;
+            }
+        }
+
+        /// <summary>
+        /// Gets the keys.
+        /// </summary>
+        /// <value>The keys.</value>
+        public static Dictionary<string, LogLevelInfo>.KeyCollection Keys
+        {
+            get
+            {
+                return Levels.Keys;
+            }
+        }
+
         public static LogLevelInfo GetByString(string value)
         {
             foreach (LogLevelInfo item in Values)
@@ -116,30 +140,6 @@ namespace Managed.Adb
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Gets the values.
-        /// </summary>
-        /// <value>The values.</value>
-        public static Dictionary<string, LogLevelInfo>.ValueCollection Values
-        {
-            get
-            {
-                return Levels.Values;
-            }
-        }
-
-        /// <summary>
-        /// Gets the keys.
-        /// </summary>
-        /// <value>The keys.</value>
-        public static Dictionary<string, LogLevelInfo>.KeyCollection Keys
-        {
-            get
-            {
-                return Levels.Keys;
-            }
         }
 
         /// <summary>
