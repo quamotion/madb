@@ -4,6 +4,7 @@
 
 namespace SharpAdbClient
 {
+    using Exceptions;
     using SharpAdbClient.Logs;
     using System;
     using System.Net;
@@ -29,7 +30,7 @@ namespace SharpAdbClient
         /// <param name="remotePort">
         /// The remote port to forward to
         /// </param>
-        /// <exception cref="Managed.SharpAdbClient.Exceptions.AdbException">
+        /// <exception cref="AdbException">
         /// failed to submit the forward command.
         /// or
         /// Device rejected command:  + resp.Message
@@ -54,10 +55,10 @@ namespace SharpAdbClient
         /// <param name="remoteSocket">
         /// The remote Unix socket.
         /// </param>
-        /// <exception cref="Managed.SharpAdbClient.Exceptions.AdbException">
+        /// <exception cref="AdbException">
         /// The client failed to submit the forward command.
         /// </exception>
-        /// <exception cref="Managed.SharpAdbClient.Exceptions.AdbException">
+        /// <exception cref="AdbException">
         /// The device rejected command. The error message will include the error message provided by the device.
         /// </exception>
         public static void CreateForward(this IAdbClient client, DeviceData device, int localPort, string remoteSocket)

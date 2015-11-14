@@ -100,7 +100,7 @@ namespace SharpAdbClient
             this.Read(data, -1, DdmPreferences.Timeout);
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/AsyncRead_byte/*'/>
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAsync_byte/*'/>
         public virtual Task ReadAsync(byte[] data)
         {
             return this.ReadAsync(data, -1);
@@ -142,7 +142,7 @@ namespace SharpAdbClient
             this.Write(pathBytes);
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest/*'/>
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_int/*'/>
         public virtual void SendSyncRequest(SyncCommand command, int length)
         {
             // The message structure is:

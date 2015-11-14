@@ -22,6 +22,19 @@
       Gets the devices that are available for communication.
     </summary>
     <returns>A list of devices that are connected.</returns>
+    <example>
+      <para>
+        The following example list all Android devices that are currently connected to this PC:
+      </para>
+      <code>
+        var devices = devices = AdbClient.Instance.GetDevices();
+
+        foreach(var device in devices)
+        {
+          Console.WriteLine(device.Name
+        }
+      </code>
+    </example>
   </GetDevices>
 
   <CreateForward>
@@ -123,10 +136,10 @@
     </summary>
     <param name="device">The device.</param>
     <returns>Returns the RawImage.</returns>
-    <exception cref="Managed.Adb.Exceptions.AdbException">
+    <exception cref="SharpAdbClient.Exceptions.AdbException">
       failed asking for frame buffer
     </exception>
-    <exception cref="Managed.Adb.Exceptions.AdbException">
+    <exception cref="SharpAdbClient.Exceptions.AdbException">
       failed nudging
     </exception>
   </GetFrameBuffer>

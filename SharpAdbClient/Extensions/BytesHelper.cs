@@ -9,7 +9,7 @@ namespace SharpAdbClient
     using System.Linq;
     using System.Text;
 
-    public static partial class ManagedAdbExtenstions
+    internal static partial class ManagedAdbExtenstions
     {
         /// <summary>
         /// Ints the reverse for raw image.

@@ -10,7 +10,7 @@ namespace SharpAdbClient
     using System.Text;
 
     /// <ignore>true</ignore>
-    public static partial class ManagedAdbExtenstions
+    internal static partial class ManagedAdbExtenstions
     {
         /// <summary>
         /// Reads a signed 32 bit integer from an array coming from a device.

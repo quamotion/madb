@@ -7,7 +7,7 @@ namespace SharpAdbClient
     using System.Text.RegularExpressions;
 
     /// <ignore>true</ignore>
-    public static partial class ManagedAdbExtenstions
+    internal static partial class ManagedAdbExtenstions
     {
         /// <summary>
         /// Matches the specified source.

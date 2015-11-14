@@ -17,8 +17,18 @@ namespace SharpAdbClient
     using System.Threading;
 
     /// <summary>
-    /// Implements the <see cref="IAdbClient"/> interface, and allows you to interact with the
-    /// adb server and devices that are connected to that adb server.
+    /// <para>
+    ///     Implements the <see cref="IAdbClient"/> interface, and allows you to interact with the
+    ///     adb server and devices that are connected to that adb server.
+    /// </para>
+    /// <para>
+    ///     For example, to fetch a list of all devices that are currently connected to this PC, you can
+    ///     call the <see cref="GetDevices"/> method.
+    /// </para>
+    /// <para>
+    ///     To run a command on a device, you can use the <see cref="ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, int)"/>
+    ///     method.
+    /// </para>
     /// </summary>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>

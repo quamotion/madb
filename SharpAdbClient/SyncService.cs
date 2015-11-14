@@ -12,9 +12,39 @@ namespace SharpAdbClient
     using System.Threading;
 
     /// <summary>
-    /// Provides access to the sync service running on the Android device. Allows you to
-    /// list, download and upload files on the device.
+    /// <para>
+    ///     Provides access to the sync service running on the Android device. Allows you to
+    ///     list, download and upload files on the device.
+    /// </para>
     /// </summary>
+    /// <example>
+    /// <para>
+    ///     To send files to or receive files from your Android device, you can use the following code:
+    /// </para>
+    /// <code>
+    /// void DownloadFile()
+    /// {
+    ///     var device = AdbClient.Instance.GetDevices().First();
+    ///
+    ///     using (SyncService service = new SyncService(new AdbSocket(), device))
+    ///     using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
+    ///     {
+    ///         service.Pull("/data/MyFile.txt", stream, null, CancellationToken.None);
+    ///     }
+    /// }
+    ///
+    ///     void UploadFile()
+    /// {
+    ///     var device = AdbClient.Instance.GetDevices().First();
+    ///
+    ///     using (SyncService service = new SyncService(new AdbSocket(), device))
+    ///     using (Stream stream = File.OpenRead(@"C:\MyFile.txt"))
+    ///     {
+    ///         service.Push(stream, "/data/MyFile.txt", null, CancellationToken.None);
+    ///     }
+    /// }
+    /// </code>
+    /// </example>
     public class SyncService : ISyncService, IDisposable
     {
         /// <summary>

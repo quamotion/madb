@@ -6,8 +6,10 @@ namespace SharpAdbClient
 {
     using System;
 
-    /// <ignore>true</ignore>
-    public static class DateTimeHelper
+    /// <summary>
+    /// Provides helper methods for working with Unix-based date formats.
+    /// </summary>
+    internal static class DateTimeHelper
     {
         /// <summary>
         /// Gets EPOCH time
@@ -16,20 +18,14 @@ namespace SharpAdbClient
         { get; } = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
-        /// Gets epoch time.
+        /// Converts a <see cref="DateTime"/> to the Unix equivalent.
         /// </summary>
-        /// <param name="dt">The dt.</param>
-        /// <returns></returns>
-        public static DateTime GetEpoch(this DateTime dt)
-        {
-            return Epoch;
-        }
-
-        /// <summary>
-        /// Converts a DateTime to Unix Epoch
-        /// </summary>
-        /// <param name="date">The date.</param>
-        /// <returns></returns>
+        /// <param name="date">
+        /// The date to convert to the Unix format.
+        /// </param>
+        /// <returns>
+        /// A <see cref="long"/> that represents the date, in Unix format.
+        /// </returns>
         public static long ToUnixEpoch(this DateTime date)
         {
             TimeSpan t = date.ToUniversalTime() - Epoch;

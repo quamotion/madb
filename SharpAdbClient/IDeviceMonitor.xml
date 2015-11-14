@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<DeviceMonitor>
+<IDeviceMonitor>
   <DeviceChanged>
     <summary>
       Occurs when the status of one of the connected devices has changed.
@@ -29,4 +29,4 @@
       Starts the monitoring
     </summary>
   </Start>
-</DeviceMonitor>
+</IDeviceMonitor>

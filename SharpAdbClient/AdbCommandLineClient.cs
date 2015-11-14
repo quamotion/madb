@@ -69,6 +69,9 @@ namespace SharpAdbClient
         /// <summary>
         /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
         /// </summary>
+        /// <returns>
+        /// A <see cref="Version"/> object that contains the version number of the Android Command Line client.
+        /// </returns>
         public Version GetVersion()
         {
             // Run the adb.exe version command and capture the output.

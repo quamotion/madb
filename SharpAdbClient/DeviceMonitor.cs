@@ -10,9 +10,29 @@ namespace SharpAdbClient
     using System.Threading;
 
     /// <summary>
-    /// A Device monitor. This connects to the Android Debug Bridge and get device and
-    /// debuggable process information from it.
+    /// <para>
+    ///     A Device monitor. This connects to the Android Debug Bridge and get device and
+    ///     debuggable process information from it.
+    /// </para>
     /// </summary>
+    /// <example>
+    /// <para>
+    ///     To receive notifications when devices connect to or disconnect from your PC, you can use the following code:
+    /// </para>
+    /// <code>
+    /// void Test()
+    /// {
+    ///     var monitor = new DeviceMonitor(new AdbSocket());
+    ///     monitor.DeviceConnected += this.OnDeviceConnected;
+    ///     monitor.Start();
+    /// }
+    ///
+    /// void OnDeviceConnected(object sender, DeviceDataEventArgs e)
+    /// {
+    ///     Console.WriteLine($"The device {e.Device.Name} has connected to this PC");
+    /// }
+    /// </code>
+    /// </example>
     public class DeviceMonitor : IDeviceMonitor, IDisposable
     {
         /// <summary>

@@ -4,15 +4,9 @@
 
 namespace SharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     /// <summary>
-    ///
+    /// Contains information about a color element.
     /// </summary>
-    /// <ignore>true</ignore>
     public class ColorData
     {
         /// <summary>

@@ -4,13 +4,11 @@
 
 namespace SharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
 
     /// <summary>
-    ///
+    /// Recieves console output, and makes the console output available as a <see cref="string"/>. To
+    /// fetch the console output that was received, used the <see cref="ToString"/> method.
     /// </summary>
     public class ConsoleOutputReceiver : MultiLineReceiver
     {

@@ -53,7 +53,7 @@ void OnDeviceConnected(object sender, DeviceDataEventArgs e)
 ```
 
 ### Send or receive files
-To send files to or receive files from your Androi device, you can use the `SyncService` class like this:
+To send files to or receive files from your Android device, you can use the `SyncService` class like this:
 
 ```
 void DownloadFile()
