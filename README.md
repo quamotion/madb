@@ -2,7 +2,7 @@
 |-------|----------|
 | [![Build Status](https://ci.appveyor.com/api/projects/status/github/quamotion/madb)](https://ci.appveyor.com/project/qmfrederik/madb/) | [![codecov.io](https://codecov.io/github/quamotion/madb/coverage.svg?branch=master)](https://codecov.io/github/quamotion/madb?branch=master)
 
-# .NET client for the adb, the Android Debug Bridge (SharpAdbClient)
+# A .NET client for the adb, the Android Debug Bridge (SharpAdbClient)
 
 SharpAdbClient is a .NET library that allows .NET applications to communicate with Android devices. 
 It provides a .NET implementation of the `adb` protocol, giving more flexibility to the developer than launching an 
