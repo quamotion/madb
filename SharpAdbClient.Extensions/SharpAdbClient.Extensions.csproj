@@ -57,6 +57,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="BatteryInfo.cs" />
     <Compile Include="BusyBox.cs" />
     <Compile Include="Device.cs" />
@@ -87,7 +90,6 @@
     <Compile Include="ThrowIf.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Managd.Adb.snk" />
     <None Include="packages.config" />
     <None Include="SharpAdbClient.snk" />
   </ItemGroup>

@@ -93,7 +93,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="madb.xunit" />
-    <None Include="Managd.Adb.snk" />
     <None Include="packages.config" />
     <None Include="SharpAdbClient.snk" />
   </ItemGroup>

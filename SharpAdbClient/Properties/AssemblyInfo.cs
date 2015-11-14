@@ -6,8 +6,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Managed Android Debug Bridge")]
-[assembly: AssemblyDescription("A managed communication wrapper for the ADB.")]
+[assembly: AssemblyTitle("SharpAdbClient: A .NET client for the adb, the Android Debug Bridge")]
+[assembly: AssemblyDescription("SharpAdbClient is a .NET library that allows .NET applications to communicate with Android devices. ")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("97fcf487-fa41-466f-a485-95d8d9d0a4cc")]

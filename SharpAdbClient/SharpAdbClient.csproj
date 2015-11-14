@@ -176,10 +176,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Managd.Adb.snk" />
-    <None Include="Managed.Adb.ruleset" />
     <None Include="packages.config" />
     <AdditionalFiles Include="stylecop.json" />
+    <None Include="SharpAdbClient.ruleset" />
     <None Include="SharpAdbClient.snk" />
   </ItemGroup>
   <ItemGroup>
