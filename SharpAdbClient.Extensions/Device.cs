@@ -83,7 +83,7 @@ namespace SharpAdbClient
         /// <summary>
         /// The tag to use when logging messages.
         /// </summary>
-        private const string LOG_TAG = "Device";
+        private const string LOG_TAG = nameof(Device);
 
         /// <summary>
         /// The time-out when receiving battery information. The default is two seconds.

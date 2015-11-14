@@ -16,7 +16,7 @@ namespace SharpAdbClient
     /// </summary>
     public class BatteryReceiver : MultiLineReceiver
     {
-        private const string TAG = "BatteryReceiver";
+        private const string TAG = nameof(BatteryReceiver);
         private const string BATTERY_LEVEL = @"\s*level:\s?(\d+)";
         private const string AC_POWER = @"\s*AC\spowered:\s?(true|false)";
         private const string USB_POWER = @"\s*USB\spowered:\s?(true|false)";
