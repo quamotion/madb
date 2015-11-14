@@ -6,7 +6,6 @@ namespace SharpAdbClient
 {
     using System.Text.RegularExpressions;
 
-    /// <ignore>true</ignore>
     internal static partial class ManagedAdbExtenstions
     {
         /// <summary>

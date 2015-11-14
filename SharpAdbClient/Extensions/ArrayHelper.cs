@@ -4,12 +4,6 @@
 
 namespace SharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
-    /// <ignore>true</ignore>
     internal static partial class ManagedAdbExtenstions
     {
         /// <summary>
