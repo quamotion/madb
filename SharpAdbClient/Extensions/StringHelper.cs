@@ -6,7 +6,7 @@ namespace SharpAdbClient
 {
     using System.Text.RegularExpressions;
 
-    internal static partial class ManagedAdbExtenstions
+    public static class StringHelper
     {
         /// <summary>
         /// Matches the specified source.
