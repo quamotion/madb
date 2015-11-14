@@ -79,7 +79,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>;TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\bin\x86\Release\\Managed.Adb.xml</DocumentationFile>
+    <DocumentationFile>..\bin\x86\Release\SharpAdbClient.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
