@@ -1,4 +1,4 @@
-version: 1.0.{build}.0
+version: 2.0.{build}.0
 
 environment:
   NuGetApiKey:
@@ -11,12 +11,10 @@ assembly_info:
   assembly_informational_version: '{version}'
 
 build_script:
-  - msbuild Managed.Adb.sln /p:Configuration=Release /p:Platform="Any CPU" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - msbuild SharpAdbClient.sln /p:Configuration=Release /p:Platform="Any CPU" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 on_success:
-  - cmd: nuget pack Managed.Adb.nuspec -Version %APPVEYOR_BUILD_VERSION%
-  - cmd: nuget setApiKey %NuGetApiKey% > nul
-  - cmd: nuget push madb.%APPVEYOR_BUILD_VERSION%.nupkg
+  - cmd: nuget pack SharpAdbClient.nuspec -Version %APPVEYOR_BUILD_VERSION%
   - ps: Push-AppveyorArtifact "madb.$($env:APPVEYOR_BUILD_VERSION).nupkg"
 
 test:
@@ -25,10 +23,10 @@ test:
       - IntegrationTest
 
 test_script: 
-  - .\packages\OpenCover.4.6.210-rc\tools\OpenCover.Console.exe -register:user -target:"c:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" -targetargs:".\Managed.Adb.Tests\bin\Release\Managed.Adb.Tests.dll /logger:Appveyor /testcasefilter:TestCategory!=IntegrationTest" -filter:"+[Managed.Adb]*  -[Managed.Adb]Managed.Adb.Properties.*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\Managed.Adb.coverage.xml
+  - .\packages\OpenCover.4.6.210-rc\tools\OpenCover.Console.exe -register:user -target:"c:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" -targetargs:".\SharpAdbClient.Tests\bin\Release\SharpAdbClient.dll /logger:Appveyor /testcasefilter:TestCategory!=IntegrationTest" -filter:"+[SharpAdbClient]*  -[SharpAdbClient]SharpAdbClient.Properties.*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\SharpAdbClient.coverage.xml
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - pip install codecov
-  - codecov -f "Managed.Adb.Coverage.xml"
+  - codecov -f "SharpAdbClient.Coverage.xml"
 
 nuget:
   project_feed: true

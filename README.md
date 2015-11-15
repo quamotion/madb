@@ -1,107 +1,110 @@
-| build |
-|-------|
-| [![Build Status](https://ci.appveyor.com/api/projects/status/github/quamotion/madb)](https://ci.appveyor.com/project/qmfrederik/madb/)
+| build | coverage |
+|-------|----------|
+| [![Build Status](https://ci.appveyor.com/api/projects/status/github/quamotion/madb)](https://ci.appveyor.com/project/qmfrederik/madb/) | [![codecov.io](https://codecov.io/github/quamotion/madb/coverage.svg?branch=master)](https://codecov.io/github/quamotion/madb?branch=master)
 
-# madb
-This is a Managed port of the Android Debug Bridge to allow communication from .NET applications to Android devices. 
-This wraps the same methods that the ddms uses to directly communicate with ADB. 
-This gives more flexibility to the developer then launching an adb process and executing one of its build in commands.
+# A .NET client for the adb, the Android Debug Bridge (SharpAdbClient)
+
+SharpAdbClient is a .NET library that allows .NET applications to communicate with Android devices. 
+It provides a .NET implementation of the `adb` protocol, giving more flexibility to the developer than launching an 
+`adb.exe` process and parsing the console output.
 
 ## Installation
-To install madb, run the following command in the [Package Manager Console](http://docs.nuget.org/consume/package-manager-console):
+To install SharpAdbClient install the [SharpAdbClient NuGetPackage](https://www.nuget.org/packages/SharpAdbClient). If you're
+using Visual Studio, you can run the following command in the [Package Manager Console](http://docs.nuget.org/consume/package-manager-console):
 
 ```
-PM> Install-Package madb 
+PM> Install-Package SharpAdbClient
 ```
 
-## FileSystem Methods / Properties
-* Create 
-* Move 
-* Copy 
-* MakeDirectory 
-* Exists 
-* Chmod 
-* Delete 
-* IsMountPointReadOnly 
-* DeviceBlocks - Get a collection of the device blocks 
-* Mount 
-* Unmount 
-* ResolveLink - Resolves a symbolic link to its full path
+## Getting Started
 
-## Busybox Methods / Properties
-* Available 
-* Version 
-* Commands 
-* Supports ( command ) 
-* Install 
-* ExecuteShellCommand 
-* ExecuteRootCommand
+All of the adb functionality is exposed through the `SharpAdbClient.AdbClient` class. You can create your own instance of that class,
+or just use the instance we provide for you at `SharpAdbClient.AdbClient.Instance`.
 
-## Device Methods / Properties
-* CanSU 
-* State 
-* MountPoints 
-* Properties 
-* EnvironmentVariables 
-* GetProperty 
-* FileSystem 
-* BusyBox 
-* IsOnline 
-* IsOffline 
-* IsEmulator 
-* IsBootLoader 
-* IsRecovery 
-* RemountMountPoint 
-* Reboot 
-* Reboot ( into ) 
-* SyncService 
-* PackageManager 
-* FileListingService 
-* Screenshot 
-* ExecuteShellCommand 
-* ExecuteRootShellCommand 
-* InstallPackage 
-* SyncPackageToDevice 
-* InstallRemotePackage 
-* RemoveRemotePackage 
-* UninstallPackage
+This class provides various methods that allow you to interact with Android devices.
 
-## FileEntry Methods / Properties
-* FindOrCreate *static 
-* Find *static 
-* Parent 
-* Name 
-* LinkName 
-* Info 
-* Permissions 
-* Size 
-* Date 
-* Owner 
-* Group 
-* Type 
-* IsApplicationPackage 
-* IsRoot 
-* IsExecutable 
-* Children 
-* IsLink 
-* Exists 
-* FindChild 
-* IsDirectory 
-* IsApplicationFileName 
-* FullPath 
-* FullResolvedPath 
-* FullEscapedPath 
-* PathSegments
+### List all Android devices currently connected
+To list all Android devices that are connected to your PC, you can use the following code:
 
-## PackageManager Methods / Properties
-* Packages 
-* RefreshPackages 
-* Exists 
-* GetApkFileEntry 
-* GetApkPath
+```
+var devices = devices = AdbClient.Instance.GetDevices();
 
-## SyncService
-* Pull 
-* PullFile 
-* Push 
-* PushFile
+foreach(var device in devices)
+{
+    Console.WriteLine(device.Name
+}
+```
+
+### Subscribe for events when devices connect/disconnect
+To receive notifications when devices connect to or disconnect from your PC, you can use the `DeviceMonitor` class:
+
+```
+void Test()
+{
+    var monitor = new DeviceMonitor(new AdbSocket());
+    monitor.DeviceConnected += this.OnDeviceConnected;
+    monitor.Start();
+}
+
+void OnDeviceConnected(object sender, DeviceDataEventArgs e)
+{
+    Console.WriteLine($"The device {e.Device.Name} has connected to this PC");
+}
+```
+
+### Send or receive files
+To send files to or receive files from your Android device, you can use the `SyncService` class like this:
+
+```
+void DownloadFile()
+{
+    var device = AdbClient.Instance.GetDevices().First();
+    
+    using (SyncService service = new SyncService(new AdbSocket(), device))
+    using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
+    {
+        service.Pull("/data/MyFile.txt", stream, null, CancellationToken.None);     
+    }
+}
+
+void UploadFile()
+{
+    var device = AdbClient.Instance.GetDevices().First();
+    
+    using (SyncService service = new SyncService(new AdbSocket(), device))
+    using (Stream stream = File.OpenRead(@"C:\MyFile.txt"))
+    {
+        service.Push(stream, "/data/MyFile.txt", null, CancellationToken.None);     
+    }
+}
+```
+
+### Run shell commands
+To run shell commands on an Android device, you can use the `AdbClient.Instance.ExecuteRemoteCommand` method.
+
+You need to pass a `DeviceData` object which specifies the device on which you want to run your command. You
+can get a `DeviceData` object by calling `AdbClient.Instance.GetDevices()`, which will run one `DeviceData`
+object for each device Android connected to your PC.
+
+You'll also need to pass an `IOutputReceiver` object. Output receivers are classes that receive and parse the data
+the device sends back. In this example, we'll use the standard `ConsoleOutputReceiver`, which reads all console
+output and allows you to retrieve it as a single string. You can also use other output receivers or create your own.
+
+```
+var EchoTest()
+{
+    var device = AdbClient.Instance.GetDevices().First();
+    var receiver = new ConsoleOutputReceiver();
+
+    AdbClient.Instance.ExecuteRemoteCommand("echo Hello, World", device, receiver);
+
+    Console.WriteLine("The device responded:");
+    Console.WriteLine(receiver.ToString());
+}
+```
+
+## History
+SharpAdbClient is a fork of [madb](https://github.com/camalot/madb); which in itself is a .NET port of the 
+[ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/). Credits for porting 
+this library go to [Ryan Conrad](https://github.com/camalot).
+
