@@ -133,6 +133,9 @@
     <Compile Include="IAdbSocketFactory.cs" />
     <Compile Include="IDeviceMonitor.cs" />
     <Compile Include="ISyncService.cs" />
+    <Compile Include="Logs\AndroidLogEntry.cs" />
+    <Compile Include="Logs\EventLogEntry.cs" />
+    <Compile Include="Logs\EventLogType.cs" />
     <Compile Include="Logs\LogEntry.cs" />
     <Compile Include="Logs\LogId.cs" />
     <Compile Include="Logs\LogReader.cs" />
@@ -187,7 +190,9 @@
     <None Include="SharpAdbClient.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="IAdbClient.xml" />
+    <Content Include="IAdbClient.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="IAdbSocket.xml">
       <SubType>Designer</SubType>
     </Content>

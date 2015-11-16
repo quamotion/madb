@@ -146,7 +146,7 @@
 
   <RunLogService>
     <summary>
-      Runs the Event log service on the Device, and provides its output to the <paramref name="receiver"/>.
+      Runs the Event log service on the Device.
     </summary>
     <param name="device">
       The device.

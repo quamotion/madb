@@ -12,7 +12,7 @@ namespace SharpAdbClient.Logs
     /// driver unless an upgrade to a newer ABI version is requested.
     /// </summary>
     /// <seealso href="https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h"/>
-    public sealed class LogEntry
+    public class LogEntry
     {
         /// <summary>
         /// Gets or sets the process ID of the code that generated the log message.

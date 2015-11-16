@@ -650,7 +650,7 @@ namespace SharpAdbClient
         /// <param name="logname">
         /// The names of the log files to retrieve.
         /// </param>
-        public IEnumerable<LogEntry> RunLogService(params string[] logNames)
+        public IEnumerable<LogEntry> RunLogService(params LogId[] logNames)
         {
             return AdbClient.Instance.RunLogService(this.DeviceData, logNames);
         }

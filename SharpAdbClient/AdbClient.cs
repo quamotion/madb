@@ -447,7 +447,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/RunLogService/*'/>
-        public IEnumerable<LogEntry> RunLogService(DeviceData device, params string[] logNames)
+        public IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames)
         {
             // The 'log' service has been deprecated, see
             // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177

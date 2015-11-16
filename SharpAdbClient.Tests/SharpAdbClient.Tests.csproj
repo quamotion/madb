@@ -91,6 +91,9 @@
     <Compile Include="TracingAdbSocketFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="logcatevents.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="fstab.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
