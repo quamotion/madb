@@ -8,6 +8,7 @@ namespace SharpAdbClient
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Threading;
 
     /// <summary>
     /// A common interface for any class that allows you to interact with the
@@ -52,7 +53,7 @@ namespace SharpAdbClient
         IEnumerable<ForwardData> ListForward(DeviceData device);
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
-        void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse);
+        void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse);
 
         // shell: not implemented
         // remount: not implemented

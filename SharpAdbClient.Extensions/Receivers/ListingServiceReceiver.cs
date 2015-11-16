@@ -177,19 +177,6 @@ namespace SharpAdbClient {
 			}
 		}
 
-
-		/// <summary>
-		/// Gets a value indicating whether this instance is cancelled.
-		/// </summary>
-		/// <value>
-		/// 	<see langword="true"/> if this instance is cancelled; otherwise, <see langword="false"/>.
-		/// </value>
-		public override bool IsCancelled {
-			get {
-				return false;
-			}
-		}
-
 		/// <summary>
 		/// Queries for an already existing Entry per name
 		/// </summary>

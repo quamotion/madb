@@ -127,6 +127,9 @@
       A <see cref="IShellOutputReceiver"/> that receives the command output. Set to <see langword="null"/>
       if you are not interested in the output.
     </param>
+    <param name="cancellationToken">
+      A <see cref="CancellationToken"/> that can be used to cancel the task.
+    </param>
     <param name="maxTimeToOutputResponse">The max time to output response.</param>
   </ExecuteRemoteCommand>
 

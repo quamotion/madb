@@ -15,14 +15,6 @@ namespace SharpAdbClient
     public interface IShellOutputReceiver
     {
         /// <summary>
-        /// Gets a value indicating whether this instance is cancelled.
-        /// </summary>
-        /// <value>
-        /// 	<see langword="true"/> if this instance is cancelled; otherwise, <see langword="false"/>.
-        /// </value>
-        bool IsCancelled { get; }
-
-        /// <summary>
         /// Gets a value indicating whether the receiver parses error messages.
         /// </summary>
         /// <value>

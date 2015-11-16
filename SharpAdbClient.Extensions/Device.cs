@@ -641,7 +641,7 @@ namespace SharpAdbClient
         /// <param name="commandArgs">The command args.</param>
         public void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
         {
-            AdbClient.Instance.ExecuteRemoteCommand(string.Format("su -c \"{0}\"", command), this.DeviceData, receiver, int.MaxValue);
+            AdbClient.Instance.ExecuteRemoteCommand(string.Format("su -c \"{0}\"", command), this.DeviceData, receiver);
         }
         
         /// <summary>

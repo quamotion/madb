@@ -286,13 +286,13 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
-        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 this.SetDevice(socket, device);
                 socket.SendAdbRequest($"shell:{command}");
-                var resopnse = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse(false);
 
                 try
                 {
@@ -301,11 +301,7 @@ namespace SharpAdbClient
 
                     while (true)
                     {
-                        if (rcvr != null && rcvr.IsCancelled)
-                        {
-                            Log.w(Tag, "execute: cancelled");
-                            throw new OperationCanceledException();
-                        }
+                        cancellationToken.ThrowIfCancellationRequested();
 
                         int count = socket.Read(data, maxTimeToOutputResponse);
 

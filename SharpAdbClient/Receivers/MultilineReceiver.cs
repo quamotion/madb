@@ -51,14 +51,6 @@ namespace SharpAdbClient
         public virtual bool ParsesErrors { get; protected set; }
 
         /// <summary>
-        /// Gets a value indicating whether this instance is canceled.
-        /// </summary>
-        /// <value>
-        /// 	<see langword="true"/> if this instance is canceled; otherwise, <see langword="false"/>.
-        /// </value>
-        public virtual bool IsCancelled { get; protected set; }
-
-        /// <summary>
         /// Gets or sets the unfinished line.
         /// </summary>
         /// <value>The unfinished line.</value>
@@ -78,58 +70,55 @@ namespace SharpAdbClient
         /// <param name="length">The length.</param>
         public void AddOutput(byte[] data, int offset, int length)
         {
-            if (!this.IsCancelled)
+            string s = null;
+            try
             {
-                string s = null;
-                try
+                s = Encoding.GetEncoding(ENCODING).GetString(data, offset, length);
+            }
+            catch (DecoderFallbackException)
+            {
+                // normal encoding didn't work, try the default one
+                s = Encoding.Default.GetString(data, offset, length);
+            }
+
+            // ok we've got a string
+            if (!string.IsNullOrEmpty(s))
+            {
+                // if we had an unfinished line we add it.
+                if (!string.IsNullOrEmpty(this.UnfinishedLine))
                 {
-                    s = Encoding.GetEncoding(ENCODING).GetString(data, offset, length);
-                }
-                catch (DecoderFallbackException)
-                {
-                    // normal encoding didn't work, try the default one
-                    s = Encoding.Default.GetString(data, offset, length);
+                    s = this.UnfinishedLine + s;
+                    this.UnfinishedLine = null;
                 }
 
-                // ok we've got a string
-                if (!string.IsNullOrEmpty(s))
+                // now we split the lines
+                int start = 0;
+                do
                 {
-                    // if we had an unfinished line we add it.
-                    if (!string.IsNullOrEmpty(this.UnfinishedLine))
+                    int index = s.IndexOf(NEWLINE, start);
+
+                    // if \r\n was not found, this is an unfinished line
+                    // and we store it to be processed for the next packet
+                    if (index == -1)
                     {
-                        s = this.UnfinishedLine + s;
-                        this.UnfinishedLine = null;
+                        this.UnfinishedLine = s.Substring(start);
+                        break;
                     }
 
-                    // now we split the lines
-                    int start = 0;
-                    do
+                    // so we found a \r\n;
+                    // extract the line
+                    string line = s.Substring(start, index - start);
+                    if (this.TrimLines)
                     {
-                        int index = s.IndexOf(NEWLINE, start);
-
-                        // if \r\n was not found, this is an unfinished line
-                        // and we store it to be processed for the next packet
-                        if (index == -1)
-                        {
-                            this.UnfinishedLine = s.Substring(start);
-                            break;
-                        }
-
-                        // so we found a \r\n;
-                        // extract the line
-                        string line = s.Substring(start, index - start);
-                        if (this.TrimLines)
-                        {
-                            line = line.Trim();
-                        }
-
-                        this.Lines.Add(line);
-
-                        // move start to after the \r\n we found
-                        start = index + 2;
+                        line = line.Trim();
                     }
-                    while (true);
+
+                    this.Lines.Add(line);
+
+                    // move start to after the \r\n we found
+                    start = index + 2;
                 }
+                while (true);
             }
         }
 
@@ -138,7 +127,7 @@ namespace SharpAdbClient
         /// </summary>
         public void Flush()
         {
-            if (!this.IsCancelled && this.Lines.Count > 0)
+            if (this.Lines.Count > 0)
             {
                 // at this point we've split all the lines.
                 // make the array
@@ -149,7 +138,7 @@ namespace SharpAdbClient
                 this.Lines.Clear();
             }
 
-            if (!this.IsCancelled && !string.IsNullOrEmpty(this.UnfinishedLine))
+            if (!string.IsNullOrEmpty(this.UnfinishedLine))
             {
                 this.ProcessNewLines(new string[] { this.UnfinishedLine });
             }
