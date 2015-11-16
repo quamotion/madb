@@ -156,7 +156,6 @@
     <Compile Include="LogLevel.cs" />
     <Compile Include="Receivers\MultilineReceiver.cs" />
     <Compile Include="Receivers\NamespaceDoc.cs" />
-    <Compile Include="Receivers\NullOutputReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketExtensions.cs" />
     <Compile Include="StartServerResult.cs" />

@@ -177,7 +177,7 @@ namespace SharpAdbClient
                 // this now checks if permission was denied and accounts for that.
                 // The nulloutput receiver is fine here because it doesn't need to send the output anywhere,
                 // the execute command can still handle the output with the null output receiver.
-                this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", NullOutputReceiver.Instance);
+                this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", null);
                 this.canSU = true;
             }
             catch (PermissionDeniedException)
@@ -395,7 +395,7 @@ namespace SharpAdbClient
         public void RemountMountPoint(MountPoint mnt, bool readOnly)
         {
             string command = string.Format("mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name);
-            this.ExecuteShellCommand(command, NullOutputReceiver.Instance);
+            this.ExecuteShellCommand(command, null);
             this.RefreshMountPoints();
         }
 
@@ -855,7 +855,7 @@ namespace SharpAdbClient
             // now we delete the app we sync'ed
             try
             {
-                this.ExecuteShellCommand("rm " + remoteFilePath, NullOutputReceiver.Instance);
+                this.ExecuteShellCommand("rm " + remoteFilePath, null);
             }
             catch (IOException e)
             {

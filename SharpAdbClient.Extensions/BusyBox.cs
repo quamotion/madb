@@ -46,7 +46,7 @@ namespace SharpAdbClient {
 			FileEntry bb = null;
 
 			try {
-				Device.ExecuteShellCommand ( BUSYBOX_COMMAND, NullOutputReceiver.Instance );
+				Device.ExecuteShellCommand ( BUSYBOX_COMMAND, null );
 				return true;
 			} catch {
 				// we are just checking if it is already installed so we really expect it to wind up here.
@@ -87,8 +87,8 @@ namespace SharpAdbClient {
 					// we didnt find it, so add it.
 					if ( !found ) {
 						// this doesn't seem to actually work
-						Device.ExecuteShellCommand ( @"echo \ Mad Bee buxybox >> /init.rc", NullOutputReceiver.Instance );
-						Device.ExecuteShellCommand ( @"echo export PATH={0}:\$PATH >> /init.rc", NullOutputReceiver.Instance, BUSYBOX_BIN );
+						Device.ExecuteShellCommand ( @"echo \ Mad Bee buxybox >> /init.rc", null );
+						Device.ExecuteShellCommand ( @"echo export PATH={0}:\$PATH >> /init.rc", null, BUSYBOX_BIN );
 					}
 				}
 
@@ -98,7 +98,7 @@ namespace SharpAdbClient {
 					Device.RemountMountPoint ( mp, isRO );
 				}
 
-				Device.ExecuteShellCommand ( "sync", NullOutputReceiver.Instance );
+				Device.ExecuteShellCommand ( "sync", null );
 			} catch ( Exception ) {
 				throw;
 			}
