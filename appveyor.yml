@@ -15,7 +15,7 @@ build_script:
 
 on_success:
   - cmd: nuget pack SharpAdbClient.nuspec -Version %APPVEYOR_BUILD_VERSION%
-  - ps: Push-AppveyorArtifact "madb.$($env:APPVEYOR_BUILD_VERSION).nupkg"
+  - ps: Push-AppveyorArtifact "sharpadbclient.$($env:APPVEYOR_BUILD_VERSION).nupkg"
 
 test:
   categories:
