@@ -134,6 +134,7 @@
     <Compile Include="IDeviceMonitor.cs" />
     <Compile Include="ISyncService.cs" />
     <Compile Include="Logs\LogEntry.cs" />
+    <Compile Include="Logs\LogId.cs" />
     <Compile Include="Logs\LogReader.cs" />
     <Compile Include="Logs\NamespaceDoc.cs" />
     <Compile Include="Logs\ShellStream.cs" />
