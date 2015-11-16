@@ -33,8 +33,7 @@ lrwxrwxrwx root     root              2015-06-01 10:17 etc -> /system/etc";
 
             foreach (var line in lines)
             {
-                byte[] data = Encoding.ASCII.GetBytes(line + "\r\n");
-                receiver.AddOutput(data, 0, data.Length);
+                receiver.AddOutput(line);
             }
 
             receiver.Flush();

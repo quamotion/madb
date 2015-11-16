@@ -40,7 +40,7 @@ namespace SharpAdbClient
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines(string[] lines)
+        protected override void ProcessNewLines(IEnumerable<string> lines)
         {
             // We receive an array of lines. We're expecting
             // to have the build info in the first line, and the build

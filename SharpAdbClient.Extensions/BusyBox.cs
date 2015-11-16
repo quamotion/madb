@@ -195,7 +195,7 @@ namespace SharpAdbClient {
 			/// </summary>
 			/// <param name="lines">The lines.</param>
 			/// <workitem id="16000">Issues w/ BusyBox.cs/ProcessNewLines()</workitem>
-			protected override void ProcessNewLines ( string[] lines ) {
+			protected override void ProcessNewLines ( IEnumerable<string> lines ) {
 				Match match = null;
 				int state = 0;
 				foreach ( var line in lines ) {

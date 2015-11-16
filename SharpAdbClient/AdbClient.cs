@@ -296,84 +296,17 @@ namespace SharpAdbClient
 
                 try
                 {
-                    // Read in blocks of 16kb
-                    byte[] data = new byte[16 * 1024];
-
-                    while (true)
+                    using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        int count = socket.Read(data, maxTimeToOutputResponse);
-
-                        if (count == 0)
+                        while (reader.Peek() >= 0)
                         {
-                            // we're at the end, we flush the output
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            var line = reader.ReadLine();
+
                             if (rcvr != null)
                             {
-                                rcvr.Flush();
-                            }
-
-                            Log.w(Tag, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count);
-                            break;
-                        }
-                        else
-                        {
-                            // Attempt to detect error messages and throw an exception based on them. The caller can override
-                            // this behavior by specifying a receiver that has the ParsesErrors flag set to true; in this case,
-                            // the receiver is responsible for all error handling.
-                            if (rcvr == null || !rcvr.ParsesErrors)
-                            {
-                                string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                string sdata = AdbClient.Encoding.GetString(data, 0, count);
-
-                                var sdataTrimmed = sdata.Trim();
-                                if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))
-                                {
-                                    Log.w(Tag, "The remote execution returned: '{0}: not found'", cmd[0]);
-                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}: not found'", cmd[0]));
-                                }
-
-                                if (sdataTrimmed.EndsWith("No such file or directory"))
-                                {
-                                    Log.w(Tag, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new FileNotFoundException(string.Format("The remote execution returned: {0}", sdataTrimmed));
-                                }
-
-                                // for "unknown options"
-                                if (sdataTrimmed.Contains("Unknown option"))
-                                {
-                                    Log.w(Tag, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new UnknownOptionException(sdataTrimmed);
-                                }
-
-                                // for "aborting" commands
-                                if (sdataTrimmed.IsMatch("Aborting.$"))
-                                {
-                                    Log.w(Tag, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new CommandAbortingException(sdataTrimmed);
-                                }
-
-                                // for busybox applets
-                                // cmd: applet not found
-                                if (sdataTrimmed.IsMatch("applet not found$") && cmd.Length > 1)
-                                {
-                                    Log.w(Tag, "The remote execution returned: '{0}'", sdataTrimmed);
-                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
-                                }
-
-                                // checks if the permission to execute the command was denied.
-                                // workitem: 16822
-                                if (sdataTrimmed.IsMatch("(permission|access) denied$"))
-                                {
-                                    Log.w(Tag, "The remote execution returned: '{0}'", sdataTrimmed);
-                                    throw new PermissionDeniedException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
-                                }
-                            }
-
-                            // Add the data to the receiver
-                            if (rcvr != null)
-                            {
-                                rcvr.AddOutput(data, 0, count);
+                                rcvr.AddOutput(line);
                             }
                         }
                     }

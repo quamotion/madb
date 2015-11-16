@@ -4,11 +4,6 @@
 
 namespace SharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     /// <summary>
     ///
     /// </summary>
@@ -29,10 +24,7 @@ namespace SharpAdbClient
         /// <summary>
         /// Adds the output.
         /// </summary>
-        /// <param name="data">The data.</param>
-        /// <param name="offset">The offset.</param>
-        /// <param name="length">The length.</param>
-        void AddOutput(byte[] data, int offset, int length);
+        void AddOutput(string line);
 
         /// <summary>
         /// Flushes the output.
