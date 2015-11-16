@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Drawing.Imaging;
 
 namespace SharpAdbClient.Tests
 {
@@ -336,6 +337,19 @@ namespace SharpAdbClient.Tests
         public void ConnectHostEndpointNullTest()
         {
             AdbClient.Instance.Connect((string)null);
+        }
+
+        [TestMethod]
+        public void FramebufferTest()
+        {
+            DeviceData device = new DeviceData()
+            {
+                Serial = "EAOKCY112414"
+            };
+            
+            AdbClient.SocketFactory = new AdbSocketFactory();
+            var image = AdbClient.Instance.GetFrameBuffer(device);
+            image.Save(@"screenshot.png", ImageFormat.Png);
         }
 
         public void RunConnectTest(Action test, string connectString)

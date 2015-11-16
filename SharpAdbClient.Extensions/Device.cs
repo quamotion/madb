@@ -18,6 +18,7 @@ namespace SharpAdbClient
     using SharpAdbClient.IO;
     using SharpAdbClient.Logs;
     using System.Threading;
+    using System.Drawing;
 
     /// <summary>
     /// Represents an Android device.
@@ -548,7 +549,7 @@ namespace SharpAdbClient
         /// Takes a screen shot of the device and returns it as a <see cref="RawImage"/>
         /// </summary>
         /// <value>The screenshot.</value>
-        public RawImage Screenshot
+        public Image Screenshot
         {
             get
             {

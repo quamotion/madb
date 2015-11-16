@@ -8,11 +8,14 @@ namespace SharpAdbClient
     using SharpAdbClient.Logs;
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
+    using System.Drawing.Imaging;
     using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
+    using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
 
@@ -390,52 +393,38 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
-        public RawImage GetFrameBuffer(DeviceData device)
+        public Image GetFrameBuffer(DeviceData device)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
-                RawImage imageParams = new RawImage();
-                socket.SendAdbRequest($"host-serial:{device.Serial}:framebuffer:");
+                // Select the target device
+                this.SetDevice(socket, device);
+
+                // Send the framebuffer command
+                socket.SendAdbRequest("framebuffer:");
                 socket.ReadAdbResponse(false);
 
-                // After the OKAY, the service sends 16-byte binary structure
-                // containing the following fields (little - endian format):
-                // depth:
-                //    uint32_t:
-                //    framebuffer depth
-                // size: uint32_t: framebuffer size in bytes
-                // width:   uint32_t: framebuffer width in pixels
-                // height:  uint32_t: framebuffer height in pixels
+                // The result first is a FramebufferHeader object,
+                var size = Marshal.SizeOf(typeof(FramebufferHeader));
+                var headerData = new byte[size];
+                socket.Read(headerData);
 
-                // first the protocol version.
-                var reply = new byte[4];
-                socket.Read(reply);
-                int version = BitConverter.ToInt16(reply, 0);
+                var header = FramebufferHeader.Read(headerData);
 
-                // get the header size (this is a count of int)
-                int headerSize = RawImage.GetHeaderSize(version);
+                // followed by the actual framebuffer content
+                var imageData = new byte[header.Size];
+                socket.Read(imageData);
 
-                // read the header
-                reply = new byte[headerSize * 4];
-                socket.Read(reply);
+                // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
+                var pixelFormat = header.StandardizePixelFormat(imageData);
 
-                using (MemoryStream ms = new MemoryStream(reply))
-                using (BinaryReader reader = new BinaryReader(ms))
-                {
-                    // fill the RawImage with the header
-                    if (imageParams.ReadHeader(version, reader) == false)
-                    {
-                        Log.w(Tag, "Unsupported protocol: " + version);
-                        return null;
-                    }
-                }
+                // and then save it to a bitmap.
+                Bitmap bitmap = new Bitmap((int)header.Width, (int)header.Height,pixelFormat);
+                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
+                Marshal.Copy(imageData, 0, bitmapData.Scan0, imageData.Length);
+                bitmap.UnlockBits(bitmapData);
 
-                Log.d(Tag, $"image params: bpp={imageParams.Bpp}, size={imageParams.Size}, width={imageParams.Width}, height={imageParams.Height}");
-
-                reply = new byte[imageParams.Size];
-                socket.Read(reply);
-                imageParams.Data = reply;
-                return imageParams;
+                return bitmap;
             }
         }
 

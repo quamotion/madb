@@ -123,10 +123,10 @@
     <Compile Include="Exceptions\PermissionDeniedException.cs" />
     <Compile Include="Exceptions\ShellCommandUnresponsiveException.cs" />
     <Compile Include="Exceptions\UnknownOptionException.cs" />
-    <Compile Include="Extensions\BytesHelper.cs" />
     <Compile Include="Extensions\StringHelper.cs" />
     <Compile Include="FileStatistics.cs" />
     <Compile Include="ForwardData.cs" />
+    <Compile Include="FramebufferHeader.cs" />
     <Compile Include="IAdbClient.cs" />
     <Compile Include="IAdbCommandLineClient.cs" />
     <Compile Include="IAdbSocket.cs" />
@@ -137,7 +137,6 @@
     <Compile Include="Logs\LogEntry.cs" />
     <Compile Include="Logs\NamespaceDoc.cs" />
     <Compile Include="NamespaceDoc.cs" />
-    <Compile Include="RawImage.cs" />
     <Compile Include="Receivers\ConsoleOutputReceiver.cs" />
     <Compile Include="DdmPreferences.cs" />
     <Compile Include="DeviceMonitor.cs" />
