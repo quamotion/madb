@@ -5,6 +5,7 @@
 namespace SharpAdbClient
 {
     using Exceptions;
+    using Logs;
     using System;
     using System.Globalization;
     using System.IO;
@@ -373,6 +374,13 @@ namespace SharpAdbClient
                     throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
                 }
             }
+        }
+
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/GetShellStream/*'/>
+        public Stream GetShellStream()
+        {
+            NetworkStream stream = new NetworkStream(this.socket);
+            return new ShellStream(stream, closeStream: true);
         }
 
         /// <summary>

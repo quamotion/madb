@@ -110,7 +110,7 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual(1, devices.Count);
 
             var device = devices.Single();
-            
+
             Assert.AreEqual("169.254.109.177:5555", device.Serial);
             Assert.AreEqual(DeviceState.Online, device.State);
             Assert.AreEqual("5__KitKat__4_4__XXHDPI_Phone", device.Model);
@@ -205,7 +205,7 @@ namespace SharpAdbClient.Tests
             {
                 AdbResponse.FromError("cannot rebind existing socket")
             };
-            
+
             var requests = new string[]
             {
                 "host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"
@@ -336,6 +336,23 @@ namespace SharpAdbClient.Tests
         public void ConnectHostEndpointNullTest()
         {
             AdbClient.Instance.Connect((string)null);
+        }
+
+        [TestMethod]
+        [Ignore]
+        public void ReadLogTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "EAOKCY112414"
+            };
+
+            var entries = AdbClient.Instance.RunLogService(device);
+
+            foreach (var entry in entries)
+            {
+                Console.WriteLine(entry.ToString());
+            }
         }
 
         public void RunConnectTest(Action test, string connectString)
