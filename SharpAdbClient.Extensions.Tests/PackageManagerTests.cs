@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpAdbClient.DeviceCommands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace SharpAdbClient.Tests {
         [TestMethod]
         [TestCategory("IntegrationTest")]
 		public void ExistsTest ( ) {
-			Device device = GetFirstDevice ( );
+			DeviceData device = GetFirstDevice ( );
 
 			PackageManager pm = new PackageManager ( device );
 			Assert.IsTrue ( pm.Exists ( "com.android.contacts" ) );
@@ -22,7 +23,7 @@ namespace SharpAdbClient.Tests {
         [TestMethod]
         [TestCategory("IntegrationTest")]
 		public void RefreshPackagesTest ( ) {
-			Device device = GetFirstDevice ( );
+			DeviceData device = GetFirstDevice ( );
 
 			PackageManager pm = new PackageManager ( device );
 		    pm.RefreshPackages ( );
@@ -32,10 +33,10 @@ namespace SharpAdbClient.Tests {
 		}
 
 
-		private Device GetFirstDevice ( ) {
+		private DeviceData GetFirstDevice ( ) {
 			List<DeviceData> devices = AdbClient.Instance.GetDevices();
 			Assert.IsTrue ( devices.Count >= 1 );
-			return new Device(devices[0]);
+			return devices[0];
 		}
 	}
 }

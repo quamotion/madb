@@ -7,6 +7,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using SharpAdbClient.IO;
 using MoreLinq;
+using SharpAdbClient.Receivers;
 
 namespace SharpAdbClient {
 	/// <summary>

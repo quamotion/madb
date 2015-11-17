@@ -76,7 +76,6 @@
     <Compile Include="IFileSystem.cs" />
     <Compile Include="IO\LinuxPath.cs" />
     <Compile Include="MountPoint.cs" />
-    <Compile Include="PackageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Receivers\BatteryReceiver.cs" />
     <Compile Include="Receivers\CommandErrorReceiver.cs" />
@@ -86,7 +85,7 @@
     <Compile Include="Receivers\InstallReceiver.cs" />
     <Compile Include="Receivers\ListingServiceReceiver.cs" />
     <Compile Include="Receivers\MountPointReceiver.cs" />
-    <Compile Include="Receivers\PackageManagerReceiver.cs" />
+    <Compile Include="Receivers\PackageManagerListingReceiver.cs" />
     <Compile Include="ThrowIf.cs" />
   </ItemGroup>
   <ItemGroup>
