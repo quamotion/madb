@@ -1,17 +1,16 @@
-﻿using System;
+﻿using SharpAdbClient.DeviceCommands;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using SharpAdbClient.IO;
-using MoreLinq;
+using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace SharpAdbClient {
-	/// <summary>
-	/// A class to help with working with BusyBox
-	/// </summary>
-	public class BusyBox : IBusyBox
+namespace SharpAdbClient
+{
+    /// <summary>
+    /// A class to help with working with BusyBox
+    /// </summary>
+    public class BusyBox : IBusyBox
     {
         private IFileListingService fileListingService;
         private FileSystem fileSystem;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpAdbClient.DeviceCommands;
 using System;
 
 namespace SharpAdbClient.Tests

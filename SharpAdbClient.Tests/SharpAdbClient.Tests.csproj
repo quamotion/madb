@@ -82,6 +82,7 @@
     <Compile Include="DummyAdbSocket.cs" />
     <Compile Include="DummyAdbSocketFactory.cs" />
     <Compile Include="IDummyAdbSocket.cs" />
+    <Compile Include="LinuxPathTests.cs" />
     <Compile Include="LoggerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShellStreamTests.cs" />

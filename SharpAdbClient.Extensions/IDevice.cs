@@ -270,45 +270,6 @@ namespace SharpAdbClient
         bool RemoveForward(int localPort);
 
         /// <summary>
-        /// Installs an Android application on device.
-        /// This is a helper method that combines the syncPackageToDevice, installRemotePackage,
-        /// and removePackage steps
-        /// </summary>
-        /// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
-        /// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
-        void InstallPackage(string packageFilePath, bool reinstall);
-
-        /// <summary>
-        /// Pushes a file to device
-        /// </summary>
-        /// <param name="localFilePath">the absolute path to file on local host</param>
-        /// <returns>destination path on device for file</returns>
-        /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
-        string SyncPackageToDevice(string localFilePath);
-
-        /// <summary>
-        /// Installs the application package that was pushed to a temporary location on the device.
-        /// </summary>
-        /// <param name="remoteFilePath">absolute file path to package file on device</param>
-        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
-        void InstallRemotePackage(string remoteFilePath, bool reinstall);
-
-        /// <summary>
-        /// Remove a file from device
-        /// </summary>
-        /// <param name="remoteFilePath">path on device of file to remove</param>
-        /// <exception cref="IOException">if file removal failed</exception>
-        void RemoveRemotePackage(string remoteFilePath);
-
-        /// <summary>
-        /// Uninstall an package from the device.
-        /// </summary>
-        /// <param name="packageName">Name of the package.</param>
-        /// <exception cref="IOException"></exception>
-        /// <exception cref="PackageInstallationException"></exception>
-        void UninstallPackage(string packageName);
-
-        /// <summary>
         /// Refreshes the environment variables.
         /// </summary>
         void RefreshEnvironmentVariables();
