@@ -15,15 +15,18 @@ namespace SharpAdbClient.DeviceCommands
     public class PackageManager
     {
         /// <summary>
-        ///
+        /// The path to a temporary directory to use when pushing files to the device.
         /// </summary>
-        public const string TEMP_DIRECTORY_FOR_INSTALL = "/storage/sdcard0/tmp/";
+        public const string TempInstallationDirectory = "/storage/sdcard0/tmp/";
 
         /// <summary>
         /// The command that list all packages installed on the device.
         /// </summary>
         private const string ListFull = "pm list packages -f";
 
+        /// <summary>
+        /// The tag to use when logging messages.
+        /// </summary>
         private const string Tag = nameof(PackageManager);
 
         /// <summary>
@@ -41,6 +44,7 @@ namespace SharpAdbClient.DeviceCommands
 
             this.Device = device;
             this.Packages = new Dictionary<string, string>();
+            this.RefreshPackages();
         }
 
         /// <summary>
@@ -133,11 +137,14 @@ namespace SharpAdbClient.DeviceCommands
 
         /// <summary>
         /// Installs an Android application on device.
-        /// This is a helper method that combines the syncPackageToDevice, installRemotePackage,
-        /// and removePackage steps
         /// </summary>
-        /// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
-        /// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
+        /// <param name="packageFilePath">
+        /// The absolute file system path to file on local host to install.
+        /// </param>
+        /// <param name="reinstall">
+        /// <see langword="true"/>if re-install of app should be performed; otherwise,
+        /// <see langword="false"/>.
+        /// </param>
         public void InstallPackage(string packageFilePath, bool reinstall)
         {
             string remoteFilePath = this.SyncPackageToDevice(packageFilePath);
@@ -160,7 +167,7 @@ namespace SharpAdbClient.DeviceCommands
                 // only root has access to /data/local/tmp/... not sure how adb does it then...
                 // workitem: 16823
                 // workitem: 19711
-                string remoteFilePath = LinuxPath.Combine(TEMP_DIRECTORY_FOR_INSTALL, packageFileName);
+                string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
                 Log.d(packageFileName, string.Format("Uploading {0} onto device '{1}'", packageFileName, this.Device.Serial));
 
@@ -222,9 +229,6 @@ namespace SharpAdbClient.DeviceCommands
         /// Uninstall an package from the device.
         /// </summary>
         /// <param name="packageName">Name of the package.</param>
-        /// <exception cref="IOException"></exception>
-        ///
-        /// <exception cref="PackageInstallationException"></exception>
         public void UninstallPackage(string packageName)
         {
             InstallReceiver receiver = new InstallReceiver();

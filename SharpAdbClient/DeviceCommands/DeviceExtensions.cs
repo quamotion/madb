@@ -2,6 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Collections.Generic;
+
 namespace SharpAdbClient.DeviceCommands
 {
     /// <summary>
@@ -45,6 +47,22 @@ namespace SharpAdbClient.DeviceCommands
             {
                 return service.Stat(path);
             }
+        }
+
+        /// <summary>
+        /// Gets the properties of a device.
+        /// </summary>
+        /// <param name="device">
+        /// The device for which to list the properties.
+        /// </param>
+        /// <returns>
+        /// A dictionary containing the properties of the device, and their values.
+        /// </returns>
+        public static Dictionary<string, string> GetProperties(this DeviceData device)
+        {
+            var receiver = new GetPropReceiver();
+            AdbClient.Instance.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
+            return receiver.Properties;
         }
     }
 }

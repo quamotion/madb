@@ -78,9 +78,7 @@
     <Compile Include="Receivers\BatteryReceiver.cs" />
     <Compile Include="Receivers\CommandErrorReceiver.cs" />
     <Compile Include="Receivers\EnvironmentVariablesReceiver.cs" />
-    <Compile Include="Receivers\GetPropReceiver.cs" />
     <Compile Include="Receivers\IListingReceiver.cs" />
-    <Compile Include="Receivers\InstallReceiver.cs" />
     <Compile Include="Receivers\ListingServiceReceiver.cs" />
     <Compile Include="Receivers\MountPointReceiver.cs" />
     <Compile Include="Receivers\PackageManagerListingReceiver.cs" />

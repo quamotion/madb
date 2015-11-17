@@ -5,6 +5,7 @@
 namespace SharpAdbClient
 {
     using Exceptions;
+    using DeviceCommands;
     using SharpAdbClient.Logs;
     using System;
     using System.Collections.Generic;
@@ -451,7 +452,16 @@ namespace SharpAdbClient
                 try
                 {
                     this.Properties.Clear();
-                    this.ExecuteShellCommand(GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver(this));
+
+                    var receiver = new GetPropReceiver();
+                    this.ExecuteShellCommand(GetPropReceiver.GetpropCommand, receiver);
+
+                    foreach (var property in receiver.Properties)
+                    {
+                        this.Properties.Add(property.Key, property.Value);
+                    }
+
+                    this.OnBuildInfoChanged(EventArgs.Empty);
                 }
                 catch (AdbException aex)
                 {
@@ -632,7 +642,7 @@ namespace SharpAdbClient
         {
             AdbClient.Instance.ExecuteRemoteCommand(string.Format("su -c \"{0}\"", command), this.DeviceData, receiver);
         }
-        
+
         /// <summary>
         /// Runs the log service.
         /// </summary>
