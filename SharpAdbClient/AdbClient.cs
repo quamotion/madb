@@ -224,7 +224,7 @@ namespace SharpAdbClient
 
                 try
                 {
-                    socket.ReadAdbResponse(false);
+                    var response = socket.ReadAdbResponse(false);
                 }
                 catch (AdbException e)
                 {
@@ -315,7 +315,11 @@ namespace SharpAdbClient
                         if (count == 0)
                         {
                             // we're at the end, we flush the output
-                            rcvr.Flush();
+                            if (rcvr != null)
+                            {
+                                rcvr.Flush();
+                            }
+
                             Log.w(Tag, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count);
                             break;
                         }
@@ -327,7 +331,7 @@ namespace SharpAdbClient
                             if (rcvr == null || !rcvr.ParsesErrors)
                             {
                                 string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                string sdata = AdbClient.Encoding.GetString(data);
+                                string sdata = AdbClient.Encoding.GetString(data, 0, count);
 
                                 var sdataTrimmed = sdata.Trim();
                                 if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))
@@ -387,7 +391,10 @@ namespace SharpAdbClient
                 }
                 finally
                 {
-                    rcvr.Flush();
+                    if (rcvr != null)
+                    {
+                        rcvr.Flush();
+                    }
                 }
             }
         }
@@ -429,53 +436,31 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/RunLogService/*'/>
-        public void RunLogService(DeviceData device, string logName, LogReceiver receiver)
+        public IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames)
         {
+            // The 'log' service has been deprecated, see
+            // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
-                socket.SendAdbRequest($"log:{logName}");
+                this.SetDevice(socket, device);
+
+                StringBuilder request = new StringBuilder();
+                request.Append("shell:logcat -B");
+
+                foreach (var logName in logNames)
+                {
+                    request.Append($" -b {logName}");
+                }
+
+                socket.SendAdbRequest(request.ToString());
                 var response = socket.ReadAdbResponse(false);
 
-                byte[] data = new byte[16384];
-                using (var ms = new MemoryStream(data))
+                using (Stream stream = socket.GetShellStream())
+                using (LogReader reader = new LogReader(stream))
                 {
-                    int offset = 0;
-
                     while (true)
                     {
-                        int count;
-                        if (receiver != null && receiver.IsCancelled)
-                        {
-                            break;
-                        }
-
-                        var buffer = new byte[4 * 1024];
-
-                        count = socket.Read(buffer, DdmPreferences.Timeout);
-                        if (count < 0)
-                        {
-                            break;
-                        }
-                        else if (count == 0)
-                        {
-                            try
-                            {
-                                Thread.Sleep(WaitTime * 5);
-                            }
-                            catch (ThreadInterruptedException)
-                            {
-                            }
-                        }
-                        else
-                        {
-                            ms.Write(buffer, offset, count);
-                            offset += count;
-                            if (receiver != null)
-                            {
-                                var d = ms.ToArray();
-                                receiver.ParseNewData(d, 0, d.Length);
-                            }
-                        }
+                        yield return reader.ReadEntry();
                     }
                 }
             }

@@ -146,17 +146,17 @@
 
   <RunLogService>
     <summary>
-      Runs the Event log service on the Device, and provides its output to the <paramref name="receiver"/>.
+      Runs the Event log service on the Device.
     </summary>
     <param name="device">
       The device.
     </param>
-    <param name="logName">
-      Name of the log.
+    <param name="logNames">
+      Optionally, the names of the logs to receive.
     </param>
-    <param name="receiver">
-      The receiver to which to send the log messages.
-    </param>
+    <returns>
+      An enumerator which enumerates all the log entries.
+    </returns>
   </RunLogService>
 
   <Reboot>

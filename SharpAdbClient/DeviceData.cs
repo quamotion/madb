@@ -94,6 +94,12 @@ namespace SharpAdbClient
             }
         }
 
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return this.Serial;
+        }
+
         /// <summary>
         /// Get the device state from the string value
         /// </summary>

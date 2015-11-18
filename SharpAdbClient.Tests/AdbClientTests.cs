@@ -340,6 +340,24 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
+        [Ignore]
+        public void ReadLogTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "EAOKCY112414"
+            };
+
+            var entries = AdbClient.Instance.RunLogService(device);
+
+            foreach (var entry in entries)
+            {
+                Console.WriteLine(entry.ToString());
+            }
+        }
+
+        [TestMethod]
+        [Ignore]
         public void FramebufferTest()
         {
             DeviceData device = new DeviceData()

@@ -84,7 +84,7 @@ namespace SharpAdbClient
         /// <summary>
         /// The tag to use when logging messages.
         /// </summary>
-        private const string LOG_TAG = "Device";
+        private const string LOG_TAG = nameof(Device);
 
         /// <summary>
         /// The time-out when receiving battery information. The default is two seconds.
@@ -644,24 +644,16 @@ namespace SharpAdbClient
         {
             AdbClient.Instance.ExecuteRemoteCommand(string.Format("su -c \"{0}\"", command), this.DeviceData, receiver, int.MaxValue);
         }
-
-        /// <summary>
-        /// Runs the event log service.
-        /// </summary>
-        /// <param name="receiver">The receiver.</param>
-        public void RunEventLogService(LogReceiver receiver)
-        {
-            AdbClient.Instance.RunEventLogService(this.DeviceData, receiver);
-        }
-
+        
         /// <summary>
         /// Runs the log service.
         /// </summary>
-        /// <param name="logname">The logname.</param>
-        /// <param name="receiver">The receiver.</param>
-        public void RunLogService(string logname, LogReceiver receiver)
+        /// <param name="logname">
+        /// The names of the log files to retrieve.
+        /// </param>
+        public IEnumerable<LogEntry> RunLogService(params LogId[] logNames)
         {
-            AdbClient.Instance.RunLogService(this.DeviceData, logname, receiver);
+            return AdbClient.Instance.RunLogService(this.DeviceData, logNames);
         }
 
         /// <summary>

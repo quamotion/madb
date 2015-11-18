@@ -133,9 +133,14 @@
     <Compile Include="IAdbSocketFactory.cs" />
     <Compile Include="IDeviceMonitor.cs" />
     <Compile Include="ISyncService.cs" />
-    <Compile Include="Logs\ILogListener.cs" />
+    <Compile Include="Logs\AndroidLogEntry.cs" />
+    <Compile Include="Logs\EventLogEntry.cs" />
+    <Compile Include="Logs\EventLogType.cs" />
     <Compile Include="Logs\LogEntry.cs" />
+    <Compile Include="Logs\LogId.cs" />
+    <Compile Include="Logs\LogReader.cs" />
     <Compile Include="Logs\NamespaceDoc.cs" />
+    <Compile Include="Logs\ShellStream.cs" />
     <Compile Include="NamespaceDoc.cs" />
     <Compile Include="Receivers\ConsoleOutputReceiver.cs" />
     <Compile Include="DdmPreferences.cs" />
@@ -148,7 +153,6 @@
     <Compile Include="Receivers\IShellOutputReceiver.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogLevel.cs" />
-    <Compile Include="Logs\LogReceiver.cs" />
     <Compile Include="Receivers\MultilineReceiver.cs" />
     <Compile Include="Receivers\NamespaceDoc.cs" />
     <Compile Include="Receivers\NullOutputReceiver.cs" />
@@ -185,7 +189,9 @@
     <None Include="SharpAdbClient.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="IAdbClient.xml" />
+    <Content Include="IAdbClient.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="IAdbSocket.xml">
       <SubType>Designer</SubType>
     </Content>

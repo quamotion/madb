@@ -6,7 +6,10 @@ namespace SharpAdbClient
 {
     using System.Text.RegularExpressions;
 
-    public static partial class StringHelper
+    /// <summary>
+    /// Provides extension methods for working with <see cref="string"/> objects.
+    /// </summary>
+    public static class StringHelper
     {
         /// <summary>
         /// Matches the specified source.
