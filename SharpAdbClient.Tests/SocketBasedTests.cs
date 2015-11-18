@@ -69,6 +69,8 @@ namespace SharpAdbClient
             this.Socket = (IDummyAdbSocket)Factory.Create(AdbServer.EndPoint);
             AdbClient.SocketFactory = this.Factory;
             this.EndPoint = AdbServer.EndPoint;
+
+            AdbClient.Instance = new AdbClient(AdbServer.EndPoint);
         }
 
         /// <summary>

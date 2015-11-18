@@ -340,16 +340,8 @@ namespace SharpAdbClient
                 var imageData = new byte[header.Size];
                 socket.Read(imageData);
 
-                // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
-                var pixelFormat = header.StandardizePixelFormat(imageData);
-
-                // and then save it to a bitmap.
-                Bitmap bitmap = new Bitmap((int)header.Width, (int)header.Height,pixelFormat);
-                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
-                Marshal.Copy(imageData, 0, bitmapData.Scan0, imageData.Length);
-                bitmap.UnlockBits(bitmapData);
-
-                return bitmap;
+                // Convert the framebuffer to an image, and return that.
+                return header.ToImage(imageData);
             }
         }
 

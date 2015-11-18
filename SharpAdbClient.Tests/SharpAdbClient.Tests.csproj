@@ -82,6 +82,7 @@
     <Compile Include="DummyAdbCommandLineClient.cs" />
     <Compile Include="DummyAdbSocket.cs" />
     <Compile Include="DummyAdbSocketFactory.cs" />
+    <Compile Include="FramebufferHeaderTests.cs" />
     <Compile Include="GetPropReceiverTests.cs" />
     <Compile Include="IDummyAdbSocket.cs" />
     <Compile Include="LinuxPathTests.cs" />
@@ -95,6 +96,12 @@
     <Compile Include="TracingAdbSocketFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="framebuffer.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="framebufferheader.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="logcatevents.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
