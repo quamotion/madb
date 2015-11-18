@@ -150,25 +150,6 @@ namespace SharpAdbClient.Tests
 
         [TestMethod]
         [TestCategory("IntegrationTest")]
-        public void DeviceInstallPackageTest()
-        {
-            Device device = GetFirstDevice();
-            String package = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "com.camalotdesigns.httpdump.apk");
-            Assert.IsTrue(File.Exists(package));
-
-            device.InstallPackage(package, false);
-        }
-
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
-        public void DeviceUninstallPackageTest()
-        {
-            Device device = GetFirstDevice();
-            device.UninstallPackage("com.camalotdesigns.httpdump");
-        }
-
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
         public void DeviceEnvironmentVariablesTest()
         {
             Device device = GetFirstDevice();

@@ -4,20 +4,16 @@
 
 namespace SharpAdbClient
 {
-    using Exceptions;
     using DeviceCommands;
+    using SharpAdbClient.Exceptions;
     using SharpAdbClient.Logs;
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
     using System.Text.RegularExpressions;
-    using SharpAdbClient.Exceptions;
-    using SharpAdbClient.IO;
-    using SharpAdbClient.Logs;
-    using System.Threading;
-    using System.Drawing;
 
     /// <summary>
     /// Represents an Android device.

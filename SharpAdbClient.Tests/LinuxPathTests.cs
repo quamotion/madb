@@ -69,82 +69,6 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual<string>("file.ext", result);
         }
 
-
-        [TestMethod]
-        public void GetFileNameExtensionTest()
-        {
-            String result = LinuxPath.GetExtension("/system/busybox");
-            Assert.AreEqual<string>("", result);
-
-            result = LinuxPath.GetExtension("/");
-            Assert.AreEqual<string>("", result);
-
-            result = LinuxPath.GetExtension("/system/xbin/");
-            Assert.AreEqual<string>("", result);
-
-            result = LinuxPath.GetExtension("/system/xbin/file.ext");
-            Assert.AreEqual<string>(".ext", result);
-        }
-
-        [TestMethod]
-        public void GetFileNameWithoutExtensionTest()
-        {
-            String result = LinuxPath.GetFileNameWithoutExtension("/system/busybox");
-            Assert.AreEqual<string>("busybox", result);
-
-            result = LinuxPath.GetFileNameWithoutExtension("/");
-            Assert.AreEqual<string>("", result);
-
-            result = LinuxPath.GetFileNameWithoutExtension("/system/xbin/");
-            Assert.AreEqual<string>("", result);
-
-            result = LinuxPath.GetFileNameWithoutExtension("/system/xbin/file.ext");
-            Assert.AreEqual<string>("file", result);
-        }
-
-        [TestMethod]
-        public void ChangeExtensionTest()
-        {
-            String result = LinuxPath.ChangeExtension("/system/busybox", "foo");
-            Assert.AreEqual<string>("/system/busybox.foo", result);
-
-            result = LinuxPath.ChangeExtension("/system/xbin/file.ext", "myext");
-            Assert.AreEqual<string>("/system/xbin/file.myext", result);
-
-            result = LinuxPath.ChangeExtension("/system/xbin/file.ext", "");
-            Assert.AreEqual<string>("/system/xbin/file", result);
-
-            result = LinuxPath.ChangeExtension("/system/busybox.foo", "");
-            Assert.AreEqual<string>("/system/busybox", result);
-        }
-
-        [TestMethod]
-        public void GetPathWithoutFileTest()
-        {
-            String result = LinuxPath.GetPathWithoutFile("/system/busybox");
-            Assert.AreEqual<string>("/system/", result);
-
-            result = LinuxPath.GetPathWithoutFile("/system/xbin/");
-            Assert.AreEqual<string>("/system/xbin/", result);
-
-            result = LinuxPath.GetPathWithoutFile("/system/xbin/file.ext");
-            Assert.AreEqual<string>("/system/xbin/", result);
-        }
-
-        [TestMethod]
-        public void GetPathRootTest()
-        {
-            String result = LinuxPath.GetPathRoot("/system/busybox");
-            Assert.AreEqual<string>("/", result);
-
-            result = LinuxPath.GetPathRoot("/system/xbin/");
-            Assert.AreEqual<string>("/", result);
-
-            result = LinuxPath.GetPathRoot("/system/xbin/file.ext");
-            Assert.AreEqual<string>("/", result);
-        }
-
-
         [TestMethod]
         public void IsPathRootedTest()
         {
@@ -156,19 +80,6 @@ namespace SharpAdbClient.Tests
 
             result = LinuxPath.IsPathRooted("system/xbin/");
             Assert.AreEqual<bool>(false, result);
-        }
-
-        [TestMethod]
-        public void HasExtensionTest()
-        {
-            bool result = LinuxPath.HasExtension("/system/busybox");
-            Assert.AreEqual<bool>(false, result);
-
-            result = LinuxPath.HasExtension("/system/xbin.foo/");
-            Assert.AreEqual<bool>(false, result);
-
-            result = LinuxPath.HasExtension("system/xbin/file.ext");
-            Assert.AreEqual<bool>(true, result);
         }
     }
 }
