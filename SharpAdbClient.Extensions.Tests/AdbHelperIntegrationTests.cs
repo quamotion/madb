@@ -154,25 +154,6 @@ namespace SharpAdbClient.Tests
 
         [TestMethod]
         [TestCategory("IntegrationTest")]
-        public void GetRawImageTest()
-        {
-            Device device = GetFirstDevice();
-
-            RawImage rawImage = device.Screenshot;
-
-            Assert.IsNotNull(rawImage);
-            Assert.AreEqual<int>(32, rawImage.Bpp);
-            Assert.AreEqual<int>(480, rawImage.Width);
-            Assert.AreEqual<int>(800, rawImage.Height);
-
-            rawImage.ToImage(PixelFormat.Format32bppArgb).Save(@"c:\Users\Ryan\Desktop\file.png", ImageFormat.Png);
-
-        }
-
-
-
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
         public void DeviceInstallPackageTest()
         {
             Device device = GetFirstDevice();

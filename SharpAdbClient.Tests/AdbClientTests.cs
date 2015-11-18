@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Drawing.Imaging;
 
 namespace SharpAdbClient.Tests
 {
@@ -110,7 +111,7 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual(1, devices.Count);
 
             var device = devices.Single();
-
+            
             Assert.AreEqual("169.254.109.177:5555", device.Serial);
             Assert.AreEqual(DeviceState.Online, device.State);
             Assert.AreEqual("5__KitKat__4_4__XXHDPI_Phone", device.Model);
@@ -205,7 +206,7 @@ namespace SharpAdbClient.Tests
             {
                 AdbResponse.FromError("cannot rebind existing socket")
             };
-
+            
             var requests = new string[]
             {
                 "host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"
@@ -353,6 +354,20 @@ namespace SharpAdbClient.Tests
             {
                 Console.WriteLine(entry.ToString());
             }
+        }
+
+        [TestMethod]
+        [Ignore]
+        public void FramebufferTest()
+        {
+            DeviceData device = new DeviceData()
+            {
+                Serial = "EAOKCY112414"
+            };
+            
+            AdbClient.SocketFactory = new AdbSocketFactory();
+            var image = AdbClient.Instance.GetFrameBuffer(device);
+            image.Save(@"screenshot.png", ImageFormat.Png);
         }
 
         public void RunConnectTest(Action test, string connectString)
