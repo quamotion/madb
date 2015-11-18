@@ -9,7 +9,7 @@ namespace SharpAdbClient
     /// <summary>
     /// Provides helper methods for working with Unix-based date formats.
     /// </summary>
-    internal static class DateTimeHelper
+    public static class DateTimeHelper
     {
         /// <summary>
         /// Gets EPOCH time

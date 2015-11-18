@@ -81,19 +81,6 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Runs the Event log service on the Device, and provides its output to the LogReceiver.
-        /// </summary>
-        /// <param name="client">
-        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
-        /// </param>
-        /// <param name="device">The device.</param>
-        /// <param name="rcvr">The RCVR.</param>
-        public static void RunEventLogService(this IAdbClient client, DeviceData device, LogReceiver rcvr)
-        {
-            client.RunLogService(device, "events", rcvr);
-        }
-
-        /// <summary>
         /// Reboots the specified adb socket address.
         /// </summary>
         /// <param name="client">

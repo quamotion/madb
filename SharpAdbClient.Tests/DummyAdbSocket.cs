@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using System.IO;
 
 namespace SharpAdbClient.Tests
 {
@@ -157,6 +158,11 @@ namespace SharpAdbClient.Tests
         public void SendSyncRequest(SyncCommand command, string path, int permissions)
         {
             this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, $"{path},{permissions}"));
+        }
+
+        public Stream GetShellStream()
+        {
+            throw new NotImplementedException();
         }
     }
 }

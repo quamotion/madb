@@ -72,7 +72,7 @@ namespace SharpAdbClient
         // reverse:<forward-command>: not implemented
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/RunLogService/*'/>
-        void RunLogService(DeviceData device, string logName, LogReceiver receiver);
+        IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames);
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/Reboot/*'/>
         void Reboot(string into, DeviceData device);

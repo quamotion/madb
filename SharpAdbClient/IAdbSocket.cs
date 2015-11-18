@@ -6,6 +6,7 @@ namespace SharpAdbClient
 {
     using SharpAdbClient.Exceptions;
     using System;
+    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -59,5 +60,8 @@ namespace SharpAdbClient
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int_int/*'/>
         void Read(byte[] data, int length, int timeout);
+
+        /// <include file='IAdbSocket.xml' path='/IAdbSocket/GetShellStream/*'/>
+        Stream GetShellStream();
     }
 }

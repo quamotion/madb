@@ -15,7 +15,7 @@ namespace SharpAdbClient
         /// <summary>
         /// Logging tag
         /// </summary>
-        private const string TAG = "ConsoleOutputReceiver";
+        private const string TAG = nameof(ConsoleOutputReceiver);
 
         private static ConsoleOutputReceiver instance = null;
 
