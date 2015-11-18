@@ -16,7 +16,7 @@ namespace SharpAdbClient.DeviceCommands
         /// <summary>
         /// The path to the <c>getprop</c> executable to run on the device.
         /// </summary>
-        public const string GetpropCommand = "getprop";
+        public const string GetpropCommand = "/system/bin/getprop";
 
         /// <summary>
         /// A regular expression which can be used to parse the getprop output.

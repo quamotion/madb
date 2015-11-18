@@ -60,8 +60,8 @@ namespace SharpAdbClient.DeviceCommands
                     if (m.Success)
                     {
                         // get the children with that path
-                        string name = m.Groups[1].Value;
-                        string path = m.Groups[2].Value;
+                        string name = m.Groups[2].Value;
+                        string path = m.Groups[1].Value;
 
                         if (!this.PackageManager.Packages.ContainsKey(name))
                         {

@@ -20,14 +20,9 @@ namespace SharpAdbClient.DeviceCommands
         private const string ESCAPEPATTERN = "([\\\\()*+?\"'#/\\s])";
 
         /// <summary>
-        /// The directory separator character
+        /// The directory separator character.
         /// </summary>
         public const char DirectorySeparatorChar = '/';
-
-        /// <summary>
-        /// The directory separator alternate character
-        /// </summary>
-        public const char AltDirectorySeparatorChar = '/';
 
         /// <summary>
         /// Checks the invalid path chars.
@@ -80,7 +75,7 @@ namespace SharpAdbClient.DeviceCommands
                     }
 
                     char ch = paths[i][paths[i].Length - 1];
-                    if ((ch != DirectorySeparatorChar) && (ch != AltDirectorySeparatorChar))
+                    if (ch != DirectorySeparatorChar)
                     {
                         capacity++;
                     }
@@ -99,7 +94,7 @@ namespace SharpAdbClient.DeviceCommands
                     else
                     {
                         char ch2 = builder[builder.Length - 1];
-                        if ((ch2 != DirectorySeparatorChar) && (ch2 != AltDirectorySeparatorChar))
+                        if (ch2 != DirectorySeparatorChar)
                         {
                             builder.Append(DirectorySeparatorChar);
                         }
@@ -185,7 +180,7 @@ namespace SharpAdbClient.DeviceCommands
                 while (--num2 >= 0)
                 {
                     char ch = path[num2];
-                    if ((ch == DirectorySeparatorChar) || (ch == AltDirectorySeparatorChar))
+                    if (ch == DirectorySeparatorChar)
                     {
                         return path.Substring(num2 + 1, (length - num2) - 1);
                     }
@@ -206,7 +201,7 @@ namespace SharpAdbClient.DeviceCommands
             {
                 CheckInvalidPathChars(path);
                 int length = path.Length;
-                if ((length >= 1 && (path[0] == DirectorySeparatorChar || path[0] == AltDirectorySeparatorChar)) ||
+                if ((length >= 1 && (path[0] == DirectorySeparatorChar)) ||
                     (length == 1))
                     {
                     return true;

@@ -61,7 +61,7 @@ namespace SharpAdbClient
         /// <summary>
         /// The singleton instance of the <see cref="AdbClient"/> class.
         /// </summary>
-        private static AdbClient instance = null;
+        private static IAdbClient instance = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
@@ -88,7 +88,7 @@ namespace SharpAdbClient
         /// <summary>
         /// Gets an instance of the AdbHelper.
         /// </summary>
-        public static AdbClient Instance
+        public static IAdbClient Instance
         {
             get
             {
@@ -98,6 +98,11 @@ namespace SharpAdbClient
                 }
 
                 return instance;
+            }
+
+            internal set
+            {
+                instance = value;
             }
         }
 
@@ -198,22 +203,6 @@ namespace SharpAdbClient
             }
         }
 
-        /// <summary>
-        /// Ask to switch the connection to the device/emulator identified by
-        /// <paramref name="device"/>. After this request, every client request will
-        /// be sent directly to the adbd daemon running on the device.
-        /// </summary>
-        /// <param name="socket">
-        /// An instance of the <see cref="IAdbSocket"/> class which is connected to
-        /// the Android Debug Bridge.
-        /// </param>
-        /// <param name="device">
-        /// The device to which to connect.
-        /// </param>
-        /// <remarks>
-        /// If <paramref name="device"/> is <see langword="null"/>, this metod
-        /// does nothing.
-        /// </remarks>
         public void SetDevice(IAdbSocket socket, DeviceData device)
         {
             // if the device is not null, then we first tell adb we're looking to talk

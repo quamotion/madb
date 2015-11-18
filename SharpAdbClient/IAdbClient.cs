@@ -81,5 +81,8 @@ namespace SharpAdbClient
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/Connect/*'/>
         void Connect(DnsEndPoint endpoint);
+
+        /// <include file='IAdbClient.xml' path='/IAdbClient/SetDevice/*'/>
+        void SetDevice(IAdbSocket socket, DeviceData device);
     }
 }

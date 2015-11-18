@@ -78,9 +78,11 @@
     <Compile Include="DeviceDataTests.cs" />
     <Compile Include="DeviceMonitorSink.cs" />
     <Compile Include="DeviceMonitorTests.cs" />
+    <Compile Include="DummyAdbClient.cs" />
     <Compile Include="DummyAdbCommandLineClient.cs" />
     <Compile Include="DummyAdbSocket.cs" />
     <Compile Include="DummyAdbSocketFactory.cs" />
+    <Compile Include="GetPropReceiverTests.cs" />
     <Compile Include="IDummyAdbSocket.cs" />
     <Compile Include="LinuxPathTests.cs" />
     <Compile Include="LoggerTests.cs" />

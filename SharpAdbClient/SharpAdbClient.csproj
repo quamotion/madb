@@ -121,7 +121,6 @@
     <Compile Include="DeviceCommands\LinuxPath.cs" />
     <Compile Include="DeviceCommands\PackageInstallationException.cs" />
     <Compile Include="DeviceCommands\PackageManager.cs" />
-    <Compile Include="DeviceCommands\PackageManagerPathReceiver.cs" />
     <Compile Include="DeviceCommands\PackageManagerReceiver.cs" />
     <Compile Include="DeviceData.cs" />
     <Compile Include="DeviceDataEventArgs.cs" />
