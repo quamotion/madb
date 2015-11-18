@@ -165,7 +165,7 @@ namespace SharpAdbClient
         /// Takes a screen shot of the device and returns it as a <see cref="RawImage"/>
         /// </summary>
         /// <value>The screenshot.</value>
-        RawImage Screenshot { get; }
+        Image Screenshot { get; }
 
         /// <summary>
         /// Determines whether this instance can use the SU shell.

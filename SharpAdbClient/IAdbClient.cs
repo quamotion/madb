@@ -7,6 +7,7 @@ namespace SharpAdbClient
     using Logs;
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Net;
     using System.Threading;
 
@@ -65,7 +66,7 @@ namespace SharpAdbClient
         // localabstract:<path> not implemented
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
-        RawImage GetFrameBuffer(DeviceData device);
+        Image GetFrameBuffer(DeviceData device);
 
         // jdwp:<pid>: not implemented
         // track-jdwp: not implemented

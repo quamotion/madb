@@ -150,19 +150,21 @@ namespace SharpAdbClient.Tests
 
         [TestMethod]
         [TestCategory("IntegrationTest")]
-        public void GetRawImageTest()
+        public void DeviceInstallPackageTest()
         {
             Device device = GetFirstDevice();
+            String package = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "com.camalotdesigns.httpdump.apk");
+            Assert.IsTrue(File.Exists(package));
 
-            RawImage rawImage = device.Screenshot;
+            device.InstallPackage(package, false);
+        }
 
-            Assert.IsNotNull(rawImage);
-            Assert.AreEqual<int>(32, rawImage.Bpp);
-            Assert.AreEqual<int>(480, rawImage.Width);
-            Assert.AreEqual<int>(800, rawImage.Height);
-
-            rawImage.ToImage(PixelFormat.Format32bppArgb).Save(@"c:\Users\Ryan\Desktop\file.png", ImageFormat.Png);
-
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
+        public void DeviceUninstallPackageTest()
+        {
+            Device device = GetFirstDevice();
+            device.UninstallPackage("com.camalotdesigns.httpdump");
         }
 
         [TestMethod]

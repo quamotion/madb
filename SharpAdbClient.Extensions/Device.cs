@@ -13,6 +13,11 @@ namespace SharpAdbClient
     using System.Net;
     using System.Net.Sockets;
     using System.Text.RegularExpressions;
+    using SharpAdbClient.Exceptions;
+    using SharpAdbClient.IO;
+    using SharpAdbClient.Logs;
+    using System.Threading;
+    using System.Drawing;
 
     /// <summary>
     /// Represents an Android device.
@@ -459,7 +464,7 @@ namespace SharpAdbClient
                     foreach (var property in receiver.Properties)
                     {
                         this.Properties.Add(property.Key, property.Value);
-                    }
+                }
 
                     this.OnBuildInfoChanged(EventArgs.Empty);
                 }
@@ -547,7 +552,7 @@ namespace SharpAdbClient
         /// Takes a screen shot of the device and returns it as a <see cref="RawImage"/>
         /// </summary>
         /// <value>The screenshot.</value>
-        public RawImage Screenshot
+        public Image Screenshot
         {
             get
             {
@@ -642,7 +647,7 @@ namespace SharpAdbClient
         {
             AdbClient.Instance.ExecuteRemoteCommand(string.Format("su -c \"{0}\"", command), this.DeviceData, receiver);
         }
-
+        
         /// <summary>
         /// Runs the log service.
         /// </summary>
