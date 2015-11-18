@@ -25,25 +25,6 @@ namespace SharpAdbClient
         private StringBuilder output = new StringBuilder();
 
         /// <summary>
-        /// Gets the instance.
-        /// </summary>
-        /// <value>
-        /// The instance.
-        /// </value>
-        public static ConsoleOutputReceiver Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new ConsoleOutputReceiver();
-                }
-
-                return instance;
-            }
-        }
-
-        /// <summary>
         /// Gets a <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
         /// </summary>
         /// <returns>

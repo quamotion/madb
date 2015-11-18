@@ -356,20 +356,6 @@ namespace SharpAdbClient.Tests
             }
         }
 
-        [TestMethod]
-        [Ignore]
-        public void FramebufferTest()
-        {
-            DeviceData device = new DeviceData()
-            {
-                Serial = "ZX1G425RW5"
-            };
-
-            AdbClient.SocketFactory = new AdbSocketFactory();
-            var image = AdbClient.Instance.GetFrameBuffer(device);
-            image.Save(@"screenshot.png", ImageFormat.Png);
-        }
-
         public void RunConnectTest(Action test, string connectString)
         {
             var requests = new string[]
