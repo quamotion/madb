@@ -5,7 +5,7 @@
 		<version>$version$</version>
 		<authors>The Android Open Source Project, Ryan Conrad, Quamotion</authors>
 		<owners>Quamotion</owners>
-		<title>.NET client for the adb, the Android Debug Bridge (SharpAdbClient)</title>
+		<title>.NET client for adb, the Android Debug Bridge (SharpAdbClient)</title>
 		<description>A managed library for communicating with the Android Debug Bridge (adb).</description>
 		<projectUrl>http://github.com/quamotion/madb</projectUrl>
 		<licenseUrl>https://raw.githubusercontent.com/quamotion/madb/master/LICENSE</licenseUrl>
