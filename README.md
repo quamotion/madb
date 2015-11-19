@@ -61,6 +61,18 @@ void OnDeviceConnected(object sender, DeviceDataEventArgs e)
 }
 ```
 
+### Manage applications
+To install or uninstall applications, you can use the `ApplicationManager` class:
+
+```
+void InstallApplication()
+{
+    var device = AdbClient.Instance.GetDevices().First();
+    PackageManager manager = new PackageManager(device);
+    manager.InstallPackage(@"C:\Users\me\Documents\mypackage.apk", reinstall: false);
+}
+```
+
 ### Send or receive files
 To send files to or receive files from your Android device, you can use the `SyncService` class like this:
 
@@ -100,7 +112,7 @@ the device sends back. In this example, we'll use the standard `ConsoleOutputRec
 output and allows you to retrieve it as a single string. You can also use other output receivers or create your own.
 
 ```
-var EchoTest()
+void EchoTest()
 {
     var device = AdbClient.Instance.GetDevices().First();
     var receiver = new ConsoleOutputReceiver();
