@@ -116,6 +116,7 @@
     <Compile Include="AdbSocketFactory.cs" />
     <Compile Include="ColorData.cs" />
     <Compile Include="DeviceCommands\DeviceExtensions.cs" />
+    <Compile Include="DeviceCommands\EnvironmentVariablesReceiver.cs" />
     <Compile Include="DeviceCommands\GetPropReceiver.cs" />
     <Compile Include="DeviceCommands\InstallReceiver.cs" />
     <Compile Include="DeviceCommands\LinuxPath.cs" />

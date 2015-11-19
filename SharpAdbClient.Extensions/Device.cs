@@ -435,7 +435,7 @@ namespace SharpAdbClient
             {
                 try
                 {
-                    this.ExecuteShellCommand(EnvironmentVariablesReceiver.ENV_COMMAND, new EnvironmentVariablesReceiver(this));
+                    this.ExecuteShellCommand(EnvironmentVariablesReceiver.PrintEnvCommand, new EnvironmentVariablesReceiver(this));
                 }
                 catch (AdbException)
                 {

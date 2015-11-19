@@ -64,5 +64,21 @@ namespace SharpAdbClient.DeviceCommands
             AdbClient.Instance.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
             return receiver.Properties;
         }
+
+        /// <summary>
+        /// Gets the environment variables currently defined on a device.
+        /// </summary>
+        /// <param name="device">
+        /// The device for which to list the environment variables.
+        /// </param>
+        /// <returns>
+        /// A dictionary containing the environment variables of the device, and their values.
+        /// </returns>
+        public static Dictionary<string, string> GetEnvironmentVariables(this DeviceData device)
+        {
+            var receiver = new EnvironmentVariablesReceiver();
+            AdbClient.Instance.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
+            return receiver.EnvironmentVariables;
+        }
     }
 }
