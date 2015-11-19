@@ -23,6 +23,15 @@ or just use the instance we provide for you at `SharpAdbClient.AdbClient.Instanc
 
 This class provides various methods that allow you to interact with Android devices.
 
+### Starting the `adb` server
+SharpAdbClient does not communicate directly with your Android devices, but uses the `adb.exe` server process as an intermediate. Before you can connect to your Android device, you must first start the `adb.exe` server.
+
+You can do so by either running `adb.exe` yourself (it comes as a part of the ADK, the Android Development Kit), or you can use the `AdbServer.StartServer` method like this:
+
+```
+AdbServer.StartServer(@"C:\Program Files (x86)\android-sdk\platform-tools\adb.exe", restartServerIfNewer: false);
+```
+
 ### List all Android devices currently connected
 To list all Android devices that are connected to your PC, you can use the following code:
 
