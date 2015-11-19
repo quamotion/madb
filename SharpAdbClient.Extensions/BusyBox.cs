@@ -1,17 +1,16 @@
-﻿using System;
+﻿using SharpAdbClient.DeviceCommands;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using SharpAdbClient.IO;
-using MoreLinq;
+using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace SharpAdbClient {
-	/// <summary>
-	/// A class to help with working with BusyBox
-	/// </summary>
-	public class BusyBox : IBusyBox
+namespace SharpAdbClient
+{
+    /// <summary>
+    /// A class to help with working with BusyBox
+    /// </summary>
+    public class BusyBox : IBusyBox
     {
         private IFileListingService fileListingService;
         private FileSystem fileSystem;
@@ -46,7 +45,7 @@ namespace SharpAdbClient {
 			FileEntry bb = null;
 
 			try {
-				Device.ExecuteShellCommand ( BUSYBOX_COMMAND, NullOutputReceiver.Instance );
+				Device.ExecuteShellCommand ( BUSYBOX_COMMAND, null );
 				return true;
 			} catch {
 				// we are just checking if it is already installed so we really expect it to wind up here.
@@ -87,8 +86,8 @@ namespace SharpAdbClient {
 					// we didnt find it, so add it.
 					if ( !found ) {
 						// this doesn't seem to actually work
-						Device.ExecuteShellCommand ( @"echo \ Mad Bee buxybox >> /init.rc", NullOutputReceiver.Instance );
-						Device.ExecuteShellCommand ( @"echo export PATH={0}:\$PATH >> /init.rc", NullOutputReceiver.Instance, BUSYBOX_BIN );
+						Device.ExecuteShellCommand ( @"echo \ Mad Bee buxybox >> /init.rc", null );
+						Device.ExecuteShellCommand ( @"echo export PATH={0}:\$PATH >> /init.rc", null, BUSYBOX_BIN );
 					}
 				}
 
@@ -98,7 +97,7 @@ namespace SharpAdbClient {
 					Device.RemountMountPoint ( mp, isRO );
 				}
 
-				Device.ExecuteShellCommand ( "sync", NullOutputReceiver.Instance );
+				Device.ExecuteShellCommand ( "sync", null );
 			} catch ( Exception ) {
 				throw;
 			}
@@ -195,7 +194,7 @@ namespace SharpAdbClient {
 			/// </summary>
 			/// <param name="lines">The lines.</param>
 			/// <workitem id="16000">Issues w/ BusyBox.cs/ProcessNewLines()</workitem>
-			protected override void ProcessNewLines ( string[] lines ) {
+			protected override void ProcessNewLines ( IEnumerable<string> lines ) {
 				Match match = null;
 				int state = 0;
 				foreach ( var line in lines ) {

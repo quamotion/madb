@@ -61,7 +61,7 @@ namespace SharpAdbClient
         /// <summary>
         /// The singleton instance of the <see cref="AdbClient"/> class.
         /// </summary>
-        private static AdbClient instance = null;
+        private static IAdbClient instance = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
@@ -88,7 +88,7 @@ namespace SharpAdbClient
         /// <summary>
         /// Gets an instance of the AdbHelper.
         /// </summary>
-        public static AdbClient Instance
+        public static IAdbClient Instance
         {
             get
             {
@@ -98,6 +98,11 @@ namespace SharpAdbClient
                 }
 
                 return instance;
+            }
+
+            internal set
+            {
+                instance = value;
             }
         }
 
@@ -198,22 +203,6 @@ namespace SharpAdbClient
             }
         }
 
-        /// <summary>
-        /// Ask to switch the connection to the device/emulator identified by
-        /// <paramref name="device"/>. After this request, every client request will
-        /// be sent directly to the adbd daemon running on the device.
-        /// </summary>
-        /// <param name="socket">
-        /// An instance of the <see cref="IAdbSocket"/> class which is connected to
-        /// the Android Debug Bridge.
-        /// </param>
-        /// <param name="device">
-        /// The device to which to connect.
-        /// </param>
-        /// <remarks>
-        /// If <paramref name="device"/> is <see langword="null"/>, this metod
-        /// does nothing.
-        /// </remarks>
         public void SetDevice(IAdbSocket socket, DeviceData device)
         {
             // if the device is not null, then we first tell adb we're looking to talk
@@ -289,98 +278,27 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
-        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, int maxTimeToOutputResponse)
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 this.SetDevice(socket, device);
                 socket.SendAdbRequest($"shell:{command}");
-                var resopnse = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse(false);
 
                 try
                 {
-                    // Read in blocks of 16kb
-                    byte[] data = new byte[16 * 1024];
-
-                    while (true)
+                    using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                     {
-                        if (rcvr != null && rcvr.IsCancelled)
+                        while (reader.Peek() >= 0)
                         {
-                            Log.w(Tag, "execute: cancelled");
-                            throw new OperationCanceledException();
-                        }
+                            cancellationToken.ThrowIfCancellationRequested();
 
-                        int count = socket.Read(data, maxTimeToOutputResponse);
+                            var line = reader.ReadLine();
 
-                        if (count == 0)
-                        {
-                            // we're at the end, we flush the output
                             if (rcvr != null)
                             {
-                                rcvr.Flush();
-                            }
-
-                            Log.w(Tag, "execute '" + command + "' on '" + device + "' : EOF hit. Read: " + count);
-                            break;
-                        }
-                        else
-                        {
-                            // Attempt to detect error messages and throw an exception based on them. The caller can override
-                            // this behavior by specifying a receiver that has the ParsesErrors flag set to true; in this case,
-                            // the receiver is responsible for all error handling.
-                            if (rcvr == null || !rcvr.ParsesErrors)
-                            {
-                                string[] cmd = command.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                string sdata = AdbClient.Encoding.GetString(data, 0, count);
-
-                                var sdataTrimmed = sdata.Trim();
-                                if (sdataTrimmed.EndsWith(string.Format("{0}: not found", cmd[0])))
-                                {
-                                    Log.w(Tag, "The remote execution returned: '{0}: not found'", cmd[0]);
-                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}: not found'", cmd[0]));
-                                }
-
-                                if (sdataTrimmed.EndsWith("No such file or directory"))
-                                {
-                                    Log.w(Tag, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new FileNotFoundException(string.Format("The remote execution returned: {0}", sdataTrimmed));
-                                }
-
-                                // for "unknown options"
-                                if (sdataTrimmed.Contains("Unknown option"))
-                                {
-                                    Log.w(Tag, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new UnknownOptionException(sdataTrimmed);
-                                }
-
-                                // for "aborting" commands
-                                if (sdataTrimmed.IsMatch("Aborting.$"))
-                                {
-                                    Log.w(Tag, "The remote execution returned: {0}", sdataTrimmed);
-                                    throw new CommandAbortingException(sdataTrimmed);
-                                }
-
-                                // for busybox applets
-                                // cmd: applet not found
-                                if (sdataTrimmed.IsMatch("applet not found$") && cmd.Length > 1)
-                                {
-                                    Log.w(Tag, "The remote execution returned: '{0}'", sdataTrimmed);
-                                    throw new FileNotFoundException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
-                                }
-
-                                // checks if the permission to execute the command was denied.
-                                // workitem: 16822
-                                if (sdataTrimmed.IsMatch("(permission|access) denied$"))
-                                {
-                                    Log.w(Tag, "The remote execution returned: '{0}'", sdataTrimmed);
-                                    throw new PermissionDeniedException(string.Format("The remote execution returned: '{0}'", sdataTrimmed));
-                                }
-                            }
-
-                            // Add the data to the receiver
-                            if (rcvr != null)
-                            {
-                                rcvr.AddOutput(data, 0, count);
+                                rcvr.AddOutput(line);
                             }
                         }
                     }
@@ -422,16 +340,8 @@ namespace SharpAdbClient
                 var imageData = new byte[header.Size];
                 socket.Read(imageData);
 
-                // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
-                var pixelFormat = header.StandardizePixelFormat(imageData);
-
-                // and then save it to a bitmap.
-                Bitmap bitmap = new Bitmap((int)header.Width, (int)header.Height,pixelFormat);
-                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
-                Marshal.Copy(imageData, 0, bitmapData.Scan0, imageData.Length);
-                bitmap.UnlockBits(bitmapData);
-
-                return bitmap;
+                // Convert the framebuffer to an image, and return that.
+                return header.ToImage(imageData);
             }
         }
 

@@ -2,45 +2,51 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
-namespace SharpAdbClient
+namespace SharpAdbClient.DeviceCommands
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.Text.RegularExpressions;
 
     /// <summary>
-    ///
+    /// Parses the output of the <c>getprop</c> command, which lists all properties of an
+    /// Android device.
     /// </summary>
     public sealed class GetPropReceiver : MultiLineReceiver
     {
         /// <summary>
-        /// The getprop command
+        /// The path to the <c>getprop</c> executable to run on the device.
         /// </summary>
-        public const string GETPROP_COMMAND = "getprop";
-        private const string GETPROP_PATTERN = "^\\[([^]]+)\\]\\:\\s*\\[(.*)\\]$";
+        public const string GetpropCommand = "/system/bin/getprop";
+
+        /// <summary>
+        /// A regular expression which can be used to parse the getprop output.
+        /// </summary>
+        private const string GetpropRegex = "^\\[([^]]+)\\]\\:\\s*\\[(.*)\\]$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GetPropReceiver"/> class.
         /// </summary>
-        /// <param name="device">The device.</param>
-        public GetPropReceiver(Device device)
+        public GetPropReceiver()
         {
-            this.Device = device;
+            this.Properties = new Dictionary<string, string>();
         }
 
         /// <summary>
-        /// Gets or sets the device.
+        /// Gets the list of properties which have been retrieved.
         /// </summary>
-        /// <value>The device.</value>
-        public Device Device { get; set; }
+        public Dictionary<string, string> Properties
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Processes the new lines.
         /// </summary>
-        /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines(string[] lines)
+        /// <param name="lines">
+        /// The lines to process.
+        /// </param>
+        protected override void ProcessNewLines(IEnumerable<string> lines)
         {
             // We receive an array of lines. We're expecting
             // to have the build info in the first line, and the build
@@ -53,7 +59,7 @@ namespace SharpAdbClient
                     continue;
                 }
 
-                var m = line.Match(GETPROP_PATTERN, RegexOptions.Compiled);
+                var m = line.Match(GetpropRegex, RegexOptions.Compiled);
                 if (m.Success)
                 {
                     string label = m.Groups[1].Value.Trim();
@@ -61,19 +67,10 @@ namespace SharpAdbClient
 
                     if (label.Length > 0)
                     {
-                        this.Device.Properties.Add(label, value);
+                        this.Properties.Add(label, value);
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Finishes the receiver
-        /// </summary>
-        protected override void Done()
-        {
-            this.Device.OnBuildInfoChanged(EventArgs.Empty);
-            base.Done();
         }
     }
 }

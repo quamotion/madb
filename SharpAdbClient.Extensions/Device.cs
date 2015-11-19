@@ -4,21 +4,16 @@
 
 namespace SharpAdbClient
 {
+    using DeviceCommands;
+    using SharpAdbClient.Exceptions;
+    using SharpAdbClient.Logs;
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
+    using System.Drawing;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
-    using System.Reflection;
-    using System.Text;
     using System.Text.RegularExpressions;
-    using SharpAdbClient.Exceptions;
-    using SharpAdbClient.IO;
-    using SharpAdbClient.Logs;
-    using System.Threading;
-    using System.Drawing;
 
     /// <summary>
     /// Represents an Android device.
@@ -39,11 +34,6 @@ namespace SharpAdbClient
         /// Occurs when [client list changed].
         /// </summary>
         public event EventHandler<EventArgs> ClientListChanged;
-
-        /// <summary>
-        ///
-        /// </summary>
-        public const string TEMP_DIRECTORY_FOR_INSTALL = "/storage/sdcard0/tmp/";
 
         /// <summary>
         /// The name of the device property that holds the Android build version.
@@ -178,7 +168,7 @@ namespace SharpAdbClient
                 // this now checks if permission was denied and accounts for that.
                 // The nulloutput receiver is fine here because it doesn't need to send the output anywhere,
                 // the execute command can still handle the output with the null output receiver.
-                this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", NullOutputReceiver.Instance);
+                this.ExecuteRootShellCommand("echo \\\"I can haz root\\\"", null);
                 this.canSU = true;
             }
             catch (PermissionDeniedException)
@@ -396,7 +386,7 @@ namespace SharpAdbClient
         public void RemountMountPoint(MountPoint mnt, bool readOnly)
         {
             string command = string.Format("mount -o {0},remount -t {1} {2} {3}", readOnly ? "ro" : "rw", mnt.FileSystem, mnt.Block, mnt.Name);
-            this.ExecuteShellCommand(command, NullOutputReceiver.Instance);
+            this.ExecuteShellCommand(command, null);
             this.RefreshMountPoints();
         }
 
@@ -463,7 +453,16 @@ namespace SharpAdbClient
                 try
                 {
                     this.Properties.Clear();
-                    this.ExecuteShellCommand(GetPropReceiver.GETPROP_COMMAND, new GetPropReceiver(this));
+
+                    var receiver = new GetPropReceiver();
+                    this.ExecuteShellCommand(GetPropReceiver.GetpropCommand, receiver);
+
+                    foreach (var property in receiver.Properties)
+                    {
+                        this.Properties.Add(property.Key, property.Value);
+                }
+
+                    this.OnBuildInfoChanged(EventArgs.Empty);
                 }
                 catch (AdbException aex)
                 {
@@ -642,7 +641,7 @@ namespace SharpAdbClient
         /// <param name="commandArgs">The command args.</param>
         public void ExecuteRootShellCommand(string command, IShellOutputReceiver receiver, int timeout, params object[] commandArgs)
         {
-            AdbClient.Instance.ExecuteRemoteCommand(string.Format("su -c \"{0}\"", command), this.DeviceData, receiver, int.MaxValue);
+            AdbClient.Instance.ExecuteRemoteCommand(string.Format("su -c \"{0}\"", command), this.DeviceData, receiver);
         }
         
         /// <summary>
@@ -770,117 +769,6 @@ namespace SharpAdbClient
             Monitor.Server.ClientChanged ( client, changeMask );
         }
 */
-
-        /// <summary>
-        /// Installs an Android application on device.
-        /// This is a helper method that combines the syncPackageToDevice, installRemotePackage,
-        /// and removePackage steps
-        /// </summary>
-        /// <param name="packageFilePath">the absolute file system path to file on local host to install</param>
-        /// <param name="reinstall">set to <see langword="true"/>if re-install of app should be performed</param>
-        public void InstallPackage(string packageFilePath, bool reinstall)
-        {
-            string remoteFilePath = this.SyncPackageToDevice(packageFilePath);
-            this.InstallRemotePackage(remoteFilePath, reinstall);
-            this.RemoveRemotePackage(remoteFilePath);
-        }
-
-        /// <summary>
-        /// Pushes a file to device
-        /// </summary>
-        /// <param name="localFilePath">the absolute path to file on local host</param>
-        /// <returns>destination path on device for file</returns>
-        /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
-        public string SyncPackageToDevice(string localFilePath)
-        {
-            try
-            {
-                string packageFileName = Path.GetFileName(localFilePath);
-
-                // only root has access to /data/local/tmp/... not sure how adb does it then...
-                // workitem: 16823
-                // workitem: 19711
-                string remoteFilePath = LinuxPath.Combine(TEMP_DIRECTORY_FOR_INSTALL, packageFileName);
-
-                Log.d(packageFileName, string.Format("Uploading {0} onto device '{1}'", packageFileName, this.SerialNumber));
-
-                ISyncService sync = this.SyncService;
-                if (sync != null)
-                {
-                    string message = string.Format("Uploading file onto device '{0}'", this.SerialNumber);
-                    Log.d(LOG_TAG, message);
-
-                    using (Stream stream = File.OpenRead(localFilePath))
-                    {
-                        sync.Push(stream, remoteFilePath, 644, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
-                    }
-                }
-                else
-                {
-                    throw new IOException("Unable to open sync connection!");
-                }
-
-                return remoteFilePath;
-            }
-            catch (IOException e)
-            {
-                Log.e(LOG_TAG, string.Format("Unable to open sync connection! reason: {0}", e.Message));
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Installs the application package that was pushed to a temporary location on the device.
-        /// </summary>
-        /// <param name="remoteFilePath">absolute file path to package file on device</param>
-        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
-        public void InstallRemotePackage(string remoteFilePath, bool reinstall)
-        {
-            InstallReceiver receiver = new InstallReceiver();
-            string cmd = string.Format("pm install {1}{0}", remoteFilePath, reinstall ? "-r " : string.Empty);
-            this.ExecuteShellCommand(cmd, receiver);
-
-            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
-            {
-                throw new PackageInstallationException(receiver.ErrorMessage);
-            }
-        }
-
-        /// <summary>
-        /// Remove a file from device
-        /// </summary>
-        /// <param name="remoteFilePath">path on device of file to remove</param>
-        /// <exception cref="IOException">if file removal failed</exception>
-        public void RemoveRemotePackage(string remoteFilePath)
-        {
-            // now we delete the app we sync'ed
-            try
-            {
-                this.ExecuteShellCommand("rm " + remoteFilePath, NullOutputReceiver.Instance);
-            }
-            catch (IOException e)
-            {
-                Log.e(LOG_TAG, string.Format("Failed to delete temporary package: {0}", e.Message));
-                throw e;
-            }
-        }
-
-        /// <summary>
-        /// Uninstall an package from the device.
-        /// </summary>
-        /// <param name="packageName">Name of the package.</param>
-        /// <exception cref="IOException"></exception>
-        ///
-        /// <exception cref="PackageInstallationException"></exception>
-        public void UninstallPackage(string packageName)
-        {
-            InstallReceiver receiver = new InstallReceiver();
-            this.ExecuteShellCommand(string.Format("pm uninstall {0}", packageName), receiver);
-            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
-            {
-                throw new PackageInstallationException(receiver.ErrorMessage);
-            }
-        }
 
         /// <summary>
         /// Raises the <see cref="E:StateChanged"/> event.

@@ -2,16 +2,13 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
-namespace SharpAdbClient
+namespace SharpAdbClient.DeviceCommands
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.Text.RegularExpressions;
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
     public class InstallReceiver : MultiLineReceiver
     {
@@ -31,7 +28,7 @@ namespace SharpAdbClient
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines(string[] lines)
+        protected override void ProcessNewLines(IEnumerable<string> lines)
         {
             foreach (string line in lines)
             {

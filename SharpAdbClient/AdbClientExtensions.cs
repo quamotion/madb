@@ -8,6 +8,7 @@ namespace SharpAdbClient
     using SharpAdbClient.Logs;
     using System;
     using System.Net;
+    using System.Threading;
 
     /// <summary>
     /// Provides extension methods for the <see cref="IAdbClient"/> interface. Provides overloads
@@ -77,7 +78,7 @@ namespace SharpAdbClient
         /// <param name="rcvr">The shell output receiver</param>
         public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver rcvr)
         {
-            client.ExecuteRemoteCommand(command, device, rcvr, int.MaxValue);
+            client.ExecuteRemoteCommand(command, device, rcvr, CancellationToken.None, int.MaxValue);
         }
 
         /// <summary>

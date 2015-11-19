@@ -4,11 +4,6 @@
 
 namespace SharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     /// <summary>
     ///
     /// </summary>
@@ -19,20 +14,12 @@ namespace SharpAdbClient
         /// </summary>
         static LogLevel()
         {
-            Levels = new Dictionary<string, LogLevelInfo>();
             Verbose = new LogLevelInfo { Priority = 2, Value = "verbose", Letter = 'V' };
             Debug = new LogLevelInfo { Priority = 3, Value = "debug", Letter = 'D' };
             Info = new LogLevelInfo { Priority = 4, Value = "info", Letter = 'I' };
             Warn = new LogLevelInfo { Priority = 5, Value = "warn", Letter = 'W' };
             Error = new LogLevelInfo { Priority = 6, Value = "error", Letter = 'E' };
             Assert = new LogLevelInfo { Priority = 7, Value = "assert", Letter = 'A' };
-
-            Levels.Add(Verbose.Value, Verbose);
-            Levels.Add(Debug.Value, Debug);
-            Levels.Add(Info.Value, Info);
-            Levels.Add(Warn.Value, Warn);
-            Levels.Add(Error.Value, Error);
-            Levels.Add(Assert.Value, Assert);
         }
 
         /// <summary>
@@ -70,77 +57,6 @@ namespace SharpAdbClient
         /// </summary>
         /// <value>The assert log level.</value>
         public static LogLevelInfo Assert { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the levels.
-        /// </summary>
-        /// <value>The levels.</value>
-        public static Dictionary<string, LogLevelInfo> Levels { get; private set; }
-
-        /// <summary>
-        /// Gets the values.
-        /// </summary>
-        /// <value>The values.</value>
-        public static Dictionary<string, LogLevelInfo>.ValueCollection Values
-        {
-            get
-            {
-                return Levels.Values;
-            }
-        }
-
-        /// <summary>
-        /// Gets the keys.
-        /// </summary>
-        /// <value>The keys.</value>
-        public static Dictionary<string, LogLevelInfo>.KeyCollection Keys
-        {
-            get
-            {
-                return Levels.Keys;
-            }
-        }
-
-        public static LogLevelInfo GetByString(string value)
-        {
-            foreach (LogLevelInfo item in Values)
-            {
-                if (string.Compare(item.Value, value, true) == 0)
-                {
-                    return item;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the by letter.
-        /// </summary>
-        /// <param name="letter">The letter.</param>
-        /// <returns></returns>
-        public static LogLevelInfo GetByLetter(string letter)
-        {
-            return GetByLetter(letter[0]);
-        }
-
-        /// <summary>
-        /// Gets the by letter.
-        /// </summary>
-        /// <param name="letter">The letter.</param>
-        /// <returns></returns>
-        public static LogLevelInfo GetByLetter(char letter)
-        {
-            foreach (LogLevelInfo item in Values)
-            {
-                if (item.Letter == letter)
-                {
-                    return item;
-                }
-            }
-
-            return null;
-        }
 
         /// <summary>
         ///

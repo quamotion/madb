@@ -41,7 +41,7 @@ namespace SharpAdbClient
         /// </summary>
         /// <param name="lines">The lines.</param>
         /// <workitem id="16001">Bug w/ MountPointReceiver.cs/ProcessNewLines()</workitem>
-        protected override void ProcessNewLines(string[] lines)
+        protected override void ProcessNewLines(IEnumerable<string> lines)
         {
             this.Device.MountPoints.Clear();
 

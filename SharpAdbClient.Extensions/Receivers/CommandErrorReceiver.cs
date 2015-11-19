@@ -16,7 +16,7 @@ namespace SharpAdbClient {
 		/// Processes the new lines.
 		/// </summary>
 		/// <param name="lines">The lines.</param>
-		protected override void ProcessNewLines ( string[] lines ) {
+		protected override void ProcessNewLines ( IEnumerable<string> lines ) {
 			StringBuilder message = new StringBuilder ( );
 			foreach ( var line in lines ) {
 				if ( String.IsNullOrEmpty ( line ) || line.StartsWith ( "#" ) || line.StartsWith("$") ) {

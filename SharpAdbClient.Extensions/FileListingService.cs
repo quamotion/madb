@@ -1,18 +1,17 @@
-﻿using System;
+﻿using MoreLinq;
+using SharpAdbClient.DeviceCommands;
+using SharpAdbClient.Receivers;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.IO;
-using System.Text.RegularExpressions;
-using SharpAdbClient.IO;
-using MoreLinq;
+using System.Threading;
 
-namespace SharpAdbClient {
-	/// <summary>
-	/// Provides Device side file listing service.
-	/// </summary>
-	public class FileListingService: IFileListingService
+namespace SharpAdbClient
+{
+    /// <summary>
+    /// Provides Device side file listing service.
+    /// </summary>
+    public class FileListingService: IFileListingService
     {
 		/// <summary>
 		/// 

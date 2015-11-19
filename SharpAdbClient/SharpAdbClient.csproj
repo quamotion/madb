@@ -115,6 +115,13 @@
     <Compile Include="AdbSocket.cs" />
     <Compile Include="AdbSocketFactory.cs" />
     <Compile Include="ColorData.cs" />
+    <Compile Include="DeviceCommands\DeviceExtensions.cs" />
+    <Compile Include="DeviceCommands\GetPropReceiver.cs" />
+    <Compile Include="DeviceCommands\InstallReceiver.cs" />
+    <Compile Include="DeviceCommands\LinuxPath.cs" />
+    <Compile Include="DeviceCommands\PackageInstallationException.cs" />
+    <Compile Include="DeviceCommands\PackageManager.cs" />
+    <Compile Include="DeviceCommands\PackageManagerReceiver.cs" />
     <Compile Include="DeviceData.cs" />
     <Compile Include="DeviceDataEventArgs.cs" />
     <Compile Include="DeviceState.cs" />
@@ -155,7 +162,6 @@
     <Compile Include="LogLevel.cs" />
     <Compile Include="Receivers\MultilineReceiver.cs" />
     <Compile Include="Receivers\NamespaceDoc.cs" />
-    <Compile Include="Receivers\NullOutputReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketExtensions.cs" />
     <Compile Include="StartServerResult.cs" />

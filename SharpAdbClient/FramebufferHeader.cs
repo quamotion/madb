@@ -5,8 +5,10 @@
 namespace SharpAdbClient
 {
     using System;
+    using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
+    using System.Runtime.InteropServices;
     using System.Text;
 
     /// <summary>
@@ -112,6 +114,19 @@ namespace SharpAdbClient
             return header;
         }
 
+        public Image ToImage(byte[] buffer)
+        {
+            // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
+            var pixelFormat = this.StandardizePixelFormat(buffer);
+
+            Bitmap bitmap = new Bitmap((int)this.Width, (int)this.Height, pixelFormat);
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
+            Marshal.Copy(buffer, 0, bitmapData.Scan0, buffer.Length);
+            bitmap.UnlockBits(bitmapData);
+
+            return bitmap;
+        }
+
         /// <summary>
         /// Returns the <see cref="PixelFormat"/> that describes pixel format of an image that is stored according to the information
         /// present in this <see cref="FramebufferHeader"/>. Because the <see cref="PixelFormat"/> enumeration does not allow for all
@@ -124,7 +139,7 @@ namespace SharpAdbClient
         /// <returns>
         /// A <see cref="PixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.
         /// </returns>
-        public PixelFormat StandardizePixelFormat(byte[] buffer)
+        private PixelFormat StandardizePixelFormat(byte[] buffer)
         {
             // Initial parameter validation.
             if (buffer == null)
@@ -132,7 +147,7 @@ namespace SharpAdbClient
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            if (buffer.Length != this.Width * this.Size * (this.Bpp / 8))
+            if (buffer.Length != this.Width * this.Height * (this.Bpp / 8))
             {
                 throw new ArgumentOutOfRangeException(nameof(buffer));
             }

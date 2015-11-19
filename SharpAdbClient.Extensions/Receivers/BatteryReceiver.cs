@@ -42,7 +42,7 @@ namespace SharpAdbClient
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines(string[] lines)
+        protected override void ProcessNewLines(IEnumerable<string> lines)
         {
             this.BatteryInfo = new BatteryInfo();
             foreach (var line in lines)

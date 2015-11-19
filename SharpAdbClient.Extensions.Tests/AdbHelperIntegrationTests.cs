@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using SharpAdbClient.IO;
-using System.Drawing.Imaging;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpAdbClient.Exceptions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Drawing.Imaging;
+using System.IO;
 
 namespace SharpAdbClient.Tests
 {
@@ -150,25 +146,6 @@ namespace SharpAdbClient.Tests
                 }
 
             }
-        }
-
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
-        public void DeviceInstallPackageTest()
-        {
-            Device device = GetFirstDevice();
-            String package = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "com.camalotdesigns.httpdump.apk");
-            Assert.IsTrue(File.Exists(package));
-
-            device.InstallPackage(package, false);
-        }
-
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
-        public void DeviceUninstallPackageTest()
-        {
-            Device device = GetFirstDevice();
-            device.UninstallPackage("com.camalotdesigns.httpdump");
         }
 
         [TestMethod]

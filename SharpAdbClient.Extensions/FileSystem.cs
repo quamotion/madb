@@ -1,11 +1,8 @@
-﻿using System;
+﻿using SharpAdbClient.DeviceCommands;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using SharpAdbClient.IO;
-using MoreLinq;
-using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace SharpAdbClient
 {
