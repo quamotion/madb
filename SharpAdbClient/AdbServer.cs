@@ -51,14 +51,6 @@ namespace SharpAdbClient
         private const string Tag = nameof(AdbServer);
 
         /// <summary>
-        /// Gets or sets a function that returns a new instance of a class that implements the
-        /// <see cref="IAdbCommandLineClient"/> interface, that can be used to interact with the
-        /// <c>adb.exe</c> command line client.
-        /// </summary>
-        public static Func<string, IAdbCommandLineClient> AdbCommandLineClientFactory
-        { get; set; } = (path) => new AdbCommandLineClient(path);
-
-        /// <summary>
         /// Gets or sets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server is listening..
         /// </summary>
         public static IPEndPoint EndPoint { get; } = new IPEndPoint(IPAddress.Loopback, AdbServerPort);
@@ -103,7 +95,7 @@ namespace SharpAdbClient
             var serverStatus = GetStatus();
             Version commandLineVersion = null;
 
-            var commandLineClient = AdbCommandLineClientFactory(adbPath);
+            var commandLineClient = Factories.AdbCommandLineClientFactory(adbPath);
 
             if (adbPath != null)
             {

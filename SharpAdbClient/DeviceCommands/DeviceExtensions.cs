@@ -43,7 +43,7 @@ namespace SharpAdbClient.DeviceCommands
         /// </returns>
         public static FileStatistics Stat(this DeviceData device, string path)
         {
-            using (SyncService service = new SyncService(device))
+            using (ISyncService service = Factories.SyncServiceFactory(device))
             {
                 return service.Stat(path);
             }

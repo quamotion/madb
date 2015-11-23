@@ -530,7 +530,7 @@ namespace SharpAdbClient
         {
             get
             {
-                ISyncService syncService = new SyncService(this.DeviceData);
+                ISyncService syncService = Factories.SyncServiceFactory(this.DeviceData);
                 try
                 {
                     syncService.Open();

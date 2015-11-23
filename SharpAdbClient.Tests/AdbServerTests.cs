@@ -21,7 +21,7 @@ namespace SharpAdbClient.Tests
             Factories.AdbSocketFactory = (endPoint) => this.socket;
 
             this.commandLineClient = new DummyAdbCommandLineClient();
-            AdbServer.AdbCommandLineClientFactory = (version) => this.commandLineClient;
+            Factories.AdbCommandLineClientFactory = (version) => this.commandLineClient;
         }
 
         [TestMethod]

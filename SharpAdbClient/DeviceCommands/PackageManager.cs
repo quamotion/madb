@@ -155,7 +155,7 @@ namespace SharpAdbClient.DeviceCommands
 
                 Log.d(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
 
-                using (SyncService sync = new SyncService(this.Device))
+                using (ISyncService sync = Factories.SyncServiceFactory(this.Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
                     string message = $"Uploading file onto device '{this.Device.Serial}'";
