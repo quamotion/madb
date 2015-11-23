@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
-using System.Collections.Generic;
-
 namespace SharpAdbClient.DeviceCommands
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Provides extension methods for the <see cref="DeviceData"/> class, allowing you to run
     /// commands directory against a <see cref="DeviceData"/> object.

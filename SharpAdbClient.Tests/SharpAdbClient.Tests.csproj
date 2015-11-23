@@ -75,6 +75,7 @@
     <Compile Include="AdbCommandLineClientTests.cs" />
     <Compile Include="AdbServerTests.cs" />
     <Compile Include="AdbClientTests.cs" />
+    <Compile Include="ConsoleOutputReceiverTests.cs" />
     <Compile Include="DeviceDataTests.cs" />
     <Compile Include="DeviceMonitorSink.cs" />
     <Compile Include="DeviceMonitorTests.cs" />
