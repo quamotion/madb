@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace SharpAdbClient.Tests
 {
@@ -12,6 +13,12 @@ namespace SharpAdbClient.Tests
     {
         public TracingAdbSocket(IPEndPoint endPoint) : base(endPoint)
         {
+        }
+
+        public Stream ShellStream
+        {
+            get;
+            set;
         }
 
         public bool DoDispose

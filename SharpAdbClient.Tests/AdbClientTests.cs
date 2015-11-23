@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Drawing.Imaging;
+using System.IO;
 
 namespace SharpAdbClient.Tests
 {
@@ -137,7 +138,6 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
-        [Ignore]
         public void ExecuteRemoteCommandTest()
         {
             var device = new DeviceData()
@@ -160,12 +160,16 @@ namespace SharpAdbClient.Tests
                 "shell:echo Hello, World"
             };
 
+            byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
+            MemoryStream shellStream = new MemoryStream(streamData);
+
             var receiver = new ConsoleOutputReceiver();
 
             this.RunTest(
                 responses,
                 responseMessages,
                 requests,
+                shellStream,
                 () =>
                 {
                     AdbClient.Instance.ExecuteRemoteCommand("echo Hello, World", device, receiver);

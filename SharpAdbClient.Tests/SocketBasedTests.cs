@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace SharpAdbClient
 {
@@ -108,7 +109,17 @@ namespace SharpAdbClient
             IEnumerable<string> requests,
             Action test)
         {
-            RunTest(responses, responseMessages, requests, null, null, null, null, test);
+            RunTest(responses, responseMessages, requests, null, null, null, null, null, test);
+        }
+
+        protected void RunTest(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            Stream shellStream,
+            Action test)
+        {
+            RunTest(responses, responseMessages, requests, null, null, null, null, shellStream, test);
         }
 
         protected void RunTest(
@@ -121,10 +132,35 @@ namespace SharpAdbClient
             IEnumerable<byte[]> syncDataSent,
             Action test)
         {
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                syncRequests,
+                syncResponses,
+                syncDataReceived,
+                syncDataSent,
+                null,
+                test);
+        }
+        
+        protected void RunTest(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            IEnumerable<Tuple<SyncCommand, string>> syncRequests,
+            IEnumerable<SyncCommand> syncResponses,
+            IEnumerable<byte[]> syncDataReceived,
+            IEnumerable<byte[]> syncDataSent,
+            Stream shellStream,
+            Action test)
+        {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
             if (!this.IntegrationTest)
             {
+                this.Socket.ShellStream = shellStream;
+
                 foreach (var response in responses)
                 {
                     this.Socket.Responses.Enqueue(response);

@@ -18,6 +18,12 @@ namespace SharpAdbClient.Tests
             this.Connected = true;
         }
 
+        public Stream ShellStream
+        {
+            get;
+            set;
+        }
+
         public Queue<AdbResponse> Responses
         {
             get;
@@ -162,7 +168,7 @@ namespace SharpAdbClient.Tests
 
         public Stream GetShellStream()
         {
-            throw new NotImplementedException();
+            return this.ShellStream;
         }
     }
 }
