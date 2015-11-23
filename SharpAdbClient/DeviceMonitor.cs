@@ -189,7 +189,7 @@ namespace SharpAdbClient
 
             // Set up the connection to track the list of devices.
             this.Socket.SendAdbRequest("host:track-devices");
-            this.Socket.ReadAdbResponse(false);
+            this.Socket.ReadAdbResponse();
 
             do
             {

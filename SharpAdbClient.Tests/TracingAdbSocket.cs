@@ -88,14 +88,14 @@ namespace SharpAdbClient.Tests
             }
         }
 
-        public override AdbResponse ReadAdbResponse(bool readDiagString)
+        public override AdbResponse ReadAdbResponse()
         {
             Exception exception = null;
             AdbResponse response;
 
             try
             {
-                response = base.ReadAdbResponse(readDiagString);
+                response = base.ReadAdbResponse();
             }
             catch (AdbException ex)
             {

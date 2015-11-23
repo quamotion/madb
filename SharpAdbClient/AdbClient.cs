@@ -169,7 +169,7 @@ namespace SharpAdbClient
             using (var socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest("host:version");
-                var response = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse();
                 var version = socket.ReadString();
 
                 return int.Parse(version, NumberStyles.HexNumber);
@@ -194,7 +194,7 @@ namespace SharpAdbClient
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest("host:devices-l");
-                socket.ReadAdbResponse(false);
+                socket.ReadAdbResponse();
                 var reply = socket.ReadString();
 
                 string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -213,7 +213,7 @@ namespace SharpAdbClient
 
                 try
                 {
-                    var response = socket.ReadAdbResponse(false);
+                    var response = socket.ReadAdbResponse();
                 }
                 catch (AdbException e)
                 {
@@ -237,7 +237,7 @@ namespace SharpAdbClient
                 string rebind = allowRebind ? string.Empty : "norebind:";
 
                 socket.SendAdbRequest($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}");
-                var response = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse();
             }
         }
 
@@ -247,7 +247,7 @@ namespace SharpAdbClient
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
-                var response = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse();
             }
         }
 
@@ -257,7 +257,7 @@ namespace SharpAdbClient
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
-                var response = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse();
             }
         }
 
@@ -267,7 +267,7 @@ namespace SharpAdbClient
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
-                var response = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse();
 
                 var data = socket.ReadString();
 
@@ -284,7 +284,7 @@ namespace SharpAdbClient
             {
                 this.SetDevice(socket, device);
                 socket.SendAdbRequest($"shell:{command}");
-                var response = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse();
 
                 try
                 {
@@ -327,7 +327,7 @@ namespace SharpAdbClient
 
                 // Send the framebuffer command
                 socket.SendAdbRequest("framebuffer:");
-                socket.ReadAdbResponse(false);
+                socket.ReadAdbResponse();
 
                 // The result first is a FramebufferHeader object,
                 var size = Marshal.SizeOf(typeof(FramebufferHeader));
@@ -363,7 +363,7 @@ namespace SharpAdbClient
                 }
 
                 socket.SendAdbRequest(request.ToString());
-                var response = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse();
 
                 using (Stream stream = socket.GetShellStream())
                 using (LogReader reader = new LogReader(stream))
@@ -403,7 +403,7 @@ namespace SharpAdbClient
             {
                 this.SetDevice(socket, device);
                 socket.SendAdbRequest(request);
-                var response = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse();
             }
         }
 
@@ -418,7 +418,7 @@ namespace SharpAdbClient
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
                 socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
-                var response = socket.ReadAdbResponse(false);
+                var response = socket.ReadAdbResponse();
             }
         }
     }

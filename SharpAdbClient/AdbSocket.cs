@@ -234,9 +234,9 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAdbResponse/*'/>
-        public virtual AdbResponse ReadAdbResponse(bool readDiagString)
+        public virtual AdbResponse ReadAdbResponse()
         {
-            var response = this.ReadAdbResponseInner(readDiagString);
+            var response = this.ReadAdbResponseInner();
 
             if (!response.IOSuccess || !response.Okay)
             {
@@ -412,14 +412,10 @@ namespace SharpAdbClient
         /// <summary>
         /// Reads the response from ADB after a command.
         /// </summary>
-        /// <param name="readDiagString">
-        /// if <see langword="true"/>, we're expecting an <c>OKAY</c> response to be
-        /// followed by a diagnostic string. Otherwise, we only expect the
-        /// diagnostic string to follow a <c>FAIL</c>.</param>
         /// <returns>
         /// A <see cref="AdbResponse"/> that represents the response received from ADB.
         /// </returns>
-        protected AdbResponse ReadAdbResponseInner(bool readDiagString)
+        protected AdbResponse ReadAdbResponseInner()
         {
             AdbResponse resp = new AdbResponse();
 
@@ -434,18 +430,15 @@ namespace SharpAdbClient
             }
             else
             {
-                readDiagString = true; // look for a reason after the FAIL
                 resp.Okay = false;
             }
 
             // not a loop -- use "while" so we can use "break"
-            while (readDiagString)
+            if (!resp.Okay)
             {
                 var message = this.ReadString();
                 resp.Message = message;
                 Log.e(TAG, "Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
-
-                break;
             }
 
             return resp;

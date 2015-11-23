@@ -38,7 +38,7 @@ namespace SharpAdbClient
         SyncCommand ReadSyncResponse();
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAdbResponse/*'/>
-        AdbResponse ReadAdbResponse(bool readDiagString);
+        AdbResponse ReadAdbResponse();
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte/*'/>
         void Read(byte[] data);

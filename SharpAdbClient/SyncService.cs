@@ -123,7 +123,7 @@ namespace SharpAdbClient
             AdbClient.Instance.SetDevice(this.Socket, this.Device);
 
             this.Socket.SendAdbRequest("sync:");
-            var resp = this.Socket.ReadAdbResponse(false);
+            var resp = this.Socket.ReadAdbResponse();
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>

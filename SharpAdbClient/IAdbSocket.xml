@@ -16,7 +16,7 @@
   <SendAdbRequest>
     <summary>
       Sends a request to the Android Debug Bridge. To read the response, call
-      <see cref="ReadAdbResponse(bool)"/>.
+      <see cref="ReadAdbResponse()"/>.
     </summary>
     <param name="request">
       The request to send.
@@ -28,10 +28,6 @@
       Receives an <see cref="AdbResponse"/> message, and throws an error
       if the message does not indicate success.
     </summary>
-    <param name="readDiagString">
-      <see langword="true"/> to read the string that immediately follows the
-      <see cref="AdbResponse"/>.
-    </param>
     <returns>
       A <see cref="AdbResponse"/> object that represents the response from the
       Android Debug Bridge.

@@ -82,7 +82,7 @@ namespace SharpAdbClient.Tests
             }
         }
 
-        public AdbResponse ReadAdbResponse(bool readDiagString)
+        public AdbResponse ReadAdbResponse()
         {
             var response = this.Responses.Dequeue();
 
