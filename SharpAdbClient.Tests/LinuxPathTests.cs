@@ -7,6 +7,49 @@ namespace SharpAdbClient.Tests
     [TestClass]
     public class LinuxPathTests
     {
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CheckInvalidPathCharsNullTest()
+        {
+            LinuxPath.CheckInvalidPathChars(null);
+        }
+
+        [TestMethod]
+        public void CheckInvalidPathCharsTest()
+        {
+            // Should not throw an exception.
+            LinuxPath.CheckInvalidPathChars("/var/test");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CheckInvalidPathCharsTest2()
+        {
+            // Should throw an exception.
+            LinuxPath.CheckInvalidPathChars("/var/test > out");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CheckInvalidPathCharsTest3()
+        {
+            // Should throw an exception.
+            LinuxPath.CheckInvalidPathChars("\t/var/test");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CombineNullTest()
+        {
+            LinuxPath.Combine(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CombineNullTest2()
+        {
+            LinuxPath.Combine(new string[] { "/test", "hi", null });
+        }
 
         [TestMethod]
         public void CombineTest()
@@ -51,6 +94,9 @@ namespace SharpAdbClient.Tests
 
             result = LinuxPath.GetDirectoryName("/system/xbin/");
             Assert.AreEqual<string>("/system/xbin/", result);
+
+            result = LinuxPath.GetDirectoryName("echo");
+            Assert.AreEqual<string>(null, result);
         }
 
         [TestMethod]
@@ -67,6 +113,9 @@ namespace SharpAdbClient.Tests
 
             result = LinuxPath.GetFileName("/system/xbin/file.ext");
             Assert.AreEqual<string>("file.ext", result);
+
+            result = LinuxPath.GetFileName(null);
+            Assert.IsNull(result);
         }
 
         [TestMethod]

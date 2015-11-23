@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using SharpAdbClient.DeviceCommands;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -9,6 +10,13 @@ namespace SharpAdbClient.Tests
     [TestClass]
     public class PackageManagerTests
     {
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorNullTest()
+        {
+            new PackageManager(null);
+        }
+
         [TestMethod]
         public void PackagesPropertyTest()
         {
@@ -24,6 +32,12 @@ namespace SharpAdbClient.Tests
 
             Assert.IsTrue(manager.Packages.ContainsKey("com.android.gallery3d"));
             Assert.AreEqual("/system/app/Gallery2/Gallery2.apk", manager.Packages["com.android.gallery3d"]);
+        }
+
+        [TestMethod]
+        public void InstallRemotePackage()
+        {
+
         }
 
         [TestMethod]
