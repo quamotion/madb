@@ -168,7 +168,15 @@ namespace SharpAdbClient.Tests
 
         public Stream GetShellStream()
         {
-            return this.ShellStream;
+            if (this.ShellStream != null)
+            {
+                return this.ShellStream;
+            }
+            else
+            {
+                // Simulate the device failing to respond properly.
+                throw new SocketException();
+            }
         }
     }
 }

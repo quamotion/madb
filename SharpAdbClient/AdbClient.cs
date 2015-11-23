@@ -359,7 +359,7 @@ namespace SharpAdbClient
 
                 foreach (var logName in logNames)
                 {
-                    request.Append($" -b {logName}");
+                    request.Append($" -b {logName.ToString().ToLower()}");
                 }
 
                 socket.SendAdbRequest(request.ToString());
@@ -370,7 +370,25 @@ namespace SharpAdbClient
                 {
                     while (true)
                     {
-                        yield return reader.ReadEntry();
+                        LogEntry entry = null;
+
+                        try
+                        {
+                            entry = reader.ReadEntry();
+                        }
+                        catch (EndOfStreamException)
+                        {
+                            // This indicates the end of the stream; the entry will remain null.
+                        }
+
+                        if (entry != null)
+                        {
+                            yield return entry;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -383,6 +401,7 @@ namespace SharpAdbClient
 
             using (IAdbSocket socket = SocketFactory.Create(this.EndPoint))
             {
+                this.SetDevice(socket, device);
                 socket.SendAdbRequest(request);
                 var response = socket.ReadAdbResponse(false);
             }
