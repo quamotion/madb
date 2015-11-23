@@ -27,7 +27,7 @@ namespace SharpAdbClient.DeviceCommands
 
         private static readonly char[] InvalidCharacters = new char[]
         {
-            '|', '\\', '?', '*', '<', '\"', ':', '>', '+', '[', ']', '/'
+            '|', '\\', '?', '*', '<', '\"', ':', '>', '+', '[', ']'
         };
 
         /// <summary>

@@ -11,23 +11,26 @@ namespace SharpAdbClient
     using System.Text;
 
     /// <summary>
-    /// Implements the <see cref="IAdbSocketFactory"/> protocol for the <see cref="AdbSocket"/>
-    /// class.
+    /// Provides factory methods used by the various SharpAdbClient classes.
     /// </summary>
-    public class AdbSocketFactory : IAdbSocketFactory
+    public static class Factories
     {
         /// <summary>
         /// Creates a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
-        /// <param name="endPoint">
-        /// The <see cref="IPEndPoint"/> to which the socket should connect.
-        /// </param>
         /// <returns>
         /// A new instance of the <see cref="AdbSocket"/> class.
         /// </returns>
-        public IAdbSocket Create(IPEndPoint endPoint)
-        {
-            return new AdbSocket(endPoint);
-        }
+        public static Func<IPEndPoint, IAdbSocket> AdbSocketFactory
+        { get; set; } = (endPoint) => new AdbSocket(endPoint);
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="AdbClient"/> class.
+        /// </summary>
+        /// <returns>
+        /// A new instance of the <see cref="AdbClient"/> class.
+        /// </returns>
+        public static Func<IPEndPoint, IAdbClient> AdbClientFactory
+        { get; set; } = (endPoint) => new AdbClient(endPoint);
     }
 }

@@ -82,7 +82,6 @@
     <Compile Include="DummyAdbClient.cs" />
     <Compile Include="DummyAdbCommandLineClient.cs" />
     <Compile Include="DummyAdbSocket.cs" />
-    <Compile Include="DummyAdbSocketFactory.cs" />
     <Compile Include="FramebufferHeaderTests.cs" />
     <Compile Include="GetPropReceiverTests.cs" />
     <Compile Include="IDummyAdbSocket.cs" />
@@ -94,7 +93,6 @@
     <Compile Include="SocketBasedTests.cs" />
     <Compile Include="SyncServiceTests.cs" />
     <Compile Include="TracingAdbSocket.cs" />
-    <Compile Include="TracingAdbSocketFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="framebuffer.bin">

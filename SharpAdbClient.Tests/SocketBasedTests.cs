@@ -21,12 +21,6 @@ namespace SharpAdbClient
             State = DeviceState.Online
         };
 
-        protected IAdbSocketFactory Factory
-        {
-            get;
-            set;
-        }
-
         protected IDummyAdbSocket Socket
         {
             get;
@@ -52,11 +46,14 @@ namespace SharpAdbClient
             // use the dummy socket factory to run unit tests.
             if (integrationTest)
             {
-                this.Factory = new TracingAdbSocketFactory(doDispose);
+                Factories.AdbSocketFactory = (endPoint) => new TracingAdbSocket(endPoint)
+                {
+                    DoDispose = doDispose
+                };
             }
             else
             {
-                this.Factory = new DummyAdbSocketFactory();
+                Factories.AdbSocketFactory = (endPoint) => new DummyAdbSocket();
             }
 
             this.IntegrationTest = integrationTest;
@@ -67,8 +64,8 @@ namespace SharpAdbClient
             this.IntegrationTest = false;
 #endif
 
-            this.Socket = (IDummyAdbSocket)Factory.Create(AdbServer.EndPoint);
-            AdbClient.SocketFactory = this.Factory;
+            this.Socket = new DummyAdbSocket();
+            Factories.AdbSocketFactory = (endPoint) => this.Socket;
             this.EndPoint = AdbServer.EndPoint;
 
             AdbClient.Instance = new AdbClient(AdbServer.EndPoint);
@@ -143,7 +140,7 @@ namespace SharpAdbClient
                 null,
                 test);
         }
-        
+
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,

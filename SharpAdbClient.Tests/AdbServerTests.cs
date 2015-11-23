@@ -12,24 +12,25 @@ namespace SharpAdbClient.Tests
     public class AdbServerTests
     {
         private DummyAdbSocket socket;
-        private DummyAdbSocketFactory socketFactory;
         private DummyAdbCommandLineClient commandLineClient;
 
         [TestInitialize]
         public void Initialize()
         {
-            this.socketFactory = new DummyAdbSocketFactory();
-            this.socket = this.socketFactory.Socket;
+            this.socket = new DummyAdbSocket();
+            Factories.AdbSocketFactory = (endPoint) => this.socket;
 
             this.commandLineClient = new DummyAdbCommandLineClient();
-            AdbClient.SocketFactory = this.socketFactory;
             AdbServer.AdbCommandLineClientFactory = (version) => this.commandLineClient;
         }
 
         [TestMethod]
         public void GetStatusNotRunningTest()
         {
-            this.socketFactory.Exception = new SocketException(AdbServer.ConnectionRefused);
+            Factories.AdbSocketFactory = (endPoint) =>
+            {
+                throw new SocketException(AdbServer.ConnectionRefused);
+            };
 
             var status = AdbServer.GetStatus();
             Assert.IsFalse(status.IsRunning);
@@ -57,7 +58,10 @@ namespace SharpAdbClient.Tests
         [ExpectedException(typeof(SocketException))]
         public void GetStatusOtherSocketExceptionTest()
         {
-            this.socketFactory.Exception = new SocketException();
+            Factories.AdbSocketFactory = (endPoint) =>
+            {
+                throw new SocketException();
+            };
 
             var status = AdbServer.GetStatus();
         }
@@ -66,7 +70,10 @@ namespace SharpAdbClient.Tests
         [ExpectedException(typeof(Exception))]
         public void GetStatusOtherExceptionTest()
         {
-            this.socketFactory.Exception = new Exception();
+            Factories.AdbSocketFactory = (endPoint) =>
+            {
+                throw new Exception();
+            };
 
             var status = AdbServer.GetStatus();
         }
@@ -102,7 +109,10 @@ namespace SharpAdbClient.Tests
         [ExpectedException(typeof(AdbException))]
         public void StartServerNotRunningNoExecutableTest()
         {
-            this.socketFactory.Exception = new SocketException(AdbServer.ConnectionRefused);
+            Factories.AdbSocketFactory = (endPoint) =>
+            {
+                throw new SocketException(AdbServer.ConnectionRefused);
+            };
 
             var result = AdbServer.StartServer(null, false);
         }
@@ -129,7 +139,10 @@ namespace SharpAdbClient.Tests
         [TestMethod]
         public void StartServerNotRunningTest()
         {
-            this.socketFactory.Exception = new SocketException(AdbServer.ConnectionRefused);
+            Factories.AdbSocketFactory = (endPoint) =>
+            {
+                throw new SocketException(AdbServer.ConnectionRefused);
+            };
 
             this.commandLineClient.Version = new Version(1, 0, 32);
 

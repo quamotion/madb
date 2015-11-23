@@ -113,7 +113,7 @@
     <Compile Include="AdbResponse.cs" />
     <Compile Include="AdbServer.cs" />
     <Compile Include="AdbSocket.cs" />
-    <Compile Include="AdbSocketFactory.cs" />
+    <Compile Include="Factories.cs" />
     <Compile Include="ColorData.cs" />
     <Compile Include="DeviceCommands\DeviceExtensions.cs" />
     <Compile Include="DeviceCommands\EnvironmentVariablesReceiver.cs" />
@@ -138,7 +138,6 @@
     <Compile Include="IAdbClient.cs" />
     <Compile Include="IAdbCommandLineClient.cs" />
     <Compile Include="IAdbSocket.cs" />
-    <Compile Include="IAdbSocketFactory.cs" />
     <Compile Include="IDeviceMonitor.cs" />
     <Compile Include="ISyncService.cs" />
     <Compile Include="Logs\AndroidLogEntry.cs" />

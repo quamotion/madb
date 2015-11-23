@@ -96,6 +96,9 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual<string>("/system/xbin/", result);
 
             result = LinuxPath.GetDirectoryName("echo");
+            Assert.AreEqual<string>("./", result);
+
+            result = LinuxPath.GetDirectoryName(null);
             Assert.AreEqual<string>(null, result);
         }
 

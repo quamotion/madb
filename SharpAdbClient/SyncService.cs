@@ -70,7 +70,7 @@ namespace SharpAdbClient
         /// The device on which to interact with the files.
         /// </param>
         public SyncService(DeviceData device)
-            : this(AdbClient.SocketFactory.Create(AdbServer.EndPoint), device)
+            : this(Factories.AdbSocketFactory(AdbServer.EndPoint), device)
         {
         }
 
