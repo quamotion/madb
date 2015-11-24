@@ -63,6 +63,18 @@ namespace SharpAdbClient
             this.socket.Connect(endPoint);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbSocket"/> class.
+        /// </summary>
+        /// <param name="socket">
+        /// The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening
+        /// for clients.
+        /// </param>
+        public AdbSocket(ITcpSocket socket)
+        {
+            this.socket = socket;
+        }
+
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Connected/*'/>
         public bool Connected
         {
@@ -364,7 +376,7 @@ namespace SharpAdbClient
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/GetShellStream/*'/>
         public Stream GetShellStream()
         {
-            NetworkStream stream = this.socket.GetStream();
+            var stream = this.socket.GetStream();
             return new ShellStream(stream, closeStream: true);
         }
 

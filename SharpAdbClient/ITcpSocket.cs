@@ -5,6 +5,7 @@
 namespace SharpAdbClient
 {
     using System;
+    using System.IO;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace SharpAdbClient
 
         Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags);
 
-        NetworkStream GetStream();
+        Stream GetStream();
 
         bool Connected
         {

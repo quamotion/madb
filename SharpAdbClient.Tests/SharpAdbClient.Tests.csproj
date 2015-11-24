@@ -84,6 +84,7 @@
     <Compile Include="DummyAdbCommandLineClient.cs" />
     <Compile Include="DummyAdbSocket.cs" />
     <Compile Include="DummySyncService.cs" />
+    <Compile Include="DummyTcpSocket.cs" />
     <Compile Include="EnvironmentVariablesReceiverTests.cs" />
     <Compile Include="FramebufferHeaderTests.cs" />
     <Compile Include="GetPropReceiverTests.cs" />

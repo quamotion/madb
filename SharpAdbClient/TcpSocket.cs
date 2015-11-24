@@ -4,6 +4,7 @@
 
 namespace SharpAdbClient
 {
+    using System.IO;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading.Tasks;
@@ -16,47 +17,15 @@ namespace SharpAdbClient
     {
         private Socket socket;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TcpSocket"/> class.
+        /// </summary>
         public TcpSocket()
         {
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        public void Connect(IPEndPoint endPoint)
-        {
-            this.socket.Connect(endPoint);
-            this.socket.Blocking = true;
-        }
-
-        public void Close()
-        {
-            this.socket.Close();
-        }
-
-        public void Dispose()
-        {
-            this.socket.Dispose();
-        }
-
-        public int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags)
-        {
-            return this.socket.Send(buffer, offset, size, socketFlags);
-        }
-
-        public NetworkStream GetStream()
-        {
-            return new NetworkStream(this.socket);
-        }
-
-        public int Receive(byte[] buffer, int offset, SocketFlags socketFlags)
-        {
-            return this.socket.Receive(buffer, offset, socketFlags);
-        }
-
-        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags)
-        {
-            return this.socket.ReceiveAsync(buffer, offset, size, socketFlags);
-        }
-
+        /// <inheritdoc/>
         public bool Connected
         {
             get
@@ -65,6 +34,50 @@ namespace SharpAdbClient
             }
         }
 
+        /// <inheritdoc/>
+        public void Connect(IPEndPoint endPoint)
+        {
+            this.socket.Connect(endPoint);
+            this.socket.Blocking = true;
+        }
+
+        /// <inheritdoc/>
+        public void Close()
+        {
+            this.socket.Close();
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.socket.Dispose();
+        }
+
+        /// <inheritdoc/>
+        public int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        {
+            return this.socket.Send(buffer, offset, size, socketFlags);
+        }
+
+        /// <inheritdoc/>
+        public Stream GetStream()
+        {
+            return new NetworkStream(this.socket);
+        }
+
+        /// <inheritdoc/>
+        public int Receive(byte[] buffer, int offset, SocketFlags socketFlags)
+        {
+            return this.socket.Receive(buffer, offset, socketFlags);
+        }
+
+        /// <inheritdoc/>
+        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        {
+            return this.socket.ReceiveAsync(buffer, offset, size, socketFlags);
+        }
+
+        /// <inheritdoc/>
         public int ReceiveBufferSize
         {
             get
