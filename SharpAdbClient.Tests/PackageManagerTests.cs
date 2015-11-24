@@ -1,9 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using SharpAdbClient.DeviceCommands;
 using System;
-using System.Collections.Generic;
-using System.Threading;
 
 namespace SharpAdbClient.Tests
 {
@@ -32,6 +29,23 @@ namespace SharpAdbClient.Tests
 
             Assert.IsTrue(manager.Packages.ContainsKey("com.android.gallery3d"));
             Assert.AreEqual("/system/app/Gallery2/Gallery2.apk", manager.Packages["com.android.gallery3d"]);
+        }
+
+        [TestMethod]
+        public void PackagesPropertyTest2()
+        {
+            DeviceData device = new DeviceData()
+            {
+                State = DeviceState.Online
+            };
+
+            DummyAdbClient client = new DummyAdbClient();
+            client.Commands.Add("pm list packages -f", "package:mwc2015.be");
+            AdbClient.Instance = client;
+            PackageManager manager = new PackageManager(device);
+
+            Assert.IsTrue(manager.Packages.ContainsKey("mwc2015.be"));
+            Assert.AreEqual(null, manager.Packages["mwc2015.be"]);
         }
 
         [TestMethod]

@@ -13,13 +13,6 @@ namespace SharpAdbClient.DeviceCommands
     public class PackageManagerReceiver : MultiLineReceiver
     {
         /// <summary>
-        /// Pattern to parse the output of the 'pm -lf' command.
-        /// The output format looks like:
-        /// <c>/data/app/myapp.apk=com.mypackage.myapp</c>
-        /// </summary>
-        public const string PackagePattern = "^package:(.+?)=(.+)$";
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PackageManagerReceiver"/> class.
         /// </summary>
         /// <param name="device">
@@ -54,19 +47,20 @@ namespace SharpAdbClient.DeviceCommands
 
             foreach (var line in lines)
             {
-                if (line.Trim().Length > 0)
+                if (line != null && line.StartsWith("package:"))
                 {
-                    var m = line.Match(PackageManagerReceiver.PackagePattern, RegexOptions.Compiled);
-                    if (m.Success)
-                    {
-                        // get the children with that path
-                        string name = m.Groups[2].Value;
-                        string path = m.Groups[1].Value;
+                    // Samples include:
+                    // package:/system/app/LegacyCamera.apk=com.android.camera
+                    // package:mwc2015.be
+                    string[] parts = line.Split(':', '=');
 
-                        if (!this.PackageManager.Packages.ContainsKey(name))
-                        {
-                            this.PackageManager.Packages.Add(name, path);
-                        }
+                    if (parts.Length == 3)
+                    {
+                        this.PackageManager.Packages.Add(parts[2], parts[1]);
+                    }
+                    else
+                    {
+                        this.PackageManager.Packages.Add(parts[1], null);
                     }
                 }
             }
