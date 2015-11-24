@@ -7,14 +7,13 @@
 namespace SharpAdbClient.DeviceCommands
 {
     using SharpAdbClient;
-    using SharpAdbClient.DeviceCommands;
     using System;
     using System.Collections.Generic;
 
     /// <summary>
     /// Processes command line output of a <c>adb</c> shell command.
     /// </summary>
-    internal class InfoReceiver : MultiLineReceiver
+    public class InfoReceiver : MultiLineReceiver
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="InfoReceiver"/> class.
