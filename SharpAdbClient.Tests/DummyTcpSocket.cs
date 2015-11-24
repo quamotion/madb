@@ -20,13 +20,14 @@ namespace SharpAdbClient.Tests
         { get; set; } = new MemoryStream();
 
         public bool Connected
-        { get; set; } = false;
+        { get; set; } = true;
 
         public int ReceiveBufferSize
         { get; set; } = 1024;
 
         public void Close()
         {
+            this.Connected = false;
         }
 
         public void Connect(IPEndPoint endPoint)

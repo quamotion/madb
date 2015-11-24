@@ -430,7 +430,6 @@ namespace SharpAdbClient
                 resp.Okay = false;
             }
 
-            // not a loop -- use "while" so we can use "break"
             if (!resp.Okay)
             {
                 var message = this.ReadString();
