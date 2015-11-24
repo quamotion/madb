@@ -111,9 +111,11 @@ namespace SharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Uninstall an package from the device.
+        /// Uninstalls a package from the device.
         /// </summary>
-        /// <param name="packageName">Name of the package.</param>
+        /// <param name="packageName">
+        /// The name of the package to uninstall.
+        /// </param>
         public void UninstallPackage(string packageName)
         {
             this.ValidateDevice();
@@ -124,6 +126,21 @@ namespace SharpAdbClient.DeviceCommands
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
+        }
+
+        /// <summary>
+        /// Requests the version information from the device.
+        /// </summary>
+        /// <param name="packageName">
+        /// The name of the package from which to get the application version.
+        /// </param>
+        public VersionInfo GetVersionInfo(string packageName)
+        {
+            this.ValidateDevice();
+
+            VersionInfoReceiver receiver = new VersionInfoReceiver();
+            this.Device.ExecuteShellCommand($"dumpsys package {packageName}", receiver);
+            return receiver.VersionInfo;
         }
 
         private void ValidateDevice()

@@ -1,0 +1,84 @@
+﻿Activity Resolver Table:
+  Schemes:
+      http:
+        52b1e580 com.lufthansa.android.lufthansa/.ui.activity.HomeActivity filter 52b0648c
+        52af2718 com.lufthansa.android.lufthansa/.ui.activity.mbp.MBPListActivity filter 52acec14
+      service:
+        52abbb94 com.lufthansa.android.lufthansa/.ui.activity.flightstate.FlightStateSearchActivity filter 52b56fd8
+        52b494f4 com.lufthansa.android.lufthansa/.ui.activity.MoreActivity filter 52b419a4
+        52b2e604 com.lufthansa.android.lufthansa/.ui.activity.FeedbackActivity filter 52b292f0
+        52b23708 com.lufthansa.android.lufthansa/.ui.activity.ContactActivity filter 52b1a718
+        52b19a18 com.lufthansa.android.lufthansa/.ui.activity.SettingsActivity filter 52b0793c
+        52b069ec com.lufthansa.android.lufthansa/.ui.activity.PersonalDataActivity filter 52afa660
+        52af2718 com.lufthansa.android.lufthansa/.ui.activity.mbp.MBPListActivity filter 52ae9f24
+        52b5ae64 com.lufthansa.android.lufthansa/.ui.activity.mbr.MBRListActivity filter 52b522c8
+        52b248a0 com.lufthansa.android.lufthansa/.ui.activity.web.LufthansaWebActivity filter 52b20128
+      lufthansa:
+        52b1e580 com.lufthansa.android.lufthansa/.ui.activity.HomeActivity filter 52b120c0
+
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        52b1e580 com.lufthansa.android.lufthansa/.ui.activity.HomeActivity filter 52b1beec
+
+Receiver Resolver Table:
+  Schemes:
+      apis:
+        52b3a66c com.lufthansa.android.lufthansa/.apis.model.APISNotificationTimer filter 52b39e4c
+
+  Non-Data Actions:
+      com.google.android.c2dm.intent.RECEIVE:
+        52b43eec com.lufthansa.android.lufthansa/com.google.android.gcm.GCMBroadcastReceiver filter 52b43974
+      com.google.android.c2dm.intent.REGISTRATION:
+        52b43eec com.lufthansa.android.lufthansa/com.google.android.gcm.GCMBroadcastReceiver filter 52b43974
+      android.intent.action.LOCALE_CHANGED:
+        52b29ca0 com.lufthansa.android.lufthansa/.receiver.LocaleChangedReceiver filter 52b28cf0
+
+Service Resolver Table:
+  Schemes:
+      service:
+        52add158 com.lufthansa.android.lufthansa/.service.MBRDownloadService filter 52b5186c
+
+Permissions:
+  Permission [com.lufthansa.android.lufthansa.permission.C2D_MESSAGE] (52a97668):
+    sourcePackage=com.lufthansa.android.lufthansa
+    uid=10081 gids=[] type=0 prot=signature
+    packageSetting=PackageSetting{52a6d808 com.lufthansa.android.lufthansa/10081}
+    perm=Permission{52ade3b8 com.lufthansa.android.lufthansa.permission.C2D_MESSAGE}
+
+Registered ContentProviders:
+  com.lufthansa.android.lufthansa/.model.database.MBProvider:
+    Provider{52b49814 com.lufthansa.android.lufthansa.model.database.MBProvider}
+
+ContentProvider Authorities:
+  [com.lufthansa.android.lufthansa.mbpprovider]:
+    Provider{52b49814 com.lufthansa.android.lufthansa.model.database.MBProvider}
+      applicationInfo=ApplicationInfo{52b82e30 com.lufthansa.android.lufthansa}
+
+Packages:
+  Package [com.lufthansa.android.lufthansa] (52a6d808):
+    userId=10081 gids=[3003, 1028]
+    pkg=Package{52aefec8 com.lufthansa.android.lufthansa}
+    codePath=/data/app/com.lufthansa.android.lufthansa-1.apk
+    resourcePath=/data/app/com.lufthansa.android.lufthansa-1.apk
+    nativeLibraryPath=/data/app-lib/com.lufthansa.android.lufthansa-1
+    versionCode=10210 targetSdk=18
+    versionName=4.7.1
+    applicationInfo=ApplicationInfo{52b82e30 com.lufthansa.android.lufthansa}
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    dataDir=/data/data/com.lufthansa.android.lufthansa
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    timeStamp=2015-08-13 11:12:36
+    firstInstallTime=2015-08-13 11:12:36
+    lastUpdateTime=2015-08-13 11:12:36
+    signatures=PackageSignatures{52a6d86c [52a8dcac]}
+    permissionsFixed=true haveGids=true installStatus=1
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    User 0:  installed=true stopped=false notLaunched=false enabled=0
+    grantedPermissions:
+      android.permission.READ_EXTERNAL_STORAGE
+      android.permission.READ_PHONE_STATE
+      com.lufthansa.android.lufthansa.permission.C2D_MESSAGE
+      android.permission.ACCESS_NETWORK_STATE
+      android.permission.WAKE_LOCK
+      android.permission.INTERNET
+      com.google.android.c2dm.permission.RECEIVE
