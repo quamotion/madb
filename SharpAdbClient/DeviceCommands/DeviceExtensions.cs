@@ -105,10 +105,10 @@ namespace SharpAdbClient.DeviceCommands
         /// <param name="packageName">
         /// The name of the package from which to get the application version.
         /// </param>
-        public static void GetPackageVersion(this DeviceData device, string packageName)
+        public static VersionInfo GetPackageVersion(this DeviceData device, string packageName)
         {
             PackageManager manager = new PackageManager(device);
-            manager.GetVersionInfo(packageName);
+            return manager.GetVersionInfo(packageName);
         }
     }
 }
