@@ -99,6 +99,7 @@
     <Compile Include="SocketBasedTests.cs" />
     <Compile Include="SyncServiceTests.cs" />
     <Compile Include="TracingAdbSocket.cs" />
+    <Compile Include="VersionInfoReceiverTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="framebuffer.bin">
@@ -130,6 +131,9 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="dumpsys_package.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="test.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

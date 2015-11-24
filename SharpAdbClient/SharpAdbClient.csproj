@@ -113,6 +113,9 @@
     <Compile Include="AdbResponse.cs" />
     <Compile Include="AdbServer.cs" />
     <Compile Include="AdbSocket.cs" />
+    <Compile Include="DeviceCommands\InfoReceiver.cs" />
+    <Compile Include="DeviceCommands\VersionInfo.cs" />
+    <Compile Include="DeviceCommands\VersionInfoReceiver.cs" />
     <Compile Include="Factories.cs" />
     <Compile Include="ColorData.cs" />
     <Compile Include="DeviceCommands\DeviceExtensions.cs" />

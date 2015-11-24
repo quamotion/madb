@@ -80,5 +80,35 @@ namespace SharpAdbClient.DeviceCommands
             AdbClient.Instance.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
             return receiver.EnvironmentVariables;
         }
+
+        /// <summary>
+        /// Uninstalls a package from the device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to uninstall the package.
+        /// </param>
+        /// <param name="packageName">
+        /// The name of the package to uninstall.
+        /// </param>
+        public static void UninstallPackage(this DeviceData device, string packageName)
+        {
+            PackageManager manager = new PackageManager(device);
+            manager.UninstallPackage(packageName);
+        }
+
+        /// <summary>
+        /// Requests the version information from the device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to uninstall the package.
+        /// </param>
+        /// <param name="packageName">
+        /// The name of the package from which to get the application version.
+        /// </param>
+        public static void GetPackageVersion(this DeviceData device, string packageName)
+        {
+            PackageManager manager = new PackageManager(device);
+            manager.GetVersionInfo(packageName);
+        }
     }
 }
