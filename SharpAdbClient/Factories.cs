@@ -15,6 +15,11 @@ namespace SharpAdbClient
     /// </summary>
     public static class Factories
     {
+        static Factories()
+        {
+            Reset();
+        }
+
         /// <summary>
         /// Creates a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
@@ -22,7 +27,7 @@ namespace SharpAdbClient
         /// A new instance of the <see cref="AdbSocket"/> class.
         /// </returns>
         public static Func<IPEndPoint, IAdbSocket> AdbSocketFactory
-        { get; set; } = (endPoint) => new AdbSocket(endPoint);
+        { get; set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="AdbClient"/> class.
@@ -31,7 +36,7 @@ namespace SharpAdbClient
         /// A new instance of the <see cref="AdbClient"/> class.
         /// </returns>
         public static Func<IPEndPoint, IAdbClient> AdbClientFactory
-        { get; set; } = (endPoint) => new AdbClient(endPoint);
+        { get; set; }
 
         /// <summary>
         /// Gets or sets a function that returns a new instance of a class that implements the
@@ -39,7 +44,7 @@ namespace SharpAdbClient
         /// <c>adb.exe</c> command line client.
         /// </summary>
         public static Func<string, IAdbCommandLineClient> AdbCommandLineClientFactory
-        { get; set; } = (path) => new AdbCommandLineClient(path);
+        { get; set; }
 
         /// <summary>
         /// Gets or sets a function that returns a new instance of a class that implements the
@@ -47,6 +52,17 @@ namespace SharpAdbClient
         /// a given device.
         /// </summary>
         public static Func<DeviceData, ISyncService> SyncServiceFactory
-        { get; set; } = (device) => new SyncService(device);
+        { get; set; }
+
+        /// <summary>
+        /// Restes all factories to their default values.
+        /// </summary>
+        public static void Reset()
+        {
+            AdbSocketFactory = (endPoint) => new AdbSocket(endPoint);
+            AdbClientFactory = (endPoint) => new AdbClient(endPoint);
+            AdbCommandLineClientFactory = (path) => new AdbCommandLineClient(path);
+            SyncServiceFactory = (device) => new SyncService(device);
+        }
     }
 }

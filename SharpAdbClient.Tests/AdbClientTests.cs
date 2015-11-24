@@ -38,6 +38,7 @@ namespace SharpAdbClient.Tests
         [TestInitialize]
         public void Initialize()
         {
+            Factories.Reset();
             // Toggle the integration test flag to true to run on an actual adb server
             // (and to build/validate the test cases), set to false to use the mocked
             // adb sockets.

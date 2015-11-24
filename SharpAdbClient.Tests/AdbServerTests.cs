@@ -17,6 +17,8 @@ namespace SharpAdbClient.Tests
         [TestInitialize]
         public void Initialize()
         {
+            Factories.Reset();
+
             this.socket = new DummyAdbSocket();
             Factories.AdbSocketFactory = (endPoint) => this.socket;
 

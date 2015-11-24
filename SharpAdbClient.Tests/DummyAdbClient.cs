@@ -1,6 +1,7 @@
 ﻿using SharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Net;
@@ -12,6 +13,9 @@ namespace SharpAdbClient.Tests
     {
         public Dictionary<string, string> Commands
         { get; private set; } = new Dictionary<string, string>();
+
+        public Collection<string> ReceivedCommands
+        { get; private set; } = new Collection<string>();
 
         public void Connect(DnsEndPoint endpoint)
         {
@@ -25,6 +29,8 @@ namespace SharpAdbClient.Tests
 
         public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
+            this.ReceivedCommands.Add(command);
+
             if (this.Commands.ContainsKey(command))
             {
                 if (rcvr != null)

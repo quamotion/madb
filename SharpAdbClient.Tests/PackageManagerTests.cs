@@ -35,9 +35,61 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
-        public void InstallRemotePackage()
+        public void InstallRemotePackageTest()
         {
+            var adbClient = new DummyAdbClient();
 
+            adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
+            adbClient.Commands.Add("pm install /data/test.apk", string.Empty);
+            adbClient.Commands.Add("pm install -r /data/test.apk", string.Empty);
+
+            AdbClient.Instance = adbClient;
+
+            DeviceData device = new DeviceData()
+            {
+                State = DeviceState.Online
+            };
+
+            PackageManager manager = new PackageManager(device);
+            manager.InstallRemotePackage("/data/test.apk", false);
+
+            Assert.AreEqual(2, adbClient.ReceivedCommands.Count);
+            Assert.AreEqual("pm install /data/test.apk", adbClient.ReceivedCommands[1]);
+
+            manager.InstallRemotePackage("/data/test.apk", true);
+
+            Assert.AreEqual(3, adbClient.ReceivedCommands.Count);
+            Assert.AreEqual("pm install -r /data/test.apk", adbClient.ReceivedCommands[2]);
+        }
+
+        [TestMethod]
+        [DeploymentItem("test.txt")]
+        public void InstallPackageTest()
+        {
+            var syncService = new DummySyncService();
+            Factories.SyncServiceFactory = (d) => syncService;
+
+            var adbClient = new DummyAdbClient();
+
+            adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
+            adbClient.Commands.Add("pm install /storage/sdcard0/tmp/test.txt", string.Empty);
+            adbClient.Commands.Add("rm /storage/sdcard0/tmp/test.txt", string.Empty);
+
+            AdbClient.Instance = adbClient;
+
+            DeviceData device = new DeviceData()
+            {
+                State = DeviceState.Online
+            };
+
+            PackageManager manager = new PackageManager(device);
+            manager.InstallPackage("test.txt", false);
+            Assert.AreEqual(3, adbClient.ReceivedCommands.Count);
+            Assert.AreEqual("pm install /storage/sdcard0/tmp/test.txt", adbClient.ReceivedCommands[1]);
+            Assert.AreEqual("rm /storage/sdcard0/tmp/test.txt", adbClient.ReceivedCommands[2]);
+
+            Assert.AreEqual(1, syncService.UploadedFiles.Count);
+            Assert.IsTrue(syncService.UploadedFiles.ContainsKey("/storage/sdcard0/tmp/test.txt"));
         }
 
         [TestMethod]
