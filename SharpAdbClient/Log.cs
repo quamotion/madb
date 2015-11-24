@@ -27,7 +27,7 @@ namespace SharpAdbClient
         /// </summary>
         static Log()
         {
-            Level = DdmPreferences.LogLevel;
+            Level = LogLevel.Error;
         }
 
         /// <summary>

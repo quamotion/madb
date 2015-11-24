@@ -114,11 +114,6 @@ namespace SharpAdbClient.Tests
             this.Requests.Add(request);
         }
 
-        public int Read(byte[] data, int timeout)
-        {
-            return 0;
-        }
-
         public void Close()
         {
             this.Connected = false;
@@ -129,12 +124,12 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public void Send(byte[] data, int length, int timeout)
+        public void Send(byte[] data, int length)
         {
             this.SyncDataSent.Enqueue(data.Take(length).ToArray());
         }
 
-        public void Read(byte[] data, int length, int timeout)
+        public void Read(byte[] data, int length)
         {
             var actual = this.SyncDataReceived.Dequeue();
 

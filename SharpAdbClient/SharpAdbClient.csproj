@@ -139,6 +139,7 @@
     <Compile Include="IAdbCommandLineClient.cs" />
     <Compile Include="IAdbSocket.cs" />
     <Compile Include="IDeviceMonitor.cs" />
+    <Compile Include="ITcpSocket.cs" />
     <Compile Include="ISyncService.cs" />
     <Compile Include="Logs\AndroidLogEntry.cs" />
     <Compile Include="Logs\EventLogEntry.cs" />
@@ -150,7 +151,6 @@
     <Compile Include="Logs\ShellStream.cs" />
     <Compile Include="NamespaceDoc.cs" />
     <Compile Include="Receivers\ConsoleOutputReceiver.cs" />
-    <Compile Include="DdmPreferences.cs" />
     <Compile Include="DeviceMonitor.cs" />
     <Compile Include="Exceptions\AdbException.cs" />
     <Compile Include="Exceptions\DeviceNotFoundException.cs" />
@@ -168,6 +168,7 @@
     <Compile Include="SyncCommand.cs" />
     <Compile Include="SyncCommandConverter.cs" />
     <Compile Include="SyncService.cs" />
+    <Compile Include="TcpSocket.cs" />
     <Compile Include="TransportType.cs" />
     <Compile Include="UnixFileMode.cs" />
   </ItemGroup>

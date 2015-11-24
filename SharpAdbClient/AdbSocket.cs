@@ -38,6 +38,8 @@ namespace SharpAdbClient
         /// </summary>
         private const int WaitTime = 5;
 
+        private const int Timeout = 5000;
+
         /// <summary>
         /// Logging tag
         /// </summary>
@@ -46,7 +48,7 @@ namespace SharpAdbClient
         /// <summary>
         /// The underlying TCP socket that manages the connection with the ADB server.
         /// </summary>
-        private Socket socket;
+        private ITcpSocket socket;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
@@ -57,9 +59,8 @@ namespace SharpAdbClient
         /// </param>
         public AdbSocket(IPEndPoint endPoint)
         {
-            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this.socket = new TcpSocket();
             this.socket.Connect(endPoint);
-            this.socket.Blocking = true;
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Connected/*'/>
@@ -98,29 +99,13 @@ namespace SharpAdbClient
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte/*'/>
         public virtual void Read(byte[] data)
         {
-            this.Read(data, -1, DdmPreferences.Timeout);
+            this.Read(data, -1);
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAsync_byte/*'/>
         public virtual Task ReadAsync(byte[] data)
         {
             return this.ReadAsync(data, -1);
-        }
-
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int/*'/>
-        public virtual int Read(byte[] data, int timeout)
-        {
-            int currentTimeout = this.socket.ReceiveTimeout;
-
-            try
-            {
-                this.socket.ReceiveTimeout = timeout;
-                return this.socket.Receive(data);
-            }
-            finally
-            {
-                this.socket.ReceiveTimeout = currentTimeout;
-            }
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string_int/*'/>
@@ -259,7 +244,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Send_byte_int_int/*'/>
-        public virtual void Send(byte[] data, int length, int timeout)
+        public virtual void Send(byte[] data, int length)
         {
             int numWaits = 0;
             int count = -1;
@@ -274,9 +259,9 @@ namespace SharpAdbClient
                 else if (count == 0)
                 {
                     // TODO: need more accurate timeout?
-                    if (timeout != 0 && numWaits * WaitTime > timeout)
+                    if (Timeout != 0 && numWaits * WaitTime > Timeout)
                     {
-                        throw new AdbException("timeout");
+                        throw new AdbException("A timeout has occurred while sending the data");
                     }
 
                     // non-blocking spin
@@ -338,7 +323,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int_int/*'/>
-        public virtual void Read(byte[] data, int length, int timeout)
+        public virtual void Read(byte[] data, int length)
         {
             int expLen = length != -1 ? length : data.Length;
             int count = -1;
@@ -379,7 +364,7 @@ namespace SharpAdbClient
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/GetShellStream/*'/>
         public Stream GetShellStream()
         {
-            NetworkStream stream = new NetworkStream(this.socket);
+            NetworkStream stream = this.socket.GetStream();
             return new ShellStream(stream, closeStream: true);
         }
 
@@ -398,7 +383,7 @@ namespace SharpAdbClient
         {
             try
             {
-                this.Send(data, -1, DdmPreferences.Timeout);
+                this.Send(data, -1);
             }
             catch (IOException e)
             {

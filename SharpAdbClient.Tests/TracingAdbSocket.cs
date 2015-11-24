@@ -76,11 +76,11 @@ namespace SharpAdbClient.Tests
             }
         }
 
-        public override void Read(byte[] data, int length, int timeout)
+        public override void Read(byte[] data, int length)
         {
             StackTrace trace = new StackTrace(false);
 
-            base.Read(data, length, timeout);
+            base.Read(data, length);
 
             if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
             {
@@ -165,11 +165,11 @@ namespace SharpAdbClient.Tests
             return response;
         }
 
-        public override void Send(byte[] data, int length, int timeout)
+        public override void Send(byte[] data, int length)
         {
             StackTrace trace = new StackTrace(false);
 
-            base.Send(data, length, timeout);
+            base.Send(data, length);
 
             if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
             {
