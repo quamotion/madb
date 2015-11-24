@@ -60,7 +60,7 @@ namespace SharpAdbClient
 #else
             // In release mode (e.g. on the build server),
             // never run integration tests.
-            this.Factory = new DummyAdbSocketFactory();
+            Factories.AdbSocketFactory = (endPoint) => new DummyAdbSocket();
             this.IntegrationTest = false;
 #endif
 
