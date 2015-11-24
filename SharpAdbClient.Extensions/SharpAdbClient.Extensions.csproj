@@ -80,7 +80,6 @@
     <Compile Include="Receivers\IListingReceiver.cs" />
     <Compile Include="Receivers\ListingServiceReceiver.cs" />
     <Compile Include="Receivers\MountPointReceiver.cs" />
-    <Compile Include="Receivers\PackageManagerListingReceiver.cs" />
     <Compile Include="ThrowIf.cs" />
   </ItemGroup>
   <ItemGroup>

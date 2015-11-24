@@ -110,5 +110,22 @@ namespace SharpAdbClient.DeviceCommands
             PackageManager manager = new PackageManager(device);
             return manager.GetVersionInfo(packageName);
         }
+
+        /// <summary>
+        /// Lists all processes running on the device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to list the processes that are running.
+        /// </param>
+        /// <returns>
+        /// An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all
+        /// processes that are currently running on the device.
+        /// </returns>
+        public static IEnumerable<AndroidProcess> ListProcesses(this DeviceData device)
+        {
+            var receiver = new ProcessOutputReceiver();
+            device.ExecuteShellCommand("ps", receiver);
+            return receiver.Processes;
+        }
     }
 }
