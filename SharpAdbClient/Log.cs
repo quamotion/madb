@@ -5,14 +5,11 @@
 namespace SharpAdbClient
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
 
     /// <summary>
     ///
     /// </summary>
-    public sealed class Log
+    public static class Log
     {
         /// <summary>
         /// Gets or sets the level.
@@ -26,63 +23,11 @@ namespace SharpAdbClient
         public static ILogOutput LogOutput { get; set; }
 
         /// <summary>
-        ///
-        /// </summary>
-        private static char[] SpaceLine = new char[72];
-
-        /// <summary>
-        ///
-        /// </summary>
-        private static readonly char[] HEXDIGIT = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-
-        /// <summary>
         /// Initializes static members of the <see cref="Log"/> class.
         /// </summary>
         static Log()
         {
-            /* prep for hex dump */
-            int i = SpaceLine.Length - 1;
-            while (i >= 0)
-            {
-                SpaceLine[i--] = ' ';
-            }
-
-            SpaceLine[0] = SpaceLine[1] = SpaceLine[2] = SpaceLine[3] = '0';
-            SpaceLine[4] = '-';
             Level = DdmPreferences.LogLevel;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Log"/> class.
-        /// </summary>
-        private Log()
-        {
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        private sealed class Config
-        {
-            /// <summary>
-            /// Log Verbose
-            /// </summary>
-            public const bool LOGV = true;
-
-            /// <summary>
-            /// Log Debug
-            /// </summary>
-            public const bool LOGD = true;
-        }
-
-        /// <summary>
-        /// Outputs a Verbose level message.
-        /// </summary>
-        /// <param name="tag">The tag associated with the message.</param>
-        /// <param name="message">The message to output</param>
-        public static void v(string tag, string message)
-        {
-            WriteLine(LogLevel.Verbose, tag, message);
         }
 
         /// <summary>
@@ -100,16 +45,6 @@ namespace SharpAdbClient
         /// Outputs a Debug level message.
         /// </summary>
         /// <param name="tag">The tag associated with the message.</param>
-        /// <param name="message">The message to output</param>
-        public static void d(string tag, string message)
-        {
-            WriteLine(LogLevel.Debug, tag, message);
-        }
-
-        /// <summary>
-        /// Outputs a Debug level message.
-        /// </summary>
-        /// <param name="tag">The tag associated with the message.</param>
         /// <param name="format">The message to output format string.</param>
         /// <param name="args">The values for the format message</param>
         public static void d(string tag, string format, params object[] args)
@@ -121,31 +56,11 @@ namespace SharpAdbClient
         /// Outputs a Info level message.
         /// </summary>
         /// <param name="tag">The tag associated with the message.</param>
-        /// <param name="format">The message to output.</param>
-        public static void i(string tag, string message)
-        {
-            WriteLine(LogLevel.Info, tag, message);
-        }
-
-        /// <summary>
-        /// Outputs a Info level message.
-        /// </summary>
-        /// <param name="tag">The tag associated with the message.</param>
         /// <param name="format">The message to output format string.</param>
         /// <param name="args">The values for the format message</param>
         public static void i(string tag, string format, params object[] args)
         {
             WriteLine(LogLevel.Info, tag, string.Format(format, args));
-        }
-
-        /// <summary>
-        /// Outputs a Warn level message.
-        /// </summary>
-        /// <param name="tag">The tag associated with the message.</param>
-        /// <param name="message">The message to output.</param>
-        public static void w(string tag, string message)
-        {
-            WriteLine(LogLevel.Warn, tag, message);
         }
 
         /// <summary>
@@ -170,28 +85,6 @@ namespace SharpAdbClient
             {
                 w(tag, exception.ToString());
             }
-        }
-
-        /// <summary>
-        /// Outputs a Warn level message.
-        /// </summary>
-        /// <param name="tag">The tag associated with the message.</param>
-        /// <param name="message">The message to output.</param>
-        /// <param name="exception">The exception to warn</param>
-        public static void w(string tag, string message, Exception exception)
-        {
-            w(tag, "{0}\n{1}", message, exception);
-        }
-
-        /// <summary>
-        /// Outputs a Error level message.
-        /// </summary>
-        /// <param name="tag">The tag associated with the message.</param>
-        /// <param name="message">The message to output.</param>
-        /// <gist id="f4fa3525f899e5461d4e" />
-        public static void e(string tag, string message)
-        {
-            WriteLine(LogLevel.Error, tag, message);
         }
 
         /// <summary>
@@ -221,18 +114,6 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Outputs a Error level message.
-        /// </summary>
-        /// <param name="tag">The tag associated with the message.</param>
-        /// <param name="message">The message to output.</param>
-        /// <param name="exception">The exception to warn</param>
-        /// <gist id="90b6664f4dd84da50b27" />
-        public static void e(string tag, string message, Exception exception)
-        {
-            e(tag, "{0}\n{1}", message, exception);
-        }
-
-        /// <summary>
         /// Outputs a log message and attempts to display it in a dialog.
         /// </summary>
         /// <param name="logLevel">The log level</param>
@@ -248,98 +129,6 @@ namespace SharpAdbClient
             {
                 WriteLine(logLevel, tag, message);
             }
-        }
-
-        /// <summary>
-        /// Dump the entire contents of a byte array with DEBUG priority.
-        /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="level"></param>
-        /// <param name="data"></param>
-        /// <param name="offset"></param>
-        /// <param name="length"></param>
-        /// <remarks>
-        /// Local addition.  Output looks like:
-        /// 1230- 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff  0123456789abcdef
-        /// Uses no string concatenation; creates one String object per line.
-        /// </remarks>
-        internal static void HexDump(string tag, LogLevel.LogLevelInfo level, byte[] data, int offset, int length)
-        {
-            int kHexOffset = 6;
-            int kAscOffset = 55;
-            char[] line = new char[SpaceLine.Length];
-            int addr, baseAddr, count;
-            int i, ch;
-            bool needErase = true;
-
-            baseAddr = 0;
-            while (length != 0)
-            {
-                if (length > 16)
-                {
-                    // full line
-                    count = 16;
-                }
-                else
-                {
-                    // partial line; re-copy blanks to clear end
-                    count = length;
-                    needErase = true;
-                }
-
-                if (needErase)
-                {
-                    Array.Copy(SpaceLine, 0, line, 0, SpaceLine.Length);
-                    needErase = false;
-                }
-
-                // output the address (currently limited to 4 hex digits)
-                addr = baseAddr;
-                addr &= 0xffff;
-                ch = 3;
-                while (addr != 0)
-                {
-                    line[ch] = HEXDIGIT[addr & 0x0f];
-                    ch--;
-                    addr >>= 4;
-                }
-
-                // output hex digits and ASCII chars
-                ch = kHexOffset;
-                for (i = 0; i < count; i++)
-                {
-                    byte val = data[offset + i];
-
-                    line[ch++] = HEXDIGIT[(val >> 4) & 0x0f];
-                    line[ch++] = HEXDIGIT[val & 0x0f];
-                    ch++;
-
-                    if (val >= 0x20 && val < 0x7f)
-                    {
-                        line[kAscOffset + i] = (char)val;
-                    }
-                    else
-                    {
-                        line[kAscOffset + i] = '.';
-                    }
-                }
-
-                WriteLine(level, tag, new string(line));
-
-                // advance to next chunk of data
-                length -= count;
-                offset += count;
-                baseAddr += count;
-            }
-        }
-
-        /// <summary>
-        /// Dump the entire contents of a byte array with DEBUG priority.
-        /// </summary>
-        /// <param name="data"></param>
-        internal static void HexDump(byte[] data)
-        {
-            HexDump("ddms", LogLevel.Debug, data, 0, data.Length);
         }
 
         /// <summary>
