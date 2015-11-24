@@ -78,6 +78,7 @@
     <Compile Include="AdbSocketTests.cs" />
     <Compile Include="ConsoleOutputReceiverTests.cs" />
     <Compile Include="DeviceDataTests.cs" />
+    <Compile Include="DeviceExtensionsTests.cs" />
     <Compile Include="DeviceMonitorSink.cs" />
     <Compile Include="DeviceMonitorTests.cs" />
     <Compile Include="DummyAdbClient.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="FramebufferHeaderTests.cs" />
     <Compile Include="GetPropReceiverTests.cs" />
     <Compile Include="IDummyAdbSocket.cs" />
+    <Compile Include="InstallReceiverTests.cs" />
     <Compile Include="LinuxPathTests.cs" />
     <Compile Include="LoggerTests.cs" />
     <Compile Include="PackageManagerTests.cs" />

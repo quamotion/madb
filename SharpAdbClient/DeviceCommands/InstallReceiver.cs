@@ -8,21 +8,37 @@ namespace SharpAdbClient.DeviceCommands
     using System.Text.RegularExpressions;
 
     /// <summary>
-    /// 
+    /// Processes output of the <c>pm install</c> command.
     /// </summary>
     public class InstallReceiver : MultiLineReceiver
     {
         /// <summary>
-        ///
+        /// The error message that indicates an unkown error occurred.
         /// </summary>
-        private const string SUCCESS_OUTPUT = "Success";
+        public const string UnknownError = "An unknown error occurred.";
 
         /// <summary>
-        ///
+        /// The message that indicates the operation completed successfully.
         /// </summary>
-        private const string FAILURE_PATTERN = @"Failure(?:\s+\[(.*)\])?";
+        private const string SuccessOutput = "Success";
 
-        private const string UNKNOWN_ERROR = "An unknown error occurred.";
+        /// <summary>
+        /// A regular expression that matches output that indicates a failure.
+        /// </summary>
+        private const string FailurePattern = @"Failure(?:\s+\[(.*)\])?";
+
+        /// <summary>
+        /// Gets the error message if the install was unsuccessful.
+        /// </summary>
+        public string ErrorMessage { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the install was a success.
+        /// </summary>
+        /// <value>
+        ///   <see langword="true"/> if success; otherwise, <see langword="false"/>.
+        /// </value>
+        public bool Success { get; private set; }
 
         /// <summary>
         /// Processes the new lines.
@@ -34,19 +50,20 @@ namespace SharpAdbClient.DeviceCommands
             {
                 if (line.Length > 0)
                 {
-                    if (line.StartsWith(SUCCESS_OUTPUT))
+                    if (line.StartsWith(SuccessOutput))
                     {
                         this.ErrorMessage = null;
                         this.Success = true;
                     }
                     else
                     {
-                        var m = line.Match(FAILURE_PATTERN, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                        this.ErrorMessage = UNKNOWN_ERROR;
+                        var m = line.Match(FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        this.ErrorMessage = UnknownError;
+
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            this.ErrorMessage = string.IsNullOrWhiteSpace(msg) ? UNKNOWN_ERROR : msg;
+                            this.ErrorMessage = string.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
                         }
 
                         this.Success = false;
@@ -54,19 +71,5 @@ namespace SharpAdbClient.DeviceCommands
                 }
             }
         }
-
-        /// <summary>
-        /// Gets the error message if the install was unsuccessful.
-        /// </summary>
-        /// <value>The error message.</value>
-        public string ErrorMessage { get; private set; }
-
-        /// <summary>
-        /// Gets a value indicating whether the install was a success.
-        /// </summary>
-        /// <value>
-        ///   <see langword="true"/> if success; otherwise, <see langword="false"/>.
-        /// </value>
-        public bool Success { get; private set; }
     }
 }
