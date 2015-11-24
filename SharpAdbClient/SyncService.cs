@@ -70,7 +70,7 @@ namespace SharpAdbClient
         /// The device on which to interact with the files.
         /// </param>
         public SyncService(DeviceData device)
-            : this(AdbClient.SocketFactory.Create(AdbServer.EndPoint), device)
+            : this(Factories.AdbSocketFactory(AdbServer.EndPoint), device)
         {
         }
 
@@ -123,7 +123,7 @@ namespace SharpAdbClient
             AdbClient.Instance.SetDevice(this.Socket, this.Device);
 
             this.Socket.SendAdbRequest("sync:");
-            var resp = this.Socket.ReadAdbResponse(false);
+            var resp = this.Socket.ReadAdbResponse();
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
@@ -168,7 +168,7 @@ namespace SharpAdbClient
                 // now send the data to the device
                 // first write the amount read
                 this.Socket.SendSyncRequest(SyncCommand.DATA, read);
-                this.Socket.Send(buffer, read, -1);
+                this.Socket.Send(buffer, read);
             }
 
             // create the DONE message
@@ -239,7 +239,7 @@ namespace SharpAdbClient
                 }
 
                 // now read the length we received
-                this.Socket.Read(buffer, size, -1);
+                this.Socket.Read(buffer, size);
                 stream.Write(buffer, 0, size);
             }
         }

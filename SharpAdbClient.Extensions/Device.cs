@@ -435,7 +435,7 @@ namespace SharpAdbClient
             {
                 try
                 {
-                    this.ExecuteShellCommand(EnvironmentVariablesReceiver.ENV_COMMAND, new EnvironmentVariablesReceiver(this));
+                    this.ExecuteShellCommand(EnvironmentVariablesReceiver.PrintEnvCommand, new EnvironmentVariablesReceiver(this));
                 }
                 catch (AdbException)
                 {
@@ -530,7 +530,7 @@ namespace SharpAdbClient
         {
             get
             {
-                ISyncService syncService = new SyncService(this.DeviceData);
+                ISyncService syncService = Factories.SyncServiceFactory(this.DeviceData);
                 try
                 {
                     syncService.Open();

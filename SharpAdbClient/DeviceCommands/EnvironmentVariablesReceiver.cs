@@ -6,39 +6,40 @@ namespace SharpAdbClient
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.Text.RegularExpressions;
 
     /// <summary>
-    ///
+    /// Processes the output of the <c>printenv</c> command, which dumps all environment variables of
+    /// an Android device.
     /// </summary>
     public sealed class EnvironmentVariablesReceiver : MultiLineReceiver
     {
         /// <summary>
-        ///
+        /// The path to the <c>printenv</c> command.
         /// </summary>
-        public const string ENV_COMMAND = "printenv";
+        public const string PrintEnvCommand = "printenv";
 
         /// <summary>
-        ///
+        /// A regular expression that can be used to parse the output of the <c>printenv/c> command.
         /// </summary>
-        private const string ENV_PATTERN = @"^([^=\s]+)\s*=\s*(.*)$";
+        private const string EnvPattern = @"^([^=\s]+)\s*=\s*(.*)$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EnvironmentVariablesReceiver"/> class.
         /// </summary>
-        /// <param name="device">The device.</param>
-        public EnvironmentVariablesReceiver(Device device)
+        public EnvironmentVariablesReceiver()
         {
-            this.Device = device;
+            this.EnvironmentVariables = new Dictionary<string, string>();
         }
 
         /// <summary>
-        /// Gets or sets the device.
+        /// Gets or sets the environment variables that are currently defined on the device.
         /// </summary>
-        /// <value>The device.</value>
-        public Device Device { get; private set; }
+        public Dictionary<string, string> EnvironmentVariables
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Processes the new lines.
@@ -53,7 +54,7 @@ namespace SharpAdbClient
                     continue;
                 }
 
-                Match m = Regex.Match(line, ENV_PATTERN);
+                Match m = Regex.Match(line, EnvPattern);
                 if (m.Success)
                 {
                     string label = m.Groups[1].Value.Trim();
@@ -61,26 +62,17 @@ namespace SharpAdbClient
 
                     if (label.Length > 0)
                     {
-                        if (this.Device.EnvironmentVariables.ContainsKey(label))
+                        if (this.EnvironmentVariables.ContainsKey(label))
                         {
-                            this.Device.EnvironmentVariables[label] = value;
+                            this.EnvironmentVariables[label] = value;
                         }
                         else
                         {
-                            this.Device.EnvironmentVariables.Add(label, value);
+                            this.EnvironmentVariables.Add(label, value);
                         }
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Finishes the receiver
-        /// </summary>
-        protected override void Done()
-        {
-            this.Device.OnBuildInfoChanged(EventArgs.Empty);
-            base.Done();
         }
     }
 }

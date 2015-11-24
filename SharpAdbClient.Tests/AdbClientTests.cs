@@ -6,12 +6,21 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Drawing.Imaging;
+using System.IO;
+using SharpAdbClient.Logs;
 
 namespace SharpAdbClient.Tests
 {
     [TestClass]
     public class AdbClientTests : SocketBasedTests
     {
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorNullTest()
+        {
+            new AdbClient(null);
+        }
+
         [TestMethod]
         public void FormAdbRequestTest()
         {
@@ -29,6 +38,7 @@ namespace SharpAdbClient.Tests
         [TestInitialize]
         public void Initialize()
         {
+            Factories.Reset();
             // Toggle the integration test flag to true to run on an actual adb server
             // (and to build/validate the test cases), set to false to use the mocked
             // adb sockets.
@@ -137,8 +147,106 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
-        [Ignore]
+        [ExpectedException(typeof(DeviceNotFoundException))]
+        public void SetInvalidDeviceTest()
+        {
+            var requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555"
+            };
+
+            this.RunTest(
+                new AdbResponse[] { AdbResponse.FromError("device not found") },
+                NoResponseMessages,
+                requests,
+                () =>
+                {
+                    AdbClient.Instance.SetDevice(this.Socket, Device);
+                });
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AdbException))]
+        public void SetDeviceOtherException()
+        {
+            var requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555"
+            };
+
+            this.RunTest(
+                new AdbResponse[] { AdbResponse.FromError("Too many cats.") },
+                NoResponseMessages,
+                requests,
+                () =>
+                {
+                    AdbClient.Instance.SetDevice(this.Socket, Device);
+                });
+        }
+
+        [TestMethod]
+        public void RebootTest()
+        {
+            var requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "reboot:"
+            };
+
+            this.RunTest(
+                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                NoResponseMessages,
+                requests,
+                () =>
+                {
+                    AdbClient.Instance.Reboot(Device);
+                });
+        }
+
+        [TestMethod]
         public void ExecuteRemoteCommandTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            var responses = new AdbResponse[]
+            {
+                AdbResponse.OK,
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "shell:echo Hello, World"
+            };
+
+            byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
+            MemoryStream shellStream = new MemoryStream(streamData);
+
+            var receiver = new ConsoleOutputReceiver();
+
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                shellStream,
+                () =>
+                {
+                    AdbClient.Instance.ExecuteRemoteCommand("echo Hello, World", device, receiver);
+                });
+
+            Assert.AreEqual("Hello, World\r\n", receiver.ToString());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ShellCommandUnresponsiveException))]
+        public void ExecuteRemoteCommandUnresponsiveTest()
         {
             var device = new DeviceData()
             {
@@ -166,12 +274,11 @@ namespace SharpAdbClient.Tests
                 responses,
                 responseMessages,
                 requests,
+                null,
                 () =>
                 {
                     AdbClient.Instance.ExecuteRemoteCommand("echo Hello, World", device, receiver);
                 });
-
-            Assert.AreEqual("Hello, World\r\n", receiver.ToString());
         }
 
         [TestMethod]
@@ -340,23 +447,51 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
-        [Ignore]
+        [DeploymentItem("logcat.bin")]
         public void ReadLogTest()
         {
             var device = new DeviceData()
             {
-                Serial = "EAOKCY112414"
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
             };
 
-            var entries = AdbClient.Instance.RunLogService(device);
-
-            foreach (var entry in entries)
+            var responses = new AdbResponse[]
             {
-                Console.WriteLine(entry.ToString());
+                AdbResponse.OK,
+                AdbResponse.OK
+            };
+
+            var responseMessages = new string[] { };
+
+            var requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "shell:logcat -B -b system"
+            };
+
+            var receiver = new ConsoleOutputReceiver();
+
+            using (Stream stream = File.OpenRead("logcat.bin"))
+            using (ShellStream shellStream = new ShellStream(stream, false))
+            {
+                Logs.LogEntry[] logs = null;
+
+                this.RunTest(
+                    responses,
+                    responseMessages,
+                    requests,
+                    shellStream,
+                    () =>
+                    {
+                        logs = AdbClient.Instance.RunLogService(device, Logs.LogId.System).ToArray();
+                    });
+
+                Assert.AreEqual(3, logs.Count());
             }
         }
 
-        public void RunConnectTest(Action test, string connectString)
+        private void RunConnectTest(Action test, string connectString)
         {
             var requests = new string[]
             {

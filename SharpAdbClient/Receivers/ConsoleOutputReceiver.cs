@@ -20,8 +20,9 @@ namespace SharpAdbClient
         /// </summary>
         private const string Tag = nameof(ConsoleOutputReceiver);
 
-        private static ConsoleOutputReceiver instance = null;
-
+        /// <summary>
+        /// A <see cref="StringBuilder"/> which receives all output from the device.
+        /// </summary>
         private StringBuilder output = new StringBuilder();
 
         /// <summary>
@@ -48,27 +49,27 @@ namespace SharpAdbClient
                 if (line.EndsWith(": not found"))
                 {
                     Log.w(Tag, $"The remote execution returned: '{line}'");
-                    throw new FileNotFoundException($"The remote execution returned: '{line}");
+                    throw new FileNotFoundException($"The remote execution returned: '{line}'");
                 }
 
                 if (line.EndsWith("No such file or directory"))
                 {
                     Log.w(Tag, $"The remote execution returned: {line}");
-                    throw new FileNotFoundException($"The remote execution returned: {line}");
+                    throw new FileNotFoundException($"The remote execution returned: '{line}'");
                 }
 
                 // for "unknown options"
                 if (line.Contains("Unknown option"))
                 {
                     Log.w(Tag, $"The remote execution returned: {line}");
-                    throw new UnknownOptionException(line);
+                    throw new UnknownOptionException($"The remote execution returned: '{line}'");
                 }
 
                 // for "aborting" commands
                 if (line.IsMatch("Aborting.$"))
                 {
                     Log.w(Tag, $"The remote execution returned: {line}");
-                    throw new CommandAbortingException(line);
+                    throw new CommandAbortingException($"The remote execution returned: '{line}'");
                 }
 
                 // for busybox applets
@@ -84,7 +85,7 @@ namespace SharpAdbClient
                 if (line.IsMatch("(permission|access) denied$"))
                 {
                     Log.w(Tag, $"The remote execution returned: '{line}'");
-                    throw new PermissionDeniedException(string.Format("The remote execution returned: '{line}'"));
+                    throw new PermissionDeniedException($"The remote execution returned: '{line}'");
                 }
             }
         }

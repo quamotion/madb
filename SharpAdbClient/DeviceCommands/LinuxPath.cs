@@ -6,6 +6,7 @@ namespace SharpAdbClient.DeviceCommands
 {
     using System;
     using System.Runtime.CompilerServices;
+    using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
 
@@ -15,14 +16,19 @@ namespace SharpAdbClient.DeviceCommands
     public static class LinuxPath
     {
         /// <summary>
-        /// Pattern to escape filenames for shell command consumption.
-        /// </summary>
-        private const string ESCAPEPATTERN = "([\\\\()*+?\"'#/\\s])";
-
-        /// <summary>
         /// The directory separator character.
         /// </summary>
         public const char DirectorySeparatorChar = '/';
+
+        /// <summary>
+        /// Pattern to escape filenames for shell command consumption.
+        /// </summary>
+        private const string EscapePattern = "([\\\\()*+?\"'#/\\s])";
+
+        private static readonly char[] InvalidCharacters = new char[]
+        {
+            '|', '\\', '?', '*', '<', '\"', ':', '>', '+', '[', ']'
+        };
 
         /// <summary>
         /// Checks the invalid path chars.
@@ -30,13 +36,14 @@ namespace SharpAdbClient.DeviceCommands
         /// <param name="path">The path.</param>
         internal static void CheckInvalidPathChars(string path)
         {
-            for (int i = 0; i < path.Length; i++)
+            if (path == null)
             {
-                int num2 = path[i];
-                if (((num2 == 0x22) || (num2 == 60)) || (((num2 == 0x3e) || (num2 == 0x7c)) || (num2 < 0x20)))
-                {
-                    throw new ArgumentException("Path contains invalid characters");
-                }
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            if (path.ToCharArray().Any(c => c < 0x20 || InvalidCharacters.Contains(c)))
+            {
+                throw new ArgumentException("Path contains invalid characters");
             }
         }
 
@@ -49,7 +56,7 @@ namespace SharpAdbClient.DeviceCommands
         {
             if (paths == null)
             {
-                throw new ArgumentNullException("paths");
+                throw new ArgumentNullException(nameof(paths));
             }
 
             int capacity = 0;
@@ -58,7 +65,7 @@ namespace SharpAdbClient.DeviceCommands
             {
                 if (paths[i] == null)
                 {
-                    throw new ArgumentNullException("paths");
+                    throw new ArgumentNullException(nameof(paths));
                 }
 
                 if (paths[i].Length != 0)
@@ -99,7 +106,7 @@ namespace SharpAdbClient.DeviceCommands
                             builder.Append(DirectorySeparatorChar);
                         }
 
-                            builder.Append(paths[j]);
+                        builder.Append(paths[j]);
                     }
                 }
             }
@@ -203,7 +210,7 @@ namespace SharpAdbClient.DeviceCommands
                 int length = path.Length;
                 if ((length >= 1 && (path[0] == DirectorySeparatorChar)) ||
                     (length == 1))
-                    {
+                {
                     return true;
                 }
             }
@@ -218,7 +225,7 @@ namespace SharpAdbClient.DeviceCommands
         /// <returns></returns>
         public static string Escape(string path)
         {
-            return new Regex(ESCAPEPATTERN).Replace(path, new MatchEvaluator(delegate(Match m)
+            return new Regex(EscapePattern).Replace(path, new MatchEvaluator(delegate(Match m)
             {
                 return m.Result("\\\\$1");
             }));

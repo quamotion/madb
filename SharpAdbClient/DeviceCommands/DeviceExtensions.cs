@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
-using System.Collections.Generic;
-
 namespace SharpAdbClient.DeviceCommands
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Provides extension methods for the <see cref="DeviceData"/> class, allowing you to run
     /// commands directory against a <see cref="DeviceData"/> object.
@@ -43,7 +43,7 @@ namespace SharpAdbClient.DeviceCommands
         /// </returns>
         public static FileStatistics Stat(this DeviceData device, string path)
         {
-            using (SyncService service = new SyncService(device))
+            using (ISyncService service = Factories.SyncServiceFactory(device))
             {
                 return service.Stat(path);
             }
@@ -63,6 +63,22 @@ namespace SharpAdbClient.DeviceCommands
             var receiver = new GetPropReceiver();
             AdbClient.Instance.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
             return receiver.Properties;
+        }
+
+        /// <summary>
+        /// Gets the environment variables currently defined on a device.
+        /// </summary>
+        /// <param name="device">
+        /// The device for which to list the environment variables.
+        /// </param>
+        /// <returns>
+        /// A dictionary containing the environment variables of the device, and their values.
+        /// </returns>
+        public static Dictionary<string, string> GetEnvironmentVariables(this DeviceData device)
+        {
+            var receiver = new EnvironmentVariablesReceiver();
+            AdbClient.Instance.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
+            return receiver.EnvironmentVariables;
         }
     }
 }

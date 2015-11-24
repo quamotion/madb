@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace SharpAdbClient
 {
@@ -19,12 +20,6 @@ namespace SharpAdbClient
             Serial = "169.254.109.177:5555",
             State = DeviceState.Online
         };
-
-        protected IAdbSocketFactory Factory
-        {
-            get;
-            set;
-        }
 
         protected IDummyAdbSocket Socket
         {
@@ -51,23 +46,26 @@ namespace SharpAdbClient
             // use the dummy socket factory to run unit tests.
             if (integrationTest)
             {
-                this.Factory = new TracingAdbSocketFactory(doDispose);
+                Factories.AdbSocketFactory = (endPoint) => new TracingAdbSocket(endPoint)
+                {
+                    DoDispose = doDispose
+                };
             }
             else
             {
-                this.Factory = new DummyAdbSocketFactory();
+                Factories.AdbSocketFactory = (endPoint) => new DummyAdbSocket();
             }
 
             this.IntegrationTest = integrationTest;
 #else
             // In release mode (e.g. on the build server),
             // never run integration tests.
-            this.Factory = new DummyAdbSocketFactory();
+            Factories.AdbSocketFactory = (endPoint) => new DummyAdbSocket();
             this.IntegrationTest = false;
 #endif
 
-            this.Socket = (IDummyAdbSocket)Factory.Create(AdbServer.EndPoint);
-            AdbClient.SocketFactory = this.Factory;
+            this.Socket = new DummyAdbSocket();
+            Factories.AdbSocketFactory = (endPoint) => this.Socket;
             this.EndPoint = AdbServer.EndPoint;
 
             AdbClient.Instance = new AdbClient(AdbServer.EndPoint);
@@ -108,7 +106,17 @@ namespace SharpAdbClient
             IEnumerable<string> requests,
             Action test)
         {
-            RunTest(responses, responseMessages, requests, null, null, null, null, test);
+            RunTest(responses, responseMessages, requests, null, null, null, null, null, test);
+        }
+
+        protected void RunTest(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            Stream shellStream,
+            Action test)
+        {
+            RunTest(responses, responseMessages, requests, null, null, null, null, shellStream, test);
         }
 
         protected void RunTest(
@@ -121,10 +129,35 @@ namespace SharpAdbClient
             IEnumerable<byte[]> syncDataSent,
             Action test)
         {
+            this.RunTest(
+                responses,
+                responseMessages,
+                requests,
+                syncRequests,
+                syncResponses,
+                syncDataReceived,
+                syncDataSent,
+                null,
+                test);
+        }
+
+        protected void RunTest(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            IEnumerable<Tuple<SyncCommand, string>> syncRequests,
+            IEnumerable<SyncCommand> syncResponses,
+            IEnumerable<byte[]> syncDataReceived,
+            IEnumerable<byte[]> syncDataSent,
+            Stream shellStream,
+            Action test)
+        {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
             if (!this.IntegrationTest)
             {
+                this.Socket.ShellStream = shellStream;
+
                 foreach (var response in responses)
                 {
                     this.Socket.Responses.Enqueue(response);

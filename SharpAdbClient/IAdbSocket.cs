@@ -23,7 +23,7 @@ namespace SharpAdbClient
         void SendAdbRequest(string request);
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Send_byte_int_int/*'/>
-        void Send(byte[] data, int length, int timeout);
+        void Send(byte[] data, int length);
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string_int/*'/>
         void SendSyncRequest(SyncCommand command, string path, int permissions);
@@ -38,13 +38,10 @@ namespace SharpAdbClient
         SyncCommand ReadSyncResponse();
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAdbResponse/*'/>
-        AdbResponse ReadAdbResponse(bool readDiagString);
+        AdbResponse ReadAdbResponse();
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte/*'/>
         void Read(byte[] data);
-
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int/*'/>
-        int Read(byte[] data, int timeout);
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadString/*'/>
         string ReadString();
@@ -59,7 +56,7 @@ namespace SharpAdbClient
         void Close();
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int_int/*'/>
-        void Read(byte[] data, int length, int timeout);
+        void Read(byte[] data, int length);
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/GetShellStream/*'/>
         Stream GetShellStream();

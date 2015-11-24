@@ -101,7 +101,7 @@ namespace SharpAdbClient.DeviceCommands
             InstallReceiver receiver = new InstallReceiver();
             var reinstallSwitch = reinstall ? "-r " : string.Empty;
 
-            string cmd = $"pm install {remoteFilePath}{reinstallSwitch}";
+            string cmd = $"pm install {reinstallSwitch}{remoteFilePath}";
             this.Device.ExecuteShellCommand(cmd, receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
@@ -155,7 +155,7 @@ namespace SharpAdbClient.DeviceCommands
 
                 Log.d(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
 
-                using (SyncService sync = new SyncService(this.Device))
+                using (ISyncService sync = Factories.SyncServiceFactory(this.Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
                     string message = $"Uploading file onto device '{this.Device.Serial}'";

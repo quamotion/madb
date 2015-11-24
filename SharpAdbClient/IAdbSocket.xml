@@ -16,7 +16,7 @@
   <SendAdbRequest>
     <summary>
       Sends a request to the Android Debug Bridge. To read the response, call
-      <see cref="ReadAdbResponse(bool)"/>.
+      <see cref="ReadAdbResponse()"/>.
     </summary>
     <param name="request">
       The request to send.
@@ -28,10 +28,6 @@
       Receives an <see cref="AdbResponse"/> message, and throws an error
       if the message does not indicate success.
     </summary>
-    <param name="readDiagString">
-      <see langword="true"/> to read the string that immediately follows the
-      <see cref="AdbResponse"/>.
-    </param>
     <returns>
       A <see cref="AdbResponse"/> object that represents the response from the
       Android Debug Bridge.
@@ -87,21 +83,6 @@
     </returns>
   </ReadAsync_byte_int>
 
-  <Read_byte_int>
-    <summary>
-      Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
-    </summary>
-    <param name="data">
-      An array of type <see cref="byte"/> that is the storage location for the received data.
-    </param>
-    <param name="timeout">
-      The amount of time after which the receive operation will time out.
-    </param>
-    <returns>
-      The number of bytes received.
-    </returns>
-  </Read_byte_int>
-
   <ReadString>
     <summary>
       Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance.
@@ -156,27 +137,19 @@
     <param name="length">
       The number of bytes to send.
     </param>
-    <param name="timeout">
-      The interval after which the operation times out.
-    </param>
   </Send_byte_int_int>
 
   <Read_byte_int_int>
     <summary>
       Reads from the socket until the array is filled, the optional <paramref name="length"/>
       is reached, or no more data is coming (because the socket closed or the
-      timeout expired). After <paramref name="timeout"/> milliseconds since the
-      previous successful read, this will return whether or not new data has
-      been found.
+      timeout expired).
     </summary>
     <param name="data">
       The buffer to store the read data into.
     </param>
     <param name="length">
       The length to read or -1 to fill the data buffer completely
-    </param>
-    <param name="timeout">
-      The timeout value in ms. A timeout of zero means "wait forever".
     </param>
     <exception cref="AdbException">
       EOF

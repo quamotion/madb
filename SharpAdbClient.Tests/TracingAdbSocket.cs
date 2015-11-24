@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace SharpAdbClient.Tests
 {
@@ -12,6 +13,12 @@ namespace SharpAdbClient.Tests
     {
         public TracingAdbSocket(IPEndPoint endPoint) : base(endPoint)
         {
+        }
+
+        public Stream ShellStream
+        {
+            get;
+            set;
         }
 
         public bool DoDispose
@@ -69,11 +76,11 @@ namespace SharpAdbClient.Tests
             }
         }
 
-        public override void Read(byte[] data, int length, int timeout)
+        public override void Read(byte[] data, int length)
         {
             StackTrace trace = new StackTrace(false);
 
-            base.Read(data, length, timeout);
+            base.Read(data, length);
 
             if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
             {
@@ -81,14 +88,14 @@ namespace SharpAdbClient.Tests
             }
         }
 
-        public override AdbResponse ReadAdbResponse(bool readDiagString)
+        public override AdbResponse ReadAdbResponse()
         {
             Exception exception = null;
             AdbResponse response;
 
             try
             {
-                response = base.ReadAdbResponse(readDiagString);
+                response = base.ReadAdbResponse();
             }
             catch (AdbException ex)
             {
@@ -158,11 +165,11 @@ namespace SharpAdbClient.Tests
             return response;
         }
 
-        public override void Send(byte[] data, int length, int timeout)
+        public override void Send(byte[] data, int length)
         {
             StackTrace trace = new StackTrace(false);
 
-            base.Send(data, length, timeout);
+            base.Send(data, length);
 
             if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
             {

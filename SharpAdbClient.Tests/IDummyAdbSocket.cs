@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SharpAdbClient.Tests
 {
     public interface IDummyAdbSocket : IAdbSocket
     {
+        Stream ShellStream
+        { get; set; }
+
         Queue<AdbResponse> Responses
         { get; }
 
