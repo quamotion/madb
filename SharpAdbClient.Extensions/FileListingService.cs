@@ -278,15 +278,6 @@ namespace SharpAdbClient
 					children.ForEach ( child => {
 						map.Add ( child.FullPath, child );
 					} );
-
-					// call pm.
-					String command = PM_FULL_LISTING;
-					try {
-						this.Device.ExecuteShellCommand ( command, new PackageManagerListingReceiver ( map, receiver ) );
-					} catch ( IOException e ) {
-						// adb failed somehow, we do nothing.
-						Log.e ( "FileListingService", e );
-					}
 				}
 
 
