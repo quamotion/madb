@@ -26,6 +26,11 @@ namespace SharpAdbClient.DeviceCommands
         private const string ListFull = "pm list packages -f";
 
         /// <summary>
+        /// The command that list all third party packages installed on the device.
+        /// </summary>
+        private const string ListThirdPartyOnly = "pm list packages -f -3";
+
+        /// <summary>
         /// The tag to use when logging messages.
         /// </summary>
         private const string Tag = nameof(PackageManager);
@@ -36,7 +41,11 @@ namespace SharpAdbClient.DeviceCommands
         /// <param name="device">
         /// The device on which to look for packages.
         /// </param>
-        public PackageManager(DeviceData device)
+        /// <param name="thirdPartyOnly">
+        /// <see langword="true"/> to only indicate third party applications;
+        /// <see langword="false"/> to also include built-in applications.
+        /// </param>
+        public PackageManager(DeviceData device, bool thirdPartyOnly = false)
         {
             if (device == null)
             {
@@ -45,7 +54,18 @@ namespace SharpAdbClient.DeviceCommands
 
             this.Device = device;
             this.Packages = new Dictionary<string, string>();
+            this.ThirdPartyOnly = thirdPartyOnly;
             this.RefreshPackages();
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this package manager only lists third party
+        /// applications, or also includes built-in applications.
+        /// </summary>
+        public bool ThirdPartyOnly
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -67,7 +87,15 @@ namespace SharpAdbClient.DeviceCommands
             this.ValidateDevice();
 
             PackageManagerReceiver pmr = new PackageManagerReceiver(this.Device, this);
-            this.Device.ExecuteShellCommand(ListFull, pmr);
+
+            if (this.ThirdPartyOnly)
+            {
+                this.Device.ExecuteShellCommand(ListThirdPartyOnly, pmr);
+            }
+            else
+            {
+                this.Device.ExecuteShellCommand(ListFull, pmr);
+            }
         }
 
         /// <summary>
