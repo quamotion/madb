@@ -55,7 +55,7 @@ namespace SharpAdbClient
         { get; set; }
 
         /// <summary>
-        /// Restes all factories to their default values.
+        /// Resets all factories to their default values.
         /// </summary>
         public static void Reset()
         {
@@ -63,6 +63,7 @@ namespace SharpAdbClient
             AdbClientFactory = (endPoint) => new AdbClient(endPoint);
             AdbCommandLineClientFactory = (path) => new AdbCommandLineClient(path);
             SyncServiceFactory = (device) => new SyncService(device);
+            AdbClient.Instance = new AdbClient(AdbServer.EndPoint);
         }
     }
 }

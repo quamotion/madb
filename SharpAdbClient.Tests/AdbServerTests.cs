@@ -1,10 +1,7 @@
-﻿using SharpAdbClient.Exceptions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpAdbClient.Exceptions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
 
 namespace SharpAdbClient.Tests
 {
