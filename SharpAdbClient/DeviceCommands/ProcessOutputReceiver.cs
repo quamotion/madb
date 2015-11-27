@@ -75,7 +75,7 @@ namespace SharpAdbClient.DeviceCommands
         /// </summary>
         public void Flush()
         {
-            bool firstLine = true;
+            AndroidProcessHeader header = null;
 
             using (StringReader reader = new StringReader(this.buffer.ToString()))
             {
@@ -83,13 +83,13 @@ namespace SharpAdbClient.DeviceCommands
                 {
                     string line = reader.ReadLine();
 
-                    if (firstLine)
+                    if (header == null)
                     {
-                        firstLine = false;
+                        header = AndroidProcess.ParseHeader(line);
                         continue;
                     }
 
-                    this.processes.Add(AndroidProcess.Parse(line));
+                    this.processes.Add(AndroidProcess.Parse(line, header));
                 }
             }
         }

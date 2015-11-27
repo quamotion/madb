@@ -69,7 +69,7 @@ root      1044  991   1868   504   00000000 b76c0fe6 R ps";
         /// is sent in a single packet.
         /// </summary>
         [TestMethod]
-        public void ProcessMultiLineOutputtest()
+        public void ProcessMultiLineOutputTest()
         {
             string content = @"root      1     0     852    628   c1157816 0805d0d6 S /init
 root      2     0     0      0     c10589a4 00000000 S kthreadd
@@ -86,6 +86,32 @@ root      3     2     0      0     c105fd59 00000000 S ksoftirqd/0";
 
             receiver.Flush();
             Assert.AreEqual(2, receiver.Processes.Count);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="ProcessOutputReceiver"/> class in a scenario where the output is in 
+        /// a limited format (not all fields are present)
+        /// </summary>
+        [TestMethod]
+        public void ProcessLimitedOutputTest()
+        {
+            string content = @"  PID USER       VSZ STAT COMMAND
+    1 root       340 S    /init
+    2 root         0 SW<  [kthreadd]";
+
+            ProcessOutputReceiver receiver = new ProcessOutputReceiver();
+
+            StringReader reader = new StringReader(content);
+
+            while (reader.Peek() >= 0)
+            {
+                receiver.AddOutput(reader.ReadLine());
+            }
+
+            receiver.Flush();
+            Assert.AreEqual(2, receiver.Processes.Count);
+            Assert.AreEqual("/init", receiver.Processes.First().Name);
+            Assert.AreEqual("kthreadd", receiver.Processes.Last().Name);
         }
     }
 }

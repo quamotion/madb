@@ -124,7 +124,7 @@ namespace SharpAdbClient.DeviceCommands
         public static IEnumerable<AndroidProcess> ListProcesses(this DeviceData device)
         {
             var receiver = new ProcessOutputReceiver();
-            device.ExecuteShellCommand("ps", receiver);
+            device.ExecuteShellCommand("/system/bin/ps", receiver);
             return receiver.Processes;
         }
     }
