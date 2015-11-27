@@ -12,6 +12,11 @@ namespace SharpAdbClient.DeviceCommands
     public enum AndroidProcessState
     {
         /// <summary>
+        /// The process state is unknown.
+        /// </summary>
+        Unknown,
+
+        /// <summary>
         /// Uninterruptible sleep (usually IO)
         /// </summary>
         D,

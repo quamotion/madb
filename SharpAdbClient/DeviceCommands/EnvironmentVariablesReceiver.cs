@@ -17,7 +17,7 @@ namespace SharpAdbClient
         /// <summary>
         /// The path to the <c>printenv</c> command.
         /// </summary>
-        public const string PrintEnvCommand = "printenv";
+        public const string PrintEnvCommand = "/system/bin/printenv";
 
         /// <summary>
         /// A regular expression that can be used to parse the output of the <c>printenv/c> command.

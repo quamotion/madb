@@ -114,6 +114,7 @@
     <Compile Include="AdbServer.cs" />
     <Compile Include="AdbSocket.cs" />
     <Compile Include="DeviceCommands\AndroidProcess.cs" />
+    <Compile Include="DeviceCommands\AndroidProcessHeader.cs" />
     <Compile Include="DeviceCommands\AndroidProcessState.cs" />
     <Compile Include="DeviceCommands\InfoReceiver.cs" />
     <Compile Include="DeviceCommands\ProcessOutputReceiver.cs" />
