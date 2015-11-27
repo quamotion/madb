@@ -137,8 +137,9 @@ namespace SharpAdbClient
             {
                 this.IsRunning = false;
 
-                // Wait for the monitor thread to stop.
-                this.monitorThread.Join();
+                // Stop the thread. The tread will keep waiting for updated information from adb
+                // eternally, so we need to forcefully abort it here.
+                this.monitorThread.Abort();
 
                 this.monitorThread = null;
             }

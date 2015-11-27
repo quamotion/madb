@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,21 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual("c1", receiver.EnvironmentVariables["XDG_SESSION_ID"]);
             Assert.AreEqual("xim", receiver.EnvironmentVariables["CLUTTER_IM_MODULE"]);
             Assert.AreEqual(string.Empty, receiver.EnvironmentVariables["GNOME_KEYRING_PID"]);
+        }
+
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
+        public void EnvironmentVariablesReceiverTest2()
+        {
+            var device = AdbClient.Instance.GetDevices().First();
+
+            for(int i = 0; i < 1000; i++)
+            {
+                EnvironmentVariablesReceiver receiver = new EnvironmentVariablesReceiver();
+                AdbClient.Instance.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
+
+                Assert.AreEqual(16, receiver.EnvironmentVariables.Count);
+            }
         }
     }
 }
