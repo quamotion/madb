@@ -48,6 +48,8 @@ namespace SharpAdbClient
             {
                 throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
             }
+
+            this.AdbPath = adbPath;
         }
 
         /// <summary>

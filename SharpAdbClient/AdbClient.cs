@@ -100,7 +100,7 @@ namespace SharpAdbClient
                 return instance;
             }
 
-            internal set
+            set
             {
                 instance = value;
             }
