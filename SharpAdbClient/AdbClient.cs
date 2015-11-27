@@ -100,7 +100,7 @@ namespace SharpAdbClient
                 return instance;
             }
 
-            internal set
+            set
             {
                 instance = value;
             }
@@ -283,11 +283,20 @@ namespace SharpAdbClient
                 {
                     using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                     {
-                        while (reader.Peek() >= 0)
+                        // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
+                        // break too soon in certain cases (about every 10 loops, so it appears to be a timing
+                        // issue). Checking for reader.ReadLine() to return null appears to be much more robust
+                        // -- one of the integration test fetches output 1000 times and found no truncations.
+                        while (true)
                         {
                             cancellationToken.ThrowIfCancellationRequested();
 
                             var line = reader.ReadLine();
+
+                            if (line == null)
+                            {
+                                break;
+                            }
 
                             if (rcvr != null)
                             {
