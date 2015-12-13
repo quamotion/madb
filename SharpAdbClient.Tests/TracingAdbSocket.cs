@@ -11,7 +11,7 @@ namespace SharpAdbClient.Tests
 {
     internal class TracingAdbSocket : AdbSocket, IDummyAdbSocket
     {
-        public TracingAdbSocket(IPEndPoint endPoint) : base(endPoint)
+        public TracingAdbSocket(EndPoint endPoint) : base(endPoint)
         {
         }
 

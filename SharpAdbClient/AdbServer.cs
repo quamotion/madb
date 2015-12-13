@@ -4,6 +4,7 @@
 
 namespace SharpAdbClient
 {
+    using Mono.Unix;
     using SharpAdbClient.Exceptions;
     using System;
     using System.Net;
@@ -53,7 +54,25 @@ namespace SharpAdbClient
         /// <summary>
         /// Gets or sets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server is listening..
         /// </summary>
-        public static IPEndPoint EndPoint { get; } = new IPEndPoint(IPAddress.Loopback, AdbServerPort);
+        public static EndPoint EndPoint { get; private set; }
+
+        static AdbServer()
+        {
+            switch (Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT:
+                    EndPoint = new IPEndPoint(IPAddress.Loopback, AdbServerPort);
+                    break;
+
+                case PlatformID.MacOSX:
+                case PlatformID.Unix:
+                    EndPoint = new UnixEndPoint($"/tmp/{AdbServerPort}");
+                    break;
+
+                default:
+                    throw new InvalidOperationException("Only Windows, Linux and Mac OS X are supported");
+            }
+        }
 
         /// <summary>
         /// Starts the adb server if it was not previously running.

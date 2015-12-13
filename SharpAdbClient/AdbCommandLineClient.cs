@@ -46,6 +46,7 @@ namespace SharpAdbClient
                     {
                         throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
                     }
+
                     break;
 
                 case PlatformID.Unix:
@@ -54,6 +55,7 @@ namespace SharpAdbClient
                     {
                         throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb executable. The path must end with `adb`");
                     }
+
                     break;
 
                 default:

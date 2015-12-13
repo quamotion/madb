@@ -30,7 +30,7 @@ namespace SharpAdbClient.Tests
             this.Connected = false;
         }
 
-        public void Connect(IPEndPoint endPoint)
+        public void Connect(EndPoint endPoint)
         {
             this.Connected = true;
         }

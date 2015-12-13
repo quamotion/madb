@@ -4,6 +4,8 @@
 
 namespace SharpAdbClient
 {
+    using Mono.Unix;
+    using System;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
@@ -22,7 +24,20 @@ namespace SharpAdbClient
         /// </summary>
         public TcpSocket()
         {
-            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            switch (Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT:
+                    this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    break;
+
+                case PlatformID.Unix:
+                case PlatformID.MacOSX:
+                    this.socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
+                    break;
+
+                default:
+                    throw new NotSupportedException("Only Windows, Linux and Mac OS are supported");
+            }
         }
 
         /// <inheritdoc/>
@@ -35,7 +50,7 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Connect(IPEndPoint endPoint)
+        public void Connect(EndPoint endPoint)
         {
             this.socket.Connect(endPoint);
             this.socket.Blocking = true;

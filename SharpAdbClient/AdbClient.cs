@@ -67,9 +67,9 @@ namespace SharpAdbClient
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
         /// <param name="endPoint">
-        /// The <see cref="IPEndPoint"/> at which the adb server is listening.
+        /// The <see cref="EndPoint"/> at which the adb server is listening.
         /// </param>
-        public AdbClient(IPEndPoint endPoint)
+        public AdbClient(EndPoint endPoint)
         {
             if (endPoint == null)
             {
@@ -107,9 +107,9 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="IPEndPoint"/> at which the adb server is listening.
+        /// Gets or sets the <see cref="EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public IPEndPoint EndPoint
+        public EndPoint EndPoint
         {
             get;
             private set;

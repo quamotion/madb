@@ -17,7 +17,7 @@ namespace SharpAdbClient
     /// </summary>
     public interface ITcpSocket : IDisposable
     {
-        void Connect(IPEndPoint endPoint);
+        void Connect(EndPoint endPoint);
 
         void Close();
 
