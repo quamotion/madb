@@ -54,10 +54,10 @@ namespace SharpAdbClient
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         /// <param name="endPoint">
-        /// The <see cref="IPEndPoint"/> at which the Android Debug Bridge is listening
+        /// The <see cref="EndPoint"/> at which the Android Debug Bridge is listening
         /// for clients.
         /// </param>
-        public AdbSocket(IPEndPoint endPoint)
+        public AdbSocket(EndPoint endPoint)
         {
             this.socket = new TcpSocket();
             this.socket.Connect(endPoint);

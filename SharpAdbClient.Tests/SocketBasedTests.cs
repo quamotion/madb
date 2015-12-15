@@ -27,7 +27,7 @@ namespace SharpAdbClient
             set;
         }
 
-        public IPEndPoint EndPoint
+        public EndPoint EndPoint
         {
             get;
             set;

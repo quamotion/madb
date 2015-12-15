@@ -26,7 +26,7 @@ namespace SharpAdbClient
         /// <returns>
         /// A new instance of the <see cref="AdbSocket"/> class.
         /// </returns>
-        public static Func<IPEndPoint, IAdbSocket> AdbSocketFactory
+        public static Func<EndPoint, IAdbSocket> AdbSocketFactory
         { get; set; }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace SharpAdbClient
         /// <returns>
         /// A new instance of the <see cref="AdbClient"/> class.
         /// </returns>
-        public static Func<IPEndPoint, IAdbClient> AdbClientFactory
+        public static Func<EndPoint, IAdbClient> AdbClientFactory
         { get; set; }
 
         /// <summary>
