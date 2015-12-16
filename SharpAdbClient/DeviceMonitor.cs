@@ -203,7 +203,7 @@ namespace SharpAdbClient
                 }
                 catch (ThreadAbortException ex)
                 {
-                    if (this.IsRunning = false)
+                    if (this.IsRunning == false)
                     {
                         // The DeviceMonitor is shutting down (disposing) and Dispose()
                         // has called deviceMonitorThread.Abort. This exception is expected,
