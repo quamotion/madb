@@ -212,7 +212,7 @@ namespace SharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it.
-                        Log.e(ex);
+                        Log.e(Tag, ex);
                     }
                 }
                 catch (Exception ex)
