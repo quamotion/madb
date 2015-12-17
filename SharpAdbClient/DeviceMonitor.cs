@@ -201,6 +201,20 @@ namespace SharpAdbClient
 
                     this.firstDeviceListParsed.Set();
                 }
+                catch (ThreadAbortException ex)
+                {
+                    if (this.IsRunning == false)
+                    {
+                        // The DeviceMonitor is shutting down (disposing) and Dispose()
+                        // has called deviceMonitorThread.Abort. This exception is expected,
+                        // so we can safely swallow it.
+                    }
+                    else
+                    {
+                        // The exception was unexpected, so log it.
+                        Log.e(Tag, ex);
+                    }
+                }
                 catch (Exception ex)
                 {
                     Log.e(Tag, ex);
