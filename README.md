@@ -40,7 +40,7 @@ var devices = AdbClient.Instance.GetDevices();
 
 foreach(var device in devices)
 {
-    Console.WriteLine(device.Name
+    Console.WriteLine(device.Name);
 }
 ```
 
