@@ -36,7 +36,7 @@ AdbServer.StartServer(@"C:\Program Files (x86)\android-sdk\platform-tools\adb.ex
 To list all Android devices that are connected to your PC, you can use the following code:
 
 ```
-var devices = devices = AdbClient.Instance.GetDevices();
+var devices = AdbClient.Instance.GetDevices();
 
 foreach(var device in devices)
 {
