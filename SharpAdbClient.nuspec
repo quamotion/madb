@@ -12,6 +12,7 @@
     <tags>.net45 android adb</tags>
     <language>en-US</language>
     <dependencies>
+      <dependency id="Mono.Posix" version="4.0.0" />
     </dependencies>
   </metadata>
   <files>
