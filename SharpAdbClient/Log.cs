@@ -38,7 +38,7 @@ namespace SharpAdbClient
         /// <param name="args">The values for the format message</param>
         public static void v(string tag, string format, params object[] args)
         {
-            WriteLine(LogLevel.Verbose, tag, string.Format(format, args));
+            WriteLine(LogLevel.Verbose, tag, format, args);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SharpAdbClient
         /// <param name="args">The values for the format message</param>
         public static void d(string tag, string format, params object[] args)
         {
-            WriteLine(LogLevel.Debug, tag, string.Format(format, args));
+            WriteLine(LogLevel.Debug, tag, format, args);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace SharpAdbClient
         /// <param name="args">The values for the format message</param>
         public static void i(string tag, string format, params object[] args)
         {
-            WriteLine(LogLevel.Info, tag, string.Format(format, args));
+            WriteLine(LogLevel.Info, tag, format, args);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace SharpAdbClient
         /// <param name="args">The values for the format message</param>
         public static void w(string tag, string format, params object[] args)
         {
-            WriteLine(LogLevel.Warn, tag, string.Format(format, args));
+            WriteLine(LogLevel.Warn, tag, format, args);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace SharpAdbClient
         /// <gist id="16a731d7e4f074fca809" />
         public static void e(string tag, string format, params object[] args)
         {
-            WriteLine(LogLevel.Error, tag, string.Format(format, args));
+            WriteLine(LogLevel.Error, tag, format, args);
         }
 
         /// <summary>
@@ -137,17 +137,24 @@ namespace SharpAdbClient
         /// <param name="logLevel"></param>
         /// <param name="tag"></param>
         /// <param name="message"></param>
-        private static void WriteLine(LogLevel.LogLevelInfo logLevel, string tag, string message)
+        private static void WriteLine(LogLevel.LogLevelInfo logLevel, string tag, string message, params object[] args)
         {
             if (logLevel.Priority >= Level.Priority)
             {
+                string formattedMessage = message;
+                
+                if (args != null && args.Length > 0)
+                {
+                    formattedMessage = string.Format(formattedMessage, args);
+                }
+                
                 if (LogOutput != null)
                 {
-                    LogOutput.Write(logLevel, tag, message);
+                    LogOutput.Write(logLevel, tag, formattedMessage);
                 }
                 else
                 {
-                    Write(logLevel, tag, message);
+                    Write(logLevel, tag, formattedMessage);
                 }
             }
         }
