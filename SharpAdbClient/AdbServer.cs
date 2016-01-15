@@ -144,6 +144,11 @@ namespace SharpAdbClient
                 && ((serverStatus.Version < RequiredAdbVersion)
                      || ((serverStatus.Version < commandLineVersion) && restartServerIfNewer)))
             {
+                if(adbPath == null)
+                {
+                    throw new ArgumentNullException(nameof(adbPath));
+                }
+
                 AdbClient.Instance.KillAdb();
                 serverStatus.IsRunning = false;
                 serverStatus.Version = null;
@@ -153,6 +158,11 @@ namespace SharpAdbClient
             }
             else if (!serverStatus.IsRunning)
             {
+                if (adbPath == null)
+                {
+                    throw new ArgumentNullException(nameof(adbPath));
+                }
+
                 commandLineClient.StartServer();
                 return StartServerResult.Started;
             }
