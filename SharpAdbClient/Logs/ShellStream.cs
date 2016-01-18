@@ -143,18 +143,26 @@ namespace SharpAdbClient.Logs
                     // We have removed one byte from the array of bytes which has
                     // been read; but the caller asked for a fixed number of bytes.
                     // So we need to get the next byte from the base stream.
-                    int nextByte = this.Inner.ReadByte();
-
-                    if (nextByte == -1)
+                    // If less bytes were received than asked, we know no more data is
+                    // available so we can skip this step
+                    if (read < count)
                     {
-                        // If the value is -1, no more data is available, and reduce the
+                        continue;
+                    }
+
+                    byte[] minibuffer = new byte[1];
+                    int miniRead = this.Inner.Read(minibuffer, 0, 1);
+
+                    if (miniRead == 0)
+                    {
+                        // If no byte was read, no more data is (currently) available, and reduce the
                         // number of bytes by 1.
                         read--;
                     }
                     else
                     {
                         // Append the byte to the buffer.
-                        buffer[offset + read - 1] = (byte)nextByte;
+                        buffer[offset + read - 1] = minibuffer[0];
                     }
                 }
             }
