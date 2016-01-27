@@ -64,7 +64,7 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public Image GetFrameBuffer(DeviceData device)
+        public Task<Image> GetFrameBuffer(DeviceData device, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

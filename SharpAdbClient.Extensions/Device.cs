@@ -14,7 +14,7 @@ namespace SharpAdbClient
     using System.Net;
     using System.Net.Sockets;
     using System.Text.RegularExpressions;
-
+    using System.Threading;
     /// <summary>
     /// Represents an Android device.
     /// </summary>
@@ -552,7 +552,7 @@ namespace SharpAdbClient
         {
             get
             {
-                return AdbClient.Instance.GetFrameBuffer(this.DeviceData);
+                return AdbClient.Instance.GetFrameBuffer(this.DeviceData, CancellationToken.None).Result;
             }
         }
 

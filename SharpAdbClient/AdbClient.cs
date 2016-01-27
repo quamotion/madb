@@ -328,7 +328,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
-        public Image GetFrameBuffer(DeviceData device)
+        public async Task<Image> GetFrameBuffer(DeviceData device, CancellationToken cancellationToken)
         {
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
@@ -342,7 +342,7 @@ namespace SharpAdbClient
                 // The result first is a FramebufferHeader object,
                 var size = Marshal.SizeOf(typeof(FramebufferHeader));
                 var headerData = new byte[size];
-                socket.Read(headerData);
+                await socket.ReadAsync(headerData, cancellationToken);
 
                 var header = FramebufferHeader.Read(headerData);
 

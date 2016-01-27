@@ -82,6 +82,13 @@ namespace SharpAdbClient.Tests
             }
         }
 
+        public Task ReadAsync(byte[] data, CancellationToken cancellationToken)
+        {
+            this.Read(data);
+
+            return Task.FromResult(true);
+        }
+
         public AdbResponse ReadAdbResponse()
         {
             var response = this.Responses.Dequeue();
@@ -104,7 +111,7 @@ namespace SharpAdbClient.Tests
             return this.ResponseMessages.Dequeue();
         }
 
-        public Task<string> ReadStringAsync()
+        public Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(this.ReadString());
         }

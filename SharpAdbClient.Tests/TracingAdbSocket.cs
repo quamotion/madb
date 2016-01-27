@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 namespace SharpAdbClient.Tests
 {
@@ -127,9 +128,9 @@ namespace SharpAdbClient.Tests
             return value;
         }
 
-        public async override Task<string> ReadStringAsync()
+        public async override Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
-            var value = await base.ReadStringAsync();
+            var value = await base.ReadStringAsync(cancellationToken);
             this.ResponseMessages.Enqueue(value);
             return value;
         }

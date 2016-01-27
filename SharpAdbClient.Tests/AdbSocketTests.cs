@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SharpAdbClient.Tests
@@ -129,7 +130,7 @@ namespace SharpAdbClient.Tests
 
             tcpSocket.InputStream.Position = 0;
 
-            Assert.AreEqual("Hello", await socket.ReadStringAsync());
+            Assert.AreEqual("Hello", await socket.ReadStringAsync(CancellationToken.None));
         }
 
         [TestMethod]
@@ -219,7 +220,7 @@ namespace SharpAdbClient.Tests
             // Buffer has a capacity of 101, but we'll only want to read 100 bytes
             byte[] received = new byte[101];
 
-            await socket.ReadAsync(received, 100);
+            await socket.ReadAsync(received, 100, CancellationToken.None);
 
             for (int i = 0; i < 100; i++)
             {

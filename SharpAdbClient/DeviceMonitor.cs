@@ -196,7 +196,7 @@ namespace SharpAdbClient
             {
                 try
                 {
-                    var value = this.Socket.ReadStringAsync().Result;
+                    var value = this.Socket.ReadStringAsync(CancellationToken.None).Result;
                     this.ProcessIncomingDeviceData(value);
 
                     this.firstDeviceListParsed.Set();

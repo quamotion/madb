@@ -66,7 +66,7 @@ namespace SharpAdbClient
         // localabstract:<path> not implemented
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
-        Image GetFrameBuffer(DeviceData device);
+        Task<Image> GetFrameBuffer(DeviceData device, CancellationToken cancellationToken);
 
         // jdwp:<pid>: not implemented
         // track-jdwp: not implemented
