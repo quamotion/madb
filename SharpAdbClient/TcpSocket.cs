@@ -50,6 +50,20 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
+        public int ReceiveBufferSize
+        {
+            get
+            {
+                return this.socket.ReceiveBufferSize;
+            }
+
+            set
+            {
+                this.socket.ReceiveBufferSize = value;
+            }
+        }
+
+        /// <inheritdoc/>
         public void Connect(EndPoint endPoint)
         {
             this.socket.Connect(endPoint);
@@ -90,20 +104,6 @@ namespace SharpAdbClient
         public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags)
         {
             return this.socket.ReceiveAsync(buffer, offset, size, socketFlags);
-        }
-
-        /// <inheritdoc/>
-        public int ReceiveBufferSize
-        {
-            get
-            {
-                return this.socket.ReceiveBufferSize;
-            }
-
-            set
-            {
-                this.socket.ReceiveBufferSize = value;
-            }
         }
     }
 }

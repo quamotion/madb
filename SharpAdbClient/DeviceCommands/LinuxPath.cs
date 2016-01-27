@@ -31,23 +31,6 @@ namespace SharpAdbClient.DeviceCommands
         };
 
         /// <summary>
-        /// Checks the invalid path chars.
-        /// </summary>
-        /// <param name="path">The path.</param>
-        internal static void CheckInvalidPathChars(string path)
-        {
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            if (path.ToCharArray().Any(c => c < 0x20 || InvalidCharacters.Contains(c)))
-            {
-                throw new ArgumentException("Path contains invalid characters");
-            }
-        }
-
-        /// <summary>
         /// Combine the specified paths to form one path
         /// </summary>
         /// <param name="paths">The paths.</param>
@@ -147,31 +130,6 @@ namespace SharpAdbClient.DeviceCommands
             return null;
         }
 
-        /// <summary>
-        /// Fixups the path.
-        /// </summary>
-        /// <param name="path">The path.</param>
-        /// <returns></returns>
-        private static string FixupPath(string path)
-        {
-            string sb = path;
-            sb = sb.Replace(System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar);
-
-            if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar })))
-            {
-                sb = string.Format(".{0}{1}", DirectorySeparatorChar, sb);
-            }
-
-            if (!sb.EndsWith(new string(new char[] { DirectorySeparatorChar })))
-            {
-                sb = string.Format("{0}{1}", sb, DirectorySeparatorChar);
-            }
-
-            sb = sb.Replace("//", new string(new char[] { DirectorySeparatorChar }));
-
-            return sb;
-        }
-
         /// <summary>Returns the file name and extension of the specified path string.</summary>
         /// <returns>A <see cref="T:System.String"></see> consisting of the characters after the last directory character in path. If the last character of path is a directory or volume separator character, this method returns <see cref="F:System.String.Empty"></see>. If path is null, this method returns null.</returns>
         /// <param name="path">The path string from which to obtain the file name and extension. </param>
@@ -225,10 +183,7 @@ namespace SharpAdbClient.DeviceCommands
         /// <returns></returns>
         public static string Escape(string path)
         {
-            return new Regex(EscapePattern).Replace(path, new MatchEvaluator(delegate(Match m)
-            {
-                return m.Result("\\\\$1");
-            }));
+            return new Regex(EscapePattern).Replace(path, new MatchEvaluator(m => m.Result("\\\\$1")));
         }
 
         /// <summary>
@@ -246,6 +201,48 @@ namespace SharpAdbClient.DeviceCommands
             {
                 return path;
             }
+        }
+
+        /// <summary>
+        /// Checks the invalid path chars.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        internal static void CheckInvalidPathChars(string path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            if (path.ToCharArray().Any(c => c < 0x20 || InvalidCharacters.Contains(c)))
+            {
+                throw new ArgumentException("Path contains invalid characters");
+            }
+        }
+
+        /// <summary>
+        /// Fixups the path.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns></returns>
+        private static string FixupPath(string path)
+        {
+            string sb = path;
+            sb = sb.Replace(System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar);
+
+            if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar })))
+            {
+                sb = string.Format(".{0}{1}", DirectorySeparatorChar, sb);
+            }
+
+            if (!sb.EndsWith(new string(new char[] { DirectorySeparatorChar })))
+            {
+                sb = string.Format("{0}{1}", sb, DirectorySeparatorChar);
+            }
+
+            sb = sb.Replace("//", new string(new char[] { DirectorySeparatorChar }));
+
+            return sb;
         }
     }
 }

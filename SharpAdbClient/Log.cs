@@ -142,12 +142,12 @@ namespace SharpAdbClient
             if (logLevel.Priority >= Level.Priority)
             {
                 string formattedMessage = message;
-                
+
                 if (args != null && args.Length > 0)
                 {
                     formattedMessage = string.Format(formattedMessage, args);
                 }
-                
+
                 if (LogOutput != null)
                 {
                     LogOutput.Write(logLevel, tag, formattedMessage);
