@@ -51,11 +51,6 @@ namespace SharpAdbClient
         /// </summary>
         private const string Tag = nameof(AdbServer);
 
-        /// <summary>
-        /// Gets or sets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server is listening..
-        /// </summary>
-        public static EndPoint EndPoint { get; private set; }
-
         static AdbServer()
         {
             switch (Environment.OSVersion.Platform)
@@ -73,6 +68,11 @@ namespace SharpAdbClient
                     throw new InvalidOperationException("Only Windows, Linux and Mac OS X are supported");
             }
         }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server is listening..
+        /// </summary>
+        public static EndPoint EndPoint { get; private set; }
 
         /// <summary>
         /// Starts the adb server if it was not previously running.
@@ -144,7 +144,7 @@ namespace SharpAdbClient
                 && ((serverStatus.Version < RequiredAdbVersion)
                      || ((serverStatus.Version < commandLineVersion) && restartServerIfNewer)))
             {
-                if(adbPath == null)
+                if (adbPath == null)
                 {
                     throw new ArgumentNullException(nameof(adbPath));
                 }

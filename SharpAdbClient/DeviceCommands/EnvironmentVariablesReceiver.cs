@@ -20,7 +20,7 @@ namespace SharpAdbClient
         public const string PrintEnvCommand = "/system/bin/printenv";
 
         /// <summary>
-        /// A regular expression that can be used to parse the output of the <c>printenv/c> command.
+        /// A regular expression that can be used to parse the output of the <c>printenv</c> command.
         /// </summary>
         private const string EnvPattern = @"^([^=\s]+)\s*=\s*(.*)$";
 

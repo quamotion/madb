@@ -5,11 +5,11 @@
 namespace SharpAdbClient
 {
     using Logs;
-    using System;
     using System.Collections.Generic;
     using System.Drawing;
     using System.Net;
     using System.Threading;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// A common interface for any class that allows you to interact with the
@@ -54,7 +54,7 @@ namespace SharpAdbClient
         IEnumerable<ForwardData> ListForward(DeviceData device);
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
-        void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse);
+        Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse);
 
         // shell: not implemented
         // remount: not implemented
@@ -66,7 +66,7 @@ namespace SharpAdbClient
         // localabstract:<path> not implemented
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
-        Image GetFrameBuffer(DeviceData device);
+        Task<Image> GetFrameBuffer(DeviceData device, CancellationToken cancellationToken);
 
         // jdwp:<pid>: not implemented
         // track-jdwp: not implemented

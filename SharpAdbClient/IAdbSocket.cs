@@ -43,6 +43,8 @@ namespace SharpAdbClient
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte/*'/>
         void Read(byte[] data);
 
+        Task ReadAsync(byte[] data, CancellationToken cancellationToken);
+
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadString/*'/>
         string ReadString();
 
@@ -50,7 +52,7 @@ namespace SharpAdbClient
         string ReadSyncString();
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadStringAsync/*'/>
-        Task<string> ReadStringAsync();
+        Task<string> ReadStringAsync(CancellationToken cancellationToken);
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/Close/*'/>
         void Close();

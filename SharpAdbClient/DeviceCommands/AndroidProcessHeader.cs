@@ -1,4 +1,8 @@
-﻿namespace SharpAdbClient.DeviceCommands
+﻿// <copyright file="AndroidProcessHeader.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// </copyright>
+
+namespace SharpAdbClient.DeviceCommands
 {
     /// <summary>
     /// Represents information of the <c>ps</c> command output.

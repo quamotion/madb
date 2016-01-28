@@ -115,9 +115,9 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAsync_byte/*'/>
-        public virtual Task ReadAsync(byte[] data)
+        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken)
         {
-            return this.ReadAsync(data, -1);
+            return this.ReadAsync(data, -1, cancellationToken);
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string_int/*'/>
@@ -212,11 +212,11 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadStringAsync/*'/>
-        public virtual async Task<string> ReadStringAsync()
+        public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
             // The first 4 bytes contain the length of the string
             var reply = new byte[4];
-            await this.ReadAsync(reply);
+            await this.ReadAsync(reply, cancellationToken);
 
             // Convert the bytes to a hex string
             string lenHex = AdbClient.Encoding.GetString(reply);
@@ -224,7 +224,7 @@ namespace SharpAdbClient
 
             // And get the string
             reply = new byte[len];
-            await this.ReadAsync(reply);
+            await this.ReadAsync(reply, cancellationToken);
 
             string value = AdbClient.Encoding.GetString(reply);
             return value;
@@ -293,7 +293,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAsync_byte_int/*'/>
-        public virtual async Task<int> ReadAsync(byte[] data, int length)
+        public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken)
         {
             int expLen = length != -1 ? length : data.Length;
             int count = -1;
@@ -301,6 +301,8 @@ namespace SharpAdbClient
 
             while (count != 0 && totalRead < expLen)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     int left = expLen - totalRead;

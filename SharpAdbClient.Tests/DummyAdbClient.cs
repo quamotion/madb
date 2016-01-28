@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SharpAdbClient.Tests
 {
@@ -27,7 +28,7 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        public Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             this.ReceivedCommands.Add(command);
 
@@ -49,6 +50,8 @@ namespace SharpAdbClient.Tests
             {
                 throw new ArgumentOutOfRangeException(nameof(command));
             }
+
+            return Task.FromResult(true);
         }
 
         public int GetAdbVersion()
@@ -61,7 +64,7 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public Image GetFrameBuffer(DeviceData device)
+        public Task<Image> GetFrameBuffer(DeviceData device, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

@@ -144,6 +144,9 @@ namespace SharpAdbClient.DeviceCommands
         /// <param name="line">
         /// The line to parse.
         /// </param>
+        /// <param name="header">
+        /// THe header information, that defines how the <paramref name="line"/> is structured.
+        /// </param>
         /// <returns>
         /// A <see cref="AndroidProcess"/> that represents the process.
         /// </returns>

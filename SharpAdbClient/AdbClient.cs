@@ -18,6 +18,7 @@ namespace SharpAdbClient
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// <para>
@@ -196,6 +197,7 @@ namespace SharpAdbClient
             }
         }
 
+        /// <inheritdoc/>
         public void SetDevice(IAdbSocket socket, DeviceData device)
         {
             // if the device is not null, then we first tell adb we're looking to talk
@@ -271,10 +273,12 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
-        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        public async Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
+                cancellationToken.Register(() => socket.Close());
+
                 this.SetDevice(socket, device);
                 socket.SendAdbRequest($"shell:{command}");
                 var response = socket.ReadAdbResponse();
@@ -287,11 +291,9 @@ namespace SharpAdbClient
                         // break too soon in certain cases (about every 10 loops, so it appears to be a timing
                         // issue). Checking for reader.ReadLine() to return null appears to be much more robust
                         // -- one of the integration test fetches output 1000 times and found no truncations.
-                        while (true)
+                        while (!cancellationToken.IsCancellationRequested)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            var line = reader.ReadLine();
+                            var line = await reader.ReadLineAsync();
 
                             if (line == null)
                             {
@@ -305,9 +307,15 @@ namespace SharpAdbClient
                         }
                     }
                 }
-                catch (SocketException)
+                catch (Exception e)
                 {
-                    throw new ShellCommandUnresponsiveException();
+                    // If a cancellation was requested, this main loop is interrupted with an exception
+                    // because the socket is closed. In that case, we don't need to throw a ShellCommandUnresponsiveException.
+                    // In all other cases, something went wrong, and we want to report it to the user.
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        throw new ShellCommandUnresponsiveException(e);
+                    }
                 }
                 finally
                 {
@@ -320,7 +328,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
-        public Image GetFrameBuffer(DeviceData device)
+        public async Task<Image> GetFrameBuffer(DeviceData device, CancellationToken cancellationToken)
         {
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
@@ -334,7 +342,7 @@ namespace SharpAdbClient
                 // The result first is a FramebufferHeader object,
                 var size = Marshal.SizeOf(typeof(FramebufferHeader));
                 var headerData = new byte[size];
-                socket.Read(headerData);
+                await socket.ReadAsync(headerData, cancellationToken);
 
                 var header = FramebufferHeader.Read(headerData);
 
