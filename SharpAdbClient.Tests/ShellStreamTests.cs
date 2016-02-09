@@ -73,6 +73,30 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
+        public void MultipleCRLFInString()
+        {
+            using (MemoryStream stream = GetStream("\r\n1\r\n2\r\n3\r\n4\r\n5"))
+            using (ShellStream shellStream = new ShellStream(stream, false))
+            using (StreamReader reader = new StreamReader(shellStream))
+            {
+                Assert.AreEqual((int)'\n', shellStream.ReadByte());
+
+                stream.Position = 0;
+                byte[] buffer = new byte[100];
+                var read = shellStream.Read(buffer, 0, 100);
+
+                var actual = Encoding.ASCII.GetString(buffer, 0, read);
+                Assert.AreEqual(actual, "\n1\n2\n3\n4\n5");
+                Assert.AreEqual(10, read);
+
+                for (int i = 10; i < buffer.Length; i++)
+                {
+                    Assert.AreEqual(0, buffer[i]);
+                }
+            }
+        }
+
+        [TestMethod]
         public void PendingByteTest1()
         {
             using (MemoryStream stream = GetStream("\r\nH\ra"))
