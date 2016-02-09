@@ -21,7 +21,7 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// When the server is running, gets or sets the version of the server that is running.
+        /// Gets or sets, when the server is running, the version of the server that is running.
         /// </summary>
         public Version Version
         {

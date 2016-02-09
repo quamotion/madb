@@ -2,11 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
-using System;
-using System.Runtime.Serialization;
-
 namespace SharpAdbClient.Exceptions
 {
+    using System;
+    using System.Runtime.Serialization;
+
     /// <summary>
     /// The exception that is thrown when a shell command becomes unresponsive.
     /// </summary>

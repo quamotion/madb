@@ -12,6 +12,14 @@ namespace SharpAdbClient
     public static class Log
     {
         /// <summary>
+        /// Initializes static members of the <see cref="Log"/> class.
+        /// </summary>
+        static Log()
+        {
+            Level = LogLevel.Error;
+        }
+
+        /// <summary>
         /// Gets or sets the level.
         /// </summary>
         /// <value>The level.</value>
@@ -21,14 +29,6 @@ namespace SharpAdbClient
         /// Gets or sets the <see cref="ILogOutput">LogOutput</see>
         /// </summary>
         public static ILogOutput LogOutput { get; set; }
-
-        /// <summary>
-        /// Initializes static members of the <see cref="Log"/> class.
-        /// </summary>
-        static Log()
-        {
-            Level = LogLevel.Error;
-        }
 
         /// <summary>
         /// Outputs a Verbose level message.
@@ -114,6 +114,32 @@ namespace SharpAdbClient
         }
 
         /// <summary>
+        /// Prints a log message.
+        /// </summary>
+        /// <param name="logLevel"></param>
+        /// <param name="tag"></param>
+        /// <param name="message"></param>
+        public static void Write(LogLevel.LogLevelInfo logLevel, string tag, string message)
+        {
+            Console.Write(GetLogFormatString(logLevel, tag, message));
+        }
+
+        /// <summary>
+        /// Formats a log message.
+        /// </summary>
+        /// <param name="logLevel"></param>
+        /// <param name="tag"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static string GetLogFormatString(LogLevel.LogLevelInfo logLevel, string tag, string message)
+        {
+            long totalmsec = DateTime.Now.ToUnixEpoch();
+            var sec = (totalmsec / 60000) % 60;
+            var msec = (totalmsec / 1000) % 60;
+            return string.Format($"{sec:00}:{msec:00} {logLevel.Letter}/{tag}: {message}\n");
+        }
+
+        /// <summary>
         /// Outputs a log message and attempts to display it in a dialog.
         /// </summary>
         /// <param name="logLevel">The log level</param>
@@ -157,32 +183,6 @@ namespace SharpAdbClient
                     Write(logLevel, tag, formattedMessage);
                 }
             }
-        }
-
-        /// <summary>
-        /// Prints a log message.
-        /// </summary>
-        /// <param name="logLevel"></param>
-        /// <param name="tag"></param>
-        /// <param name="message"></param>
-        public static void Write(LogLevel.LogLevelInfo logLevel, string tag, string message)
-        {
-            Console.Write(GetLogFormatString(logLevel, tag, message));
-        }
-
-        /// <summary>
-        /// Formats a log message.
-        /// </summary>
-        /// <param name="logLevel"></param>
-        /// <param name="tag"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public static string GetLogFormatString(LogLevel.LogLevelInfo logLevel, string tag, string message)
-        {
-            long totalmsec = DateTime.Now.ToUnixEpoch();
-            var sec = (totalmsec / 60000) % 60;
-            var msec = (totalmsec / 1000) % 60;
-            return string.Format($"{sec:00}:{msec:00} {logLevel.Letter}/{tag}: {message}\n");
         }
     }
 }

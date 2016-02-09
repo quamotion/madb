@@ -59,7 +59,7 @@ namespace SharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this package manager only lists third party
+        /// Gets a value indicating whether this package manager only lists third party
         /// applications, or also includes built-in applications.
         /// </summary>
         public bool ThirdPartyOnly
@@ -75,7 +75,7 @@ namespace SharpAdbClient.DeviceCommands
         public Dictionary<string, string> Packages { get; private set; }
 
         /// <summary>
-        /// Gets or sets the device.
+        /// Gets the device.
         /// </summary>
         public DeviceData Device { get; private set; }
 

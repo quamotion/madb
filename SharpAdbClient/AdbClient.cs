@@ -87,7 +87,7 @@ namespace SharpAdbClient
         { get; } = Encoding.GetEncoding(DefaultEncoding);
 
         /// <summary>
-        /// Gets an instance of the AdbHelper.
+        /// Gets or sets the current global instance of the <see cref="IAdbClient"/> interface.
         /// </summary>
         public static IAdbClient Instance
         {
@@ -108,7 +108,7 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="EndPoint"/> at which the adb server is listening.
+        /// Gets the <see cref="EndPoint"/> at which the adb server is listening.
         /// </summary>
         public EndPoint EndPoint
         {

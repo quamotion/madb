@@ -93,7 +93,7 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Gets or sets the device on which the file operations are being executed.
+        /// Gets the device on which the file operations are being executed.
         /// </summary>
         public DeviceData Device
         {

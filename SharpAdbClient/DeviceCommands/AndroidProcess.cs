@@ -35,7 +35,7 @@ namespace SharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gest or sets the parent Process ID number.
+        /// Gets or sets the parent Process ID number.
         /// </summary>
         public int ParentProcessId
         {

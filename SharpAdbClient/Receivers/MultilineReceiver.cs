@@ -29,7 +29,7 @@ namespace SharpAdbClient
         public bool TrimLines { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the receiver parses error messages.
+        /// Gets or sets a value indicating whether the receiver parses error messages.
         /// </summary>
         /// <value>
         ///     <see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.
