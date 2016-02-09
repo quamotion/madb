@@ -9,7 +9,6 @@ namespace SharpAdbClient
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
-    using MoreLinq;
 
     /// <summary>
     ///

@@ -9,7 +9,6 @@ namespace SharpAdbClient
     using System.Linq;
     using System.Reflection;
     using System.Text;
-    using MoreLinq;
 
     /// <summary>
     ///
@@ -187,12 +186,12 @@ namespace SharpAdbClient
         {
             var sb = new StringBuilder();
 
-            this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.IgnoreCase).ForEach(p =>
+            foreach(var p in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.IgnoreCase))
             {
                 var n = p.Name;
                 var v = p.GetValue(this, null);
                 sb.AppendLine(string.Format("{0}:{1}", n, v));
-            });
+            }
 
             return sb.ToString();
         }

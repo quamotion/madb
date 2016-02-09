@@ -17,7 +17,7 @@ namespace SharpAdbClient.Tests {
             foreach(var b in blocks)
             {
 				Console.WriteLine ( b.ToString ( ) );
-			} );
+			}
 			Assert.IsTrue ( blocks.Count() > 0 );
 		}
 
