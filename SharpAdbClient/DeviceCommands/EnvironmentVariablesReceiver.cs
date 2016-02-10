@@ -33,7 +33,7 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Gets or sets the environment variables that are currently defined on the device.
+        /// Gets the environment variables that are currently defined on the device.
         /// </summary>
         public Dictionary<string, string> EnvironmentVariables
         {

@@ -23,37 +23,37 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Gets or sets the verbose log level.
+        /// Gets the verbose log level.
         /// </summary>
         /// <value>The verbose log level.</value>
         public static LogLevelInfo Verbose { get; private set; }
 
         /// <summary>
-        /// Gets or sets the debug log level.
+        /// Gets the debug log level.
         /// </summary>
         /// <value>The debug log level.</value>
         public static LogLevelInfo Debug { get; private set; }
 
         /// <summary>
-        /// Gets or sets the info log level.
+        /// Gets the info log level.
         /// </summary>
         /// <value>The info log level.</value>
         public static LogLevelInfo Info { get; private set; }
 
         /// <summary>
-        /// Gets or sets the warn log level.
+        /// Gets the warn log level.
         /// </summary>
         /// <value>The warn log level.</value>
         public static LogLevelInfo Warn { get; private set; }
 
         /// <summary>
-        /// Gets or sets the error log level.
+        /// Gets the error log level.
         /// </summary>
         /// <value>The error log level.</value>
         public static LogLevelInfo Error { get; private set; }
 
         /// <summary>
-        /// Gets or sets the assert log level.
+        /// Gets the assert log level.
         /// </summary>
         /// <value>The assert log level.</value>
         public static LogLevelInfo Assert { get; private set; }

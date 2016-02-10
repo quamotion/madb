@@ -21,7 +21,7 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="AdbSocket"/> class.
+        /// Gets or sets a delegate which creates a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         /// <returns>
         /// A new instance of the <see cref="AdbSocket"/> class.
@@ -30,7 +30,7 @@ namespace SharpAdbClient
         { get; set; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="AdbClient"/> class.
+        /// Gets or sets a delegate that creates a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
         /// <returns>
         /// A new instance of the <see cref="AdbClient"/> class.

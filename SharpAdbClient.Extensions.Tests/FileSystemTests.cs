@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MoreLinq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SharpAdbClient.Tests {
@@ -15,9 +14,10 @@ namespace SharpAdbClient.Tests {
             FileSystem fileSystem = new FileSystem(d);
 
 			IEnumerable<FileEntry> blocks = fileSystem.DeviceBlocks;
-			blocks.ForEach ( b => {
+            foreach(var b in blocks)
+            {
 				Console.WriteLine ( b.ToString ( ) );
-			} );
+			}
 			Assert.IsTrue ( blocks.Count() > 0 );
 		}
 

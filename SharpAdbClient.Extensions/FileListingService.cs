@@ -1,5 +1,4 @@
-﻿using MoreLinq;
-using SharpAdbClient.DeviceCommands;
+﻿using SharpAdbClient.DeviceCommands;
 using SharpAdbClient.Receivers;
 using System;
 using System.Collections.Generic;
@@ -275,9 +274,10 @@ namespace SharpAdbClient
 				if ( children.Length > 0 && children[0].IsApplicationPackage ) {
 					var map = new Dictionary<String, FileEntry> ( );
 
-					children.ForEach ( child => {
+					foreach(var child in children)
+                    {
 						map.Add ( child.FullPath, child );
-					} );
+					}
 				}
 
 

@@ -138,7 +138,10 @@
       Gets the frame buffer from the specified end point.
     </summary>
     <param name="device">The device.</param>
-    <returns>Returns the RawImage.</returns>
+    <param name="cancellationToken">
+      A <see cref="CancellationToken"/> that can be used to cancel the asynchronous task.
+    </param>
+    <returns>Returns a <see cref="Task"/> which returns the raw frame buffer.</returns>
     <exception cref="SharpAdbClient.Exceptions.AdbException">
       failed asking for frame buffer
     </exception>

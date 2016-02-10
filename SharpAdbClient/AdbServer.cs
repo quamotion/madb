@@ -70,7 +70,7 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server is listening..
+        /// Gets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server is listening..
         /// </summary>
         public static EndPoint EndPoint { get; private set; }
 

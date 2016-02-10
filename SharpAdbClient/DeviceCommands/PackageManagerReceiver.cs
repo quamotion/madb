@@ -5,7 +5,7 @@
 namespace SharpAdbClient.DeviceCommands
 {
     using System.Collections.Generic;
-    using System.Text.RegularExpressions;
+    using System.Diagnostics;
 
     /// <summary>
     /// Parses the output of the various <c>pm</c> commands.
@@ -58,9 +58,13 @@ namespace SharpAdbClient.DeviceCommands
                     {
                         this.PackageManager.Packages.Add(parts[2], parts[1]);
                     }
-                    else
+                    else if (parts.Length == 2)
                     {
                         this.PackageManager.Packages.Add(parts[1], null);
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Received invalid input {line}");
                     }
                 }
             }

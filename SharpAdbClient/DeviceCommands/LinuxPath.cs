@@ -5,7 +5,6 @@
 namespace SharpAdbClient.DeviceCommands
 {
     using System;
-    using System.Runtime.CompilerServices;
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;

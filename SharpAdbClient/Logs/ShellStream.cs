@@ -140,6 +140,9 @@ namespace SharpAdbClient.Logs
                         buffer[j] = buffer[j + 1];
                     }
 
+                    // Reset unused data to \0
+                    buffer[offset + read - 1] = 0;
+
                     // We have removed one byte from the array of bytes which has
                     // been read; but the caller asked for a fixed number of bytes.
                     // So we need to get the next byte from the base stream.
@@ -147,6 +150,7 @@ namespace SharpAdbClient.Logs
                     // available so we can skip this step
                     if (read < count)
                     {
+                        read--;
                         continue;
                     }
 
