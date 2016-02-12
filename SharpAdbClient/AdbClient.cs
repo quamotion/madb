@@ -293,7 +293,7 @@ namespace SharpAdbClient
                         // -- one of the integration test fetches output 1000 times and found no truncations.
                         while (!cancellationToken.IsCancellationRequested)
                         {
-                            var line = await reader.ReadLineAsync();
+                            var line = await reader.ReadLineAsync().ConfigureAwait(false);
 
                             if (line == null)
                             {
@@ -342,7 +342,7 @@ namespace SharpAdbClient
                 // The result first is a FramebufferHeader object,
                 var size = Marshal.SizeOf(typeof(FramebufferHeader));
                 var headerData = new byte[size];
-                await socket.ReadAsync(headerData, cancellationToken);
+                await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
 
                 var header = FramebufferHeader.Read(headerData);
 
