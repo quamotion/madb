@@ -216,7 +216,7 @@ namespace SharpAdbClient
         {
             // The first 4 bytes contain the length of the string
             var reply = new byte[4];
-            await this.ReadAsync(reply, cancellationToken);
+            await this.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             // Convert the bytes to a hex string
             string lenHex = AdbClient.Encoding.GetString(reply);
@@ -224,7 +224,7 @@ namespace SharpAdbClient
 
             // And get the string
             reply = new byte[len];
-            await this.ReadAsync(reply, cancellationToken);
+            await this.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             string value = AdbClient.Encoding.GetString(reply);
             return value;
@@ -310,7 +310,7 @@ namespace SharpAdbClient
 
                     byte[] buffer = new byte[buflen];
                     this.socket.ReceiveBufferSize = expLen;
-                    count = await this.socket.ReceiveAsync(buffer, 0, buflen, SocketFlags.None);
+                    count = await this.socket.ReceiveAsync(buffer, 0, buflen, SocketFlags.None).ConfigureAwait(false);
 
                     if (count < 0)
                     {
