@@ -113,5 +113,29 @@ root      3     2     0      0     c105fd59 00000000 S ksoftirqd/0";
             Assert.AreEqual("/init", receiver.Processes.First().Name);
             Assert.AreEqual("kthreadd", receiver.Processes.Last().Name);
         }
+
+        /// <summary>
+        /// Tests the parsing of the process output in a context where the <see cref="AndroidProcess.WChan"/>
+        /// field can contain string data (instead of hexadecimal numbers).
+        /// </summary>
+        [TestMethod]
+        public void ProcessStringWchanOutputTest()
+        {
+            string content = @"USER      PID   PPID  VSIZE  RSS   WCHAN            PC  NAMEroot      1     0     2476   980   SyS_epoll_ 00000000 S /initroot      2     0     0      0       kthreadd 00000000 S kthreadd";
+
+            ProcessOutputReceiver receiver = new ProcessOutputReceiver();
+
+            StringReader reader = new StringReader(content);
+
+            while (reader.Peek() >= 0)
+            {
+                receiver.AddOutput(reader.ReadLine());
+            }
+
+            receiver.Flush();
+            Assert.AreEqual(2, receiver.Processes.Count);
+            Assert.AreEqual("SyS_epoll_", receiver.Processes.First().WChan);
+            Assert.AreEqual("kthreadd", receiver.Processes.Last().WChan);
+        }
     }
 }

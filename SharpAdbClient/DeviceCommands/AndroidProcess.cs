@@ -64,7 +64,7 @@ namespace SharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets or sets the memory address of the event the process is waiting for
         /// </summary>
-        public uint WChan
+        public string WChan
         {
             get;
             set;
@@ -172,7 +172,7 @@ namespace SharpAdbClient.DeviceCommands
                 ParentProcessId = header.ParentProcessIdIndex != -1 ? int.Parse(parts[header.ParentProcessIdIndex]) : -1,
                 VirtualSize = header.VirtualSizeIndex != -1 ? int.Parse(parts[header.VirtualSizeIndex]) : -1,
                 ResidentSetSize = header.ResidentSetSizeIndex != -1 ? int.Parse(parts[header.ResidentSetSizeIndex]) : -1,
-                WChan = header.WChanIndex != -1 ? uint.Parse(parts[header.WChanIndex], NumberStyles.HexNumber) : uint.MaxValue,
+                WChan = header.WChanIndex != -1 ? parts[header.WChanIndex] : null,
                 Pc = header.PcIndex != -1 ? uint.Parse(parts[header.PcIndex], NumberStyles.HexNumber) : uint.MaxValue,
                 State = header.StateIndex != -1 ? (AndroidProcessState)Enum.Parse(typeof(AndroidProcessState), parts[header.StateIndex].Substring(0, 1)) : AndroidProcessState.Unknown,
                 Name = header.NameIndex != -1 ? parts[header.NameIndex] : null
