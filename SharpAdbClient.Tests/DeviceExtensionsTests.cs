@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using SharpAdbClient.DeviceCommands;
+using System.Linq;
 
 namespace SharpAdbClient.Tests
 {
@@ -43,6 +44,14 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual(1, variables.Keys.Count);
             Assert.IsTrue(variables.ContainsKey("a"));
             Assert.AreEqual("b", variables["a"]);
+        }
+
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
+        public void ListProcessesTest()
+        {
+            var device = AdbClient.Instance.GetDevices().Single();
+            var processes = device.ListProcesses();
         }
     }
 }

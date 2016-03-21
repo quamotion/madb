@@ -273,7 +273,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
-        public async Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        public async Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
@@ -300,9 +300,9 @@ namespace SharpAdbClient
                                 break;
                             }
 
-                            if (rcvr != null)
+                            if (receiver != null)
                             {
-                                rcvr.AddOutput(line);
+                                receiver.AddOutput(line);
                             }
                         }
                     }
@@ -319,9 +319,9 @@ namespace SharpAdbClient
                 }
                 finally
                 {
-                    if (rcvr != null)
+                    if (receiver != null)
                     {
-                        rcvr.Flush();
+                        receiver.Flush();
                     }
                 }
             }

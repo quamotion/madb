@@ -28,22 +28,22 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        public Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             this.ReceivedCommands.Add(command);
 
             if (this.Commands.ContainsKey(command))
             {
-                if (rcvr != null)
+                if (receiver != null)
                 {
                     StringReader reader = new StringReader(this.Commands[command]);
 
                     while (reader.Peek() != -1)
                     {
-                        rcvr.AddOutput(reader.ReadLine());
+                        receiver.AddOutput(reader.ReadLine());
                     }
 
-                    rcvr.Flush();
+                    receiver.Flush();
                 }
             }
             else
