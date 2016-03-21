@@ -92,7 +92,6 @@
     <Compile Include="LinuxPathTests.cs" />
     <Compile Include="LoggerTests.cs" />
     <Compile Include="PackageManagerTests.cs" />
-    <Compile Include="ProcessOutputReceiverTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShellStreamTests.cs" />
     <Compile Include="SocketBasedTests.cs" />

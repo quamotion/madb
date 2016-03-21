@@ -217,6 +217,11 @@ namespace SharpAdbClient
                 {
                     break;
                 }
+                else if (response == SyncCommand.FAIL)
+                {
+                    var message = this.Socket.ReadSyncString();
+                    throw new AdbException($"Failed to pull '{remoteFilepath}'. {message}");
+                }
                 else if (response != SyncCommand.DATA)
                 {
                     throw new AdbException($"The server sent an invalid response {response}");

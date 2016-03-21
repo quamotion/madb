@@ -54,7 +54,7 @@ namespace SharpAdbClient
         IEnumerable<ForwardData> ListForward(DeviceData device);
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
-        Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver rcvr, CancellationToken cancellationToken, int maxTimeToOutputResponse);
+        Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse);
 
         // shell: not implemented
         // remount: not implemented

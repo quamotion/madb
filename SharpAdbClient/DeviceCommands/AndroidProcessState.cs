@@ -49,6 +49,16 @@ namespace SharpAdbClient.DeviceCommands
         /// <summary>
         /// Defunct ("zombie") process, terminated but not reaped by its parent.
         /// </summary>
-        Z
+        Z,
+
+        /// <summary>
+        /// Wakekill
+        /// </summary>
+        K,
+
+        /// <summary>
+        /// Parked
+        /// </summary>
+        P
     }
 }

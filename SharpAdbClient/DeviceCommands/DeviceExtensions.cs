@@ -4,7 +4,13 @@
 
 namespace SharpAdbClient.DeviceCommands
 {
+    using Receivers;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Threading;
 
     /// <summary>
     /// Provides extension methods for the <see cref="DeviceData"/> class, allowing you to run
@@ -123,9 +129,71 @@ namespace SharpAdbClient.DeviceCommands
         /// </returns>
         public static IEnumerable<AndroidProcess> ListProcesses(this DeviceData device)
         {
-            var receiver = new ProcessOutputReceiver();
-            device.ExecuteShellCommand("/system/bin/ps", receiver);
-            return receiver.Processes;
+            // There are a couple of gotcha's when listing processes on an Android device.
+            // One way would be to run ps and parse the output. However, the output of
+            // ps differents from Android version to Android version, is not delimited, nor
+            // entirely fixed length, and some of the fields can be empty, so it's almost impossible
+            // to parse correctly.
+            //
+            // The alternative is to directly read the values in /proc/[pid], pretty much like ps
+            // does (see https://android.googlesource.com/platform/system/core/+/master/toolbox/ps.c).
+            //
+            // The easiest way to do the directory listings would be to use the SyncService; unfortunately,
+            // the sync service doesn't work very well with /proc/ so we're back to using ls and taking it
+            // from there.
+            List<AndroidProcess> processes = new List<AndroidProcess>();
+
+            // List all processes by doing ls /proc/.
+            // All subfolders which are completely numeric are PIDs
+            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+            device.ExecuteShellCommand("/system/bin/ls /proc/", receiver);
+
+            Collection<int> pids = new Collection<int>();
+
+            using (StringReader reader = new StringReader(receiver.ToString()))
+            {
+                while (reader.Peek() > 0)
+                {
+                    string line = reader.ReadLine();
+
+                    if (!line.All(c => char.IsDigit(c)))
+                    {
+                        continue;
+                    }
+
+                    var pid = int.Parse(line);
+
+                    pids.Add(pid);
+                }
+            }
+
+            // For each pid, we can get /proc/[pid]/stat, which contains the process information in a well-defined
+            // format - see http://man7.org/linux/man-pages/man5/proc.5.html.
+            // Doing cat on each file one by one takes too much time. Doing cat on all of them at the same time doesn't work
+            // either, because the command line would be too long.
+            // So we do it 50 processes at at time.
+            StringBuilder catBuilder = null;
+            ProcessOutputReceiver processOutputReceiver = new ProcessOutputReceiver();
+
+            for (int i = 0; i < pids.Count; i++)
+            {
+                if (i % 50 == 0 || i == pids.Count - 1)
+                {
+                    if (catBuilder != null)
+                    {
+                        device.ExecuteShellCommand(catBuilder.ToString(), processOutputReceiver);
+                    }
+
+                    catBuilder = new StringBuilder();
+                    catBuilder.Append("cat ");
+                }
+
+                catBuilder.Append($"/proc/{pids[i]}/stat ");
+            }
+
+            processOutputReceiver.Flush();
+
+            return processOutputReceiver.Processes;
         }
     }
 }

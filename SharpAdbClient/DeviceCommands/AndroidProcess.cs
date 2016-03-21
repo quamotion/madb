@@ -17,15 +17,6 @@ namespace SharpAdbClient.DeviceCommands
     public class AndroidProcess
     {
         /// <summary>
-        /// Gets or sets the username of the process's owner
-        /// </summary>
-        public string User
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the Process ID number.
         /// </summary>
         public int ProcessId
@@ -46,7 +37,7 @@ namespace SharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets or sets total VM size in bytes.
         /// </summary>
-        public int VirtualSize
+        public ulong VirtualSize
         {
             get;
             set;
@@ -64,16 +55,7 @@ namespace SharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets or sets the memory address of the event the process is waiting for
         /// </summary>
-        public string WChan
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the value of the <c>PC</c> field.
-        /// </summary>
-        public uint Pc
+        public ulong WChan
         {
             get;
             set;
@@ -97,94 +79,81 @@ namespace SharpAdbClient.DeviceCommands
             set;
         }
 
-        /// <summary>
-        /// Parses the header of the <c>ps</c> command.
-        /// </summary>
-        /// <param name="header">
-        /// A <see cref="string"/> that contains the <c>ps</c> command output header.
-        /// </param>
-        /// <returns>
-        /// A <see cref="AndroidProcessHeader"/> that represents the header information.
-        /// </returns>
-        public static AndroidProcessHeader ParseHeader(string header)
-        {
-            // Sample input:
-            // USER     PID   PPID  VSIZE  RSS     WCHAN    PC         NAME
-            // system    479   138   446284 21100 ffffffff b765ffe6 S com.microsoft.xde.donatelloservice
-            // OR:
-            // PID USER       VSZ STAT COMMAND
-            // 1 root       340 S /init
-            AndroidProcessHeader value = new AndroidProcessHeader();
-
-            List<string> parts = new List<string>(header.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
-            value.UserIndex = parts.IndexOf("USER");
-            value.ProcessIdIndex = parts.IndexOf("PID");
-            value.ParentProcessIdIndex = parts.IndexOf("PPID");
-            value.VirtualSizeIndex = IndexOf(parts, "VSIZE", "VSZ");
-            value.ResidentSetSizeIndex = parts.IndexOf("RSS");
-            value.WChanIndex = parts.IndexOf("WCHAN");
-            value.PcIndex = parts.IndexOf("PC");
-            value.StateIndex = value.PcIndex != -1 ? value.PcIndex + 1 : parts.IndexOf("STAT");
-            value.NameIndex = IndexOf(parts, "NAME", "COMMAND");
-
-            // If the pcIndex is present, we should also increase the name index by one, because the
-            // state field comes in the middle yet has no header
-            if (value.PcIndex != -1)
-            {
-                value.NameIndex++;
-            }
-
-            return value;
-        }
-
-        /// <summary>
-        /// Parses an line of output of the <c>ps</c> command into a <see cref="AndroidProcess"/>
-        /// object.
-        /// </summary>
-        /// <param name="line">
-        /// The line to parse.
-        /// </param>
-        /// <param name="header">
-        /// THe header information, that defines how the <paramref name="line"/> is structured.
-        /// </param>
-        /// <returns>
-        /// A <see cref="AndroidProcess"/> that represents the process.
-        /// </returns>
-        public static AndroidProcess Parse(string line, AndroidProcessHeader header)
+        public static AndroidProcess Parse(string line)
         {
             if (line == null)
             {
                 throw new ArgumentNullException(nameof(line));
             }
 
-            // Sample input:
-            // USER     PID   PPID  VSIZE  RSS     WCHAN    PC         NAME
-            // system    479   138   446284 21100 ffffffff b765ffe6 S com.microsoft.xde.donatelloservice
-            // OR:
-            // PID USER       VSZ STAT COMMAND
-            // 1 root       340 S /init
-            string[] parts = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            // See http://man7.org/linux/man-pages/man5/proc.5.html,
+            // section /proc/[pid]/stat, for more information about the file format
 
-            AndroidProcess value = new AndroidProcess()
-            {
-                User = header.UserIndex != -1 ? parts[header.UserIndex] : null,
-                ProcessId = header.ProcessIdIndex != -1 ? int.Parse(parts[header.ProcessIdIndex]) : -1,
-                ParentProcessId = header.ParentProcessIdIndex != -1 ? int.Parse(parts[header.ParentProcessIdIndex]) : -1,
-                VirtualSize = header.VirtualSizeIndex != -1 ? int.Parse(parts[header.VirtualSizeIndex]) : -1,
-                ResidentSetSize = header.ResidentSetSizeIndex != -1 ? int.Parse(parts[header.ResidentSetSizeIndex]) : -1,
-                WChan = header.WChanIndex != -1 ? parts[header.WChanIndex] : null,
-                Pc = header.PcIndex != -1 ? uint.Parse(parts[header.PcIndex], NumberStyles.HexNumber) : uint.MaxValue,
-                State = header.StateIndex != -1 ? (AndroidProcessState)Enum.Parse(typeof(AndroidProcessState), parts[header.StateIndex].Substring(0, 1)) : AndroidProcessState.Unknown,
-                Name = header.NameIndex != -1 ? parts[header.NameIndex] : null
-            };
+            // Space delimited, so normally we would just do a string.split
+            // The process name may contain spaces but is wrapped within parenteses, all other values (we know of) are
+            // numeric.
+            // So we parse the pid & process name manually, to account for this, and do the string.split afterwards :-)
+            var processNameStart = line.IndexOf('(');
+            var processNameEnd = line.IndexOf(')');
 
-            // If the name starts with [, remove the starting & trailing ] characters
-            if (value.Name != null && value.Name.StartsWith("["))
+            var pid = int.Parse(line.Substring(0, processNameStart));
+            var comm = line.Substring(processNameStart + 1, processNameEnd - processNameStart - 1);
+
+            var parts = line.Substring(processNameEnd + 1).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length < 35)
             {
-                value.Name = value.Name.Substring(1, value.Name.Length - 2);
+                throw new ArgumentOutOfRangeException(nameof(line));
             }
 
-            return value;
+            // Only fields in Linux 2.1.10 and earlier are listed here,
+            // additional fields exist in newer versions of linux.
+            var state = parts[0];
+            var ppid = ParseInt(parts[1]);
+            var pgrp = ParseInt(parts[2]);
+            var session = ParseInt(parts[3]);
+            var tty_nr = ParseInt(parts[4]);
+            var tpgid = ParseInt(parts[5]);
+            var flags = ParseUInt(parts[6]);
+            var minflt = ParseULong(parts[7]);
+            var cminflt = ParseULong(parts[8]);
+            var majflt = ParseULong(parts[9]);
+            var cmajflt = ParseULong(parts[10]);
+            var utime = ParseULong(parts[11]);
+            var stime = ParseULong(parts[12]);
+            var cutime = ParseLong(parts[13]);
+            var cstime = ParseLong(parts[14]);
+            var priority = ParseLong(parts[15]);
+            var nice = ParseLong(parts[16]);
+            var num_threads = ParseLong(parts[17]);
+            var itrealvalue = ParseLong(parts[18]);
+            var starttime = ParseULong(parts[19]);
+            var vsize = ParseULong(parts[20]);
+            var rss = int.Parse(parts[21]);
+            var rsslim = ParseULong(parts[22]);
+            var startcode = ParseULong(parts[23]);
+            var endcode = ParseULong(parts[24]);
+            var startstack = ParseULong(parts[25]);
+            var kstkesp = ParseULong(parts[26]);
+            var kstkeip = ParseULong(parts[27]);
+            var signal = ParseULong(parts[28]);
+            var blocked = ParseULong(parts[29]);
+            var sigignore = ParseULong(parts[30]);
+            var sigcatch = ParseULong(parts[31]);
+            var wchan = ParseULong(parts[32]);
+            var nswap = ParseULong(parts[33]);
+            var cnswap = ParseULong(parts[34]);
+
+            return new AndroidProcess()
+            {
+                Name = comm,
+                ParentProcessId = ppid,
+                State = (AndroidProcessState)Enum.Parse(typeof(AndroidProcessState), state, true),
+                ProcessId = pid,
+                ResidentSetSize = rss,
+                VirtualSize = vsize,
+                WChan = wchan
+            };
         }
 
         /// <summary>
@@ -225,6 +194,26 @@ namespace SharpAdbClient.DeviceCommands
             }
 
             return -1;
+        }
+
+        private static int ParseInt(string value)
+        {
+            return value == "-" ? 0 : int.Parse(value);
+        }
+
+        private static uint ParseUInt(string value)
+        {
+            return value == "-" ? 0 :uint.Parse(value);
+        }
+
+        private static long ParseLong(string value)
+        {
+            return value == "-" ? 0 : long.Parse(value);
+        }
+
+        private static ulong ParseULong(string value)
+        {
+            return value == "-" ? 0 : ulong.Parse(value);
         }
     }
 }

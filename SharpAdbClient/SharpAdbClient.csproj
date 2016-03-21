@@ -118,10 +118,8 @@
     <Compile Include="AdbServer.cs" />
     <Compile Include="AdbSocket.cs" />
     <Compile Include="DeviceCommands\AndroidProcess.cs" />
-    <Compile Include="DeviceCommands\AndroidProcessHeader.cs" />
     <Compile Include="DeviceCommands\AndroidProcessState.cs" />
     <Compile Include="DeviceCommands\InfoReceiver.cs" />
-    <Compile Include="DeviceCommands\ProcessOutputReceiver.cs" />
     <Compile Include="DeviceCommands\VersionInfo.cs" />
     <Compile Include="DeviceCommands\VersionInfoReceiver.cs" />
     <Compile Include="Factories.cs" />
@@ -174,6 +172,7 @@
     <Compile Include="Receivers\MultilineReceiver.cs" />
     <Compile Include="Receivers\NamespaceDoc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Receivers\ProcessOutputReceiver.cs" />
     <Compile Include="SocketExtensions.cs" />
     <Compile Include="StartServerResult.cs" />
     <Compile Include="SyncCommand.cs" />

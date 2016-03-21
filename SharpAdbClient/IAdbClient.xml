@@ -123,7 +123,7 @@
     <param name="device">
       The device on which to execute the command.
     </param>
-    <param name="rcvr">
+    <param name="receiver">
       A <see cref="IShellOutputReceiver"/> that receives the command output. Set to <see langword="null"/>
       if you are not interested in the output.
     </param>
