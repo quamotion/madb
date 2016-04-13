@@ -41,11 +41,11 @@ namespace SharpAdbClient
         {
             if (this.IsRunning)
             {
-                return $"Version {this.Version} of the adb daemon is running";
+                return $"Version {this.Version} of the adb daemon is running.";
             }
             else
             {
-                return "The adb deamon is not running.";
+                return "The adb daemon is not running.";
             }
         }
     }

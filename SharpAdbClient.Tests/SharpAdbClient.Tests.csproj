@@ -69,7 +69,10 @@
     <Compile Include="..\Shared\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AdbCommandLineClientExtensionsTests.cs" />
     <Compile Include="AdbCommandLineClientTests.cs" />
+    <Compile Include="AdbResponseTests.cs" />
+    <Compile Include="AdbServerStatusTests.cs" />
     <Compile Include="AdbServerTests.cs" />
     <Compile Include="AdbClientTests.cs" />
     <Compile Include="AdbSocketTests.cs" />
@@ -105,6 +108,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShellStreamTests.cs" />
     <Compile Include="SocketBasedTests.cs" />
+    <Compile Include="SyncCommandConverterTests.cs" />
     <Compile Include="SyncServiceTests.cs" />
     <Compile Include="TracingAdbSocket.cs" />
     <Compile Include="VersionInfoReceiverTests.cs" />
