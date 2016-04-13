@@ -24,20 +24,7 @@ namespace SharpAdbClient
         /// </summary>
         public TcpSocket()
         {
-            switch (Environment.OSVersion.Platform)
-            {
-                case PlatformID.Win32NT:
-                    this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    break;
-
-                case PlatformID.Unix:
-                case PlatformID.MacOSX:
-                    this.socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
-                    break;
-
-                default:
-                    throw new NotSupportedException("Only Windows, Linux and Mac OS are supported");
-            }
+            this.socket = CreateSocket();
         }
 
         /// <inheritdoc/>
@@ -68,6 +55,22 @@ namespace SharpAdbClient
         {
             this.socket.Connect(endPoint);
             this.socket.Blocking = true;
+        }
+
+        /// <inheritdoc/>
+        public void Reconnect()
+        {
+            if (this.socket.Connected)
+            {
+                // Already connected - nothing to do.
+                return;
+            }
+
+            // Cache the previous endpoint
+            var endPoint = this.socket.RemoteEndPoint;
+
+            this.socket = CreateSocket();
+            this.Connect(endPoint);
         }
 
         /// <inheritdoc/>
@@ -104,6 +107,28 @@ namespace SharpAdbClient
         public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags)
         {
             return this.socket.ReceiveAsync(buffer, offset, size, socketFlags);
+        }
+
+        /// <summary>
+        /// Creates a new, uninitialized socket which can connect to an ADB server.
+        /// </summary>
+        /// <returns>
+        /// A new <see cref="Socket"/> which can connect to an ADB server.
+        /// </returns>
+        private static Socket CreateSocket()
+        {
+            switch (Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT:
+                    return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                case PlatformID.Unix:
+                case PlatformID.MacOSX:
+                    return new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
+
+                default:
+                    throw new NotSupportedException("Only Windows, Linux and Mac OS are supported");
+            }
         }
     }
 }
