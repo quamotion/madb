@@ -7,6 +7,7 @@ namespace SharpAdbClient.Exceptions
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.Serialization;
     using System.Text;
 
     /// <summary>
@@ -29,6 +30,26 @@ namespace SharpAdbClient.Exceptions
         public DeviceNotFoundException(string device)
             : base("The device '" + device + "' was not found.")
             {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceNotFoundException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="innerException">The inner exception.</param>
+        public DeviceNotFoundException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceNotFoundException"/> class.
+        /// </summary>
+        /// <param name="serializationInfo">The serialization info.</param>
+        /// <param name="context">The context.</param>
+        public DeviceNotFoundException(SerializationInfo serializationInfo, StreamingContext context)
+            : base(serializationInfo, context)
+        {
         }
     }
 }
