@@ -248,7 +248,7 @@ namespace SharpAdbClient.Tests
             Assert.IsInstanceOfType(stream, typeof(ShellStream));
 
             var shellStream = (ShellStream)stream;
-            Assert.AreEqual(tcpSocket.InputStream, shellStream.Inner);
+            Assert.AreEqual(tcpSocket.OutputStream, shellStream.Inner);
         }
 
         private void RunTest(Action<IAdbSocket> test, byte[] expectedDataSent)
