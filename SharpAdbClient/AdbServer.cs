@@ -114,7 +114,7 @@ namespace SharpAdbClient
 
             var commandLineClient = Factories.AdbCommandLineClientFactory(adbPath);
 
-            if (File.Exists(adbPath))
+            if (commandLineClient.IsValidAdbFile(adbPath))
             {
                 cachedAdbPath = adbPath;
                 commandLineVersion = commandLineClient.GetVersion();

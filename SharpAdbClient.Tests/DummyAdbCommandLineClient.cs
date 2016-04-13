@@ -25,9 +25,10 @@ namespace SharpAdbClient.Tests
             private set;
         }
 
-        protected override void EnsureIsValidAdbFile(string adbPath)
+        public override bool IsValidAdbFile(string adbPath)
         {
             // No validation done in the dummy adb client.
+            return true;
         }
 
         protected override int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)

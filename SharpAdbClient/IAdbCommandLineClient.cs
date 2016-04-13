@@ -21,5 +21,13 @@ namespace SharpAdbClient
         /// Starts the adb server by running the <c>adb start-server</c> command.
         /// </summary>
         void StartServer();
+
+        /// <summary>
+        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
+        /// </summary>
+        /// <param name="adbPath">
+        /// The path to validate.
+        /// </param>
+        bool IsValidAdbFile(string adbPath);
     }
 }

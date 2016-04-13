@@ -147,6 +147,12 @@ namespace SharpAdbClient
             this.RunAdbProcess("start-server", null, null);
         }
 
+        /// <inheritdoc/>
+        public virtual bool IsValidAdbFile(string adbPath)
+        {
+            return File.Exists(adbPath);
+        }
+
         /// <summary>
         /// Parses the output of the <c>adb.exe version</c> command and determines the
         /// adb version.
@@ -180,20 +186,6 @@ namespace SharpAdbClient
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
-        /// </summary>
-        /// <param name="adbPath">
-        /// The path to validate.
-        /// </param>
-        protected virtual void EnsureIsValidAdbFile(string adbPath)
-        {
-            if (!File.Exists(adbPath))
-            {
-                throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
-            }
         }
 
         /// <summary>

@@ -146,6 +146,7 @@
     <Compile Include="FramebufferHeader.cs" />
     <Compile Include="IAdbClient.cs" />
     <Compile Include="IAdbCommandLineClient.cs" />
+    <Compile Include="AdbCommandLineClientExtensions.cs" />
     <Compile Include="IAdbServer.cs" />
     <Compile Include="IAdbSocket.cs" />
     <Compile Include="IDeviceMonitor.cs" />
