@@ -7,6 +7,7 @@ namespace SharpAdbClient
     using SharpAdbClient.Exceptions;
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
     using System.Text.RegularExpressions;
@@ -122,6 +123,37 @@ namespace SharpAdbClient
         /// </summary>
         public void StartServer()
         {
+            int status = this.RunAdbProcessInner("start-server", null, null);
+
+            if (status == 0)
+            {
+                return;
+            }
+
+            // Starting the adb server failed for whatever reason. This can happen if adb.exe
+            // is running but is not accepting requests. In that case, try to kill it & start again.
+            // It kills all processes named "adb", so let's hope nobody else named their process that way.
+            foreach (var adbProcess in Process.GetProcessesByName("adb"))
+            {
+                try
+                {
+                    adbProcess.Kill();
+                }
+                catch (Win32Exception)
+                {
+                    // The associated process could not be terminated
+                    // or
+                    // The process is terminating.
+                }
+                catch (InvalidOperationException)
+                {
+                    // The process has already exited.
+                    // There is no process associated with this Process object.
+                }
+            }
+
+            // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
+            // again. We'll let that exception bubble up the stack.
             this.RunAdbProcess("start-server", null, null);
         }
 
@@ -188,6 +220,42 @@ namespace SharpAdbClient
         /// </exception>
         protected virtual void RunAdbProcess(string command, List<string> errorOutput, List<string> standardOutput)
         {
+            int status = this.RunAdbProcessInner(command, errorOutput, standardOutput);
+
+            if (status != 0)
+            {
+                throw new AdbException($"The adb process returned error code {status} when running command {command}");
+            }
+        }
+
+        /// <summary>
+        /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
+        /// and reads the standard output and standard error output.
+        /// </summary>
+        /// <param name="command">
+        /// The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.
+        /// </param>
+        /// <param name="errorOutput">
+        /// A list in which to store the standard error output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard
+        /// error.
+        /// </param>
+        /// <param name="standardOutput">
+        /// A list in which to store the standard output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard
+        /// output.
+        /// </param>
+        /// <returns>
+        /// The return code of the <c>adb</c> process.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// Use this command only for <c>adb</c> commands that return immediately, such as
+        /// <c>adb version</c>. This operation times out after 5 seconds.
+        /// </para>
+        /// </remarks>
+        protected virtual int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
+        {
             if (command == null)
             {
                 throw new ArgumentNullException(nameof(command));
@@ -228,10 +296,7 @@ namespace SharpAdbClient
                 status = process.ExitCode;
             }
 
-            if (status != 0)
-            {
-                throw new AdbException($"The adb process returned error code {status} when running command {command}");
-            }
+            return status;
         }
     }
 }
