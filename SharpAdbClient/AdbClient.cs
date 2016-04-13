@@ -95,7 +95,7 @@ namespace SharpAdbClient
             {
                 if (instance == null)
                 {
-                    instance = new AdbClient(AdbServer.EndPoint);
+                    instance = new AdbClient(AdbServer.Instance.EndPoint);
                 }
 
                 return instance;

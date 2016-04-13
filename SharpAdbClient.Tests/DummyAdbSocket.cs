@@ -180,5 +180,10 @@ namespace SharpAdbClient.Tests
                 throw new SocketException();
             }
         }
+
+        public void Reconnect()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -63,7 +63,7 @@ namespace SharpAdbClient
             AdbClientFactory = (endPoint) => new AdbClient(endPoint);
             AdbCommandLineClientFactory = (path) => new AdbCommandLineClient(path);
             SyncServiceFactory = (device) => new SyncService(device);
-            AdbClient.Instance = new AdbClient(AdbServer.EndPoint);
+            AdbClient.Instance = new AdbClient(AdbServer.Instance.EndPoint);
         }
     }
 }
