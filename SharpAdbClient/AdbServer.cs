@@ -7,8 +7,10 @@ namespace SharpAdbClient
     using Mono.Unix;
     using SharpAdbClient.Exceptions;
     using System;
+    using System.IO;
     using System.Net;
     using System.Net.Sockets;
+    using System.Threading
 
     /// <summary>
     /// <para>
@@ -51,6 +53,20 @@ namespace SharpAdbClient
         /// </summary>
         private const string Tag = nameof(AdbServer);
 
+        /// <summary>
+        /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
+        /// the server to figure out where adb is located.
+        /// </summary>
+        private static string cachedAdbPath;
+
+        /// <summary>
+        /// A lock used to ensure only one caller at a time can attempt to restart adb.
+        /// </summary>
+        private static readonly object restartLock = new object();
+
+        /// <summary>
+        /// Initializes static members of the <see cref="AdbServer"/> class.
+        /// </summary>
         static AdbServer()
         {
             switch (Environment.OSVersion.Platform)
@@ -116,8 +132,9 @@ namespace SharpAdbClient
 
             var commandLineClient = Factories.AdbCommandLineClientFactory(adbPath);
 
-            if (adbPath != null)
+            if (File.Exists(adbPath))
             {
+                cachedAdbPath = adbPath;
                 commandLineVersion = commandLineClient.GetVersion();
             }
 
@@ -169,6 +186,28 @@ namespace SharpAdbClient
             else
             {
                 return StartServerResult.AlreadyRunning;
+            }
+        }
+
+        /// <summary>
+        /// Restarts the adb server if it suddenly became unavailable. Call this class if, for example,
+        /// you receive an <see cref="AdbException"/> with the <see cref="AdbException.ConnectionReset"/> flag
+        /// set to <see langword="true"/> - a clear indicating the ADB server died.
+        /// </summary>
+        /// <remarks>
+        /// You can only call this method if you have previously started the adb server via
+        /// <see cref="AdbServer.StartServer(string, bool)"/> and passed the full path to the adb server.
+        /// </remarks>
+        public static void RestartServer()
+        {
+            if (!File.Exists(cachedAdbPath))
+            {
+                throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
+            }
+
+            lock (restartLock)
+            {
+                StartServer(cachedAdbPath, false);
             }
         }
 
