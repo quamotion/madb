@@ -18,13 +18,14 @@ namespace SharpAdbClient
     public class TcpSocket : ITcpSocket
     {
         private Socket socket;
+        private EndPoint endPoint;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpSocket"/> class.
         /// </summary>
         public TcpSocket()
         {
-            this.socket = CreateSocket();
+            this.socket = CreateSocket(Environment.OSVersion.Platform);
         }
 
         /// <inheritdoc/>
@@ -55,6 +56,7 @@ namespace SharpAdbClient
         {
             this.socket.Connect(endPoint);
             this.socket.Blocking = true;
+            this.endPoint = endPoint;
         }
 
         /// <inheritdoc/>
@@ -66,11 +68,8 @@ namespace SharpAdbClient
                 return;
             }
 
-            // Cache the previous endpoint
-            var endPoint = this.socket.RemoteEndPoint;
-
-            this.socket = CreateSocket();
-            this.Connect(endPoint);
+            this.socket = CreateSocket(Environment.OSVersion.Platform);
+            this.Connect(this.endPoint);
         }
 
         /// <inheritdoc/>
@@ -115,9 +114,9 @@ namespace SharpAdbClient
         /// <returns>
         /// A new <see cref="Socket"/> which can connect to an ADB server.
         /// </returns>
-        private static Socket CreateSocket()
+        internal static Socket CreateSocket(PlatformID platform)
         {
-            switch (Environment.OSVersion.Platform)
+            switch (platform)
             {
                 case PlatformID.Win32NT:
                     return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

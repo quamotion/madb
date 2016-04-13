@@ -110,6 +110,7 @@
     <Compile Include="SocketBasedTests.cs" />
     <Compile Include="SyncCommandConverterTests.cs" />
     <Compile Include="SyncServiceTests.cs" />
+    <Compile Include="TcpSocketTests.cs" />
     <Compile Include="TracingAdbSocket.cs" />
     <Compile Include="VersionInfoReceiverTests.cs" />
   </ItemGroup>

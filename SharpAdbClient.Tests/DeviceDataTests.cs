@@ -47,7 +47,7 @@ namespace SharpAdbClient.Tests
             DeviceData d = new DeviceData();
             d.Serial = "xyz";
 
-            Assert.AreEqual("xyz", d.Serial);
+            Assert.AreEqual("xyz", d.ToString());
         }
 
         [TestMethod]
