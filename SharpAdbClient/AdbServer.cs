@@ -49,6 +49,18 @@ namespace SharpAdbClient
         internal const int ConnectionRefused = 10061;
 
         /// <summary>
+        /// The error code that is returned by the <see cref="SocketException"/> when the connection was reset by the peer.
+        /// </summary>
+        /// <remarks>
+        /// An existing connection was forcibly closed by the remote host. This normally results if the peer application on the
+        /// remote host is suddenly stopped, the host is rebooted, the host or remote network interface is disabled, or the remote
+        /// host uses a hard close. This error may also result if a connection was broken due to keep-alive activity detecting
+        /// a failure while one or more operations are in progress.
+        /// </remarks>
+        /// <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/>
+        internal const int ConnectionReset = 10054;
+
+        /// <summary>
         /// The tag to use when logging.
         /// </summary>
         private const string Tag = nameof(AdbServer);

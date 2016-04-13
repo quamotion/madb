@@ -81,6 +81,7 @@
     <Compile Include="DeviceMonitorTests.cs" />
     <Compile Include="DummyAdbClient.cs" />
     <Compile Include="DummyAdbCommandLineClient.cs" />
+    <Compile Include="DummyAdbServer.cs" />
     <Compile Include="DummyAdbSocket.cs" />
     <Compile Include="DummySyncService.cs" />
     <Compile Include="DummyTcpSocket.cs" />

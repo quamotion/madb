@@ -13,9 +13,15 @@ namespace SharpAdbClient.Tests
 {
     internal class DummyAdbSocket : IAdbSocket, IDummyAdbSocket
     {
+        /// <summary>
+        /// Use this message to cause <see cref="ReadString"/> and <see cref="ReadStringAsync(CancellationToken)"/> to throw
+        /// a <see cref="AdbException"/> indicating that the adb server has forcefully closed the connection.
+        /// </summary>
+        public const string ServerDisconnected = "ServerDisconnected";
+
         public DummyAdbSocket()
         {
-            this.Connected = true;
+            this.IsConnected = true;
         }
 
         public Stream ShellStream
@@ -53,10 +59,32 @@ namespace SharpAdbClient.Tests
         public List<Tuple<SyncCommand, string>> SyncRequests
         { get; } = new List<Tuple<SyncCommand, string>>();
 
-        public bool Connected
+        public bool IsConnected
         {
             get;
             set;
+        }
+
+        public bool WaitForNewData
+        {
+            get;
+            set;
+        }
+
+        public bool Connected
+        {
+            get
+            {
+                return this.IsConnected
+                    && (this.WaitForNewData || this.Responses.Count > 0 || this.ResponseMessages.Count > 0 || this.SyncResponses.Count > 0 || this.SyncDataReceived.Count > 0);
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool DidReconnect
+        {
+            get;
+            private set;
         }
 
         public Socket Socket
@@ -69,7 +97,7 @@ namespace SharpAdbClient.Tests
 
         public void Dispose()
         {
-            this.Connected = false;
+            this.IsConnected = false;
         }
 
         public void Read(byte[] data)
@@ -103,7 +131,7 @@ namespace SharpAdbClient.Tests
 
         public string ReadString()
         {
-            return this.ResponseMessages.Dequeue();
+            return this.ReadStringAsync(CancellationToken.None).Result;
         }
 
         public string ReadSyncString()
@@ -111,9 +139,28 @@ namespace SharpAdbClient.Tests
             return this.ResponseMessages.Dequeue();
         }
 
-        public Task<string> ReadStringAsync(CancellationToken cancellationToken)
+        public async Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
-            return Task.FromResult(this.ReadString());
+            if (this.WaitForNewData)
+            {
+                while (this.ResponseMessages.Count == 0)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+            }
+
+            var message = this.ResponseMessages.Dequeue();
+
+            if (message == ServerDisconnected)
+            {
+                var socketException = new SocketException(AdbServer.ConnectionReset);
+                throw new AdbException(socketException.Message, socketException);
+            }
+            else
+            {
+                return message;
+            }
         }
 
         public void SendAdbRequest(string request)
@@ -123,7 +170,7 @@ namespace SharpAdbClient.Tests
 
         public void Close()
         {
-            this.Connected = false;
+            this.IsConnected = false;
         }
 
         public void SendSyncRequest(string command, int value)
@@ -183,7 +230,7 @@ namespace SharpAdbClient.Tests
 
         public void Reconnect()
         {
-            throw new NotImplementedException();
+            this.DidReconnect = true;
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 
 namespace SharpAdbClient.Tests
 {
@@ -39,6 +41,8 @@ namespace SharpAdbClient.Tests
         [TestMethod]
         public void DeviceDisconnectedTest()
         {
+            this.Socket.WaitForNewData = true;
+
             using (DeviceMonitor monitor = new DeviceMonitor(this.Socket))
             {
                 DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
@@ -86,6 +90,8 @@ namespace SharpAdbClient.Tests
         [TestMethod]
         public void DeviceConnectedTest()
         {
+            this.Socket.WaitForNewData = true;
+
             using (DeviceMonitor monitor = new DeviceMonitor(this.Socket))
             {
                 DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
@@ -161,6 +167,8 @@ namespace SharpAdbClient.Tests
         [TestMethod]
         public void DeviceChangedTest()
         {
+            this.Socket.WaitForNewData = true;
+
             using (DeviceMonitor monitor = new DeviceMonitor(this.Socket))
             {
                 DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
@@ -204,6 +212,36 @@ namespace SharpAdbClient.Tests
                     Assert.AreEqual(1, sink.ChangedEvents.Count);
                     Assert.AreEqual(0, sink.DisconnectedEvents.Count);
                     Assert.AreEqual("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
+                });
+            }
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor"/> in a case where the adb server dies in the middle of the monitor
+        /// loop. The <see cref="DeviceMonitor"/> should detect this condition and restart the adb server.
+        /// </summary>
+        [TestMethod]
+        public void AdbKilledTest()
+        {
+            var dummyAdbServer = new DummyAdbServer();
+            AdbServer.Instance = dummyAdbServer;
+
+            using (DeviceMonitor monitor = new DeviceMonitor(this.Socket))
+            {
+                base.RunTest(
+                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                ResponseMessages(
+                    DummyAdbSocket.ServerDisconnected,
+                    string.Empty),
+                Requests(
+                    "host:track-devices",
+                    "host:track-devices"),
+                () =>
+                {
+                    monitor.Start();
+
+                    Assert.IsTrue(this.Socket.DidReconnect);
+                    Assert.IsTrue(dummyAdbServer.WasRestarted);
                 });
             }
         }

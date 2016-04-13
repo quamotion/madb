@@ -94,7 +94,7 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Reconnect()
+        public virtual void Reconnect()
         {
             this.socket.Reconnect();
         }

@@ -57,6 +57,15 @@ namespace SharpAdbClient.Tests
         public List<Tuple<SyncCommand, string>> SyncRequests
         { get; } = new List<Tuple<SyncCommand, string>>();
 
+        public bool DidReconnect
+        {get; private set; }
+
+        public bool WaitForNewData
+        {
+            get;
+            set;
+        }
+
         public override void Dispose()
         {
             if (this.DoDispose)
@@ -176,6 +185,13 @@ namespace SharpAdbClient.Tests
             {
                 this.SyncDataSent.Enqueue(data.Take(length).ToArray());
             }
+        }
+
+        public override void Reconnect()
+        {
+            base.Reconnect();
+
+            this.DidReconnect = true;
         }
     }
 }
