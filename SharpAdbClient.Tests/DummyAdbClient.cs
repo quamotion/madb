@@ -48,7 +48,7 @@ namespace SharpAdbClient.Tests
             }
             else
             {
-                throw new ArgumentOutOfRangeException(nameof(command));
+                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{command}' was unexpected");
             }
 
             return Task.FromResult(true);

@@ -76,7 +76,7 @@
     <Compile Include="AndroidProcessTests.cs" />
     <Compile Include="ConsoleOutputReceiverTests.cs" />
     <Compile Include="DeviceDataTests.cs" />
-    <Compile Include="DeviceExtensionsTests.cs" />
+    <Compile Include="DeviceCommands\DeviceExtensionsTests.cs" />
     <Compile Include="DeviceMonitorSink.cs" />
     <Compile Include="DeviceMonitorTests.cs" />
     <Compile Include="DummyAdbClient.cs" />
@@ -86,6 +86,7 @@
     <Compile Include="DummySyncService.cs" />
     <Compile Include="DummyTcpSocket.cs" />
     <Compile Include="EnvironmentVariablesReceiverTests.cs" />
+    <Compile Include="Extensions\ArrayHelperTests.cs" />
     <Compile Include="FramebufferHeaderTests.cs" />
     <Compile Include="GetPropReceiverTests.cs" />
     <Compile Include="IDummyAdbSocket.cs" />
