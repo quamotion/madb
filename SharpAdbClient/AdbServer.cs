@@ -10,7 +10,7 @@ namespace SharpAdbClient
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
-    using System.Threading
+    using System.Threading;
 
     /// <summary>
     /// <para>
@@ -54,15 +54,15 @@ namespace SharpAdbClient
         private const string Tag = nameof(AdbServer);
 
         /// <summary>
+        /// A lock used to ensure only one caller at a time can attempt to restart adb.
+        /// </summary>
+        private static readonly object RestartLock = new object();
+
+        /// <summary>
         /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
         /// the server to figure out where adb is located.
         /// </summary>
         private static string cachedAdbPath;
-
-        /// <summary>
-        /// A lock used to ensure only one caller at a time can attempt to restart adb.
-        /// </summary>
-        private static readonly object restartLock = new object();
 
         /// <summary>
         /// Initializes static members of the <see cref="AdbServer"/> class.
@@ -205,7 +205,7 @@ namespace SharpAdbClient
                 throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
             }
 
-            lock (restartLock)
+            lock (RestartLock)
             {
                 StartServer(cachedAdbPath, false);
             }
@@ -233,7 +233,7 @@ namespace SharpAdbClient
             }
             catch (SocketException ex)
             {
-                if (ex.ErrorCode == ConnectionRefused)
+                if (ex.SocketErrorCode == SocketError.ConnectionRefused)
                 {
                     return new AdbServerStatus()
                     {

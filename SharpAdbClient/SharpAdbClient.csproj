@@ -209,9 +209,6 @@
     <Content Include="IAdbClient.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="IAdbSocket.xml">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="IDeviceMonitor.xml" />
     <Content Include="ISyncService.xml" />
   </ItemGroup>
