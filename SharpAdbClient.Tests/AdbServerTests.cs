@@ -80,6 +80,7 @@ namespace SharpAdbClient.Tests
         [TestMethod]
         public void StartServerAlreadyRunningTest()
         {
+            this.commandLineClient.Version = new Version(1, 0, 20);
             this.socket.Responses.Enqueue(AdbResponse.OK);
             this.socket.ResponseMessages.Enqueue("0020");
 
