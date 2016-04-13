@@ -293,7 +293,7 @@ namespace SharpAdbClient
             }
             catch (SocketException sex)
             {
-                Log.e(TAG, sex);
+                Log.Error(TAG, sex);
                 throw;
             }
         }
@@ -335,12 +335,12 @@ namespace SharpAdbClient
 
                     if (count < 0)
                     {
-                        Log.e(TAG, "read: channel EOF");
+                        Log.Error(TAG, "read: channel EOF");
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-                        Log.i(TAG, "DONE with Read");
+                        Log.Info(TAG, "DONE with Read");
                     }
                     else
                     {
@@ -376,12 +376,12 @@ namespace SharpAdbClient
                     count = this.socket.Receive(buffer, buflen, SocketFlags.None);
                     if (count < 0)
                     {
-                        Log.e(TAG, "read: channel EOF");
+                        Log.Error(TAG, "read: channel EOF");
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-                        Log.i(TAG, "DONE with Read");
+                        Log.Info(TAG, "DONE with Read");
                     }
                     else
                     {
@@ -422,7 +422,7 @@ namespace SharpAdbClient
             }
             catch (IOException e)
             {
-                Log.e(TAG, e);
+                Log.Error(TAG, e);
                 return false;
             }
 
@@ -457,7 +457,7 @@ namespace SharpAdbClient
             {
                 var message = this.ReadString();
                 resp.Message = message;
-                Log.e(TAG, "Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
+                Log.Error(TAG, "Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
             }
 
             return resp;
@@ -481,7 +481,7 @@ namespace SharpAdbClient
             }
             catch (DecoderFallbackException uee)
             {
-                Log.e(TAG, uee);
+                Log.Error(TAG, uee);
                 result = string.Empty;
             }
 

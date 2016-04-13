@@ -114,8 +114,22 @@ namespace SharpAdbClient
             return header;
         }
 
+        /// <summary>
+        /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="Image"/>.
+        /// </summary>
+        /// <param name="buffer">
+        /// The buffer containing the image data.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Image"/> that represents the image contained in the frame buffer.
+        /// </returns>
         public Image ToImage(byte[] buffer)
         {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException(nameof(buffer));
+            }
+
             // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
             var pixelFormat = this.StandardizePixelFormat(buffer);
 

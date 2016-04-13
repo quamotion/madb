@@ -55,7 +55,7 @@ namespace SharpAdbClient
                     }
                     catch (FormatException)
                     {
-                        Log.w(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
+                        Log.Warn(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
                     }
                 }
 
@@ -68,7 +68,7 @@ namespace SharpAdbClient
                     }
                     catch (FormatException)
                     {
-                        Log.w(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
+                        Log.Warn(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
                     }
                 }
 
@@ -100,7 +100,7 @@ namespace SharpAdbClient
                     }
                     catch (FormatException)
                     {
-                        Log.w(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
+                        Log.Warn(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
                     }
                 }
 
@@ -114,7 +114,7 @@ namespace SharpAdbClient
                     }
                     catch (FormatException)
                     {
-                        Log.w(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
+                        Log.Warn(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
                     }
                 }
 
@@ -127,7 +127,7 @@ namespace SharpAdbClient
                     }
                     catch (FormatException)
                     {
-                        Log.w(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
+                        Log.Warn(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
                     }
                 }
 
@@ -146,7 +146,7 @@ namespace SharpAdbClient
                     }
                     catch (FormatException)
                     {
-                        Log.w(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
+                        Log.Warn(TAG, string.Format("Failed to parse {0} as an integer", match.Groups[1].Value));
                     }
                 }
             }

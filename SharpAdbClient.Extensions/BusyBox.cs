@@ -127,7 +127,7 @@ namespace SharpAdbClient
         public void ExecuteShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
 			command.ThrowIfNullOrWhiteSpace ( "command" );
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
-			Log.d ( "executing: {0}", cmd );
+			Log.Debug ( "executing: {0}", cmd );
 			AdbClient.Instance.ExecuteRemoteCommand(cmd, this.Device.DeviceData, receiver);
 		}
 
@@ -135,7 +135,7 @@ namespace SharpAdbClient
         public void ExecuteRootShellCommand( String command, IShellOutputReceiver receiver, params object[] commandArgs ) {
 			command.ThrowIfNullOrWhiteSpace ( "command" );
 			var cmd = String.Format ( "{0} {1}", BUSYBOX_COMMAND, String.Format ( command, commandArgs ) );
-			Log.d ( "executing (su): {0}", cmd );
+			Log.Debug ( "executing (su): {0}", cmd );
             Device.ExecuteRootShellCommand(cmd, receiver );
 		}
 

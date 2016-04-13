@@ -198,13 +198,13 @@ namespace SharpAdbClient.DeviceCommands
                 // workitem: 19711
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
-                Log.d(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
+                Log.Debug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
 
                 using (ISyncService sync = Factories.SyncServiceFactory(this.Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
                     string message = $"Uploading file onto device '{this.Device.Serial}'";
-                    Log.d(Tag, message);
+                    Log.Debug(Tag, message);
 
                     sync.Push(stream, remoteFilePath, 644, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
                 }
@@ -213,7 +213,7 @@ namespace SharpAdbClient.DeviceCommands
             }
             catch (IOException e)
             {
-                Log.e(Tag, $"Unable to open sync connection! reason: {e.Message}");
+                Log.Error(Tag, $"Unable to open sync connection! reason: {e.Message}");
                 throw;
             }
         }
@@ -232,7 +232,7 @@ namespace SharpAdbClient.DeviceCommands
             }
             catch (IOException e)
             {
-                Log.e(Tag, $"Failed to delete temporary package: {e.Message}");
+                Log.Error(Tag, $"Failed to delete temporary package: {e.Message}");
                 throw e;
             }
         }

@@ -64,11 +64,10 @@ namespace SharpAdbClient
             this.IntegrationTest = false;
 #endif
 
-            this.Socket = new DummyAdbSocket();
-            Factories.AdbSocketFactory = (endPoint) => this.Socket;
-            this.EndPoint = AdbServer.EndPoint;
+            this.EndPoint = AdbServer.Instance.EndPoint;
+            this.Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(this.EndPoint);
 
-            AdbClient.Instance = new AdbClient(AdbServer.EndPoint);
+            AdbClient.Instance = new AdbClient(AdbServer.Instance.EndPoint);
         }
 
         /// <summary>

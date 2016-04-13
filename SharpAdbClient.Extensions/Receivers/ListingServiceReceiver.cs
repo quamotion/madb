@@ -64,7 +64,7 @@ namespace SharpAdbClient {
 				// run the line through the regexp
 				var m = line.Trim ( ).Match ( FileListingService.LS_PATTERN_EX, RegexOptions.Compiled );
 				if ( !m.Success ) {
-					Log.v ( "madb", "no match on file pattern: {0}", line );
+					Log.Verbose ( "madb", "no match on file pattern: {0}", line );
 					continue;
 				}
 				// get the name

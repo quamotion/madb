@@ -30,7 +30,7 @@ namespace SharpAdbClient
     ///     call the <see cref="GetDevices"/> method.
     /// </para>
     /// <para>
-    ///     To run a command on a device, you can use the <see cref="ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, int)"/>
+    ///     To run a command on a device, you can use the <see cref="ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken, int)"/>
     ///     method.
     /// </para>
     /// </summary>
@@ -273,7 +273,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
-        public async Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
@@ -328,7 +328,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
-        public async Task<Image> GetFrameBuffer(DeviceData device, CancellationToken cancellationToken)
+        public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken)
         {
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
