@@ -63,19 +63,9 @@ namespace SharpAdbClient
                     throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
             }
 
-            if (!File.Exists(adbPath))
-            {
-                throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
-            }
+            this.EnsureIsValidAdbFile(adbPath);
 
             this.AdbPath = adbPath;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
-        /// </summary>
-        protected AdbCommandLineClient()
-        {
         }
 
         /// <summary>
@@ -190,6 +180,20 @@ namespace SharpAdbClient
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
+        /// </summary>
+        /// <param name="adbPath">
+        /// The path to validate.
+        /// </param>
+        protected virtual void EnsureIsValidAdbFile(string adbPath)
+        {
+            if (!File.Exists(adbPath))
+            {
+                throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
+            }
         }
 
         /// <summary>

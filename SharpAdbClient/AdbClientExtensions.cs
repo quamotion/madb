@@ -78,7 +78,21 @@ namespace SharpAdbClient
         /// <param name="rcvr">The shell output receiver</param>
         public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver rcvr)
         {
-            client.ExecuteRemoteCommandAsync(command, device, rcvr, CancellationToken.None, int.MaxValue).Wait();
+            try
+            {
+                client.ExecuteRemoteCommandAsync(command, device, rcvr, CancellationToken.None, int.MaxValue).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                if (ex.InnerExceptions.Count == 1)
+                {
+                    throw ex.InnerException;
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         /// <summary>
