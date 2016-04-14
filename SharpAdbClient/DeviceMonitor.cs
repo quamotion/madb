@@ -4,10 +4,13 @@
 
 namespace SharpAdbClient
 {
+    using Exceptions;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net.Sockets;
     using System.Threading;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// <para>
@@ -47,15 +50,20 @@ namespace SharpAdbClient
 
         /// <summary>
         /// When the <see cref="Start"/> method is called, this <see cref="ManualResetEvent"/>
-        /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoop"/>
+        /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoopAsync"/>
         /// has processed the first list of devices.
         /// </summary>
         private readonly ManualResetEvent firstDeviceListParsed = new ManualResetEvent(false);
 
         /// <summary>
-        /// The thread that monitors the <see cref="Socket"/> and waits for device notifications.
+        /// A <see cref="CancellationToken"/> that can be used to cancel the <see cref="monitorTask"/>.
         /// </summary>
-        private Thread monitorThread;
+        private readonly CancellationTokenSource monitorTaskCancellationTokenSource = new CancellationTokenSource();
+
+        /// <summary>
+        /// The <see cref="Task"/> that monitors the <see cref="Socket"/> and waits for device notifications.
+        /// </summary>
+        private Task monitorTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
@@ -104,13 +112,11 @@ namespace SharpAdbClient
         /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Start/*'/>
         public void Start()
         {
-            if (this.monitorThread == null)
+            if (this.monitorTask == null)
             {
                 this.firstDeviceListParsed.Reset();
 
-                this.monitorThread = new Thread(new ThreadStart(this.DeviceMonitorLoop));
-                this.monitorThread.Name = "Managed.Adb - Device List Monitor";
-                this.monitorThread.Start();
+                this.monitorTask = Task.Run(() => this.DeviceMonitorLoopAsync(this.monitorTaskCancellationTokenSource.Token));
 
                 // Wait for the worker thread to have read the first list
                 // of devices.
@@ -133,15 +139,16 @@ namespace SharpAdbClient
                 this.Socket = null;
             }
 
-            if (this.monitorThread != null)
+            if (this.monitorTask != null)
             {
                 this.IsRunning = false;
 
                 // Stop the thread. The tread will keep waiting for updated information from adb
                 // eternally, so we need to forcefully abort it here.
-                this.monitorThread.Abort();
+                this.monitorTaskCancellationTokenSource.Cancel();
+                this.monitorTask.Wait();
 
-                this.monitorThread = null;
+                this.monitorTask = null;
             }
         }
 
@@ -184,43 +191,64 @@ namespace SharpAdbClient
         /// <summary>
         /// Monitors the devices. This connects to the Debug Bridge
         /// </summary>
-        private void DeviceMonitorLoop()
+        private async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken)
         {
             this.IsRunning = true;
 
             // Set up the connection to track the list of devices.
-            this.Socket.SendAdbRequest("host:track-devices");
-            this.Socket.ReadAdbResponse();
+            this.InitializeSocket();
 
             do
             {
                 try
                 {
-                    var value = this.Socket.ReadStringAsync(CancellationToken.None).Result;
+                    var value = await this.Socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
                     this.ProcessIncomingDeviceData(value);
 
                     this.firstDeviceListParsed.Set();
                 }
-                catch (ThreadAbortException ex)
+                catch (TaskCanceledException ex)
                 {
                     if (this.IsRunning == false)
                     {
                         // The DeviceMonitor is shutting down (disposing) and Dispose()
-                        // has called deviceMonitorThread.Abort. This exception is expected,
+                        // has called cancellationToken.Cancel(). This exception is expected,
                         // so we can safely swallow it.
                     }
                     else
                     {
                         // The exception was unexpected, so log it.
-                        Log.e(Tag, ex);
+                        Log.Error(Tag, ex);
+                    }
+                }
+                catch (AdbException adbException)
+                {
+                    if (adbException.ConnectionReset)
+                    {
+                        // The adb server was killed, for whatever reason. Try to restart it and recover from this.
+                        AdbServer.Instance.RestartServer();
+                        this.Socket.Reconnect();
+                        this.InitializeSocket();
+                    }
+                    else
+                    {
+                        throw;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.e(Tag, ex);
+                    Log.Error(Tag, ex);
+                    throw;
                 }
             }
             while (this.Socket != null && this.Socket.Connected);
+        }
+
+        private void InitializeSocket()
+        {
+            // Set up the connection to track the list of devices.
+            this.Socket.SendAdbRequest("host:track-devices");
+            this.Socket.ReadAdbResponse();
         }
 
         /// <summary>

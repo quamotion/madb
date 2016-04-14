@@ -75,7 +75,7 @@ namespace SharpAdbClient
             this.socket = socket;
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Connected/*'/>
+        /// <inheritdoc/>
         public bool Connected
         {
             get { return this.socket.Connected; }
@@ -93,7 +93,13 @@ namespace SharpAdbClient
             return AdbClient.Encoding.GetString(reply).Equals("OKAY");
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Close/*'/>
+        /// <inheritdoc/>
+        public virtual void Reconnect()
+        {
+            this.socket.Reconnect();
+        }
+
+        /// <inheritdoc/>
         public void Close()
         {
             this.socket.Close();
@@ -108,25 +114,25 @@ namespace SharpAdbClient
             this.socket.Dispose();
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte/*'/>
+        /// <inheritdoc/>
         public virtual void Read(byte[] data)
         {
             this.Read(data, -1);
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAsync_byte/*'/>
+        /// <inheritdoc/>
         public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken)
         {
             return this.ReadAsync(data, -1, cancellationToken);
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string_int/*'/>
+        /// <inheritdoc/>
         public virtual void SendSyncRequest(SyncCommand command, string path, int permissions)
         {
             this.SendSyncRequest(command, $"{path},{permissions}");
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string/*'/>
+        /// <inheritdoc/>
         public virtual void SendSyncRequest(SyncCommand command, string path)
         {
             if (path == null)
@@ -140,7 +146,7 @@ namespace SharpAdbClient
             this.Write(pathBytes);
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_int/*'/>
+        /// <inheritdoc/>
         public virtual void SendSyncRequest(SyncCommand command, int length)
         {
             // The message structure is:
@@ -161,7 +167,7 @@ namespace SharpAdbClient
             this.Write(lengthBytes);
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadSyncResponse/*'/>
+        /// <inheritdoc/>
         public virtual SyncCommand ReadSyncResponse()
         {
             byte[] data = new byte[4];
@@ -170,7 +176,7 @@ namespace SharpAdbClient
             return SyncCommandConverter.GetCommand(data);
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadString/*'/>
+        /// <inheritdoc/>
         public virtual string ReadString()
         {
             // The first 4 bytes contain the length of the string
@@ -189,7 +195,7 @@ namespace SharpAdbClient
             return value;
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadSyncString/*'/>
+        /// <inheritdoc/>
         public virtual string ReadSyncString()
         {
             // The first 4 bytes contain the length of the string
@@ -211,7 +217,7 @@ namespace SharpAdbClient
             return value;
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadStringAsync/*'/>
+        /// <inheritdoc/>
         public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
             // The first 4 bytes contain the length of the string
@@ -230,7 +236,7 @@ namespace SharpAdbClient
             return value;
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAdbResponse/*'/>
+        /// <inheritdoc/>
         public virtual AdbResponse ReadAdbResponse()
         {
             var response = this.ReadAdbResponseInner();
@@ -244,7 +250,7 @@ namespace SharpAdbClient
             return response;
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendAdbRequest/*'/>
+        /// <inheritdoc/>
         public virtual void SendAdbRequest(string request)
         {
             byte[] data = AdbClient.FormAdbRequest(request);
@@ -255,7 +261,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Send_byte_int_int/*'/>
+        /// <inheritdoc/>
         public virtual void Send(byte[] data, int length)
         {
             int numWaits = 0;
@@ -287,12 +293,27 @@ namespace SharpAdbClient
             }
             catch (SocketException sex)
             {
-                Log.e(TAG, sex);
+                Log.Error(TAG, sex);
                 throw;
             }
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAsync_byte_int/*'/>
+        /// <summary>
+        /// Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
+        /// </summary>
+        /// <param name="data">
+        /// An array of type <see cref="byte"/> that is the storage location for the received data.
+        /// </param>
+        /// <param name="length">
+        /// The number of bytes to receive.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> that can be used to cancel the task.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the asynchronous operation. The result value of the
+        /// task contains the number of bytes received.
+        /// </returns>
         public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken)
         {
             int expLen = length != -1 ? length : data.Length;
@@ -314,12 +335,12 @@ namespace SharpAdbClient
 
                     if (count < 0)
                     {
-                        Log.e(TAG, "read: channel EOF");
+                        Log.Error(TAG, "read: channel EOF");
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-                        Log.i(TAG, "DONE with Read");
+                        Log.Info(TAG, "DONE with Read");
                     }
                     else
                     {
@@ -327,16 +348,16 @@ namespace SharpAdbClient
                         totalRead += count;
                     }
                 }
-                catch (SocketException sex)
+                catch (SocketException ex)
                 {
-                    throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
+                    throw new AdbException($"An error occurred while receiving data from the adb server: {ex.Message}.", ex);
                 }
             }
 
             return totalRead;
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int_int/*'/>
+        /// <inheritdoc/>
         public virtual void Read(byte[] data, int length)
         {
             int expLen = length != -1 ? length : data.Length;
@@ -355,12 +376,12 @@ namespace SharpAdbClient
                     count = this.socket.Receive(buffer, buflen, SocketFlags.None);
                     if (count < 0)
                     {
-                        Log.e(TAG, "read: channel EOF");
+                        Log.Error(TAG, "read: channel EOF");
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-                        Log.i(TAG, "DONE with Read");
+                        Log.Info(TAG, "DONE with Read");
                     }
                     else
                     {
@@ -375,7 +396,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/GetShellStream/*'/>
+        /// <inheritdoc/>
         public Stream GetShellStream()
         {
             var stream = this.socket.GetStream();
@@ -401,7 +422,7 @@ namespace SharpAdbClient
             }
             catch (IOException e)
             {
-                Log.e(TAG, e);
+                Log.Error(TAG, e);
                 return false;
             }
 
@@ -436,7 +457,7 @@ namespace SharpAdbClient
             {
                 var message = this.ReadString();
                 resp.Message = message;
-                Log.e(TAG, "Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
+                Log.Error(TAG, "Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
             }
 
             return resp;
@@ -460,7 +481,7 @@ namespace SharpAdbClient
             }
             catch (DecoderFallbackException uee)
             {
-                Log.e(TAG, uee);
+                Log.Error(TAG, uee);
                 result = string.Empty;
             }
 

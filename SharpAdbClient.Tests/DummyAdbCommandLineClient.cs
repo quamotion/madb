@@ -8,6 +8,11 @@ namespace SharpAdbClient.Tests
     /// </summary>
     internal class DummyAdbCommandLineClient : AdbCommandLineClient
     {
+        public DummyAdbCommandLineClient()
+            : base("adb.exe")
+        {
+        }
+
         public Version Version
         {
             get;
@@ -20,7 +25,13 @@ namespace SharpAdbClient.Tests
             private set;
         }
 
-        protected override void RunAdbProcess(string command, List<string> errorOutput, List<string> standardOutput)
+        public override bool IsValidAdbFile(string adbPath)
+        {
+            // No validation done in the dummy adb client.
+            return true;
+        }
+
+        protected override int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
         {
             if (errorOutput != null)
             {
@@ -47,6 +58,8 @@ namespace SharpAdbClient.Tests
             {
                 throw new ArgumentOutOfRangeException(nameof(command));
             }
+
+            return 0;
         }
     }
 }

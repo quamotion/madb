@@ -63,19 +63,9 @@ namespace SharpAdbClient
                     throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
             }
 
-            if (!File.Exists(adbPath))
-            {
-                throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
-            }
+            this.EnsureIsValidAdbFile(adbPath);
 
             this.AdbPath = adbPath;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
-        /// </summary>
-        protected AdbCommandLineClient()
-        {
         }
 
         /// <summary>
@@ -155,6 +145,12 @@ namespace SharpAdbClient
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
             // again. We'll let that exception bubble up the stack.
             this.RunAdbProcess("start-server", null, null);
+        }
+
+        /// <inheritdoc/>
+        public virtual bool IsValidAdbFile(string adbPath)
+        {
+            return File.Exists(adbPath);
         }
 
         /// <summary>

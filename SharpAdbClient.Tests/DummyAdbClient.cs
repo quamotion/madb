@@ -28,7 +28,7 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public Task ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             this.ReceivedCommands.Add(command);
 
@@ -48,7 +48,7 @@ namespace SharpAdbClient.Tests
             }
             else
             {
-                throw new ArgumentOutOfRangeException(nameof(command));
+                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{command}' was unexpected");
             }
 
             return Task.FromResult(true);
@@ -64,7 +64,7 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public Task<Image> GetFrameBuffer(DeviceData device, CancellationToken cancellationToken)
+        public Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

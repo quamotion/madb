@@ -74,7 +74,7 @@ namespace SharpAdbClient.Exceptions
         /// The <see cref="StreamingContext"/> that contains contextual information about the
         /// source or destination.
         /// </param>
-        protected ShellCommandUnresponsiveException(SerializationInfo info, StreamingContext context)
+        internal ShellCommandUnresponsiveException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }

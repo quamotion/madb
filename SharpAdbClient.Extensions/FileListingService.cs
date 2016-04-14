@@ -342,7 +342,7 @@ namespace SharpAdbClient
 				// finish the process of the receiver to handle links
 				receiver.FinishLinks ( );
 			} catch ( IOException e ) {
-				Log.e ( "ddms", e );
+				Log.Error ( "ddms", e );
 				throw;
 			}
 

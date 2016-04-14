@@ -106,7 +106,7 @@ namespace SharpAdbClient
                     FileEntry fe = this.fileListingService.FindFileEntry(path);
                     return fe != null;
                 }
-                catch (FileNotFoundException e)
+                catch (FileNotFoundException)
                 {
                     return false;
                 }
@@ -470,7 +470,7 @@ namespace SharpAdbClient
             }
             catch (Exception e)
             {
-                Log.d("FileSytem", e.Message);
+                Log.Debug("FileSytem", e.Message);
             }
             return path;
         }

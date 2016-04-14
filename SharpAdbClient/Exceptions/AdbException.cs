@@ -7,6 +7,7 @@ namespace SharpAdbClient.Exceptions
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net.Sockets;
     using System.Runtime.Serialization;
     using System.Text;
 
@@ -104,6 +105,26 @@ namespace SharpAdbClient.Exceptions
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the underlying error was a <see cref="SocketException"/> where the
+        /// <see cref="SocketException.SocketErrorCode"/> is set to <see cref="SocketError.ConnectionReset"/>, indicating
+        /// that the connection was reset by the remote server. This happens when the adb server was killed.
+        /// </summary>
+        public bool ConnectionReset
+        {
+            get
+            {
+                var socketException = this.InnerException as SocketException;
+
+                if (socketException == null)
+                {
+                    return false;
+                }
+
+                return socketException.SocketErrorCode == SocketError.ConnectionReset;
+            }
         }
     }
 }

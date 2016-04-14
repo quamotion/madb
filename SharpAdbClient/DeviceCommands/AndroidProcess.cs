@@ -203,7 +203,7 @@ namespace SharpAdbClient.DeviceCommands
 
         private static uint ParseUInt(string value)
         {
-            return value == "-" ? 0 :uint.Parse(value);
+            return value == "-" ? 0 : uint.Parse(value);
         }
 
         private static long ParseLong(string value)

@@ -466,7 +466,7 @@ namespace SharpAdbClient
                 }
                 catch (AdbException aex)
                 {
-                    Log.w(LOG_TAG, aex);
+                    Log.Warn(LOG_TAG, aex);
                 }
             }
         }
@@ -552,7 +552,7 @@ namespace SharpAdbClient
         {
             get
             {
-                return AdbClient.Instance.GetFrameBuffer(this.DeviceData, CancellationToken.None).Result;
+                return AdbClient.Instance.GetFrameBufferAsync(this.DeviceData, CancellationToken.None).Result;
             }
         }
 
@@ -670,7 +670,7 @@ namespace SharpAdbClient
             }
             catch (IOException e)
             {
-                Log.w("ddms", e);
+                Log.Warn("ddms", e);
                 return false;
             }
         }
@@ -689,7 +689,7 @@ namespace SharpAdbClient
             }
             catch (IOException e)
             {
-                Log.w("ddms", e);
+                Log.Warn("ddms", e);
                 return false;
             }
         }

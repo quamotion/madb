@@ -29,5 +29,18 @@ namespace SharpAdbClient.Tests
 
         List<Tuple<SyncCommand, string>> SyncRequests
         { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the socket reconnected.
+        /// </summary>
+        bool DidReconnect
+        { get; }
+
+        /// <summary>
+        /// If <see cref="false"/>, the socket will disconnect as soon as all data has been read. If <see cref="true"/>,
+        /// the socket will wait for new messages to appear in the queue.
+        /// </summary>
+        bool WaitForNewData
+        { get; set; }
     }
 }

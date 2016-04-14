@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -65,6 +66,11 @@ namespace SharpAdbClient.Tests
         public byte[] GetBytesSent()
         {
             return this.OutputStream.ToArray();
+        }
+
+        public void Reconnect()
+        {
+            throw new NotImplementedException();
         }
     }
 }

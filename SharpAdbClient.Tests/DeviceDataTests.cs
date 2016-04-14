@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace SharpAdbClient.Tests
 {
@@ -29,6 +30,31 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual<string>("", device.Model);
             Assert.AreEqual<string>("", device.Name);
             Assert.AreEqual<DeviceState>(DeviceState.Unauthorized, device.State);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CreateFromInvalidDatatest()
+        {
+            string data = "xyz";
+
+            var device = DeviceData.CreateFromAdbData(data);
+        }
+
+        [TestMethod]
+        public void ToStringTest()
+        {
+            DeviceData d = new DeviceData();
+            d.Serial = "xyz";
+
+            Assert.AreEqual("xyz", d.ToString());
+        }
+
+        [TestMethod]
+        public void GetStateFromStringTest()
+        {
+            Assert.AreEqual(DeviceState.NoPermissions, DeviceData.GetStateFromString("no permissions"));
+            Assert.AreEqual(DeviceState.Unknown, DeviceData.GetStateFromString("hello"));
         }
     }
 }

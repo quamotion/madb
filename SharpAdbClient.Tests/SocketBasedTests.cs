@@ -53,22 +53,23 @@ namespace SharpAdbClient
             }
             else
             {
-                Factories.AdbSocketFactory = (endPoint) => new DummyAdbSocket();
+                var socket = new DummyAdbSocket();
+                Factories.AdbSocketFactory = (endPoint) => socket;
             }
 
             this.IntegrationTest = integrationTest;
 #else
             // In release mode (e.g. on the build server),
             // never run integration tests.
-            Factories.AdbSocketFactory = (endPoint) => new DummyAdbSocket();
+            var socket = new DummyAdbSocket();
+            Factories.AdbSocketFactory = (endPoint) => socket;
             this.IntegrationTest = false;
 #endif
 
-            this.Socket = new DummyAdbSocket();
-            Factories.AdbSocketFactory = (endPoint) => this.Socket;
-            this.EndPoint = AdbServer.EndPoint;
+            this.EndPoint = AdbServer.Instance.EndPoint;
+            this.Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(this.EndPoint);
 
-            AdbClient.Instance = new AdbClient(AdbServer.EndPoint);
+            AdbClient.Instance = new AdbClient(AdbServer.Instance.EndPoint);
         }
 
         /// <summary>

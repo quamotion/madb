@@ -44,6 +44,12 @@ namespace SharpAdbClient
         void Connect(EndPoint endPoint);
 
         /// <summary>
+        /// Re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
+        /// socket to disconnect.
+        /// </summary>
+        void Reconnect();
+
+        /// <summary>
         /// Closes the <see cref="ITcpSocket"/> connection and releases all associated resources.
         /// </summary>
         void Close();

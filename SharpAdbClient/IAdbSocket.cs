@@ -16,51 +16,175 @@ namespace SharpAdbClient
     /// </summary>
     public interface IAdbSocket : IDisposable
     {
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Connected/*'/>
+        /// <summary>
+        /// Gets a value indicating whether the<see cref="AdbSocket"/> is connected to a remote
+        /// host as of the latest send or receive operation.
+        /// </summary>
         bool Connected { get; }
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendAdbRequest/*'/>
+        /// <summary>
+        /// Reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
+        /// Use this when the socket was disconnected by adb and you have restarted adb.
+        /// </summary>
+        void Reconnect();
+
+        /// <summary>
+        /// Sends a request to the Android Debug Bridge.To read the response, call
+        /// <see cref="ReadAdbResponse()"/>.
+        /// </summary>
+        /// <param name = "request" >
+        /// The request to send.
+        /// </param>
         void SendAdbRequest(string request);
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Send_byte_int_int/*'/>
+        /// <summary>
+        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// </summary>
+        /// <param name="data">
+        /// A <see cref="byte"/> array that acts as a buffer, containing the data to send.
+        /// </param>
+        /// <param name = "length" >
+        /// The number of bytes to send.
+        /// </param>
         void Send(byte[] data, int length);
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string_int/*'/>
+        /// <summary>
+        /// Sends a sync request to the device.
+        /// </summary>
+        /// <param name="command" >
+        /// The command to send.
+        /// </param>
+        /// <param name="path">
+        ///  The path of the file on which the command should operate.
+        /// </param>
+        /// <param name="permissions" >
+        ///  If the command is a <see cref="SyncCommand.SEND"/> command, the permissions
+        ///  to assign to the newly created file.
+        /// </param>
         void SendSyncRequest(SyncCommand command, string path, int permissions);
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest/*'/>
+        /// <summary>
+        /// Sends a sync request to the device.
+        /// </summary>
+        /// <param name="command">
+        /// The command to send.
+        /// </param>
+        /// <param name="length">
+        /// The length of the data packet that follows.
+        /// </param>
         void SendSyncRequest(SyncCommand command, int length);
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/SendSyncRequest_SyncCommand_string/*'/>
+        /// <summary>
+        /// Sends a sync request to the device.
+        /// </summary>
+        /// <param name="command">
+        /// The command to send.
+        /// </param>
+        /// <param name="path">
+        /// The path of the file on which the command should operate.
+        /// </param>
         void SendSyncRequest(SyncCommand command, string path);
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadSyncResponse/*'/>
+        /// <summary>
+        /// Reads the response to a sync command.
+        /// </summary>
+        /// <returns>
+        /// The response that was sent by the device.
+        /// </returns>
         SyncCommand ReadSyncResponse();
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadAdbResponse/*'/>
+        /// <summary>
+        /// Receives an <see cref="AdbResponse"/> message, and throws an error
+        /// if the message does not indicate success.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="AdbResponse"/> object that represents the response from the
+        /// Android Debug Bridge.
+        /// </returns>
         AdbResponse ReadAdbResponse();
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte/*'/>
+        /// <summary>
+        /// Reads from the socket until the array is filled, or no more data is coming(because
+        /// the socket closed or the timeout expired).
+        /// </summary>
+        /// <param name="data" >
+        /// The buffer to store the read data into.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if the data was read successfully; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// This uses the default time out value.
+        /// </remarks>
         void Read(byte[] data);
 
+        /// <summary>
+        /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
+        /// the connection is in sync mode.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/> received from the <see cref = "IAdbSocket"/>.
+        /// </returns>
         Task ReadAsync(byte[] data, CancellationToken cancellationToken);
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadString/*'/>
+        /// <summary>
+        /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/> received from the <see cref = "IAdbSocket"/>.
+        /// </returns>
         string ReadString();
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadSyncString/*'/>
+        /// <summary>
+        /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
+        /// the connection is in sync mode.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/> received from the <see cref = "IAdbSocket"/>.
+        /// </returns>
         string ReadSyncString();
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/ReadStringAsync/*'/>
+        /// <summary>
+        /// Asynchronously reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the asynchronous operation. The return value
+        /// of the task is the<see cref="string"/> received from the <see cref = "IAdbSocket"/>.
+        /// </returns>
         Task<string> ReadStringAsync(CancellationToken cancellationToken);
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Close/*'/>
+        /// <summary>
+        /// Closes the<see cref="AdbSocket"/> connection and releases all associated resources.
+        /// </summary>
         void Close();
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/Read_byte_int_int/*'/>
+        /// <summary>
+        /// Reads from the socket until the array is filled, the optional<paramref name= "length"/>
+        /// is reached, or no more data is coming (because the socket closed or the
+        /// timeout expired).
+        /// </summary>
+        /// <param name="data">
+        /// The buffer to store the read data into.
+        /// </param>
+        /// <param name="length">
+        /// The length to read or -1 to fill the data buffer completely
+        /// </param>
+        /// <exception cref = "AdbException" >
+        /// EOF
+        /// or
+        /// No Data to read: exception.Message
+        /// </exception>
         void Read(byte[] data, int length);
 
-        /// <include file='IAdbSocket.xml' path='/IAdbSocket/GetShellStream/*'/>
+        /// <summary>
+        /// Gets a <see cref="Stream"/> that can be used to send and receive shell output to and
+        /// from the device.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Stream"/> that can be used to send and receive shell output to and
+        /// from the device.
+        /// </returns>
         Stream GetShellStream();
     }
 }

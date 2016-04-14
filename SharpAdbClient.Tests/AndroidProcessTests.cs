@@ -29,7 +29,7 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual(0, process.ParentProcessId);
             Assert.AreEqual(2535424ul, process.VirtualSize);
             Assert.AreEqual(245, process.ResidentSetSize);
-            Assert.AreEqual(0ul, process.WChan);
+            Assert.AreEqual(4294967295ul, process.WChan);
             Assert.AreEqual(AndroidProcessState.S, process.State);
             Assert.AreEqual("init", process.Name);
         }

@@ -36,7 +36,7 @@ namespace SharpAdbClient
         /// <param name="tag">The tag associated with the message.</param>
         /// <param name="format">The message to output format string.</param>
         /// <param name="args">The values for the format message</param>
-        public static void v(string tag, string format, params object[] args)
+        public static void Verbose(string tag, string format, params object[] args)
         {
             WriteLine(LogLevel.Verbose, tag, format, args);
         }
@@ -47,7 +47,7 @@ namespace SharpAdbClient
         /// <param name="tag">The tag associated with the message.</param>
         /// <param name="format">The message to output format string.</param>
         /// <param name="args">The values for the format message</param>
-        public static void d(string tag, string format, params object[] args)
+        public static void Debug(string tag, string format, params object[] args)
         {
             WriteLine(LogLevel.Debug, tag, format, args);
         }
@@ -58,7 +58,7 @@ namespace SharpAdbClient
         /// <param name="tag">The tag associated with the message.</param>
         /// <param name="format">The message to output format string.</param>
         /// <param name="args">The values for the format message</param>
-        public static void i(string tag, string format, params object[] args)
+        public static void Info(string tag, string format, params object[] args)
         {
             WriteLine(LogLevel.Info, tag, format, args);
         }
@@ -69,7 +69,7 @@ namespace SharpAdbClient
         /// <param name="tag">The tag associated with the message.</param>
         /// <param name="format">The message to output format string.</param>
         /// <param name="args">The values for the format message</param>
-        public static void w(string tag, string format, params object[] args)
+        public static void Warn(string tag, string format, params object[] args)
         {
             WriteLine(LogLevel.Warn, tag, format, args);
         }
@@ -79,11 +79,11 @@ namespace SharpAdbClient
         /// </summary>
         /// <param name="tag">The tag associated with the message.</param>
         /// <param name="exception">The exception to warn</param>
-        public static void w(string tag, Exception exception)
+        public static void Warn(string tag, Exception exception)
         {
             if (exception != null)
             {
-                w(tag, exception.ToString());
+                Warn(tag, exception.ToString());
             }
         }
 
@@ -94,7 +94,7 @@ namespace SharpAdbClient
         /// <param name="format">The message to output format string.</param>
         /// <param name="args">The values for the format message</param>
         /// <gist id="16a731d7e4f074fca809" />
-        public static void e(string tag, string format, params object[] args)
+        public static void Error(string tag, string format, params object[] args)
         {
             WriteLine(LogLevel.Error, tag, format, args);
         }
@@ -105,11 +105,11 @@ namespace SharpAdbClient
         /// <param name="tag">The tag associated with the message.</param>
         /// <param name="exception">The exception to warn</param>
         /// <gist id="4e0438f59a00d57af4ef"/>
-        public static void e(string tag, Exception exception)
+        public static void Error(string tag, Exception exception)
         {
             if (exception != null)
             {
-                e(tag, exception.ToString());
+                Error(tag, exception.ToString());
             }
         }
 
