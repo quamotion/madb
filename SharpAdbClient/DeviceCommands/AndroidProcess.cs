@@ -79,6 +79,15 @@ namespace SharpAdbClient.DeviceCommands
             set;
         }
 
+        /// <summary>
+        /// Creates a <see cref="AndroidProcess"/> from it <see cref="string"/> representation.
+        /// </summary>
+        /// <param name="line">
+        /// A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.
+        /// </param>
+        /// <returns>
+        /// The equivalent <see cref="AndroidProcess"/>.
+        /// </returns>
         public static AndroidProcess Parse(string line)
         {
             if (line == null)
