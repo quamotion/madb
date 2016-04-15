@@ -119,10 +119,11 @@ namespace SharpAdbClient
             switch (platform)
             {
                 case PlatformID.Win32NT:
+                case PlatformID.MacOSX:
                     return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
                 case PlatformID.Unix:
-                case PlatformID.MacOSX:
+                    // TODO: Only return Unix sockets on Debian & derivatives.
                     return new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
 
                 default:

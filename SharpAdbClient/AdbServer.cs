@@ -84,11 +84,12 @@ namespace SharpAdbClient
             switch (Environment.OSVersion.Platform)
             {
                 case PlatformID.Win32NT:
+                case PlatformID.MacOSX:
                     this.EndPoint = new IPEndPoint(IPAddress.Loopback, AdbServerPort);
                     break;
 
-                case PlatformID.MacOSX:
                 case PlatformID.Unix:
+                    // TODO: Only use Unix end points on Debian & derivatives.
                     this.EndPoint = new UnixEndPoint($"/tmp/{AdbServerPort}");
                     break;
 
