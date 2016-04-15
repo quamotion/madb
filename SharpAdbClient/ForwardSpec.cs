@@ -161,5 +161,48 @@ namespace SharpAdbClient
                     return string.Empty;
             }
         }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return (int)this.Protocol
+                ^ this.Port
+                ^ this.ProcessId
+                ^ (this.SocketName == null ? 1 : this.SocketName.GetHashCode());
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            var other = obj as ForwardSpec;
+
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (other.Protocol != this.Protocol)
+            {
+                return false;
+            }
+
+            switch (this.Protocol)
+            {
+                case ForwardProtocol.JavaDebugWireProtocol:
+                    return this.ProcessId == other.ProcessId;
+
+                case ForwardProtocol.Tcp:
+                    return this.Port == other.Port;
+
+                case ForwardProtocol.LocalAbstract:
+                case ForwardProtocol.LocalFilesystem:
+                case ForwardProtocol.LocalReserved:
+                case ForwardProtocol.Device:
+                    return string.Equals(this.SocketName, other.SocketName);
+
+                default:
+                    return false;
+            }
+        }
     }
 }

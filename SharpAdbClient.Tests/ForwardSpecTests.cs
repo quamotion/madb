@@ -94,5 +94,47 @@ namespace SharpAdbClient.Tests
             spec.Protocol = (ForwardProtocol)99;
             Assert.AreEqual(string.Empty, spec.ToString());
         }
+
+        [TestMethod]
+        public void EqualsTest()
+        {
+            var dummy = new ForwardSpec()
+            {
+                Protocol = (ForwardProtocol)99
+            };
+
+            var tcpa1 = ForwardSpec.Parse("tcp:1234");
+            var tcpa2 = ForwardSpec.Parse("tcp:1234");
+            var tcpb = ForwardSpec.Parse("tcp:4321");
+            Assert.IsTrue(tcpa1.Equals(tcpa2));
+            Assert.IsFalse(tcpa1.Equals(tcpb));
+            Assert.IsTrue(tcpa1.GetHashCode() == tcpa2.GetHashCode());
+            Assert.IsFalse(tcpa1.GetHashCode() == tcpb.GetHashCode());
+
+            var jdwpa1 = ForwardSpec.Parse("jdwp:1234");
+            var jdwpa2 = ForwardSpec.Parse("jdwp:1234");
+            var jdwpb = ForwardSpec.Parse("jdwp:4321");
+            Assert.IsTrue(jdwpa1.Equals(jdwpa2));
+            Assert.IsFalse(jdwpa1.Equals(jdwpb));
+            Assert.IsTrue(jdwpa1.GetHashCode() == jdwpa2.GetHashCode());
+            Assert.IsFalse(jdwpa1.GetHashCode() == jdwpb.GetHashCode());
+
+            var socketa1 = ForwardSpec.Parse("localabstract:/tmp/1234");
+            var socketa2 = ForwardSpec.Parse("localabstract:/tmp/1234");
+            var socketb = ForwardSpec.Parse("localabstract:/tmp/4321");
+            Assert.IsTrue(socketa1.Equals(socketa2));
+            Assert.IsFalse(socketa1.Equals(socketb));
+            Assert.IsTrue(socketa1.GetHashCode() == socketa2.GetHashCode());
+            Assert.IsFalse(socketa1.GetHashCode() == socketb.GetHashCode());
+
+            Assert.IsFalse(tcpa1.Equals(null));
+            Assert.IsFalse(tcpa1.Equals(dummy));
+            Assert.IsFalse(dummy.Equals(tcpa1));
+            Assert.IsFalse(tcpa1.Equals(jdwpa1));
+            Assert.IsFalse(tcpa1.Equals(socketa1));
+            Assert.IsFalse(tcpa1.GetHashCode() == dummy.GetHashCode());
+            Assert.IsFalse(tcpa1.GetHashCode() == jdwpa1.GetHashCode());
+            Assert.IsFalse(tcpa1.GetHashCode() == socketa1.GetHashCode());
+        }
     }
 }
