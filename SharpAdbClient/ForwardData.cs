@@ -85,5 +85,11 @@ namespace SharpAdbClient
                 Remote = parts[2]
             };
         }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return $"{this.SerialNumber} {this.Local} {this.Remote}";
+        }
     }
 }
