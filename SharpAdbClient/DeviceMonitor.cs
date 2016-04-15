@@ -208,7 +208,7 @@ namespace SharpAdbClient
                 }
                 catch (TaskCanceledException ex)
                 {
-                    if (this.IsRunning == false)
+                    if (cancellationToken.IsCancellationRequested)
                     {
                         // The DeviceMonitor is shutting down (disposing) and Dispose()
                         // has called cancellationToken.Cancel(). This exception is expected,
@@ -240,7 +240,7 @@ namespace SharpAdbClient
                     throw;
                 }
             }
-            while (this.Socket != null && this.Socket.Connected);
+            while (!cancellationToken.IsCancellationRequested);
         }
 
         private void InitializeSocket()
