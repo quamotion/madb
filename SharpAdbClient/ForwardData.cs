@@ -29,12 +29,34 @@ namespace SharpAdbClient
         }
 
         /// <summary>
+        /// Gets a <see cref="ForwardSpec"/> that represents the local (PC) endpoint.
+        /// </summary>
+        public ForwardSpec LocalSpec
+        {
+            get
+            {
+                return ForwardSpec.Parse(this.Local);
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a <see cref="string"/> that represents the remote (device) endpoint.
         /// </summary>
         public string Remote
         {
             get;
             set;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ForwardSpec"/> that represents the remote (device) endpoint.
+        /// </summary>
+        public ForwardSpec RemoteSpec
+        {
+            get
+            {
+                return ForwardSpec.Parse(this.Remote);
+            }
         }
 
         /// <summary>

@@ -143,6 +143,8 @@
     <Compile Include="Extensions\StringHelper.cs" />
     <Compile Include="FileStatistics.cs" />
     <Compile Include="ForwardData.cs" />
+    <Compile Include="ForwardProtocol.cs" />
+    <Compile Include="ForwardSpec.cs" />
     <Compile Include="FramebufferHeader.cs" />
     <Compile Include="IAdbClient.cs" />
     <Compile Include="IAdbCommandLineClient.cs" />
