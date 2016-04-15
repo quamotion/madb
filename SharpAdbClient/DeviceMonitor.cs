@@ -129,16 +129,8 @@ namespace SharpAdbClient
         /// </summary>
         public void Dispose()
         {
-            // Close the connection to adb.
-            // This will also cause the socket to disconnect, and the
-            // monitor thread to cancel out (because an ObjectDisposedException is thrown
-            // on the GetString method and subsequently Socket.Connected = false and Socket = null).
-            if (this.Socket != null)
-            {
-                this.Socket.Dispose();
-                this.Socket = null;
-            }
-
+            // First kill the monitor task, which has a dependency on the socket,
+            // then close the socket.
             if (this.monitorTask != null)
             {
                 this.IsRunning = false;
@@ -149,6 +141,13 @@ namespace SharpAdbClient
                 this.monitorTask.Wait();
 
                 this.monitorTask = null;
+            }
+
+            // Close the connection to adb. To be done after the monitor task exited.
+            if (this.Socket != null)
+            {
+                this.Socket.Dispose();
+                this.Socket = null;
             }
         }
 
