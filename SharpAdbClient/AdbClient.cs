@@ -157,7 +157,7 @@ namespace SharpAdbClient
             return FormAdbRequest(request);
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/GetAdbVersion/*'/>
+        /// <inheritdoc/>
         public int GetAdbVersion()
         {
             using (var socket = Factories.AdbSocketFactory(this.EndPoint))
@@ -170,7 +170,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/KillAdb/*'/>
+        /// <inheritdoc/>
         public void KillAdb()
         {
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
@@ -182,7 +182,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/GetDevices/*'/>
+        /// <inheritdoc/>
         public List<DeviceData> GetDevices()
         {
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
@@ -224,9 +224,11 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/CreateForward/*'/>
+        /// <inheritdoc/>
         public void CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
+            this.EnsureDevice(device);
+
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
                 string rebind = allowRebind ? string.Empty : "norebind:";
@@ -236,9 +238,17 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/RemoveForward/*'/>
+        /// <inheritdoc/>
+        public void CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind)
+        {
+            this.CreateForward(device, local?.ToString(), remote?.ToString(), allowRebind);
+        }
+
+        /// <inheritdoc/>
         public void RemoveForward(DeviceData device, int localPort)
         {
+            this.EnsureDevice(device);
+
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
@@ -246,9 +256,11 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/RemoveAllForwards/*'/>
+        /// <inheritdoc/>
         public void RemoveAllForwards(DeviceData device)
         {
+            this.EnsureDevice(device);
+
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
@@ -256,9 +268,11 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/ListForward/*'/>
+        /// <inheritdoc/>
         public IEnumerable<ForwardData> ListForward(DeviceData device)
         {
+            this.EnsureDevice(device);
+
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
@@ -272,9 +286,11 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
+        /// <inheritdoc/>
         public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
+            this.EnsureDevice(device);
+
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
                 cancellationToken.Register(() => socket.Close());
@@ -327,9 +343,11 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
+        /// <inheritdoc/>
         public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken)
         {
+            this.EnsureDevice(device);
+
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
                 // Select the target device
@@ -355,9 +373,11 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/RunLogService/*'/>
+        /// <inheritdoc/>
         public IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames)
         {
+            this.EnsureDevice(device);
+
             // The 'log' service has been deprecated, see
             // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
@@ -404,9 +424,11 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/Reboot/*'/>
+        /// <inheritdoc/>
         public void Reboot(string into, DeviceData device)
         {
+            this.EnsureDevice(device);
+
             var request = $"reboot:{into}";
 
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
@@ -417,7 +439,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/Connect/*'/>
+        /// <inheritdoc/>
         public void Connect(DnsEndPoint endpoint)
         {
             if (endpoint == null)
@@ -429,6 +451,27 @@ namespace SharpAdbClient
             {
                 socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
                 var response = socket.ReadAdbResponse();
+            }
+        }
+
+        /// <summary>
+        /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>
+        /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
+        /// if <paramref name="device"/> does not have a valid serial number.
+        /// </summary>
+        /// <param name="device">
+        /// A <see cref="DeviceData"/> object to validate.
+        /// </param>
+        protected void EnsureDevice(DeviceData device)
+        {
+            if (device == null)
+            {
+                throw new ArgumentNullException(nameof(device));
+            }
+
+            if (string.IsNullOrEmpty(device.Serial))
+            {
+                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
             }
         }
     }

@@ -44,6 +44,9 @@ namespace SharpAdbClient
         /// <include file='IAdbClient.xml' path='/IAdbClient/CreateForward/*'/>
         void CreateForward(DeviceData device, string local, string remote, bool allowRebind);
 
+        /// <include file='IAdbClient.xml' path='/IAdbClient/CreateForward/*'/>
+        void CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind);
+
         /// <include file='IAdbClient.xml' path='/IAdbClient/RemoveForward/*'/>
         void RemoveForward(DeviceData device, int localPort);
 
