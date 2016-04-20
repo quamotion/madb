@@ -34,6 +34,12 @@ namespace SharpAdbClient
         /// <param name="socketFlags">
         /// A bitwise combination of the <see cref="SocketFlags"/> values.
         /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.
+        /// </param>
+        /// <remarks>
+        /// Cancelling the task will also close the socket.
+        /// </remarks>
         /// <returns>
         /// The number of bytes received.
         /// </returns>
@@ -42,9 +48,15 @@ namespace SharpAdbClient
             byte[] buffer,
             int offset,
             int size,
-            SocketFlags socketFlags)
+            SocketFlags socketFlags,
+            CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<int>(socket);
+
+            // Register a callback so that when a cancellation is requested, the socket is closed.
+            // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
+            // and convert to a TaskCancelledException - which is the exception we expect.
+            cancellationToken.Register(() => socket.Close());
 
             socket.BeginReceive(
                 buffer,
@@ -61,7 +73,17 @@ namespace SharpAdbClient
                     }
                     catch (Exception ex)
                     {
-                        t.TrySetException(ex);
+                        // Did the cancellationToken's request for cancellation cause the socket to be closed
+                        // and an ObjectDisposedException to be thrown? If so, indicate the caller that we were
+                        // cancelled. If not, bubble up the original exception.
+                        if (ex is ObjectDisposedException && cancellationToken.IsCancellationRequested)
+                        {
+                            t.TrySetCanceled();
+                        }
+                        else
+                        {
+                            t.TrySetException(ex);
+                        }
                     }
                 },
                 tcs);

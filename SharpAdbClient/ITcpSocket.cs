@@ -8,6 +8,7 @@ namespace SharpAdbClient
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -110,10 +111,16 @@ namespace SharpAdbClient
         /// <param name="socketFlags">
         /// A bitwise combination of the SocketFlags values.
         /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.
+        /// </param>
+        /// <remarks>
+        /// Cancelling the task will also close the socket.
+        /// </remarks>
         /// <returns>
         /// The number of bytes received.
         /// </returns>
-        Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags);
+        Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the underlying <see cref="Stream"/>.

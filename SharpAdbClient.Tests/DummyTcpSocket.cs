@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SharpAdbClient.Tests
@@ -51,7 +52,7 @@ namespace SharpAdbClient.Tests
             return this.InputStream.Read(buffer, 0, size);
         }
 
-        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken)
         {
             int value = this.InputStream.Read(buffer, offset, size);
             return Task.FromResult(value);

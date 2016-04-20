@@ -310,6 +310,9 @@ namespace SharpAdbClient
         /// <param name="cancellationToken">
         /// A <see cref="CancellationToken"/> that can be used to cancel the task.
         /// </param>
+        /// <remarks>
+        /// Cancelling the task will also close the socket.
+        /// </remarks>
         /// <returns>
         /// A <see cref="Task"/> that represents the asynchronous operation. The result value of the
         /// task contains the number of bytes received.
@@ -331,7 +334,7 @@ namespace SharpAdbClient
 
                     byte[] buffer = new byte[buflen];
                     this.socket.ReceiveBufferSize = expLen;
-                    count = await this.socket.ReceiveAsync(buffer, 0, buflen, SocketFlags.None).ConfigureAwait(false);
+                    count = await this.socket.ReceiveAsync(buffer, 0, buflen, SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
                     if (count < 0)
                     {

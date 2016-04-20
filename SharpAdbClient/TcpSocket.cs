@@ -9,6 +9,7 @@ namespace SharpAdbClient
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -103,9 +104,9 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken)
         {
-            return this.socket.ReceiveAsync(buffer, offset, size, socketFlags);
+            return this.socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
         }
 
         /// <summary>
