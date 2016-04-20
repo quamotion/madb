@@ -26,7 +26,6 @@ namespace SharpAdbClient
         /// </summary>
         public TcpSocket()
         {
-            this.socket = CreateSocket(Environment.OSVersion.Platform);
         }
 
         /// <inheritdoc/>
@@ -55,6 +54,7 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public void Connect(EndPoint endPoint)
         {
+            this.socket = CreateSocket(endPoint);
             this.socket.Connect(endPoint);
             this.socket.Blocking = true;
             this.endPoint = endPoint;
@@ -69,7 +69,7 @@ namespace SharpAdbClient
                 return;
             }
 
-            this.socket = CreateSocket(Environment.OSVersion.Platform);
+            this.socket = CreateSocket(this.endPoint);
             this.Connect(this.endPoint);
         }
 
@@ -112,23 +112,26 @@ namespace SharpAdbClient
         /// <summary>
         /// Creates a new, uninitialized socket which can connect to an ADB server.
         /// </summary>
+        /// <param name="endPoint">
+        /// The <see cref="EndPoint"/> to which to connect. Currently <see cref="IPEndPoint"/>, <see cref="DnsEndPoint"/>
+        /// and <see cref="UnixEndPoint"/> endpoint types are supported.
+        /// </param>
         /// <returns>
         /// A new <see cref="Socket"/> which can connect to an ADB server.
         /// </returns>
-        internal static Socket CreateSocket(PlatformID platform)
+        internal static Socket CreateSocket(EndPoint endPoint)
         {
-            switch (platform)
+            if (endPoint is IPEndPoint || endPoint is DnsEndPoint)
             {
-                case PlatformID.Win32NT:
-                case PlatformID.MacOSX:
-                    return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                case PlatformID.Unix:
-                    // TODO: Only return Unix sockets on Debian & derivatives.
-                    return new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
-
-                default:
-                    throw new NotSupportedException("Only Windows, Linux and Mac OS are supported");
+                return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            }
+            else if (endPoint is UnixEndPoint)
+            {
+                return new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
+            }
+            else
+            {
+                throw new NotSupportedException("Only Windows, Linux and Mac OS are supported");
             }
         }
     }

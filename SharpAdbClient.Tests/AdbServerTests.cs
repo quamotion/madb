@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpAdbClient.Exceptions;
 using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace SharpAdbClient.Tests
@@ -188,6 +189,34 @@ namespace SharpAdbClient.Tests
 
             Assert.AreEqual(1, this.socket.Requests.Count);
             Assert.AreEqual("host:version", this.socket.Requests[0]);
+        }
+
+        [TestMethod]
+        public void ConstructorTest()
+        {
+            var adbServer = new AdbServer();
+            Assert.IsNotNull(adbServer);
+            Assert.IsNotNull(adbServer.EndPoint);
+            Assert.IsInstanceOfType(adbServer.EndPoint, typeof(IPEndPoint));
+
+            var endPoint = (IPEndPoint)adbServer.EndPoint;
+
+            Assert.AreEqual(IPAddress.Loopback, endPoint.Address);
+            Assert.AreEqual(AdbServer.AdbServerPort, endPoint.Port);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void ConstructorInvalidEndPointTest()
+        {
+            var adbServer = new AdbServer(new CustomEndPoint());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ConstructorNullEndPointTest()
+        {
+            var adbServer = new AdbServer(null);
         }
     }
 }

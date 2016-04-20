@@ -61,7 +61,7 @@ namespace SharpAdbClient.Tests
         [TestMethod]
         public void CreateSocketTest()
         {
-            var winSocket = TcpSocket.CreateSocket(PlatformID.Win32NT);
+            var winSocket = TcpSocket.CreateSocket(new IPEndPoint(IPAddress.Loopback, 0));
             Assert.AreEqual(AddressFamily.InterNetwork, winSocket.AddressFamily);
             Assert.AreEqual(SocketType.Stream, winSocket.SocketType);
             Assert.AreEqual(ProtocolType.Tcp, winSocket.ProtocolType);
@@ -73,7 +73,7 @@ namespace SharpAdbClient.Tests
         [ExpectedException(typeof(NotSupportedException))]
         public void CreateUnsupportedSocketTest()
         {
-            TcpSocket.CreateSocket(PlatformID.Xbox);
+            TcpSocket.CreateSocket(new CustomEndPoint());
         }
     }
 }

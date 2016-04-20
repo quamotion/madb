@@ -80,22 +80,30 @@ namespace SharpAdbClient
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
         public AdbServer()
+            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort))
         {
-            switch (Environment.OSVersion.Platform)
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbServer"/> class, and the specific <see cref="EndPoint"/> at which
+        /// the server should be listening.
+        /// </summary>
+        /// <param name="endPoint">
+        /// The <see cref="EndPoint"/> at which the server should be listening.
+        /// </param>
+        public AdbServer(EndPoint endPoint)
+        {
+            if (endPoint == null)
             {
-                case PlatformID.Win32NT:
-                case PlatformID.MacOSX:
-                    this.EndPoint = new IPEndPoint(IPAddress.Loopback, AdbServerPort);
-                    break;
-
-                case PlatformID.Unix:
-                    // TODO: Only use Unix end points on Debian & derivatives.
-                    this.EndPoint = new UnixEndPoint($"/tmp/{AdbServerPort}");
-                    break;
-
-                default:
-                    throw new InvalidOperationException("Only Windows, Linux and Mac OS X are supported");
+                throw new ArgumentNullException(nameof(endPoint));
             }
+
+            if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint || endPoint is UnixEndPoint))
+            {
+                throw new NotSupportedException("Only TCP and Unix endpoints are supported");
+            }
+
+            this.EndPoint = endPoint;
         }
 
         /// <summary>

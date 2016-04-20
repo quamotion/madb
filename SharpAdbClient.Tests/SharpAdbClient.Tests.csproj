@@ -78,6 +78,7 @@
     <Compile Include="AdbSocketTests.cs" />
     <Compile Include="AndroidProcessTests.cs" />
     <Compile Include="ConsoleOutputReceiverTests.cs" />
+    <Compile Include="CustomEndPoint.cs" />
     <Compile Include="DeviceCommands\AndroidProcessTests.cs" />
     <Compile Include="DeviceDataTests.cs" />
     <Compile Include="DeviceCommands\DeviceExtensionsTests.cs" />
