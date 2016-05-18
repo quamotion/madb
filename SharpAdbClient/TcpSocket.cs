@@ -74,12 +74,6 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Close()
-        {
-            this.socket.Close();
-        }
-
-        /// <inheritdoc/>
         public void Dispose()
         {
             this.socket.Dispose();
