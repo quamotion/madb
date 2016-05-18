@@ -62,6 +62,7 @@ namespace SharpAdbClient.Exceptions
         {
         }
 
+#if !NETCORE
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellCommandUnresponsiveException"/> class with serialized
         /// data.
@@ -78,5 +79,6 @@ namespace SharpAdbClient.Exceptions
             : base(info, context)
         {
         }
+#endif
     }
 }

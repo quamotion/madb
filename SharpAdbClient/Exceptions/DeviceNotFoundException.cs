@@ -42,6 +42,7 @@ namespace SharpAdbClient.Exceptions
         {
         }
 
+#if !NETCORE
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceNotFoundException"/> class.
         /// </summary>
@@ -51,5 +52,6 @@ namespace SharpAdbClient.Exceptions
             : base(serializationInfo, context)
         {
         }
+#endif
     }
 }

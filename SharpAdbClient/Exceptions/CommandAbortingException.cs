@@ -32,6 +32,7 @@ namespace SharpAdbClient.Exceptions
         {
         }
 
+#if !NETCORE
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
         /// </summary>
@@ -41,6 +42,7 @@ namespace SharpAdbClient.Exceptions
             : base(serializationInfo, context)
         {
         }
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
