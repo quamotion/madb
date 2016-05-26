@@ -366,7 +366,7 @@ namespace SharpAdbClient
 
                 // followed by the actual framebuffer content
                 var imageData = new byte[header.Size];
-                socket.Read(imageData);
+                await socket.ReadAsync(imageData, cancellationToken).ConfigureAwait(false);
 
                 // Convert the framebuffer to an image, and return that.
                 return header.ToImage(imageData);
