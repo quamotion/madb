@@ -343,34 +343,23 @@ namespace SharpAdbClient
             }
         }
 
+        public Framebuffer GetRefreshableFramebuffer(DeviceData device)
+        {
+            this.EnsureDevice(device);
+
+            return new Framebuffer(device, this);
+        }
+
         /// <inheritdoc/>
         public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken)
         {
             this.EnsureDevice(device);
 
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
-            {
-                // Select the target device
-                this.SetDevice(socket, device);
+            Framebuffer framebuffer = this.GetRefreshableFramebuffer(device);
+            await framebuffer.Refresh(cancellationToken).ConfigureAwait(false);
 
-                // Send the framebuffer command
-                socket.SendAdbRequest("framebuffer:");
-                socket.ReadAdbResponse();
-
-                // The result first is a FramebufferHeader object,
-                var size = Marshal.SizeOf(typeof(FramebufferHeader));
-                var headerData = new byte[size];
-                await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
-
-                var header = FramebufferHeader.Read(headerData);
-
-                // followed by the actual framebuffer content
-                var imageData = new byte[header.Size];
-                socket.Read(imageData);
-
-                // Convert the framebuffer to an image, and return that.
-                return header.ToImage(imageData);
-            }
+            // Convert the framebuffer to an image, and return that.
+            return framebuffer.ToImage();
         }
 
         /// <inheritdoc/>

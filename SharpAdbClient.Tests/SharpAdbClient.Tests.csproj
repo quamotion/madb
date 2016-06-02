@@ -102,6 +102,7 @@
     <Compile Include="ForwardDataTests.cs" />
     <Compile Include="ForwardSpecTests.cs" />
     <Compile Include="FramebufferHeaderTests.cs" />
+    <Compile Include="FramebufferTests.cs" />
     <Compile Include="GetPropReceiverTests.cs" />
     <Compile Include="IDummyAdbSocket.cs" />
     <Compile Include="InstallReceiverTests.cs" />

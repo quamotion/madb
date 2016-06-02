@@ -145,6 +145,7 @@
     <Compile Include="ForwardData.cs" />
     <Compile Include="ForwardProtocol.cs" />
     <Compile Include="ForwardSpec.cs" />
+    <Compile Include="Framebuffer.cs" />
     <Compile Include="FramebufferHeader.cs" />
     <Compile Include="IAdbClient.cs" />
     <Compile Include="IAdbCommandLineClient.cs" />
