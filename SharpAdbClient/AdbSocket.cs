@@ -33,6 +33,9 @@ namespace SharpAdbClient
     /// </summary>
     public class AdbSocket : IAdbSocket, IDisposable
     {
+        // Read 1 KB worth of data at a time
+        private const int ReadChunkSize = 1024;
+
         /// <summary>
         /// The default time to wait in the milliseconds.
         /// </summary>
@@ -117,13 +120,13 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public virtual void Read(byte[] data)
         {
-            this.Read(data, -1);
+            this.Read(data, data.Length);
         }
 
         /// <inheritdoc/>
         public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken)
         {
-            return this.ReadAsync(data, -1, cancellationToken);
+            return this.ReadAsync(data, data.Length, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -298,43 +301,37 @@ namespace SharpAdbClient
             }
         }
 
-        /// <summary>
-        /// Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
-        /// </summary>
-        /// <param name="data">
-        /// An array of type <see cref="byte"/> that is the storage location for the received data.
-        /// </param>
-        /// <param name="length">
-        /// The number of bytes to receive.
-        /// </param>
-        /// <param name="cancellationToken">
-        /// A <see cref="CancellationToken"/> that can be used to cancel the task.
-        /// </param>
-        /// <remarks>
-        /// Cancelling the task will also close the socket.
-        /// </remarks>
-        /// <returns>
-        /// A <see cref="Task"/> that represents the asynchronous operation. The result value of the
-        /// task contains the number of bytes received.
-        /// </returns>
+        /// <inheritdoc/>
         public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken)
         {
-            int expLen = length != -1 ? length : data.Length;
+            if (length < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(length));
+            }
+
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            if (data.Length < length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(data));
+            }
+
             int count = -1;
             int totalRead = 0;
 
-            while (count != 0 && totalRead < expLen)
+            while (count != 0 && totalRead < length)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 try
                 {
-                    int left = expLen - totalRead;
-                    int buflen = left < this.socket.ReceiveBufferSize ? left : this.socket.ReceiveBufferSize;
+                    int left = length - totalRead;
+                    int buflen = left < ReadChunkSize ? left : ReadChunkSize;
 
-                    byte[] buffer = new byte[buflen];
-                    this.socket.ReceiveBufferSize = expLen;
-                    count = await this.socket.ReceiveAsync(buffer, 0, buflen, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                    count = await this.socket.ReceiveAsync(data, totalRead, buflen, SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
                     if (count < 0)
                     {
@@ -347,7 +344,6 @@ namespace SharpAdbClient
                     }
                     else
                     {
-                        Array.Copy(buffer, 0, data, totalRead, count);
                         totalRead += count;
                     }
                 }
@@ -372,10 +368,9 @@ namespace SharpAdbClient
                 try
                 {
                     int left = expLen - totalRead;
-                    int buflen = left < this.socket.ReceiveBufferSize ? left : this.socket.ReceiveBufferSize;
+                    int buflen = left < ReadChunkSize ? left : ReadChunkSize;
 
                     byte[] buffer = new byte[buflen];
-                    this.socket.ReceiveBufferSize = expLen;
                     count = this.socket.Receive(buffer, buflen, SocketFlags.None);
                     if (count < 0)
                     {

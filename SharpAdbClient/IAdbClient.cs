@@ -68,6 +68,8 @@ namespace SharpAdbClient
         // localreserved:<path> not implemented
         // localabstract:<path> not implemented
 
+        Framebuffer GetRefreshableFramebuffer(DeviceData device);
+
         /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
         Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken);
 
