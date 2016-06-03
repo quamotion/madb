@@ -32,7 +32,7 @@ namespace SharpAdbClient.Tests
             Framebuffer framebuffer = AdbClient.Instance.GetRefreshableFramebuffer(device);
             while (true)
             {
-                await framebuffer.Refresh(CancellationToken.None).ConfigureAwait(false);
+                await framebuffer.RefreshAsync(CancellationToken.None).ConfigureAwait(false);
                 // var img = framebuffer.ToImage();
             }
         }

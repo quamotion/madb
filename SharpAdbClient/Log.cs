@@ -160,9 +160,18 @@ namespace SharpAdbClient
         /// <summary>
         /// prints to stdout; could write to a log window
         /// </summary>
-        /// <param name="logLevel"></param>
-        /// <param name="tag"></param>
-        /// <param name="message"></param>
+        /// <param name="logLevel">
+        /// The level of the message to log.
+        /// </param>
+        /// <param name="tag">
+        /// A tag describing the the message to log.
+        /// </param>
+        /// <param name="message">
+        /// The message to log.
+        /// </param>
+        /// <param name="args">
+        /// Any arguments associated with the message.
+        /// </param>
         private static void WriteLine(LogLevel.LogLevelInfo logLevel, string tag, string message, params object[] args)
         {
             if (logLevel.Priority >= Level.Priority)

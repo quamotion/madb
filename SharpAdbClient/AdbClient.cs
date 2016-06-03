@@ -343,6 +343,7 @@ namespace SharpAdbClient
             }
         }
 
+        /// <inheritdoc/>
         public Framebuffer GetRefreshableFramebuffer(DeviceData device)
         {
             this.EnsureDevice(device);
@@ -356,7 +357,7 @@ namespace SharpAdbClient
             this.EnsureDevice(device);
 
             Framebuffer framebuffer = this.GetRefreshableFramebuffer(device);
-            await framebuffer.Refresh(cancellationToken).ConfigureAwait(false);
+            await framebuffer.RefreshAsync(cancellationToken).ConfigureAwait(false);
 
             // Convert the framebuffer to an image, and return that.
             return framebuffer.ToImage();
