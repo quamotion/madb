@@ -16,7 +16,7 @@ namespace SharpAdbClient
         /// A regular expression that can be used to parse the device information that is returned
         /// by the Android Debut Bridge.
         /// </summary>
-        internal const string DeviceDataRegex = @"^([a-z0-9_-]+(?:\s?[\.a-z0-9_-]+)?(?:\:\d{1,})?)\s+(device|offline|unknown|bootloader|recovery|download|unauthorized)(?:\s+product:([^:]+)\s+model\:([\S]+)\s+device\:([\S]+))?$";
+        internal const string DeviceDataRegex = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|offline|unknown|bootloader|recovery|download|unauthorized|host)(\s+features:(?<features>[^:]+))?(?:\s+product:(?<product>[^:]+)\s+model\:(?<model>[\S]+)\s+device\:(?<device>[\S]+))?$";
 
         /// <summary>
         /// Gets or sets the device serial number.
@@ -64,6 +64,15 @@ namespace SharpAdbClient
         }
 
         /// <summary>
+        /// Gets or sets the features available on the device.
+        /// </summary>
+        public string Features
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
@@ -81,16 +90,17 @@ namespace SharpAdbClient
             {
                 return new DeviceData()
                 {
-                    Serial = m.Groups[1].Value,
-                    State = GetStateFromString(m.Groups[2].Value),
-                    Model = m.Groups[4].Value,
-                    Product = m.Groups[3].Value,
-                    Name = m.Groups[5].Value
+                    Serial = m.Groups["serial"].Value,
+                    State = GetStateFromString(m.Groups["state"].Value),
+                    Model = m.Groups["model"].Value,
+                    Product = m.Groups["product"].Value,
+                    Name = m.Groups["name"].Value,
+                    Features = m.Groups["features"].Value
                 };
             }
             else
             {
-                throw new ArgumentException("Invalid device list data");
+                throw new ArgumentException($"Invalid device list data '{data}'");
             }
         }
 
