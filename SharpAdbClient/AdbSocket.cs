@@ -355,6 +355,8 @@ namespace SharpAdbClient
                 {
                     throw new AdbException($"An error occurred while receiving data from the adb server: {ex.Message}.", ex);
                 }
+                
+                await Task.Delay(1, cancellationToken).ConfigureAwait(false);
             }
 
             return totalRead;
@@ -397,6 +399,8 @@ namespace SharpAdbClient
                     throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
                 }
             }
+            
+            Thread.Sleep(1);
         }
 
         /// <inheritdoc/>
