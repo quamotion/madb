@@ -48,6 +48,8 @@ namespace SharpAdbClient
         /// </param>
         void Send(byte[] data, int length);
 
+        void Send(byte[] data, int offset, int length);
+
         /// <summary>
         /// Sends a sync request to the device.
         /// </summary>

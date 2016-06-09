@@ -34,7 +34,8 @@ namespace SharpAdbClient
     public class AdbSocket : IAdbSocket, IDisposable
     {
         // Read 1 KB worth of data at a time
-        private const int ReadChunkSize = 1024;
+        public static int ReceiveBufferSize { get; set; } = 1024;
+        public static int WriteBufferSize { get; set; } = 1024;
 
         /// <summary>
         /// The default time to wait in the milliseconds.
@@ -64,6 +65,7 @@ namespace SharpAdbClient
         {
             this.socket = new TcpSocket();
             this.socket.Connect(endPoint);
+            this.socket.ReceiveBufferSize = ReceiveBufferSize;
         }
 
         /// <summary>
@@ -267,6 +269,11 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public virtual void Send(byte[] data, int length)
         {
+            this.Send(data, 0, length);
+        }
+
+        public virtual void Send(byte[] data, int offset, int length)
+        {
             int numWaits = 0;
             int count = -1;
 
@@ -329,7 +336,7 @@ namespace SharpAdbClient
                 try
                 {
                     int left = length - totalRead;
-                    int buflen = left < ReadChunkSize ? left : ReadChunkSize;
+                    int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
                     count = await this.socket.ReceiveAsync(data, totalRead, buflen, SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
@@ -368,7 +375,7 @@ namespace SharpAdbClient
                 try
                 {
                     int left = expLen - totalRead;
-                    int buflen = left < ReadChunkSize ? left : ReadChunkSize;
+                    int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
                     byte[] buffer = new byte[buflen];
                     count = this.socket.Receive(buffer, buflen, SocketFlags.None);
