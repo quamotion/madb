@@ -33,6 +33,17 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
+        public void CreateFromEmulatorTest()
+        {
+            string data = "emulator-5586          host features:shell_2";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("emulator-5586", device.Serial);
+            Assert.AreEqual<DeviceState>(DeviceState.Host, device.State);
+            Assert.AreEqual("shell_2", device.Features);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void CreateFromInvalidDatatest()
         {
