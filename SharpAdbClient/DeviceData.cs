@@ -16,7 +16,7 @@ namespace SharpAdbClient
         /// A regular expression that can be used to parse the device information that is returned
         /// by the Android Debut Bridge.
         /// </summary>
-        internal const string DeviceDataRegex = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|offline|unknown|bootloader|recovery|download|unauthorized|host)(\s+features:(?<features>[^:]+))?(?:\s+product:(?<product>[^:]+)\s+model\:(?<model>[\S]+)\s+device\:(?<device>[\S]+))?$";
+        internal const string DeviceDataRegex = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|offline|unknown|bootloader|recovery|download|unauthorized|host)(?:\s+product:(?<product>[^:]+)\s+model\:(?<model>[\S]+)\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?$";
 
         /// <summary>
         /// Gets or sets the device serial number.
@@ -94,7 +94,7 @@ namespace SharpAdbClient
                     State = GetStateFromString(m.Groups["state"].Value),
                     Model = m.Groups["model"].Value,
                     Product = m.Groups["product"].Value,
-                    Name = m.Groups["name"].Value,
+                    Name = m.Groups["device"].Value,
                     Features = m.Groups["features"].Value
                 };
             }

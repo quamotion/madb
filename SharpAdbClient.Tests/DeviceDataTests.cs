@@ -44,6 +44,20 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
+        public void CreateWithFeaturesTest()
+        {
+            string data = "0100a9ee51a18f2b device product:bullhead model:Nexus_5X device:bullhead features:shell_v2,cmd";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("0100a9ee51a18f2b", device.Serial);
+            Assert.AreEqual<DeviceState>(DeviceState.Online, device.State);
+            Assert.AreEqual("Nexus_5X", device.Model);
+            Assert.AreEqual("bullhead", device.Product);
+            Assert.AreEqual("bullhead", device.Name);
+            Assert.AreEqual("shell_v2,cmd", device.Features);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void CreateFromInvalidDatatest()
         {
