@@ -74,6 +74,11 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
+        public Framebuffer CreateRefreshableFramebuffer(DeviceData device)
+        {
+            throw new NotImplementedException();
+        }
+
         public void KillAdb()
         {
             throw new NotImplementedException();

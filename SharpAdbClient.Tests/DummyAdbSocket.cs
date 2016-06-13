@@ -232,5 +232,10 @@ namespace SharpAdbClient.Tests
         {
             this.DidReconnect = true;
         }
+
+        public Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

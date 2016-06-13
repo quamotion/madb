@@ -68,6 +68,18 @@ namespace SharpAdbClient
         // localreserved:<path> not implemented
         // localabstract:<path> not implemented
 
+        /// <summary>
+        /// Gets a <see cref="Framebuffer"/> which contains the framebuffer data for this device. The framebuffer data can be refreshed,
+        /// giving you high performance access to the device's framebuffer.
+        /// </summary>
+        /// <param name="device">
+        /// The device for which to get the framebuffer.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Framebuffer"/> object which can be used to get the framebuffer of the device.
+        /// </returns>
+        Framebuffer CreateRefreshableFramebuffer(DeviceData device);
+
         /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
         Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken);
 

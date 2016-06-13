@@ -53,10 +53,10 @@ namespace SharpAdbClient
         private const string Tag = nameof(SyncService);
 
         /// <summary>
-        /// The maximum size of data to transfer between the device and the PC
+        /// Gets or sets the maximum size of data to transfer between the device and the PC
         /// in one block.
         /// </summary>
-        private const int MaxBufferSize = 64 * 1024;
+        public int MaxBufferSize { get; set; } = 504;
 
         /// <summary>
         /// The maximum length of a path on the remote device.
@@ -150,6 +150,16 @@ namespace SharpAdbClient
             // we read max SYNC_DATA_MAX.
             byte[] buffer = new byte[MaxBufferSize];
 
+            // We need 4 bytes of the buffer to send the 'DATA' command,
+            // and an additional X bytes to inform how much data we are
+            // sending.
+            byte[] dataBytes = SyncCommandConverter.GetBytes(SyncCommand.DATA);
+            byte[] lengthBytes = BitConverter.GetBytes(MaxBufferSize);
+            int headerSize = dataBytes.Length + lengthBytes.Length;
+            int reservedHeaderSize = headerSize;
+            int maxDataSize = MaxBufferSize - reservedHeaderSize;
+            lengthBytes = BitConverter.GetBytes(maxDataSize);
+
             // look while there is something to read
             while (true)
             {
@@ -157,18 +167,27 @@ namespace SharpAdbClient
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // read up to SYNC_DATA_MAX
-                int read = stream.Read(buffer, 0, MaxBufferSize);
+                int read = stream.Read(buffer, headerSize, maxDataSize);
 
                 if (read == 0)
                 {
                     // we reached the end of the file
                     break;
                 }
+                else if (read != maxDataSize)
+                {
+                    // At the end of the line, so we need to recalculate the length of the header
+                    lengthBytes = BitConverter.GetBytes(read);
+                    headerSize = dataBytes.Length + lengthBytes.Length;
+                }
+
+                int startPosition = reservedHeaderSize - headerSize;
+
+                Buffer.BlockCopy(dataBytes, 0, buffer, startPosition, dataBytes.Length);
+                Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
 
                 // now send the data to the device
-                // first write the amount read
-                this.Socket.SendSyncRequest(SyncCommand.DATA, read);
-                this.Socket.Send(buffer, read);
+                this.Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
             }
 
             // create the DONE message

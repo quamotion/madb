@@ -48,6 +48,8 @@ namespace SharpAdbClient
         /// </param>
         void Send(byte[] data, int length);
 
+        void Send(byte[] data, int offset, int length);
+
         /// <summary>
         /// Sends a sync request to the device.
         /// </summary>
@@ -127,6 +129,27 @@ namespace SharpAdbClient
         /// The <see cref="string"/> received from the <see cref = "IAdbSocket"/>.
         /// </returns>
         Task ReadAsync(byte[] data, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
+        /// </summary>
+        /// <param name="data">
+        /// An array of type <see cref="byte"/> that is the storage location for the received data.
+        /// </param>
+        /// <param name="length">
+        /// The number of bytes to receive.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> that can be used to cancel the task.
+        /// </param>
+        /// <remarks>
+        /// Cancelling the task will also close the socket.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="Task"/> that represents the asynchronous operation. The result value of the
+        /// task contains the number of bytes received.
+        /// </returns>
+        Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken);
 
         /// <summary>
         /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance.
