@@ -37,11 +37,6 @@ namespace SharpAdbClient
         public static int ReceiveBufferSize { get; set; } = 1024;
         public static int WriteBufferSize { get; set; } = 1024;
 
-        /// <summary>
-        /// The default time to wait in the milliseconds.
-        /// </summary>
-        private const int WaitTime = 5;
-
         private const int Timeout = 5000;
 
         /// <summary>
@@ -102,12 +97,6 @@ namespace SharpAdbClient
         public virtual void Reconnect()
         {
             this.socket.Reconnect();
-        }
-
-        /// <inheritdoc/>
-        public void Close()
-        {
-            this.socket.Close();
         }
 
         /// <summary>
@@ -248,7 +237,7 @@ namespace SharpAdbClient
 
             if (!response.IOSuccess || !response.Okay)
             {
-                this.socket.Close();
+                this.socket.Dispose();
                 throw new AdbException($"An error occurred while reading a response from ADB: {response.Message}", response);
             }
 
@@ -274,31 +263,12 @@ namespace SharpAdbClient
 
         public virtual void Send(byte[] data, int offset, int length)
         {
-            int numWaits = 0;
-            int count = -1;
-
             try
             {
-                count = this.socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
+                int count = this.socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
-                }
-                else if (count == 0)
-                {
-                    // TODO: need more accurate timeout?
-                    if (Timeout != 0 && numWaits * WaitTime > Timeout)
-                    {
-                        throw new AdbException("A timeout has occurred while sending the data");
-                    }
-
-                    // non-blocking spin
-                    Thread.Sleep(WaitTime);
-                    numWaits++;
-                }
-                else
-                {
-                    numWaits = 0;
                 }
             }
             catch (SocketException sex)
@@ -482,7 +452,7 @@ namespace SharpAdbClient
             string result;
             try
             {
-                result = Encoding.Default.GetString(reply);
+                result = Encoding.ASCII.GetString(reply);
             }
             catch (DecoderFallbackException uee)
             {

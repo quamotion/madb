@@ -220,13 +220,15 @@ namespace SharpAdbClient.Logs
         }
 
         /// <inheritdoc/>
-        public override void Close()
+        protected override void Dispose(bool disposing)
         {
             if (this.closeStream && this.Inner != null)
             {
-                this.Inner.Close();
+                this.Inner.Dispose();
                 this.Inner = null;
             }
+
+            base.Dispose(disposing);
         }
     }
 }

@@ -4,7 +4,6 @@
 
 namespace SharpAdbClient
 {
-    using Mono.Unix;
     using SharpAdbClient.Exceptions;
     using System;
     using System.IO;
@@ -98,9 +97,9 @@ namespace SharpAdbClient
                 throw new ArgumentNullException(nameof(endPoint));
             }
 
-            if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint || endPoint is UnixEndPoint))
+            if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint))
             {
-                throw new NotSupportedException("Only TCP and Unix endpoints are supported");
+                throw new NotSupportedException("Only TCP endpoints are supported");
             }
 
             this.EndPoint = endPoint;

@@ -178,11 +178,6 @@ namespace SharpAdbClient
         Task<string> ReadStringAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Closes the<see cref="AdbSocket"/> connection and releases all associated resources.
-        /// </summary>
-        void Close();
-
-        /// <summary>
         /// Reads from the socket until the array is filled, the optional<paramref name= "length"/>
         /// is reached, or no more data is coming (because the socket closed or the
         /// timeout expired).

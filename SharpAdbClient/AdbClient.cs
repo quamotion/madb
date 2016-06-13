@@ -293,7 +293,7 @@ namespace SharpAdbClient
 
             using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
             {
-                cancellationToken.Register(() => socket.Close());
+                cancellationToken.Register(() => socket.Dispose());
 
                 this.SetDevice(socket, device);
                 socket.SendAdbRequest($"shell:{command}");

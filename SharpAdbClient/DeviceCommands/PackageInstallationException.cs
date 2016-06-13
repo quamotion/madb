@@ -7,12 +7,15 @@ namespace SharpAdbClient.DeviceCommands
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.Serialization;
     using System.Text;
 
     /// <summary>
     /// An exception while installing a package on the device
     /// </summary>
+#if !NETSTANDARD1_5
     [Serializable]
+#endif
     public class PackageInstallationException : Exception
     {
         /// <summary>
@@ -41,6 +44,7 @@ namespace SharpAdbClient.DeviceCommands
         {
         }
 
+#if !NETSTANDARD1_5
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>
@@ -53,11 +57,10 @@ namespace SharpAdbClient.DeviceCommands
         /// <exception cref="T:System.Runtime.Serialization.SerializationException">
         /// The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0).
         ///   </exception>
-        protected PackageInstallationException (
-        System.Runtime.Serialization.SerializationInfo info,
-        System.Runtime.Serialization.StreamingContext context)
+        protected PackageInstallationException (SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 }

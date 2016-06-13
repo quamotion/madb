@@ -51,11 +51,6 @@ namespace SharpAdbClient
         void Reconnect();
 
         /// <summary>
-        /// Closes the <see cref="ITcpSocket"/> connection and releases all associated resources.
-        /// </summary>
-        void Close();
-
-        /// <summary>
         /// Sends the specified number of bytes of data to a connected
         /// <see cref="ITcpSocket"/>, starting at the specified <paramref name="offset"/>,
         /// and using the specified <paramref name="socketFlags"/>.

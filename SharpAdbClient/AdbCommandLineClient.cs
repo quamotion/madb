@@ -10,6 +10,7 @@ namespace SharpAdbClient
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
+    using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -40,27 +41,26 @@ namespace SharpAdbClient
                 throw new ArgumentNullException(nameof(adbPath));
             }
 
-            switch (Environment.OSVersion.Platform)
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            bool isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+
+            if (isWindows)
             {
-                case PlatformID.Win32NT:
-                    if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
-                    }
-
-                    break;
-
-                case PlatformID.Unix:
-                case PlatformID.MacOSX:
-                    if (!string.Equals(Path.GetFileName(adbPath), "adb", StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb executable. The path must end with `adb`");
-                    }
-
-                    break;
-
-                default:
-                    throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
+                if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
+                }
+            }
+            else if (isUnix)
+            {
+                if (!string.Equals(Path.GetFileName(adbPath), "adb", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb executable. The path must end with `adb`");
+                }
+            }
+            else
+            {
+                throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
             }
 
             this.EnsureIsValidAdbFile(adbPath);
@@ -262,7 +262,11 @@ namespace SharpAdbClient
             ProcessStartInfo psi = new ProcessStartInfo(this.AdbPath, command)
             {
                 CreateNoWindow = true,
+
+#if !NETSTANDARD1_5
                 WindowStyle = ProcessWindowStyle.Hidden,
+#endif
+
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true

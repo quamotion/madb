@@ -51,12 +51,16 @@ namespace SharpAdbClient
             SocketFlags socketFlags,
             CancellationToken cancellationToken)
         {
-            var tcs = new TaskCompletionSource<int>(socket);
-
             // Register a callback so that when a cancellation is requested, the socket is closed.
             // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
             // and convert to a TaskCancelledException - which is the exception we expect.
-            cancellationToken.Register(() => socket.Close());
+            cancellationToken.Register(() => socket.Dispose());
+
+#if NETSTANDARD1_5
+            ArraySegment<byte> array = new ArraySegment<byte>(buffer, offset, size);
+            return socket.ReceiveAsync(array, socketFlags);
+#else
+            var tcs = new TaskCompletionSource<int>(socket);
 
             socket.BeginReceive(
                 buffer,
@@ -89,6 +93,7 @@ namespace SharpAdbClient
                 tcs);
 
             return tcs.Task;
+#endif
         }
     }
 }
