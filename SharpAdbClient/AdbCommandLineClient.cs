@@ -263,7 +263,7 @@ namespace SharpAdbClient
             {
                 CreateNoWindow = true,
 
-#if !NETCORE
+#if !NETSTANDARD1_5
                 WindowStyle = ProcessWindowStyle.Hidden,
 #endif
 

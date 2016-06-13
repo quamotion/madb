@@ -4,7 +4,6 @@
 
 namespace SharpAdbClient
 {
-    using Mono.Unix;
     using System;
     using System.IO;
     using System.Net;
@@ -119,13 +118,9 @@ namespace SharpAdbClient
             {
                 return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             }
-            else if (endPoint is UnixEndPoint)
-            {
-                return new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.IP);
-            }
             else
             {
-                throw new NotSupportedException("Only Windows, Linux and Mac OS are supported");
+                throw new NotSupportedException("Only TCP sockets are supported");
             }
         }
     }

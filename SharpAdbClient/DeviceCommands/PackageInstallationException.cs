@@ -13,7 +13,9 @@ namespace SharpAdbClient.DeviceCommands
     /// <summary>
     /// An exception while installing a package on the device
     /// </summary>
+#if !NETSTANDARD1_5
     [Serializable]
+#endif
     public class PackageInstallationException : Exception
     {
         /// <summary>
@@ -42,7 +44,7 @@ namespace SharpAdbClient.DeviceCommands
         {
         }
 
-#if !NETCORE
+#if !NETSTANDARD1_5
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>

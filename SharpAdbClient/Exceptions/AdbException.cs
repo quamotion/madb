@@ -69,7 +69,7 @@ namespace SharpAdbClient.Exceptions
             this.Response = response;
         }
 
-#if !NETCORE
+#if !NETSTANDARD1_5
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbException"/> class.
         /// </summary>

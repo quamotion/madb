@@ -350,6 +350,11 @@ namespace SharpAdbClient
 
             return new Framebuffer(device, this);
         }
+#if !NETSTANDARD1_5
+#else
+                var size = Marshal.SizeOf<FramebufferHeader>();
+#endif
+
 
         /// <inheritdoc/>
         public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken)

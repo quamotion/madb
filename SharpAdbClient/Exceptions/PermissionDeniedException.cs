@@ -32,7 +32,7 @@ namespace SharpAdbClient.Exceptions
         {
         }
 
-#if !NETCORE
+#if !NETSTANDARD1_5
         /// <summary>
         /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
         /// </summary>
