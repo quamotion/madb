@@ -26,17 +26,6 @@ on_success:
   - ps: Push-AppveyorArtifact "bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).nupkg"
   - ps: Push-AppveyorArtifact "bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).symbols.nupkg"
 
-test:
-  categories:
-    except:
-      - IntegrationTest
-
-test_script: 
-  - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"c:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" -targetargs:".\SharpAdbClient.Tests\bin\Release\SharpAdbClient.Tests.dll /logger:Appveyor /testcasefilter:TestCategory!=IntegrationTest" -filter:"+[SharpAdbClient]*  -[SharpAdbClient]SharpAdbClient.Properties.*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\SharpAdbClient.coverage.xml
-  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
-  - pip install codecov
-  - codecov -f "SharpAdbClient.Coverage.xml"
-
 nuget:
   project_feed: true
   account_feed: true
