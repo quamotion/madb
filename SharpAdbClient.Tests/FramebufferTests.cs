@@ -29,7 +29,7 @@ namespace SharpAdbClient.Tests
         {
             var device = AdbClient.Instance.GetDevices().First();
 
-            Framebuffer framebuffer = AdbClient.Instance.GetRefreshableFramebuffer(device);
+            Framebuffer framebuffer = AdbClient.Instance.CreateRefreshableFramebuffer(device);
             while (true)
             {
                 await framebuffer.RefreshAsync(CancellationToken.None).ConfigureAwait(false);
