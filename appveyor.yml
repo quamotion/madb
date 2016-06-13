@@ -1,5 +1,11 @@
 version: 2.0.{build}.0
 
+install:
+  - choco install -y wget
+  - wget -q https://download.microsoft.com/download/4/6/1/46116DFF-29F9-4FF8-94BF-F9BE05BE263B/packages/DotNetCore.1.0.0.RC2-SDK.Preview1-x64.exe
+  - DotNetCore.1.0.0.RC2-SDK.Preview1-x64.exe /install /quiet /log dotnetinstall.log
+  - ps: Push-AppveyorArtifact "dotnetinstall.log"
+
 environment:
   NuGetApiKey:
     secure: uNF4gY8KN67ODxKkGPBIz+5MDdf3MRtz4Vi+9McPhWYi4Z6YMQvOcTQRWZYd/N9b
@@ -11,11 +17,14 @@ assembly_info:
   assembly_informational_version: '{version}'
 
 build_script:
-  - msbuild SharpAdbClient.sln /p:Configuration=Release /p:Platform="Any CPU" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - cmd: cd SharpAdbClient
+  - cmd: dotnet restore
+  - cmd: dotnet build -c Release --version-suffix beta%APPVEYOR_BUILD_NUMBER%
+  - cmd: dotnet pack -c Release --version-suffix beta%APPVEYOR_BUILD_NUMBER%
 
 on_success:
-  - cmd: nuget pack SharpAdbClient.nuspec -Version %APPVEYOR_BUILD_VERSION%
-  - ps: Push-AppveyorArtifact "sharpadbclient.$($env:APPVEYOR_BUILD_VERSION).nupkg"
+  - ps: Push-AppveyorArtifact "bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).nupkg"
+  - ps: Push-AppveyorArtifact "bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).symbols.nupkg"
 
 test:
   categories:
