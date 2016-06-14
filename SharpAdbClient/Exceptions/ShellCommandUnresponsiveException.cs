@@ -62,7 +62,7 @@ namespace SharpAdbClient.Exceptions
         {
         }
 
-#if !NETSTANDARD1_5
+#if !NETSTANDARD1_3
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellCommandUnresponsiveException"/> class with serialized
         /// data.

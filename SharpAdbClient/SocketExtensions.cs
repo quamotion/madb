@@ -56,7 +56,7 @@ namespace SharpAdbClient
             // and convert to a TaskCancelledException - which is the exception we expect.
             cancellationToken.Register(() => socket.Dispose());
 
-#if NETSTANDARD1_5
+#if NETSTANDARD1_3
             ArraySegment<byte> array = new ArraySegment<byte>(buffer, offset, size);
             return socket.ReceiveAsync(array, socketFlags);
 #else

@@ -41,7 +41,7 @@ namespace SharpAdbClient
                 throw new ArgumentNullException(nameof(adbPath));
             }
 
-#if NETSTANDARD1_5
+#if NETSTANDARD1_3
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             bool isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 #else
@@ -268,7 +268,7 @@ namespace SharpAdbClient
             {
                 CreateNoWindow = true,
 
-#if !NETSTANDARD1_5
+#if !NETSTANDARD1_3
                 WindowStyle = ProcessWindowStyle.Hidden,
 #endif
 
