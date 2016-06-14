@@ -15,7 +15,7 @@
       "type": "git",
       "url": "http://github.com/quamotion/madb"
     },
-    "tags": ".net45 android adb netcore"
+    "tags": [ ".net45", "android", "adb", "netcore" ]
   },
 
   "dependencies": {
