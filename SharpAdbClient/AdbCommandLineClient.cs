@@ -41,8 +41,13 @@ namespace SharpAdbClient
                 throw new ArgumentNullException(nameof(adbPath));
             }
 
+#if NETSTANDARD1_5
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             bool isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+#else
+            bool isWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
+            bool isUnix = Environment.OSVersion.Platform == PlatformID.MacOSX || Environment.OSVersion.Platform == PlatformID.Unix;
+#endif
 
             if (isWindows)
             {
