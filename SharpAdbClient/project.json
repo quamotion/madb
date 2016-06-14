@@ -1,6 +1,23 @@
 ﻿{
   "version": "2.1.0-*",
 
+  "authors": [
+    "The Android Open Source Project, Ryan Conrad, Quamotion"
+  ],
+  "title": ".NET client for adb, the Android Debug Bridge (SharpAdbClient)",
+  "description": "A managed library for communicating with the Android Debug Bridge (adb). You can use this library to list all Android devices connected to your PC, install applications on devices, capture the system log, take screenshots and much more.",
+  "packOptions": {
+    "licenseUrl": "https://raw.githubusercontent.com/quamotion/madb/master/LICENSE",
+    "owners": [
+      "Quamotion"
+    ],
+    "repository": {
+      "type": "git",
+      "url": "http://github.com/quamotion/madb"
+    },
+    "tags": [ ".net45", "android", "adb", "netcore" ]
+  },
+
   "dependencies": {
     "NETStandard.Library": "1.5.0-rc2-24027"
   },
