@@ -21,6 +21,11 @@
   "dependencies": {
   },
 
+  "buildOptions": {
+    "strongName": "true",
+    "keyFile": "SharpAdbClient.snk"
+  },
+
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {
