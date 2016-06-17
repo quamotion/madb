@@ -56,7 +56,7 @@ namespace SharpAdbClient
         /// Gets or sets the maximum size of data to transfer between the device and the PC
         /// in one block.
         /// </summary>
-        public int MaxBufferSize { get; set; } = 504;
+        public int MaxBufferSize { get; set; } = 64 * 1024;
 
         /// <summary>
         /// The maximum length of a path on the remote device.
