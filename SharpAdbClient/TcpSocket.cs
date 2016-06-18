@@ -106,8 +106,8 @@ namespace SharpAdbClient
         /// Creates a new, uninitialized socket which can connect to an ADB server.
         /// </summary>
         /// <param name="endPoint">
-        /// The <see cref="EndPoint"/> to which to connect. Currently <see cref="IPEndPoint"/>, <see cref="DnsEndPoint"/>
-        /// and <see cref="UnixEndPoint"/> endpoint types are supported.
+        /// The <see cref="EndPoint"/> to which to connect. Currently <see cref="IPEndPoint"/> and <see cref="DnsEndPoint"/>
+        /// endpoint types are supported.
         /// </param>
         /// <returns>
         /// A new <see cref="Socket"/> which can connect to an ADB server.

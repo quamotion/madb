@@ -48,20 +48,14 @@ namespace SharpAdbClient
     public class SyncService : ISyncService, IDisposable
     {
         /// <summary>
-        /// Logging tag
-        /// </summary>
-        private const string Tag = nameof(SyncService);
-
-        /// <summary>
-        /// Gets or sets the maximum size of data to transfer between the device and the PC
-        /// in one block.
-        /// </summary>
-        public int MaxBufferSize { get; set; } = 64 * 1024;
-
-        /// <summary>
         /// The maximum length of a path on the remote device.
         /// </summary>
         private const int MaxPathLength = 1024;
+
+        /// <summary>
+        /// Logging tag
+        /// </summary>
+        private const string Tag = nameof(SyncService);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
@@ -91,6 +85,12 @@ namespace SharpAdbClient
 
             this.Open();
         }
+
+        /// <summary>
+        /// Gets or sets the maximum size of data to transfer between the device and the PC
+        /// in one block.
+        /// </summary>
+        public int MaxBufferSize { get; set; } = 64 * 1024;
 
         /// <summary>
         /// Gets the device on which the file operations are being executed.
@@ -148,16 +148,16 @@ namespace SharpAdbClient
 
             // create the buffer used to read.
             // we read max SYNC_DATA_MAX.
-            byte[] buffer = new byte[MaxBufferSize];
+            byte[] buffer = new byte[this.MaxBufferSize];
 
             // We need 4 bytes of the buffer to send the 'DATA' command,
             // and an additional X bytes to inform how much data we are
             // sending.
             byte[] dataBytes = SyncCommandConverter.GetBytes(SyncCommand.DATA);
-            byte[] lengthBytes = BitConverter.GetBytes(MaxBufferSize);
+            byte[] lengthBytes = BitConverter.GetBytes(this.MaxBufferSize);
             int headerSize = dataBytes.Length + lengthBytes.Length;
             int reservedHeaderSize = headerSize;
-            int maxDataSize = MaxBufferSize - reservedHeaderSize;
+            int maxDataSize = this.MaxBufferSize - reservedHeaderSize;
             lengthBytes = BitConverter.GetBytes(maxDataSize);
 
             // look while there is something to read
@@ -223,7 +223,7 @@ namespace SharpAdbClient
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            byte[] buffer = new byte[MaxBufferSize];
+            byte[] buffer = new byte[this.MaxBufferSize];
 
             this.Socket.SendSyncRequest(SyncCommand.RECV, remoteFilepath);
 
@@ -257,9 +257,9 @@ namespace SharpAdbClient
 
                 int size = BitConverter.ToInt32(reply, 0);
 
-                if (size > MaxBufferSize)
+                if (size > this.MaxBufferSize)
                 {
-                    throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {MaxBufferSize}");
+                    throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {this.MaxBufferSize}");
                 }
 
                 // now read the length we received

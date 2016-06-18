@@ -33,10 +33,9 @@ namespace SharpAdbClient
     /// </summary>
     public class AdbSocket : IAdbSocket, IDisposable
     {
-        // Read 1 KB worth of data at a time
-        public static int ReceiveBufferSize { get; set; } = 1024;
-        public static int WriteBufferSize { get; set; } = 1024;
-
+        /// <summary>
+        /// The default timeout.
+        /// </summary>
         private const int Timeout = 5000;
 
         /// <summary>
@@ -74,6 +73,16 @@ namespace SharpAdbClient
         {
             this.socket = socket;
         }
+
+        /// <summary>
+        /// Gets or sets the size of the receive buffer
+        /// </summary>
+        public static int ReceiveBufferSize { get; set; } = 1024;
+
+        /// <summary>
+        /// Gets or sets the size of the write buffer.
+        /// </summary>
+        public static int WriteBufferSize { get; set; } = 1024;
 
         /// <inheritdoc/>
         public bool Connected
@@ -261,6 +270,7 @@ namespace SharpAdbClient
             this.Send(data, 0, length);
         }
 
+        /// <inheritdoc/>
         public virtual void Send(byte[] data, int offset, int length)
         {
             try

@@ -22,7 +22,7 @@ namespace SharpAdbClient.Tests
 
             Assert.IsTrue(socket.Connected);
 
-            socket.Close();
+            socket.Dispose();
             Assert.IsFalse(socket.Connected);
         }
 

@@ -1,6 +1,5 @@
 ﻿{
   "version": "2.1.0-*",
-
   "authors": [
     "The Android Open Source Project, Ryan Conrad, Quamotion"
   ],
@@ -15,17 +14,20 @@
       "type": "git",
       "url": "http://github.com/quamotion/madb"
     },
-    "tags": [ ".net45", "android", "adb", "netcore" ]
+    "tags": [
+      ".net45",
+      "android",
+      "adb",
+      "netcore"
+    ]
   },
-
   "dependencies": {
+    "SonarLint": "2.0.0"
   },
-
   "buildOptions": {
     "strongName": "true",
     "keyFile": "SharpAdbClient.snk"
   },
-
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {
