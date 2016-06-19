@@ -34,11 +34,6 @@ namespace SharpAdbClient
     public class AdbSocket : IAdbSocket, IDisposable
     {
         /// <summary>
-        /// The default timeout.
-        /// </summary>
-        private const int Timeout = 5000;
-
-        /// <summary>
         /// Logging tag
         /// </summary>
         private const string TAG = nameof(AdbSocket);
@@ -46,7 +41,7 @@ namespace SharpAdbClient
         /// <summary>
         /// The underlying TCP socket that manages the connection with the ADB server.
         /// </summary>
-        private ITcpSocket socket;
+        private readonly ITcpSocket socket;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.

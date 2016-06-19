@@ -259,8 +259,8 @@ namespace SharpAdbClient
 
             string[] deviceValues = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            List<DeviceData> devices = deviceValues.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
-            this.UpdateDevices(devices);
+            List<DeviceData> currentDevices = deviceValues.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
+            this.UpdateDevices(currentDevices);
         }
 
         private void UpdateDevices(List<DeviceData> devices)

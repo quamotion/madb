@@ -53,11 +53,6 @@ namespace SharpAdbClient
         private const int MaxPathLength = 1024;
 
         /// <summary>
-        /// Logging tag
-        /// </summary>
-        private const string Tag = nameof(SyncService);
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
         /// <param name="device">

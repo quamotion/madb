@@ -17,8 +17,8 @@ namespace SharpAdbClient.Logs
     /// <seealso href="http://stackoverflow.com/questions/13578416/read-binary-stdout-data-from-adb-shell"/>
     public class ShellStream : Stream
     {
+        private readonly bool closeStream;
         private byte? pendingByte;
-        private bool closeStream;
 
         /// <summary>
         /// Initializes a new instance of the <seealso cref="ShellStream"/> class.

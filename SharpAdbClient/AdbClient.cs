@@ -50,16 +50,6 @@ namespace SharpAdbClient
         public const int DefaultPort = 5555;
 
         /// <summary>
-        /// Logging tag
-        /// </summary>
-        private const string Tag = nameof(AdbClient);
-
-        /// <summary>
-        /// The default time to wait in the milliseconds.
-        /// </summary>
-        private const int WaitTime = 5;
-
-        /// <summary>
         /// The singleton instance of the <see cref="AdbClient"/> class.
         /// </summary>
         private static IAdbClient instance = null;
@@ -379,7 +369,7 @@ namespace SharpAdbClient
 
                 foreach (var logName in logNames)
                 {
-                    request.Append($" -b {logName.ToString().ToLower()}");
+                    request.Append($" -b {logName.ToString().ToLowerInvariant()}");
                 }
 
                 socket.SendAdbRequest(request.ToString());
