@@ -140,6 +140,7 @@ namespace SharpAdbClient
                 this.monitorTaskCancellationTokenSource.Cancel();
                 this.monitorTask.Wait();
 
+                this.monitorTask.Dispose();
                 this.monitorTask = null;
             }
 
@@ -149,6 +150,9 @@ namespace SharpAdbClient
                 this.Socket.Dispose();
                 this.Socket = null;
             }
+
+            this.firstDeviceListParsed.Dispose();
+            this.monitorTaskCancellationTokenSource.Dispose();
         }
 
         /// <summary>
