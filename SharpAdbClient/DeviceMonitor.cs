@@ -140,7 +140,9 @@ namespace SharpAdbClient
                 this.monitorTaskCancellationTokenSource.Cancel();
                 this.monitorTask.Wait();
 
+#if !NETSTANDARD1_3
                 this.monitorTask.Dispose();
+#endif
                 this.monitorTask = null;
             }
 
