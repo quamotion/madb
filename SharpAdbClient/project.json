@@ -22,7 +22,6 @@
     ]
   },
   "dependencies": {
-    "SonarLint": "2.0.0"
   },
   "buildOptions": {
     "strongName": "true",
