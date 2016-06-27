@@ -7,7 +7,9 @@ namespace SharpAdbClient.DeviceCommands
     using System;
     using System.Collections.Generic;
     using System.Linq;
+#if !NETSTANDARD1_3
     using System.Runtime.Serialization;
+#endif
     using System.Text;
 
     /// <summary>

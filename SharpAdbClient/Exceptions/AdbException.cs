@@ -8,7 +8,9 @@ namespace SharpAdbClient.Exceptions
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Sockets;
+#if !NETSTANDARD1_3
     using System.Runtime.Serialization;
+#endif
     using System.Text;
 
     /// <summary>
