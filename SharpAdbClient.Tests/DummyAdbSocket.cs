@@ -237,5 +237,10 @@ namespace SharpAdbClient.Tests
         {
             throw new NotImplementedException();
         }
+
+        public void Send(byte[] data, int offset, int length)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

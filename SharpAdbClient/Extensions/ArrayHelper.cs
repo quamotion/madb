@@ -12,7 +12,7 @@ namespace SharpAdbClient
         /// <param name="value">the array containing the int</param>
         /// <param name="offset">the offset in the array at which the int starts</param>
         /// <returns>the integer read from the array</returns>
-        public static int Swap32bitFromArray(this byte[] value, int offset)
+        public static int Swap32BitFromArray(this byte[] value, int offset)
         {
             int v = 0;
             v |= ((int)value[offset]) & 0x000000FF;
@@ -31,7 +31,7 @@ namespace SharpAdbClient
         /// <param name="offset">the offset in the array at which the int starts</param>
         /// <remarks>Array length must be at least offset + 2</remarks>
         /// <returns>the integer read from the array.</returns>
-        public static int SwapU16bitFromArray(this byte[] value, int offset)
+        public static int SwapU16BitFromArray(this byte[] value, int offset)
         {
             int v = 0;
             v |= ((int)value[offset]) & 0x000000FF;

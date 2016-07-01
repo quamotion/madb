@@ -23,7 +23,7 @@ namespace SharpAdbClient
         /// <summary>
         /// A <see cref="StringBuilder"/> which receives all output from the device.
         /// </summary>
-        private StringBuilder output = new StringBuilder();
+        private readonly StringBuilder output = new StringBuilder();
 
         /// <summary>
         /// Gets a <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.

@@ -144,7 +144,7 @@ namespace SharpAdbClient.Tests
                 {
                     using (SyncService service = new SyncService(this.Socket, device))
                     {
-                        service.Pull("/fstab.donatello", stream, null, CancellationToken.None);
+                        service.Pull("/fstab.donatello", stream, CancellationToken.None);
                     }
                 });
 
@@ -183,7 +183,7 @@ namespace SharpAdbClient.Tests
                 {
                     using (SyncService service = new SyncService(this.Socket, device))
                     {
-                        service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, CancellationToken.None);
+                        service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), CancellationToken.None);
                     }
                 });
         }

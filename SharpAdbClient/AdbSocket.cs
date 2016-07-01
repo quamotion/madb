@@ -33,12 +33,6 @@ namespace SharpAdbClient
     /// </summary>
     public class AdbSocket : IAdbSocket, IDisposable
     {
-        // Read 1 KB worth of data at a time
-        public static int ReceiveBufferSize { get; set; } = 1024;
-        public static int WriteBufferSize { get; set; } = 1024;
-
-        private const int Timeout = 5000;
-
         /// <summary>
         /// Logging tag
         /// </summary>
@@ -47,7 +41,7 @@ namespace SharpAdbClient
         /// <summary>
         /// The underlying TCP socket that manages the connection with the ADB server.
         /// </summary>
-        private ITcpSocket socket;
+        private readonly ITcpSocket socket;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
@@ -74,6 +68,16 @@ namespace SharpAdbClient
         {
             this.socket = socket;
         }
+
+        /// <summary>
+        /// Gets or sets the size of the receive buffer
+        /// </summary>
+        public static int ReceiveBufferSize { get; set; } = 1024;
+
+        /// <summary>
+        /// Gets or sets the size of the write buffer.
+        /// </summary>
+        public static int WriteBufferSize { get; set; } = 1024;
 
         /// <inheritdoc/>
         public bool Connected
@@ -261,6 +265,7 @@ namespace SharpAdbClient
             this.Send(data, 0, length);
         }
 
+        /// <inheritdoc/>
         public virtual void Send(byte[] data, int offset, int length)
         {
             try

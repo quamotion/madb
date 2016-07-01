@@ -60,11 +60,6 @@ namespace SharpAdbClient
         internal const int ConnectionReset = 10054;
 
         /// <summary>
-        /// The tag to use when logging.
-        /// </summary>
-        private const string Tag = nameof(AdbServer);
-
-        /// <summary>
         /// A lock used to ensure only one caller at a time can attempt to restart adb.
         /// </summary>
         private static readonly object RestartLock = new object();

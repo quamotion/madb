@@ -241,20 +241,18 @@ namespace SharpAdbClient
                     return PixelFormat.Format24bppRgb;
                 }
             }
-            else if (this.Bpp == 16)
+            else if (this.Bpp == 16
+                     && this.Red.Offset == 11
+                     && this.Red.Length == 5
+                     && this.Green.Offset == 5
+                     && this.Green.Length == 6
+                     && this.Blue.Offset == 0
+                     && this.Blue.Length == 5
+                     && this.Alpha.Offset == 0
+                     && this.Alpha.Length == 0)
             {
-                // For 16-bit image depths, we only support Rgb565\.
-                if (this.Red.Offset == 11
-                    && this.Red.Length == 5
-                    && this.Green.Offset == 5
-                    && this.Green.Length == 6
-                    && this.Blue.Offset == 0
-                    && this.Blue.Length == 5
-                    && this.Alpha.Offset == 0
-                    && this.Alpha.Length == 0)
-                {
-                    return PixelFormat.Format16bppRgb565;
-                }
+                // For 16-bit image depths, we only support Rgb565.
+                return PixelFormat.Format16bppRgb565;
             }
 
             // If not caught by any of the statements before, the format is not supported.

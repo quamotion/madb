@@ -4,6 +4,16 @@
   <Rules AnalyzerId="AsyncUsageAnalyzers" RuleNamespace="AsyncUsageAnalyzers">
     <Rule Id="UseConfigureAwait" Action="Warning" />
   </Rules>
+  <Rules AnalyzerId="Microsoft.Maintainability.Analyzers" RuleNamespace="Microsoft.Maintainability.Analyzers">
+    <Rule Id="CA1801" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="SonarAnalyzer.CSharp" RuleNamespace="SonarAnalyzer.CSharp">
+    <Rule Id="S100" Action="None" />
+    <Rule Id="S1481" Action="None" />
+    <Rule Id="S1854" Action="None" />
+    <Rule Id="S2360" Action="None" />
+    <Rule Id="S2372" Action="None" />
+  </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
     <Rule Id="SA1208" Action="None" />
     <Rule Id="SA1600" Action="None" />

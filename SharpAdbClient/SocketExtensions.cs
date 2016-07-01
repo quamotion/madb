@@ -54,7 +54,7 @@ namespace SharpAdbClient
             // Register a callback so that when a cancellation is requested, the socket is closed.
             // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
             // and convert to a TaskCancelledException - which is the exception we expect.
-            cancellationToken.Register(() => socket.Dispose());
+            var cancellationTokenRegistration = cancellationToken.Register(() => socket.Dispose());
 
 #if NETSTANDARD1_3
             ArraySegment<byte> array = new ArraySegment<byte>(buffer, offset, size);
@@ -88,6 +88,10 @@ namespace SharpAdbClient
                         {
                             t.TrySetException(ex);
                         }
+                    }
+                    finally
+                    {
+                        cancellationTokenRegistration.Dispose();
                     }
                 },
                 tcs);

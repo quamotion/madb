@@ -48,6 +48,18 @@ namespace SharpAdbClient
         /// </param>
         void Send(byte[] data, int length);
 
+        /// <summary>
+        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// </summary>
+        /// <param name="data">
+        /// A <see cref="byte"/> array that acts as a buffer, containing the data to send.
+        /// </param>
+        /// <param name="offset">
+        /// The index of the first byte in the array to send.
+        /// </param>
+        /// <param name = "length" >
+        /// The number of bytes to send.
+        /// </param>
         void Send(byte[] data, int offset, int length);
 
         /// <summary>

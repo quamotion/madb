@@ -140,6 +140,9 @@ namespace SharpAdbClient
                 this.monitorTaskCancellationTokenSource.Cancel();
                 this.monitorTask.Wait();
 
+#if !NETSTANDARD1_3
+                this.monitorTask.Dispose();
+#endif
                 this.monitorTask = null;
             }
 
@@ -149,6 +152,9 @@ namespace SharpAdbClient
                 this.Socket.Dispose();
                 this.Socket = null;
             }
+
+            this.firstDeviceListParsed.Dispose();
+            this.monitorTaskCancellationTokenSource.Dispose();
         }
 
         /// <summary>
@@ -259,8 +265,8 @@ namespace SharpAdbClient
 
             string[] deviceValues = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            List<DeviceData> devices = deviceValues.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
-            this.UpdateDevices(devices);
+            List<DeviceData> currentDevices = deviceValues.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
+            this.UpdateDevices(currentDevices);
         }
 
         private void UpdateDevices(List<DeviceData> devices)

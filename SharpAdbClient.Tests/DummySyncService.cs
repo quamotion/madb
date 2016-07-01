@@ -31,11 +31,11 @@ namespace SharpAdbClient.Tests
         {
         }
 
-        public void Pull(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Pull(string remotePath, Stream stream, CancellationToken cancellationToken)
         {
         }
 
-        public void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, CancellationToken cancellationToken)
         {
             this.UploadedFiles.Add(remotePath, stream);
         }

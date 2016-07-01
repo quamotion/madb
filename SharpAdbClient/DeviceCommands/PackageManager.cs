@@ -233,7 +233,7 @@ namespace SharpAdbClient.DeviceCommands
             catch (IOException e)
             {
                 Log.Error(Tag, $"Failed to delete temporary package: {e.Message}");
-                throw e;
+                throw;
             }
         }
     }

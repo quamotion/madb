@@ -42,7 +42,7 @@ namespace SharpAdbClient.Tests
             socket.Connect(new DnsEndPoint("www.google.com", 80));
             Assert.IsTrue(socket.Connected);
 
-            socket.Close();
+            socket.Dispose();
             Assert.IsFalse(socket.Connected);
 
             socket.Reconnect();

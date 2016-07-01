@@ -7,7 +7,9 @@ namespace SharpAdbClient.DeviceCommands
     using System;
     using System.Collections.Generic;
     using System.Linq;
+#if !NETSTANDARD1_3
     using System.Runtime.Serialization;
+#endif
     using System.Text;
 
     /// <summary>
@@ -57,7 +59,7 @@ namespace SharpAdbClient.DeviceCommands
         /// <exception cref="T:System.Runtime.Serialization.SerializationException">
         /// The class name is null or <see cref="P:System.Exception.HResult"/> is zero (0).
         ///   </exception>
-        protected PackageInstallationException (SerializationInfo info, StreamingContext context)
+        protected PackageInstallationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
