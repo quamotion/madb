@@ -75,7 +75,6 @@ namespace SharpAdbClient.DeviceCommands
             this.Device = device;
             this.Packages = new Dictionary<string, string>();
             this.ThirdPartyOnly = thirdPartyOnly;
-            this.RefreshPackages();
 
             // Default to AdbClient.Instance
             if (client == null)
@@ -95,6 +94,8 @@ namespace SharpAdbClient.DeviceCommands
             {
                 this.syncServiceFactory = syncServiceFactory;
             }
+
+            this.RefreshPackages();
         }
 
         /// <summary>
