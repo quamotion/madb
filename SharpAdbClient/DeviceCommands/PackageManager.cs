@@ -36,6 +36,18 @@ namespace SharpAdbClient.DeviceCommands
         private const string Tag = nameof(PackageManager);
 
         /// <summary>
+        /// The <see cref="IAdbClient"/> to use when communicating with the device.
+        /// </summary>
+        private readonly IAdbClient client;
+
+        /// <summary>
+        /// A function which returns a new instance of a class that implements the
+        /// <see cref="ISyncService"/> interface, that can be used to transfer files to and from
+        /// a given device.
+        /// </summary>
+        private readonly Func<DeviceData, ISyncService> syncServiceFactory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
         /// </summary>
         /// <param name="device">
@@ -45,7 +57,15 @@ namespace SharpAdbClient.DeviceCommands
         /// <see langword="true"/> to only indicate third party applications;
         /// <see langword="false"/> to also include built-in applications.
         /// </param>
-        public PackageManager(DeviceData device, bool thirdPartyOnly = false)
+        /// <param name="client">
+        /// The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.
+        /// </param>
+        /// <param name="syncServiceFactory">
+        /// A function which returns a new instance of a class that implements the
+        /// <see cref="ISyncService"/> interface, that can be used to transfer files to and from
+        /// a given device.
+        /// </param>
+        public PackageManager(DeviceData device, bool thirdPartyOnly = false, IAdbClient client = null, Func<DeviceData, ISyncService> syncServiceFactory = null)
         {
             if (device == null)
             {
@@ -56,6 +76,25 @@ namespace SharpAdbClient.DeviceCommands
             this.Packages = new Dictionary<string, string>();
             this.ThirdPartyOnly = thirdPartyOnly;
             this.RefreshPackages();
+
+            // Default to AdbClient.Instance
+            if (client == null)
+            {
+                this.client = AdbClient.Instance;
+            }
+            else
+            {
+                this.client = client;
+            }
+
+            if (syncServiceFactory == null)
+            {
+                this.syncServiceFactory = Factories.SyncServiceFactory;
+            }
+            else
+            {
+                this.syncServiceFactory = syncServiceFactory;
+            }
         }
 
         /// <summary>
@@ -90,11 +129,11 @@ namespace SharpAdbClient.DeviceCommands
 
             if (this.ThirdPartyOnly)
             {
-                this.Device.ExecuteShellCommand(ListThirdPartyOnly, pmr);
+                this.Device.ExecuteShellCommand(this.client, ListThirdPartyOnly, pmr);
             }
             else
             {
-                this.Device.ExecuteShellCommand(ListFull, pmr);
+                this.Device.ExecuteShellCommand(this.client, ListFull, pmr);
             }
         }
 
@@ -130,7 +169,7 @@ namespace SharpAdbClient.DeviceCommands
             var reinstallSwitch = reinstall ? "-r " : string.Empty;
 
             string cmd = $"pm install {reinstallSwitch}{remoteFilePath}";
-            this.Device.ExecuteShellCommand(cmd, receiver);
+            this.Device.ExecuteShellCommand(this.client, cmd, receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -149,7 +188,7 @@ namespace SharpAdbClient.DeviceCommands
             this.ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            this.Device.ExecuteShellCommand($"pm uninstall {packageName}", receiver);
+            this.Device.ExecuteShellCommand(this.client, $"pm uninstall {packageName}", receiver);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
@@ -167,7 +206,7 @@ namespace SharpAdbClient.DeviceCommands
             this.ValidateDevice();
 
             VersionInfoReceiver receiver = new VersionInfoReceiver();
-            this.Device.ExecuteShellCommand($"dumpsys package {packageName}", receiver);
+            this.Device.ExecuteShellCommand(this.client, $"dumpsys package {packageName}", receiver);
             return receiver.VersionInfo;
         }
 
@@ -200,7 +239,7 @@ namespace SharpAdbClient.DeviceCommands
 
                 Log.Debug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
 
-                using (ISyncService sync = Factories.SyncServiceFactory(this.Device))
+                using (ISyncService sync = this.syncServiceFactory(this.Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
                     string message = $"Uploading file onto device '{this.Device.Serial}'";
@@ -228,7 +267,7 @@ namespace SharpAdbClient.DeviceCommands
             // now we delete the app we sync'ed
             try
             {
-                this.Device.ExecuteShellCommand("rm " + remoteFilePath, null);
+                this.Device.ExecuteShellCommand(this.client, "rm " + remoteFilePath, null);
             }
             catch (IOException e)
             {
