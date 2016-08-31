@@ -17,6 +17,7 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual<string>("Android_Device___480_x_800", device.Model);
             Assert.AreEqual<string>("donatello", device.Name);
             Assert.AreEqual<DeviceState>(DeviceState.Offline, device.State);
+            Assert.AreEqual(string.Empty, device.Usb);
         }
 
         [TestMethod]
@@ -30,6 +31,7 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual<string>("", device.Model);
             Assert.AreEqual<string>("", device.Name);
             Assert.AreEqual<DeviceState>(DeviceState.Unauthorized, device.State);
+            Assert.AreEqual(string.Empty, device.Usb);
         }
 
         [TestMethod]
@@ -41,6 +43,7 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual<string>("emulator-5586", device.Serial);
             Assert.AreEqual<DeviceState>(DeviceState.Host, device.State);
             Assert.AreEqual("shell_2", device.Features);
+            Assert.AreEqual(string.Empty, device.Usb);
         }
 
         [TestMethod]
@@ -55,6 +58,22 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual("bullhead", device.Product);
             Assert.AreEqual("bullhead", device.Name);
             Assert.AreEqual("shell_v2,cmd", device.Features);
+            Assert.AreEqual(string.Empty, device.Usb);
+        }
+
+        [TestMethod]
+        public void CreateWithUsbDataTest()
+        {
+            // As seen on Linux
+            string data = "EAOKCY112414           device usb:1-1 product:WW_K013 model:K013 device:K013_1";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("EAOKCY112414", device.Serial);
+            Assert.AreEqual<DeviceState>(DeviceState.Online, device.State);
+            Assert.AreEqual("K013", device.Model);
+            Assert.AreEqual("WW_K013", device.Product);
+            Assert.AreEqual("K013_1", device.Name);
+            Assert.AreEqual("1-1", device.Usb);
         }
 
         [TestMethod]

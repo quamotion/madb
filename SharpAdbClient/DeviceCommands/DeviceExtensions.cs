@@ -32,7 +32,27 @@ namespace SharpAdbClient.DeviceCommands
         /// </param>
         public static void ExecuteShellCommand(this DeviceData device, string command, IShellOutputReceiver receiver)
         {
-            AdbClient.Instance.ExecuteRemoteCommand(command, device, receiver);
+            device.ExecuteShellCommand(AdbClient.Instance, command, receiver);
+        }
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to run the command.
+        /// </param>
+        /// <param name="client">
+        /// The <see cref="IAdbClient"/> to use when executing the command.
+        /// </param>
+        /// <param name="command">
+        /// The command to execute.
+        /// </param>
+        /// <param name="receiver">
+        /// Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.
+        /// </param>
+        public static void ExecuteShellCommand(this DeviceData device, IAdbClient client, string command, IShellOutputReceiver receiver)
+        {
+            client.ExecuteRemoteCommand(command, device, receiver);
         }
 
         /// <summary>

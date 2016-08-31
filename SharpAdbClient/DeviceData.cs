@@ -16,7 +16,13 @@ namespace SharpAdbClient
         /// A regular expression that can be used to parse the device information that is returned
         /// by the Android Debut Bridge.
         /// </summary>
-        internal const string DeviceDataRegex = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|offline|unknown|bootloader|recovery|download|unauthorized|host)(?:\s+product:(?<product>[^:]+)\s+model\:(?<model>[\S]+)\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?$";
+        internal const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|offline|unknown|bootloader|recovery|download|unauthorized|host)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+)\s+model\:(?<model>[\S]+)\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?$";
+
+        /// <summary>
+        /// A regular expression that can be used to parse the device information that is returned
+        /// by the Android Debut Bridge.
+        /// </summary>
+        private static readonly Regex Regex = new Regex(DeviceDataRegexString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Gets or sets the device serial number.
@@ -73,6 +79,15 @@ namespace SharpAdbClient
         }
 
         /// <summary>
+        /// Gets or sets the USB port to which this device is connected. Usually available on Linux only.
+        /// </summary>
+        public string Usb
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
@@ -84,8 +99,7 @@ namespace SharpAdbClient
         /// </returns>
         public static DeviceData CreateFromAdbData(string data)
         {
-            Regex re = new Regex(DeviceDataRegex, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            Match m = re.Match(data);
+            Match m = Regex.Match(data);
             if (m.Success)
             {
                 return new DeviceData()
@@ -95,7 +109,8 @@ namespace SharpAdbClient
                     Model = m.Groups["model"].Value,
                     Product = m.Groups["product"].Value,
                     Name = m.Groups["device"].Value,
-                    Features = m.Groups["features"].Value
+                    Features = m.Groups["features"].Value,
+                    Usb = m.Groups["usb"].Value
                 };
             }
             else
