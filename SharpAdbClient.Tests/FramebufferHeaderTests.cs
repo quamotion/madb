@@ -61,5 +61,18 @@ namespace SharpAdbClient.Tests
                 Assert.AreEqual(0xff, pixel.A);
             }
         }
+
+        [TestMethod]
+        [DeploymentItem(@"framebufferheader-empty.bin")]
+        public void ToImageEmptyTest()
+        {
+            var data = File.ReadAllBytes("framebufferheader-empty.bin");
+            var header = FramebufferHeader.Read(data);
+
+            var framebuffer = new byte[] { };
+
+            var image = header.ToImage(framebuffer);
+            Assert.IsNull(image);
+        }
     }
 }

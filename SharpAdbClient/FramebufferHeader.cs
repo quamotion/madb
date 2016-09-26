@@ -121,13 +121,21 @@ namespace SharpAdbClient
         /// The buffer containing the image data.
         /// </param>
         /// <returns>
-        /// A <see cref="Image"/> that represents the image contained in the frame buffer.
+        /// A <see cref="Image"/> that represents the image contained in the frame buffer, or <see langword="null"/> if the framebuffer
+        /// does not contain any data. This can happen when DRM is enabled on the device.
         /// </returns>
         public Image ToImage(byte[] buffer)
         {
             if (buffer == null)
             {
                 throw new ArgumentNullException(nameof(buffer));
+            }
+
+            // This happens, for example, when DRM is enabled. In that scenario, no screenshot is taken on the device and an empty
+            // framebuffer is returned; we'll just return null.
+            if (this.Width == 0 || this.Height == 0 || this.Bpp == 0)
+            {
+                return null;
             }
 
             // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
@@ -164,6 +172,11 @@ namespace SharpAdbClient
             if (buffer.Length != this.Width * this.Height * (this.Bpp / 8))
             {
                 throw new ArgumentOutOfRangeException(nameof(buffer));
+            }
+
+            if (this.Width == 0 || this.Height == 0 || this.Bpp == 0)
+            {
+                throw new InvalidOperationException("Cannot caulcate the pixel format of an empty framebuffer");
             }
 
             // By far, the most common format is a 32-bit pixel format, which is either
