@@ -191,23 +191,21 @@ namespace SharpAdbClient.DeviceCommands
             // format - see http://man7.org/linux/man-pages/man5/proc.5.html.
             // Doing cat on each file one by one takes too much time. Doing cat on all of them at the same time doesn't work
             // either, because the command line would be too long.
-            // So we do it 50 processes at at time.
+            // So we do it 25 processes at at time.
             StringBuilder catBuilder = new StringBuilder();
             ProcessOutputReceiver processOutputReceiver = new ProcessOutputReceiver();
 
+            catBuilder.Append("cat ");
+
             for (int i = 0; i < pids.Count; i++)
             {
-                if (i % 50 == 0)
+                catBuilder.Append($"/proc/{pids[i]}/cmdline /proc/{pids[i]}/stat ");
+
+                if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
+                    device.ExecuteShellCommand(catBuilder.ToString(), processOutputReceiver);
                     catBuilder.Clear();
                     catBuilder.Append("cat ");
-                }
-
-                catBuilder.Append($"/proc/{pids[i]}/stat ");
-
-                if (i > 0 && (i % 50 == 0 || i == pids.Count - 1))
-                {
-                        device.ExecuteShellCommand(catBuilder.ToString(), processOutputReceiver);
                 }
             }
 
