@@ -51,7 +51,7 @@ namespace SharpAdbClient.Tests.DeviceCommands
         public void ListProcessesIntegrationTest()
         {
             var device = AdbClient.Instance.GetDevices().Single();
-            var processes = device.ListProcesses();
+            var processes = device.ListProcesses().ToArray();
         }
 
         [TestMethod]

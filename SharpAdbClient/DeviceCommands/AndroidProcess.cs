@@ -85,10 +85,14 @@ namespace SharpAdbClient.DeviceCommands
         /// <param name="line">
         /// A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.
         /// </param>
+        /// <param name="cmdLinePrefix">
+        /// A value indicating whether the output of <c>/proc/{pid}/stat</c> is prefixed with <c>/proc/{pid}/cmdline</c> or not.
+        /// Becuase <c>stat</c> does not contain the full process name, this can be useful.
+        /// </param>
         /// <returns>
         /// The equivalent <see cref="AndroidProcess"/>.
         /// </returns>
-        public static AndroidProcess Parse(string line)
+        public static AndroidProcess Parse(string line, bool cmdLinePrefix = false)
         {
             if (line == null)
             {
@@ -105,8 +109,34 @@ namespace SharpAdbClient.DeviceCommands
             var processNameStart = line.IndexOf('(');
             var processNameEnd = line.IndexOf(')');
 
-            var pid = int.Parse(line.Substring(0, processNameStart));
-            var comm = line.Substring(processNameStart + 1, processNameEnd - processNameStart - 1);
+            int pid = 0;
+            string comm = string.Empty;
+
+            bool parsedCmdLinePrefix = false;
+
+            if (cmdLinePrefix)
+            {
+                var cmdLineParts = line.Substring(0, processNameStart).Split(new char[] { '\0' });
+
+                if (cmdLineParts.Length <= 1)
+                {
+                    parsedCmdLinePrefix = false;
+                }
+                else
+                {
+                    pid = int.Parse(cmdLineParts[cmdLineParts.Length - 1]);
+                    comm = cmdLineParts[0];
+
+                    // All the other parts are the command line arguments, skip them.
+                    parsedCmdLinePrefix = true;
+                }
+            }
+
+            if (!parsedCmdLinePrefix)
+            {
+                pid = int.Parse(line.Substring(0, processNameStart));
+                comm = line.Substring(processNameStart + 1, processNameEnd - processNameStart - 1);
+            }
 
             var parts = line.Substring(processNameEnd + 1).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 

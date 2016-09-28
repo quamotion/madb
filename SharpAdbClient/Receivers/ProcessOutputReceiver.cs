@@ -33,7 +33,7 @@ namespace SharpAdbClient.Receivers
 
                 try
                 {
-                    this.Processes.Add(AndroidProcess.Parse(line));
+                    this.Processes.Add(AndroidProcess.Parse(line, cmdLinePrefix: true));
                 }
                 catch (Exception)
                 {
