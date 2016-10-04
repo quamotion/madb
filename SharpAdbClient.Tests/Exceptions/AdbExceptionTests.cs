@@ -24,10 +24,12 @@ namespace SharpAdbClient.Tests.Exceptions
             ExceptionTester<AdbException>.TestMessageAndInnerConstructor((message, inner) => new AdbException(message, inner));
         }
 
+#if !NETCOREAPP1_0
         [TestMethod]
         public void TestSerializationConstructor()
         {
             ExceptionTester<AdbException>.TestSerializationConstructor((info, context) => new AdbException(info, context));
         }
+#endif
     }
 }

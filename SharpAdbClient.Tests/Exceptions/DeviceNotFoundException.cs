@@ -18,10 +18,12 @@ namespace SharpAdbClient.Tests.Exceptions
             ExceptionTester<DeviceNotFoundException>.TestMessageAndInnerConstructor((message, inner) => new DeviceNotFoundException(message, inner));
         }
 
+#if !NETCOREAPP1_0
         [TestMethod]
         public void TestSerializationConstructor()
         {
             ExceptionTester<DeviceNotFoundException>.TestSerializationConstructor((info, context) => new DeviceNotFoundException(info, context));
         }
+#endif
     }
 }

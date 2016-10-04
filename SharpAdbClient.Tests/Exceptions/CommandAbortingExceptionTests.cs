@@ -24,10 +24,12 @@ namespace SharpAdbClient.Tests.Exceptions
             ExceptionTester<CommandAbortingException>.TestMessageAndInnerConstructor((message, inner) => new CommandAbortingException(message, inner));
         }
 
+#if !NETCOREAPP1_0
         [TestMethod]
         public void TestSerializationConstructor()
         {
             ExceptionTester<CommandAbortingException>.TestSerializationConstructor((info, context) => new CommandAbortingException(info, context));
         }
+#endif
     }
 }

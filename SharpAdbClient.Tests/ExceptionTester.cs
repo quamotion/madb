@@ -35,6 +35,7 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual(inner, ex.InnerException);
         }
 
+#if !NETCOREAPP1_0
         public static void TestSerializationConstructor(Func<SerializationInfo, StreamingContext, T> constructor)
         {
             var info = new SerializationInfo(typeof(T), new FormatterConverter());
@@ -53,5 +54,6 @@ namespace SharpAdbClient.Tests
 
             var ex = constructor(info, context);
         }
+#endif
     }
 }

@@ -24,10 +24,12 @@ namespace SharpAdbClient.Tests.Exceptions
             ExceptionTester<UnknownOptionException>.TestMessageAndInnerConstructor((message, inner) => new UnknownOptionException(message, inner));
         }
 
+#if !NETCOREAPP1_0
         [TestMethod]
         public void TestSerializationConstructor()
         {
             ExceptionTester<UnknownOptionException>.TestSerializationConstructor((info, context) => new UnknownOptionException(info, context));
         }
+#endif
     }
 }
