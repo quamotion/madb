@@ -72,7 +72,7 @@ namespace SharpAdbClient
         /// <summary>
         /// Gets or sets the size of the receive buffer
         /// </summary>
-        public static int ReceiveBufferSize { get; set; } = 1024;
+        public static int ReceiveBufferSize { get; set; } = 40960;
 
         /// <summary>
         /// Gets or sets the size of the write buffer.
