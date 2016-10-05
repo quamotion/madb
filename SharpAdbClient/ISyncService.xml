@@ -16,6 +16,10 @@
     <param name="timestamp">
       The time at which the file was last modified.
     </param>
+    <param name="progress">
+      An optional parameter which, when specified, returns progress notifications. The progress is reported as a value
+      between 0 and 100, representing the percentage of the file which has been transferred.
+    </param>
     <param name="cancellationToken">
       A <see cref="CancellationToken"/> that can be used to cancel the task.
     </param>
@@ -30,6 +34,10 @@
     </param>
     <param name="stream">
       A <see cref="Stream"/> that will receive the contents of the file.
+    </param>
+    <param name="progress">
+      An optional parameter which, when specified, returns progress notifications. The progress is reported as a value
+      between 0 and 100, representing the percentage of the file which has been transferred.
     </param>
     <param name="cancellationToken">
       A <see cref="CancellationToken"/> that can be used to cancel the task.

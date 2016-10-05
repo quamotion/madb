@@ -122,7 +122,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (stream == null)
             {
@@ -155,6 +155,11 @@ namespace SharpAdbClient
             int maxDataSize = this.MaxBufferSize - reservedHeaderSize;
             lengthBytes = BitConverter.GetBytes(maxDataSize);
 
+            // Try to get the total amount of bytes to transfer. This is not always possible, for example,
+            // for forward-only streams.
+            long totalBytesToProcess = stream.CanSeek ? stream.Length : 0;
+            long totalBytesRead = 0;
+
             // look while there is something to read
             while (true)
             {
@@ -163,6 +168,7 @@ namespace SharpAdbClient
 
                 // read up to SYNC_DATA_MAX
                 int read = stream.Read(buffer, headerSize, maxDataSize);
+                totalBytesRead += read;
 
                 if (read == 0)
                 {
@@ -183,6 +189,12 @@ namespace SharpAdbClient
 
                 // now send the data to the device
                 this.Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
+
+                // Let the caller know about our progress, if requested
+                if (progress != null && totalBytesToProcess != 0)
+                {
+                    progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
+                }
             }
 
             // create the DONE message
@@ -206,7 +218,7 @@ namespace SharpAdbClient
         }
 
         /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
-        public void Pull(string remoteFilepath, Stream stream, CancellationToken cancellationToken)
+        public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (remoteFilepath == null)
             {
@@ -217,6 +229,11 @@ namespace SharpAdbClient
             {
                 throw new ArgumentNullException(nameof(stream));
             }
+
+            // Get file information, including the file size, used to calculate the total amount of bytes to receive.
+            var stat = this.Stat(remoteFilepath);
+            long totalBytesToProcess = stat.Size;
+            long totalBytesRead = 0;
 
             byte[] buffer = new byte[this.MaxBufferSize];
 
@@ -260,6 +277,13 @@ namespace SharpAdbClient
                 // now read the length we received
                 this.Socket.Read(buffer, size);
                 stream.Write(buffer, 0, size);
+                totalBytesRead += size;
+
+                // Let the caller know about our progress, if requested
+                if (progress != null && totalBytesToProcess != 0)
+                {
+                    progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
+                }
             }
         }
 

@@ -90,7 +90,7 @@ namespace SharpAdbClient.Benchmarks
             using (Stream stream = File.OpenRead(filename))
             {
                 service.MaxBufferSize = this.BufferSizeInBytes;
-                service.Push(stream, "/data/local/tmp/file.bin", 666, DateTime.Now, CancellationToken.None);
+                service.Push(stream, "/data/local/tmp/file.bin", 666, DateTime.Now, null, CancellationToken.None);
             }
         }
     }
