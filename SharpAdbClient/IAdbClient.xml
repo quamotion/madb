@@ -157,6 +157,10 @@
     <param name="device">
       The device.
     </param>
+    <param name="cancellationToken">
+      A <see cref="CancellationToken"/> which can be used to cancel the event log service. Use this
+      to stop reading from the event log.
+    </param>
     <param name="logNames">
       Optionally, the names of the logs to receive.
     </param>
