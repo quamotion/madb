@@ -97,7 +97,7 @@ namespace SharpAdbClient.Logs
                             ThreadId = tid,
                             TimeStamp = timestamp,
                             Id = id,
-                            Priority = priority,
+                            Priority = (Priority)priority,
                             Message = message,
                             Tag = tag
                         };

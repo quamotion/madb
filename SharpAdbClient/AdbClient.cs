@@ -354,7 +354,7 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames)
+        public IEnumerable<LogEntry> RunLogService(DeviceData device, CancellationToken cancellationToken, params LogId[] logNames)
         {
             this.EnsureDevice(device);
 
@@ -378,7 +378,7 @@ namespace SharpAdbClient
                 using (Stream stream = socket.GetShellStream())
                 using (LogReader reader = new LogReader(stream))
                 {
-                    while (true)
+                    while (!cancellationToken.IsCancellationRequested)
                     {
                         LogEntry entry = null;
 

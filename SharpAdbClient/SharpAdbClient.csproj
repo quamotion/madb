@@ -166,6 +166,7 @@
     <Compile Include="Logs\LogId.cs" />
     <Compile Include="Logs\LogReader.cs" />
     <Compile Include="Logs\NamespaceDoc.cs" />
+    <Compile Include="Logs\Priority.cs" />
     <Compile Include="Logs\ShellStream.cs" />
     <Compile Include="NamespaceDoc.cs" />
     <Compile Include="Receivers\ConsoleOutputReceiver.cs" />
