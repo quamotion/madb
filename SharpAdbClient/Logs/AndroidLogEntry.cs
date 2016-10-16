@@ -2,6 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Collections.Generic;
+
 namespace SharpAdbClient.Logs
 {
     /// <summary>
@@ -12,9 +14,28 @@ namespace SharpAdbClient.Logs
     public class AndroidLogEntry : LogEntry
     {
         /// <summary>
+        /// Maps Android log priorities to chars used to represent them in the system log.
+        /// </summary>
+        private static readonly Dictionary<Priority, char> PriorityFormatters;
+
+        /// <summary>
+        /// Initializes static members of the <see cref="AndroidLogEntry"/> class.
+        /// </summary>
+        static AndroidLogEntry()
+        {
+            PriorityFormatters = new Dictionary<Priority, char>();
+            PriorityFormatters.Add(Priority.Verbose, 'V');
+            PriorityFormatters.Add(Priority.Debug, 'D');
+            PriorityFormatters.Add(Priority.Info, 'I');
+            PriorityFormatters.Add(Priority.Warn, 'W');
+            PriorityFormatters.Add(Priority.Error, 'E');
+            PriorityFormatters.Add(Priority.Assert, 'A');
+        }
+
+        /// <summary>
         /// Gets or sets the priority of the log message.
         /// </summary>
-        public byte Priority
+        public Priority Priority
         {
             get;
             set;
@@ -37,6 +58,33 @@ namespace SharpAdbClient.Logs
         {
             get;
             set;
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return $"{this.TimeStamp:yy-MM HH:mm:ss.fff} {this.ProcessId, 5} {this.ProcessId, 5} {FormatPriority(this.Priority)} {this.Tag, -8}: {this.Message}";
+        }
+
+        /// <summary>
+        /// Converts a <see cref="Priority"/> value to a char that represents that value in the system log.
+        /// </summary>
+        /// <param name="value">
+        /// The value to convert.
+        /// </param>
+        /// <returns>
+        /// A <see cref="char"/> that represents <paramref name="value"/> in the sysem log.
+        /// </returns>
+        private static char FormatPriority(Priority value)
+        {
+            if (PriorityFormatters == null || !PriorityFormatters.ContainsKey(value))
+            {
+                return '?';
+            }
+            else
+            {
+                return PriorityFormatters[value];
+            }
         }
     }
 }
