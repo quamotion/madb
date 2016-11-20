@@ -346,11 +346,13 @@ namespace SharpAdbClient
         {
             this.EnsureDevice(device);
 
-            Framebuffer framebuffer = this.CreateRefreshableFramebuffer(device);
-            await framebuffer.RefreshAsync(cancellationToken).ConfigureAwait(false);
+            using (Framebuffer framebuffer = this.CreateRefreshableFramebuffer(device))
+            {
+                await framebuffer.RefreshAsync(cancellationToken).ConfigureAwait(false);
 
-            // Convert the framebuffer to an image, and return that.
-            return framebuffer.ToImage();
+                // Convert the framebuffer to an image, and return that.
+                return framebuffer.ToImage();
+            }
         }
 
         /// <inheritdoc/>

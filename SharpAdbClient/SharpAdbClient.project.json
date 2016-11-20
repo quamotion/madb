@@ -1,4 +1,8 @@
 {
+  "dependencies": {
+    "System.Buffers": "4.3.0"
+  },
+
   "frameworks": {
     "net45": {
     }

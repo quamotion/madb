@@ -212,6 +212,8 @@
   <ItemGroup>
     <None Include="packages.config" />
     <AdditionalFiles Include="stylecop.json" />
+    <None Include="project.json" />
+    <None Include="SharpAdbClient.project.json" />
     <None Include="SharpAdbClient.ruleset" />
     <None Include="SharpAdbClient.snk" />
   </ItemGroup>

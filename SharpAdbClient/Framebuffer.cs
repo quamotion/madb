@@ -5,6 +5,7 @@
 namespace SharpAdbClient
 {
     using System;
+    using System.Buffers;
     using System.Drawing;
     using System.Runtime.InteropServices;
     using System.Threading;
@@ -13,11 +14,12 @@ namespace SharpAdbClient
     /// <summary>
     /// Provides access to the framebuffer (that is, a copy of the image being displayed on the device screen).
     /// </summary>
-    public class Framebuffer
+    public class Framebuffer : IDisposable
     {
         private readonly AdbClient client;
-        private readonly byte[] headerData;
+        private byte[] headerData;
         private bool headerInitialized;
+        private bool disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
@@ -90,31 +92,39 @@ namespace SharpAdbClient
         /// </returns>
         public async Task RefreshAsync(CancellationToken cancellationToken)
         {
-            var socket = Factories.AdbSocketFactory(this.client.EndPoint);
+            this.EnsureNotDisposed();
 
-            // Select the target device
-            this.client.SetDevice(socket, this.Device);
-
-            // Send the framebuffer command
-            socket.SendAdbRequest("framebuffer:");
-            socket.ReadAdbResponse();
-
-            // The result first is a FramebufferHeader object,
-            await socket.ReadAsync(this.headerData, cancellationToken).ConfigureAwait(false);
-
-            if (!this.headerInitialized)
+            using (var socket = Factories.AdbSocketFactory(this.client.EndPoint))
             {
-                this.Header = FramebufferHeader.Read(this.headerData);
-                this.headerInitialized = true;
-            }
+                // Select the target device
+                this.client.SetDevice(socket, this.Device);
 
-            if (this.Data == null || this.Data.Length < this.Header.Size)
-            {
-                this.Data = new byte[this.Header.Size];
-            }
+                // Send the framebuffer command
+                socket.SendAdbRequest("framebuffer:");
+                socket.ReadAdbResponse();
 
-            // followed by the actual framebuffer content
-            await socket.ReadAsync(this.Data, (int)this.Header.Size, cancellationToken).ConfigureAwait(false);
+                // The result first is a FramebufferHeader object,
+                await socket.ReadAsync(this.headerData, cancellationToken).ConfigureAwait(false);
+
+                if (!this.headerInitialized)
+                {
+                    this.Header = FramebufferHeader.Read(this.headerData);
+                    this.headerInitialized = true;
+                }
+
+                if (this.Data == null || this.Data.Length < this.Header.Size)
+                {
+                    if (this.Data != null)
+                    {
+                        ArrayPool<byte>.Shared.Return(this.Data, clearArray: false);
+                    }
+
+                    this.Data = ArrayPool<byte>.Shared.Rent((int)this.Header.Size);
+                }
+
+                // followed by the actual framebuffer content
+                await socket.ReadAsync(this.Data, (int)this.Header.Size, cancellationToken).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -125,12 +135,38 @@ namespace SharpAdbClient
         /// </returns>
         public Image ToImage()
         {
+            this.EnsureNotDisposed();
+
             if (this.Data == null)
             {
                 throw new InvalidOperationException("Call RefreshAsync first");
             }
 
             return this.Header.ToImage(this.Data);
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if (this.Data != null)
+            {
+                ArrayPool<byte>.Shared.Return(this.Data, clearArray: false);
+            }
+
+            this.headerData = null;
+            this.headerInitialized = false;
+            this.disposed = true;
+        }
+
+        /// <summary>
+        /// Throws an exception if this <see cref="Framebuffer"/> has been disposed.
+        /// </summary>
+        protected void EnsureNotDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(nameof(Framebuffer));
+            }
         }
     }
 }
