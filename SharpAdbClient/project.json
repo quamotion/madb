@@ -21,8 +21,6 @@
       "netcore"
     ]
   },
-  "dependencies": {
-  },
   "buildOptions": {
     "strongName": "true",
     "keyFile": "SharpAdbClient.snk"
@@ -41,7 +39,7 @@
     },
     "net45": {
       "buildOptions": {
-        "define": "NETFX"
+        "define": [ "NETFX" ]
       },
       "frameworkAssemblies": {
         "System.Runtime": "4.0.0.0",
