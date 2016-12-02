@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using SharpAdbClient.Logs;
 using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace SharpAdbClient.Tests
 {
@@ -476,7 +477,8 @@ namespace SharpAdbClient.Tests
             using (Stream stream = File.OpenRead("logcat.bin"))
             using (ShellStream shellStream = new ShellStream(stream, false))
             {
-                Logs.LogEntry[] logs = null;
+                Collection<Logs.LogEntry> logs = new Collection<LogEntry>();
+                Action<LogEntry> sink = (entry) => logs.Add(entry);
 
                 this.RunTest(
                     responses,
@@ -485,7 +487,7 @@ namespace SharpAdbClient.Tests
                     shellStream,
                     () =>
                     {
-                        logs = AdbClient.Instance.RunLogService(device, CancellationToken.None, Logs.LogId.System).ToArray();
+                        AdbClient.Instance.RunLogServiceAsync(device, sink, CancellationToken.None, Logs.LogId.System).Wait();
                     });
 
                 Assert.AreEqual(3, logs.Count());

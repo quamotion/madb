@@ -356,8 +356,13 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public IEnumerable<LogEntry> RunLogService(DeviceData device, CancellationToken cancellationToken, params LogId[] logNames)
+        public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames)
         {
+            if (messageSink == null)
+            {
+                throw new ArgumentException(nameof(messageSink));
+            }
+
             this.EnsureDevice(device);
 
             // The 'log' service has been deprecated, see
@@ -378,15 +383,16 @@ namespace SharpAdbClient
                 var response = socket.ReadAdbResponse();
 
                 using (Stream stream = socket.GetShellStream())
-                using (LogReader reader = new LogReader(stream))
                 {
+                    LogReader reader = new LogReader(stream);
+
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         LogEntry entry = null;
 
                         try
                         {
-                            entry = reader.ReadEntry();
+                            entry = await reader.ReadEntry(cancellationToken).ConfigureAwait(false);
                         }
                         catch (EndOfStreamException)
                         {
@@ -395,7 +401,7 @@ namespace SharpAdbClient
 
                         if (entry != null)
                         {
-                            yield return entry;
+                            messageSink(entry);
                         }
                         else
                         {
