@@ -1,14 +1,9 @@
-{
-  "dependencies": {
-    "System.Buffers": "4.3.0"
-  },
-
+﻿{
+  "dependencies": {},
   "frameworks": {
-    "net45": {
-    }
+    "net45": {}
   },
-
   "runtimes": {
-    "win": { }
+    "win": {}
   }
 }
