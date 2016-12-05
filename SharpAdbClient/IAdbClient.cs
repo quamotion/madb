@@ -5,6 +5,7 @@
 namespace SharpAdbClient
 {
     using Logs;
+    using System;
     using System.Collections.Generic;
     using System.Drawing;
     using System.Net;
@@ -89,7 +90,7 @@ namespace SharpAdbClient
         // reverse:<forward-command>: not implemented
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/RunLogService/*'/>
-        IEnumerable<LogEntry> RunLogService(DeviceData device, CancellationToken cancellationToken, params LogId[] logNames);
+        Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames);
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/Reboot/*'/>
         void Reboot(string into, DeviceData device);

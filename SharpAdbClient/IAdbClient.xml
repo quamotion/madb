@@ -150,12 +150,15 @@
     </exception>
   </GetFrameBuffer>
 
-  <RunLogService>
+  <RunLogServiceAsync>
     <summary>
-      Runs the Event log service on the Device.
+      Asynchronously runs the Event log service on the Device.
     </summary>
     <param name="device">
       The device.
+    </param>
+    <param name="messageSink">
+      An object which will receive the event log messages as they are received.
     </param>
     <param name="cancellationToken">
       A <see cref="CancellationToken"/> which can be used to cancel the event log service. Use this
@@ -167,7 +170,7 @@
     <returns>
       An enumerator which enumerates all the log entries.
     </returns>
-  </RunLogService>
+  </RunLogServiceAsync>
 
   <Reboot>
     <summary>

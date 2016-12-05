@@ -104,7 +104,7 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames)
+        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> sink, CancellationToken cancellationToken, params LogId[] logNames)
         {
             throw new NotImplementedException();
         }

@@ -3,6 +3,8 @@ using SharpAdbClient.Logs;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SharpAdbClient.Tests
 {
@@ -11,15 +13,16 @@ namespace SharpAdbClient.Tests
     {
         [TestMethod]
         [DeploymentItem("logcat.bin")]
-        public void ReadLogTests()
+        public async Task ReadLogTests()
         {
             using (Stream stream = File.OpenRead(@"logcat.bin"))
             using (ShellStream shellStream = new ShellStream(stream, false))
-            using (LogReader reader = new LogReader(shellStream))
             {
+                LogReader reader = new LogReader(shellStream);
+
                 // This stream contains 3 log entries. Read & validate the first one,
                 // read the next two ones (to be sure all data is read correctly).
-                var log = reader.ReadEntry();
+                var log = await reader.ReadEntry(CancellationToken.None);
 
                 Assert.IsInstanceOfType(log, typeof(AndroidLogEntry));
 
@@ -35,21 +38,21 @@ namespace SharpAdbClient.Tests
                 Assert.AreEqual("ActivityManager", androidLog.Tag);
                 Assert.AreEqual("Start proc com.google.android.gm for broadcast com.google.android.gm/.widget.GmailWidgetProvider: pid=7026 uid=10066 gids={50066, 9997, 3003, 1028, 1015} abi=x86", androidLog.Message);
 
-                Assert.IsNotNull(reader.ReadEntry());
-                Assert.IsNotNull(reader.ReadEntry());
+                Assert.IsNotNull(await reader.ReadEntry(CancellationToken.None));
+                Assert.IsNotNull(await reader.ReadEntry(CancellationToken.None));
             }
         }
 
         [TestMethod]
         [DeploymentItem("logcatevents.bin")]
-        public void ReadEventLogTest()
+        public async Task ReadEventLogTest()
         {
             // The data in this stream was read using a ShellStream, so the CRLF fixing
             // has already taken place.
             using (Stream stream = File.OpenRead(@"logcatevents.bin"))
-            using (LogReader reader = new LogReader(stream))
             {
-                var entry = reader.ReadEntry();
+                LogReader reader = new LogReader(stream);
+                var entry = await reader.ReadEntry(CancellationToken.None);
 
                 Assert.IsInstanceOfType(entry, typeof(EventLogEntry));
                 Assert.AreEqual(707, entry.ProcessId);
@@ -72,8 +75,8 @@ namespace SharpAdbClient.Tests
                 Assert.AreEqual(19512, list[1]);
                 Assert.AreEqual("com.amazon.kindle", list[2]);
 
-                entry = reader.ReadEntry();
-                entry = reader.ReadEntry();
+                entry = await reader.ReadEntry(CancellationToken.None);
+                entry = await reader.ReadEntry(CancellationToken.None);
             }
         }
     }
