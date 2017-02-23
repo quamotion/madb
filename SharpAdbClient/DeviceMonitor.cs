@@ -214,6 +214,7 @@ namespace SharpAdbClient
                 }
                 catch (TaskCanceledException ex)
                 {
+                    // We get a TaskCanceledException on Windows
                     if (cancellationToken.IsCancellationRequested)
                     {
                         // The DeviceMonitor is shutting down (disposing) and Dispose()
@@ -222,8 +223,25 @@ namespace SharpAdbClient
                     }
                     else
                     {
-                        // The exception was unexpected, so log it.
+                        // The exception was unexpected, so log it & rethrow.
                         Log.Error(Tag, ex);
+                        throw;
+                    }
+                }
+                catch (ObjectDisposedException ex)
+                {
+                    // ... but an ObjectDisposedException on .NET Core on Linux and macOS.
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        // The DeviceMonitor is shutting down (disposing) and Dispose()
+                        // has called cancellationToken.Cancel(). This exception is expected,
+                        // so we can safely swallow it.
+                    }
+                    else
+                    {
+                        // The exception was unexpected, so log it & rethrow.
+                        Log.Error(Tag, ex);
+                        throw;
                     }
                 }
                 catch (AdbException adbException)
@@ -242,6 +260,7 @@ namespace SharpAdbClient
                 }
                 catch (Exception ex)
                 {
+                    // The exception was unexpected, so log it & rethrow.
                     Log.Error(Tag, ex);
                     throw;
                 }
