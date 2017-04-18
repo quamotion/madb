@@ -165,12 +165,30 @@ namespace SharpAdbClient.DeviceCommands
 
             // List all processes by doing ls /proc/.
             // All subfolders which are completely numeric are PIDs
+
+            // Android 7 and above ships with toybox (https://github.com/landley/toybox), which includes
+            // an updated ls which behaves slightly different.
+            // The -1 parameter is important to make sure each item gets its own line (it's an assumption we
+            // make when parsing output); on Android 7 and above we may see things like:
+            // 1     135   160   171 ioports      timer_stats
+            // 10    13533 16056 172 irq tty
+            // 100   136   16066 173 kallsyms uid_cputime
+            // but unfortunately older versions do not handle the -1 parameter well. So we need to branch based
+            // on the API level. We do the branching on the device (inside a shell script) to avoid roundtrips.
+            // This if/then/else syntax was tested on Android 2.x, 4.x and 7
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            device.ExecuteShellCommand("/system/bin/ls /proc/", receiver);
+            device.ExecuteShellCommand(@"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
+if [ $SDK -lt 24 ]
+then
+    /system/bin/ls /proc/
+else
+    /system/bin/ls -1 /proc/
+fi".Replace("\r\n", "\n"), receiver);
 
             Collection<int> pids = new Collection<int>();
 
-            using (StringReader reader = new StringReader(receiver.ToString()))
+            var output = receiver.ToString();
+            using (StringReader reader = new StringReader(output))
             {
                 while (reader.Peek() > 0)
                 {
