@@ -60,10 +60,10 @@ namespace SharpAdbClient
         public static void Reset()
         {
             AdbSocketFactory = (endPoint) => new AdbSocket(endPoint);
-            AdbClientFactory = (endPoint) => new AdbClient(endPoint);
+            AdbClientFactory = (endPoint) => new AdbClient(endPoint, Factories.AdbSocketFactory);
             AdbCommandLineClientFactory = (path) => new AdbCommandLineClient(path);
             SyncServiceFactory = (device) => new SyncService(device);
-            AdbClient.Instance = new AdbClient(AdbServer.Instance.EndPoint);
+            AdbClient.Instance = new AdbClient();
         }
     }
 }

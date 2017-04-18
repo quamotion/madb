@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using SharpAdbClient.Exceptions;
 using System;
 using System.Net;
@@ -9,30 +10,36 @@ namespace SharpAdbClient.Tests
     [TestClass]
     public class AdbServerTests
     {
+        private Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
         private DummyAdbSocket socket;
         private DummyAdbCommandLineClient commandLineClient;
+        private Func<EndPoint, IAdbSocket> adbSocketFactory;
+        private AdbClient adbClient;
+        private AdbServer adbServer;
 
         [TestInitialize]
         public void Initialize()
         {
-            Factories.Reset();
-
             this.socket = new DummyAdbSocket();
-            Factories.AdbSocketFactory = (endPoint) => this.socket;
+            this.adbSocketFactory = (endPoint) => this.socket;
 
             this.commandLineClient = new DummyAdbCommandLineClient();
-            Factories.AdbCommandLineClientFactory = (version) => this.commandLineClient;
+            this.adbCommandLineClientFactory = (version) => this.commandLineClient;
+
+            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
+            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
         }
 
         [TestMethod]
         public void GetStatusNotRunningTest()
         {
-            Factories.AdbSocketFactory = (endPoint) =>
-            {
-                throw new SocketException(AdbServer.ConnectionRefused);
-            };
+            var adbClientMock = new Mock<IAdbClient>();
+            adbClientMock.Setup(c => c.GetAdbVersion())
+                .Throws(new SocketException(AdbServer.ConnectionRefused));
 
-            var status = AdbServer.Instance.GetStatus();
+            var adbServer = new AdbServer(adbClientMock.Object, this.adbCommandLineClientFactory);
+
+            var status = adbServer.GetStatus();
             Assert.IsFalse(status.IsRunning);
             Assert.IsNull(status.Version);
         }
@@ -43,7 +50,7 @@ namespace SharpAdbClient.Tests
             this.socket.Responses.Enqueue(AdbResponse.OK);
             this.socket.ResponseMessages.Enqueue("0020");
 
-            var status = AdbServer.Instance.GetStatus();
+            var status = this.adbServer.GetStatus();
 
             Assert.AreEqual(0, this.socket.Responses.Count);
             Assert.AreEqual(0, this.socket.ResponseMessages.Count);
@@ -58,24 +65,30 @@ namespace SharpAdbClient.Tests
         [ExpectedException(typeof(SocketException))]
         public void GetStatusOtherSocketExceptionTest()
         {
-            Factories.AdbSocketFactory = (endPoint) =>
+            this.adbSocketFactory = (endPoint) =>
             {
                 throw new SocketException();
             };
 
-            var status = AdbServer.Instance.GetStatus();
+            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
+            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
+
+            var status = this.adbServer.GetStatus();
         }
 
         [TestMethod]
         [ExpectedException(typeof(Exception))]
         public void GetStatusOtherExceptionTest()
         {
-            Factories.AdbSocketFactory = (endPoint) =>
+            this.adbSocketFactory = (endPoint) =>
             {
                 throw new Exception();
             };
 
-            var status = AdbServer.Instance.GetStatus();
+            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
+            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
+
+            var status = this.adbServer.GetStatus();
         }
 
         [TestMethod]
@@ -85,7 +98,7 @@ namespace SharpAdbClient.Tests
             this.socket.Responses.Enqueue(AdbResponse.OK);
             this.socket.ResponseMessages.Enqueue("0020");
 
-            var result = AdbServer.Instance.StartServer(null, false);
+            var result = this.adbServer.StartServer(null, false);
 
             Assert.AreEqual(StartServerResult.AlreadyRunning, result);
 
@@ -100,7 +113,7 @@ namespace SharpAdbClient.Tests
             this.socket.Responses.Enqueue(AdbResponse.OK);
             this.socket.ResponseMessages.Enqueue("0010");
 
-            var result = AdbServer.Instance.StartServer(null, false);
+            var result = this.adbServer.StartServer(null, false);
 
             Assert.AreEqual(1, this.socket.Requests.Count);
             Assert.AreEqual("host:version", this.socket.Requests[0]);
@@ -110,12 +123,15 @@ namespace SharpAdbClient.Tests
         [ExpectedException(typeof(AdbException))]
         public void StartServerNotRunningNoExecutableTest()
         {
-            Factories.AdbSocketFactory = (endPoint) =>
+            this.adbSocketFactory = (endPoint) =>
             {
                 throw new SocketException(AdbServer.ConnectionRefused);
             };
 
-            var result = AdbServer.Instance.StartServer(null, false);
+            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
+            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
+
+            var result = this.adbServer.StartServer(null, false);
         }
 
         [TestMethod]
@@ -128,7 +144,7 @@ namespace SharpAdbClient.Tests
 
             Assert.IsFalse(this.commandLineClient.ServerStarted);
 
-            var result = AdbServer.Instance.StartServer("adb.exe", false);
+            var result = this.adbServer.StartServer("adb.exe", false);
 
             Assert.IsTrue(this.commandLineClient.ServerStarted);
 
@@ -140,16 +156,19 @@ namespace SharpAdbClient.Tests
         [TestMethod]
         public void StartServerNotRunningTest()
         {
-            Factories.AdbSocketFactory = (endPoint) =>
+            this.adbSocketFactory = (endPoint) =>
             {
                 throw new SocketException(AdbServer.ConnectionRefused);
             };
+
+            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
+            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
 
             this.commandLineClient.Version = new Version(1, 0, 32);
 
             Assert.IsFalse(this.commandLineClient.ServerStarted);
 
-            var result = AdbServer.Instance.StartServer("adb.exe", false);
+            var result = this.adbServer.StartServer("adb.exe", false);
 
             Assert.IsTrue(this.commandLineClient.ServerStarted);
         }
@@ -164,7 +183,7 @@ namespace SharpAdbClient.Tests
 
             Assert.IsFalse(this.commandLineClient.ServerStarted);
 
-            var result = AdbServer.Instance.StartServer("adb.exe", true);
+            var result = this.adbServer.StartServer("adb.exe", true);
 
             Assert.IsTrue(this.commandLineClient.ServerStarted);
 
@@ -183,7 +202,7 @@ namespace SharpAdbClient.Tests
 
             Assert.IsFalse(this.commandLineClient.ServerStarted);
 
-            var result = AdbServer.Instance.StartServer("adb.exe", false);
+            var result = this.adbServer.StartServer("adb.exe", false);
 
             Assert.IsFalse(this.commandLineClient.ServerStarted);
 
@@ -192,31 +211,10 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
-        public void ConstructorTest()
-        {
-            var adbServer = new AdbServer();
-            Assert.IsNotNull(adbServer);
-            Assert.IsNotNull(adbServer.EndPoint);
-            Assert.IsInstanceOfType(adbServer.EndPoint, typeof(IPEndPoint));
-
-            var endPoint = (IPEndPoint)adbServer.EndPoint;
-
-            Assert.AreEqual(IPAddress.Loopback, endPoint.Address);
-            Assert.AreEqual(AdbServer.AdbServerPort, endPoint.Port);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void ConstructorInvalidEndPointTest()
-        {
-            var adbServer = new AdbServer(new CustomEndPoint());
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorNullEndPointTest()
+        public void ConstructorAdbClientNullTest()
         {
-            var adbServer = new AdbServer(null);
+            var adbServer = new AdbServer(null, this.adbCommandLineClientFactory);
         }
     }
 }

@@ -34,7 +34,7 @@ namespace SharpAdbClient.Tests
                 Assert.AreEqual(new DateTime(2015, 11, 14, 23, 38, 20, 590, DateTimeKind.Utc), log.TimeStamp);
 
                 var androidLog = (AndroidLogEntry)log;
-                Assert.AreEqual(4, androidLog.Priority);
+                Assert.AreEqual(Priority.Info, androidLog.Priority);
                 Assert.AreEqual("ActivityManager", androidLog.Tag);
                 Assert.AreEqual("Start proc com.google.android.gm for broadcast com.google.android.gm/.widget.GmailWidgetProvider: pid=7026 uid=10066 gids={50066, 9997, 3003, 1028, 1015} abi=x86", androidLog.Message);
 

@@ -140,6 +140,8 @@ namespace SharpAdbClient.Tests
         [TestMethod]
         public void StartInitialDeviceListTest()
         {
+            this.Socket.WaitForNewData = true;
+
             using (DeviceMonitor monitor = new DeviceMonitor(this.Socket))
             {
                 DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
@@ -226,6 +228,8 @@ namespace SharpAdbClient.Tests
             var dummyAdbServer = new DummyAdbServer();
             AdbServer.Instance = dummyAdbServer;
 
+            this.Socket.WaitForNewData = true;
+
             using (DeviceMonitor monitor = new DeviceMonitor(this.Socket))
             {
                 base.RunTest(
@@ -250,7 +254,7 @@ namespace SharpAdbClient.Tests
         [TestCategory("IntegrationTest")]
         public void DisposeMonitorTest()
         {
-            using (DeviceMonitor monitor = new DeviceMonitor(new AdbSocket(AdbServer.Instance.EndPoint)))
+            using (DeviceMonitor monitor = new DeviceMonitor(new AdbSocket(AdbClient.Instance.EndPoint)))
             {
                 monitor.Start();
                 Thread.Sleep(1000);

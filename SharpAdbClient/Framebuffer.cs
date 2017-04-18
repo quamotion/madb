@@ -49,7 +49,7 @@ namespace SharpAdbClient
             this.client = client;
 
             // Initialize the headerData buffer
-            var size = Marshal.SizeOf(typeof(FramebufferHeader));
+            var size = Marshal.SizeOf<FramebufferHeader>();
             this.headerData = new byte[size];
         }
 

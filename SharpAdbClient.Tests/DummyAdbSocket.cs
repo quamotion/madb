@@ -189,10 +189,7 @@ namespace SharpAdbClient.Tests
 
             Assert.AreEqual(actual.Length, length);
 
-            for (int i = 0; i < length; i++)
-            {
-                data[i] = actual[i];
-            }
+            Buffer.BlockCopy(actual, 0, data, 0, length);
         }
 
         public void SendSyncRequest(SyncCommand command, string path)
@@ -240,7 +237,14 @@ namespace SharpAdbClient.Tests
 
         public void Send(byte[] data, int offset, int length)
         {
-            throw new NotImplementedException();
+            if (offset == 0)
+            {
+                this.Send(data, length);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

@@ -66,10 +66,10 @@ namespace SharpAdbClient
             this.IntegrationTest = false;
 #endif
 
-            this.EndPoint = AdbServer.Instance.EndPoint;
+            this.EndPoint = AdbClient.Instance.EndPoint;
             this.Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(this.EndPoint);
 
-            AdbClient.Instance = new AdbClient(AdbServer.Instance.EndPoint);
+            AdbClient.Instance = new AdbClient();
         }
 
         /// <summary>
@@ -294,6 +294,12 @@ namespace SharpAdbClient
         protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path)
         {
             yield return new Tuple<SyncCommand, string>(command, path);
+        }
+
+        protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2)
+        {
+            yield return new Tuple<SyncCommand, string>(command, path);
+            yield return new Tuple<SyncCommand, string>(command2, path2);
         }
 
         protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2, SyncCommand command3, string path3)

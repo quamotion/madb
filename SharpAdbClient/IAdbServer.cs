@@ -14,11 +14,6 @@ namespace SharpAdbClient
     public interface IAdbServer
     {
         /// <summary>
-        /// Gets the <see cref="EndPoint"/> at which the Android Debug Bridge server is listening.
-        /// </summary>
-        EndPoint EndPoint { get; }
-
-        /// <summary>
         /// Starts the adb server if it was not previously running.
         /// </summary>
         /// <param name="adbPath">

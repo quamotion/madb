@@ -45,6 +45,11 @@ namespace SharpAdbClient
         public const string DefaultEncoding = "ISO-8859-1";
 
         /// <summary>
+        /// The port at which the Android Debug Bridge server listens by default.
+        /// </summary>
+        public const int AdbServerPort = 5037;
+
+        /// <summary>
         /// The default port to use when connecting to a device over TCP/IP.
         /// </summary>
         public const int DefaultPort = 5555;
@@ -54,20 +59,41 @@ namespace SharpAdbClient
         /// </summary>
         private static IAdbClient instance = null;
 
+        private Func<EndPoint, IAdbSocket> adbSocketFactory;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbClient"/> class.
+        /// </summary>
+        public AdbClient()
+            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
         /// <param name="endPoint">
         /// The <see cref="EndPoint"/> at which the adb server is listening.
         /// </param>
-        public AdbClient(EndPoint endPoint)
+        public AdbClient(EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory)
         {
             if (endPoint == null)
             {
                 throw new ArgumentNullException();
             }
 
+            if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint))
+            {
+                throw new NotSupportedException("Only TCP endpoints are supported");
+            }
+
+            if (adbSocketFactory == null)
+            {
+                throw new ArgumentNullException(nameof(adbSocketFactory));
+            }
+
             this.EndPoint = endPoint;
+            this.adbSocketFactory = adbSocketFactory;
         }
 
         /// <summary>
@@ -85,7 +111,7 @@ namespace SharpAdbClient
             {
                 if (instance == null)
                 {
-                    instance = new AdbClient(AdbServer.Instance.EndPoint);
+                    instance = new AdbClient();
                 }
 
                 return instance;
@@ -94,6 +120,14 @@ namespace SharpAdbClient
             set
             {
                 instance = value;
+            }
+        }
+
+        public static EndPoint DefaultEndPoint
+        {
+            get
+            {
+                return new IPEndPoint(IPAddress.Loopback, DefaultPort);
             }
         }
 
@@ -150,7 +184,7 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public int GetAdbVersion()
         {
-            using (var socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (var socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest("host:version");
                 var response = socket.ReadAdbResponse();
@@ -163,7 +197,7 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public void KillAdb()
         {
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest("host:kill");
 
@@ -175,7 +209,7 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public List<DeviceData> GetDevices()
         {
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest("host:devices-l");
                 socket.ReadAdbResponse();
@@ -219,7 +253,7 @@ namespace SharpAdbClient
         {
             this.EnsureDevice(device);
 
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 string rebind = allowRebind ? string.Empty : "norebind:";
 
@@ -239,7 +273,7 @@ namespace SharpAdbClient
         {
             this.EnsureDevice(device);
 
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
                 var response = socket.ReadAdbResponse();
@@ -251,7 +285,7 @@ namespace SharpAdbClient
         {
             this.EnsureDevice(device);
 
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
                 var response = socket.ReadAdbResponse();
@@ -263,7 +297,7 @@ namespace SharpAdbClient
         {
             this.EnsureDevice(device);
 
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
                 var response = socket.ReadAdbResponse();
@@ -281,7 +315,7 @@ namespace SharpAdbClient
         {
             this.EnsureDevice(device);
 
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 cancellationToken.Register(() => socket.Dispose());
 
@@ -367,7 +401,7 @@ namespace SharpAdbClient
 
             // The 'log' service has been deprecated, see
             // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 this.SetDevice(socket, device);
 
@@ -419,7 +453,7 @@ namespace SharpAdbClient
 
             var request = $"reboot:{into}";
 
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 this.SetDevice(socket, device);
                 socket.SendAdbRequest(request);
@@ -435,7 +469,7 @@ namespace SharpAdbClient
                 throw new ArgumentNullException(nameof(endpoint));
             }
 
-            using (IAdbSocket socket = Factories.AdbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
                 var response = socket.ReadAdbResponse();

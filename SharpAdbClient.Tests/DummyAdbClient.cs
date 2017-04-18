@@ -18,6 +18,9 @@ namespace SharpAdbClient.Tests
         public Collection<string> ReceivedCommands
         { get; private set; } = new Collection<string>();
 
+        public EndPoint EndPoint
+        { get; private set; }
+
         public void Connect(DnsEndPoint endpoint)
         {
             throw new NotImplementedException();

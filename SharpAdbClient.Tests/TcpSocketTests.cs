@@ -59,21 +59,11 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
-        public void CreateSocketTest()
-        {
-            var winSocket = TcpSocket.CreateSocket(new IPEndPoint(IPAddress.Loopback, 0));
-            Assert.AreEqual(AddressFamily.InterNetwork, winSocket.AddressFamily);
-            Assert.AreEqual(SocketType.Stream, winSocket.SocketType);
-            Assert.AreEqual(ProtocolType.Tcp, winSocket.ProtocolType);
-
-            // Unix sockets cannot be created on Windows machines
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
         public void CreateUnsupportedSocketTest()
         {
-            TcpSocket.CreateSocket(new CustomEndPoint());
+            TcpSocket socket = new TcpSocket();
+            socket.Connect(new CustomEndPoint());
         }
     }
 }
