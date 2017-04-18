@@ -25,6 +25,7 @@ namespace SharpAdbClient
         /// </summary>
         public TcpSocket()
         {
+            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
         /// <inheritdoc/>
@@ -53,7 +54,11 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public void Connect(EndPoint endPoint)
         {
-            this.socket = CreateSocket(endPoint);
+            if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint))
+            {
+                throw new NotSupportedException();
+            }
+
             this.socket.Connect(endPoint);
             this.socket.Blocking = true;
             this.endPoint = endPoint;
@@ -68,7 +73,7 @@ namespace SharpAdbClient
                 return;
             }
 
-            this.socket = CreateSocket(this.endPoint);
+            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             this.Connect(this.endPoint);
         }
 
@@ -100,28 +105,6 @@ namespace SharpAdbClient
         public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken)
         {
             return this.socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
-        }
-
-        /// <summary>
-        /// Creates a new, uninitialized socket which can connect to an ADB server.
-        /// </summary>
-        /// <param name="endPoint">
-        /// The <see cref="EndPoint"/> to which to connect. Currently <see cref="IPEndPoint"/> and <see cref="DnsEndPoint"/>
-        /// endpoint types are supported.
-        /// </param>
-        /// <returns>
-        /// A new <see cref="Socket"/> which can connect to an ADB server.
-        /// </returns>
-        internal static Socket CreateSocket(EndPoint endPoint)
-        {
-            if (endPoint is IPEndPoint || endPoint is DnsEndPoint)
-            {
-                return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            }
-            else
-            {
-                throw new NotSupportedException("Only TCP sockets are supported");
-            }
         }
     }
 }

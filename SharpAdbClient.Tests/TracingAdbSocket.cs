@@ -76,11 +76,11 @@ namespace SharpAdbClient.Tests
 
         public override void Read(byte[] data)
         {
-            StackTrace trace = new StackTrace(false);
+            StackTrace trace = new StackTrace((Exception)null, false);
 
             base.Read(data);
 
-            if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
+            if (trace.GetFrames()[0].GetMethod().DeclaringType != typeof(AdbSocket))
             {
                 this.SyncDataReceived.Enqueue(data);
             }
@@ -88,11 +88,11 @@ namespace SharpAdbClient.Tests
 
         public override void Read(byte[] data, int length)
         {
-            StackTrace trace = new StackTrace(false);
+            StackTrace trace = new StackTrace((Exception)null, false);
 
             base.Read(data, length);
 
-            if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
+            if (trace.GetFrames()[0].GetMethod().DeclaringType != typeof(AdbSocket))
             {
                 this.SyncDataReceived.Enqueue(data.Take(length).ToArray());
             }
@@ -158,9 +158,9 @@ namespace SharpAdbClient.Tests
 
         public override void SendSyncRequest(SyncCommand command, int length)
         {
-            StackTrace trace = new StackTrace(false);
+            var trace = new StackTrace((Exception)null, false);
 
-            if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
+            if (trace.GetFrames()[0].GetMethod().DeclaringType != typeof(AdbSocket))
             {
                 this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
             }
@@ -177,11 +177,11 @@ namespace SharpAdbClient.Tests
 
         public override void Send(byte[] data, int length)
         {
-            StackTrace trace = new StackTrace(false);
+            StackTrace trace = new StackTrace((Exception)null, false);
 
             base.Send(data, length);
 
-            if (trace.GetFrame(1).GetMethod().DeclaringType != typeof(AdbSocket))
+            if (trace.GetFrames()[0].GetMethod().DeclaringType != typeof(AdbSocket))
             {
                 this.SyncDataSent.Enqueue(data.Take(length).ToArray());
             }

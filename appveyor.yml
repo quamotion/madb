@@ -13,22 +13,17 @@ assembly_info:
   assembly_informational_version: '{version}'
 
 build_script:
-  - cmd: cd SharpAdbClient
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%\SharpAdbClient
   - cmd: dotnet restore
   - cmd: dotnet build -c Release --version-suffix beta%APPVEYOR_BUILD_NUMBER%
   - cmd: dotnet pack -c Release --version-suffix beta%APPVEYOR_BUILD_NUMBER%
 
 test_script:
-  - cmd: cd ..\SharpAdbClient.Tests\
+  - cmd: cd %APPVEYOR_BUILD_FOLDER%\SharpAdbClient.Tests\
   - cmd: dotnet restore
   - cmd: dotnet build
-  - cmd: dotnet vstest bin\Debug\netcoreapp1.1\SharpAdbClient.Tests.dll /testcasefilter:TestCategory!=IntegrationTest /logger:Appveyor
+  - cmd: dotnet vstest bin\Debug\netcoreapp1.1\SharpAdbClient.Tests.dll /testcasefilter:"TestCategory!=IntegrationTest & TestCategory!=PerformanceTest"
 
 on_success:
-  - ps: Push-AppveyorArtifact "bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).nupkg"
-  - ps: Push-AppveyorArtifact "bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).symbols.nupkg"
-
-nuget:
-  project_feed: true
-  account_feed: true
+  - ps: Push-AppveyorArtifact "$env:APPVEYOR_BUILD_FOLDER\SharpAdbClient\bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).nupkg"
 
