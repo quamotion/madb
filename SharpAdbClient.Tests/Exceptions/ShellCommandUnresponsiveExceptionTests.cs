@@ -25,7 +25,7 @@ namespace SharpAdbClient.Tests.Exceptions
             ExceptionTester<ShellCommandUnresponsiveException>.TestMessageAndInnerConstructor((message, inner) => new ShellCommandUnresponsiveException(message, inner));
         }
 
-#if !NETCOREAPP1_0
+#if !NETCOREAPP1_1
         [TestMethod]
         public void TestSerializationConstructor()
         {

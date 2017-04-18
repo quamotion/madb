@@ -18,6 +18,12 @@ build_script:
   - cmd: dotnet build -c Release --version-suffix beta%APPVEYOR_BUILD_NUMBER%
   - cmd: dotnet pack -c Release --version-suffix beta%APPVEYOR_BUILD_NUMBER%
 
+test_script:
+  - cmd: cd ..\SharpAdbClient.Tests\
+  - cmd: dotnet restore
+  - cmd: dotnet build
+  - cmd: dotnet vstest bin\Debug\netcoreapp1.1\SharpAdbClient.Tests.dll /testcasefilter:TestCategory!=IntegrationTest /logger:Appveyor
+
 on_success:
   - ps: Push-AppveyorArtifact "bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).nupkg"
   - ps: Push-AppveyorArtifact "bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).symbols.nupkg"

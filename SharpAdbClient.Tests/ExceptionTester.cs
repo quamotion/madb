@@ -35,7 +35,7 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual(inner, ex.InnerException);
         }
 
-#if !NETCOREAPP1_0
+#if !NETCOREAPP1_1
         public static void TestSerializationConstructor(Func<SerializationInfo, StreamingContext, T> constructor)
         {
             var info = new SerializationInfo(typeof(T), new FormatterConverter());
