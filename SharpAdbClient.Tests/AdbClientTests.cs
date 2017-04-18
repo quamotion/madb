@@ -20,7 +20,28 @@ namespace SharpAdbClient.Tests
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorNullTest()
         {
-            new AdbClient(null);
+            new AdbClient(null, Factories.AdbSocketFactory);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void ConstructorInvalidEndPointTest()
+        {
+            new AdbClient(new CustomEndPoint(), Factories.AdbSocketFactory);
+        }
+
+        [TestMethod]
+        public void ConstructorTest()
+        {
+            var adbClient = new AdbClient();
+            Assert.IsNotNull(adbClient);
+            Assert.IsNotNull(adbClient.EndPoint);
+            Assert.IsInstanceOfType(adbClient.EndPoint, typeof(IPEndPoint));
+
+            var endPoint = (IPEndPoint)adbClient.EndPoint;
+
+            Assert.AreEqual(IPAddress.Loopback, endPoint.Address);
+            Assert.AreEqual(AdbClient.AdbServerPort, endPoint.Port);
         }
 
         [TestMethod]

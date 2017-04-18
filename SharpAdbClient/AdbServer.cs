@@ -27,11 +27,6 @@ namespace SharpAdbClient
     public class AdbServer : IAdbServer
     {
         /// <summary>
-        /// The port at which the Android Debug Bridge server listens by default.
-        /// </summary>
-        public const int AdbServerPort = 5037;
-
-        /// <summary>
         /// The minum version of <c>adb.exe</c> that is supported by this library.
         /// </summary>
         public static readonly Version RequiredAdbVersion = new Version(1, 0, 20);
@@ -70,34 +65,40 @@ namespace SharpAdbClient
         /// </summary>
         private static string cachedAdbPath;
 
+        private readonly IAdbClient adbClient;
+
+        /// <summary>
+        /// Gets or sets a function that returns a new instance of a class that implements the
+        /// <see cref="IAdbCommandLineClient"/> interface, that can be used to interact with the
+        /// <c>adb.exe</c> command line client.
+        /// </summary>
+        private readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
         public AdbServer()
-            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort))
+            : this(AdbClient.Instance, Factories.AdbCommandLineClientFactory)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbServer"/> class, and the specific <see cref="EndPoint"/> at which
-        /// the server should be listening.
+        /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
-        /// <param name="endPoint">
-        /// The <see cref="EndPoint"/> at which the server should be listening.
-        /// </param>
-        public AdbServer(EndPoint endPoint)
+        public AdbServer(IAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
         {
-            if (endPoint == null)
+            if (adbClient == null)
             {
-                throw new ArgumentNullException(nameof(endPoint));
+                throw new ArgumentNullException(nameof(AdbClient));
             }
 
-            if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint))
+            if (adbCommandLineClientFactory == null)
             {
-                throw new NotSupportedException("Only TCP endpoints are supported");
+                throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
             }
 
-            this.EndPoint = endPoint;
+            this.adbCommandLineClientFactory = adbCommandLineClientFactory;
+            this.adbClient = adbClient;
         }
 
         /// <summary>
@@ -107,15 +108,12 @@ namespace SharpAdbClient
         { get; set; } = new AdbServer();
 
         /// <inheritdoc/>
-        public EndPoint EndPoint { get; private set; }
-
-        /// <inheritdoc/>
         public StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
         {
             var serverStatus = this.GetStatus();
             Version commandLineVersion = null;
 
-            var commandLineClient = Factories.AdbCommandLineClientFactory(adbPath);
+            var commandLineClient = this.adbCommandLineClientFactory(adbPath);
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
@@ -151,7 +149,7 @@ namespace SharpAdbClient
                     throw new ArgumentNullException(nameof(adbPath));
                 }
 
-                AdbClient.Instance.KillAdb();
+                this.adbClient.KillAdb();
                 serverStatus.IsRunning = false;
                 serverStatus.Version = null;
 
@@ -194,7 +192,7 @@ namespace SharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                int versionCode = AdbClient.Instance.GetAdbVersion();
+                int versionCode = this.adbClient.GetAdbVersion();
 
                 return new AdbServerStatus()
                 {
