@@ -127,16 +127,18 @@ namespace SharpAdbClient.Tests
 
             MemoryStream stream = new MemoryStream();
             var content = File.ReadAllBytes("fstab.bin");
+            var contentLength = BitConverter.GetBytes(content.Length);
 
             this.RunTest(
                 OkResponses(2),
                 ResponseMessages(),
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
-                SyncRequests(SyncCommand.RECV, "/fstab.donatello"),
-                new SyncCommand[] { SyncCommand.DATA, SyncCommand.DONE },
+                SyncRequests(SyncCommand.STAT, "/fstab.donatello").Union(SyncRequests(SyncCommand.RECV, "/fstab.donatello")),
+                new SyncCommand[] { SyncCommand.STAT, SyncCommand.DATA, SyncCommand.DONE },
                 new byte[][]
                 {
-                    new byte[] {85, 2, 0, 0},
+                    new byte[] { 160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0 },
+                    contentLength,
                     content
                 },
                 null,
@@ -164,6 +166,10 @@ namespace SharpAdbClient.Tests
 
             Stream stream = File.OpenRead("fstab.bin");
             var content = File.ReadAllBytes("fstab.bin");
+            var contentMessage = new List<byte>();
+            contentMessage.AddRange(SyncCommandConverter.GetBytes(SyncCommand.DATA));
+            contentMessage.AddRange(BitConverter.GetBytes(content.Length));
+            contentMessage.AddRange(content);
 
             this.RunTest(
                 OkResponses(2),
@@ -171,13 +177,12 @@ namespace SharpAdbClient.Tests
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
                 SyncRequests(
                     SyncCommand.SEND, "/sdcard/test,644",
-                    SyncCommand.DATA, content.Length.ToString(),
                     SyncCommand.DONE, "1446505200"),
                 new SyncCommand[] { SyncCommand.OKAY },
                 null,
                 new byte[][]
                 {
-                    content
+                    contentMessage.ToArray()
                 },
                 () =>
                 {

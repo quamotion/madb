@@ -296,6 +296,12 @@ namespace SharpAdbClient
             yield return new Tuple<SyncCommand, string>(command, path);
         }
 
+        protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2)
+        {
+            yield return new Tuple<SyncCommand, string>(command, path);
+            yield return new Tuple<SyncCommand, string>(command2, path2);
+        }
+
         protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2, SyncCommand command3, string path3)
         {
             yield return new Tuple<SyncCommand, string>(command, path);
