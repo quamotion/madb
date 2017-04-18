@@ -50,8 +50,13 @@ namespace SharpAdbClient.Tests.DeviceCommands
         [TestCategory("IntegrationTest")]
         public void ListProcessesIntegrationTest()
         {
-            var device = AdbClient.Instance.GetDevices().Single();
-            var processes = device.ListProcesses().ToArray();
+            var adbClient = new AdbClient();
+            var devices = adbClient.GetDevices().ToArray();
+
+            foreach (var device in devices)
+            {
+                var processes = device.ListProcesses().ToArray();
+            }
         }
 
         [TestMethod]
@@ -133,7 +138,13 @@ Shared users:
             var adbClient = new DummyAdbClient();
             AdbClient.Instance = adbClient;
 
-            adbClient.Commands.Add("/system/bin/ls /proc/", 
+            adbClient.Commands.Add(@"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
+if [ $SDK -lt 24 ]
+then
+    /system/bin/ls /proc/
+else
+    /system/bin/ls -1 /proc/
+fi".Replace("\r\n", "\n"), 
 @"1
 2
 3
