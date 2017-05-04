@@ -18,6 +18,7 @@
     <RepositoryUrl>http://github.com/quamotion/madb</RepositoryUrl>
     <PackageProjectUrl>http://github.com/quamotion/madb</PackageProjectUrl>
     <Product>SharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
+    <Version>2.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
