@@ -78,7 +78,7 @@ namespace SharpAdbClient.Logs
 
             if (headerSize != 0)
             {
-                if (headerSize <= 0x18)
+                if (headerSize >= 0x18)
                 {
                     var idValue = await this.ReadUInt32Async(cancellationToken).ConfigureAwait(false);
 
@@ -90,7 +90,7 @@ namespace SharpAdbClient.Logs
                     id = idValue.Value;
                 }
 
-                if (headerSize <= 0x1c)
+                if (headerSize >= 0x1c)
                 {
                     var uidValue = await this.ReadUInt32Async(cancellationToken).ConfigureAwait(false);
 
@@ -102,7 +102,7 @@ namespace SharpAdbClient.Logs
                     uid = uidValue.Value;
                 }
 
-                if (headerSize <= 0x20)
+                if (headerSize >= 0x20)
                 {
                     // Not sure what this is.
                     await this.ReadUInt32Async(cancellationToken).ConfigureAwait(false);
