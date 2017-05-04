@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>A managed library for communicating with the Android Debug Bridge (adb). You can use this library to list all Android devices connected to your PC, install applications on devices, capture the system log, take screenshots and much more.</Description>
+    <Description>SharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices.</Description>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (SharpAdbClient)</AssemblyTitle>
+    <Title>.NET client for adb, Android Debug Bridge (SharpAdbClient)</Title>
     <VersionPrefix>2.1.0</VersionPrefix>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion</Authors>
     <TargetFrameworks>netstandard1.3;net451</TargetFrameworks>
@@ -15,8 +16,9 @@
     <PackageLicenseUrl>https://raw.githubusercontent.com/quamotion/madb/master/LICENSE</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>http://github.com/quamotion/madb</RepositoryUrl>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <PackageProjectUrl>http://github.com/quamotion/madb</PackageProjectUrl>
+    <Product>SharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
+    <Version>2.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
