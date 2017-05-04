@@ -3,6 +3,7 @@
   <PropertyGroup>
     <Description>SharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices.</Description>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (SharpAdbClient)</AssemblyTitle>
+    <Title>.NET client for adb, Android Debug Bridge (SharpAdbClient)</Title>
     <VersionPrefix>2.1.0</VersionPrefix>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion</Authors>
     <TargetFrameworks>netstandard1.3;net451</TargetFrameworks>
