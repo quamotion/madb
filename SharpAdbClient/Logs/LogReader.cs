@@ -4,6 +4,7 @@
 
 namespace SharpAdbClient.Logs
 {
+    using SharpAdbClient.Exceptions;
     using System;
     using System.Collections.ObjectModel;
     using System.IO;
@@ -48,6 +49,7 @@ namespace SharpAdbClient.Logs
 
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
+            // https://android.googlesource.com/platform/system/core/+/67d7eaf/include/log/logger.h
             var payloadLengthValue = await this.ReadUInt16Async(cancellationToken).ConfigureAwait(false);
             var headerSizeValue = payloadLengthValue == null ? null : await this.ReadUInt16Async(cancellationToken).ConfigureAwait(false);
             var pidValue = headerSizeValue == null ? null : await this.ReadInt32Async(cancellationToken).ConfigureAwait(false);
@@ -67,12 +69,16 @@ namespace SharpAdbClient.Logs
             var sec = secValue.Value;
             var nsec = nsecValue.Value;
 
-            // If the headerSize is not 0, we have either a logger_entry_v3 or logger_entry_v2 object.
+            // If the headerSize is not 0, we have on of the logger_entry_v* objects.
+            // In all cases, it appears that they always start with a two uint16's giving the
+            // header size and payload length.
             // For both objects, the size should be 0x18
             uint id = 0;
+            uint uid = 0;
+
             if (headerSize != 0)
             {
-                if (headerSize == 0x18)
+                if (headerSize >= 0x18)
                 {
                     var idValue = await this.ReadUInt32Async(cancellationToken).ConfigureAwait(false);
 
@@ -83,9 +89,28 @@ namespace SharpAdbClient.Logs
 
                     id = idValue.Value;
                 }
-                else
+
+                if (headerSize >= 0x1c)
                 {
-                    throw new Exception();
+                    var uidValue = await this.ReadUInt32Async(cancellationToken).ConfigureAwait(false);
+
+                    if (uidValue == null)
+                    {
+                        return null;
+                    }
+
+                    uid = uidValue.Value;
+                }
+
+                if (headerSize >= 0x20)
+                {
+                    // Not sure what this is.
+                    await this.ReadUInt32Async(cancellationToken).ConfigureAwait(false);
+                }
+
+                if (headerSize > 0x20)
+                {
+                    throw new AdbException($"An error occurred while reading data from the ADB stream. Although the header size was expected to be 0x18, a header size of 0x{headerSize:X} was sent by the device");
                 }
             }
 

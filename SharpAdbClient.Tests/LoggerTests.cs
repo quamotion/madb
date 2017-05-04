@@ -3,6 +3,7 @@ using SharpAdbClient.Logs;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -78,6 +79,14 @@ namespace SharpAdbClient.Tests
                 entry = await reader.ReadEntry(CancellationToken.None);
                 entry = await reader.ReadEntry(CancellationToken.None);
             }
+        }
+
+        [TestMethod]
+        [TestCategory("IntegrationTest")]
+        public async Task ReadLogEntryTest()
+        {
+            var device = AdbClient.Instance.GetDevices().Single();
+            await AdbClient.Instance.RunLogServiceAsync(device, (logEntry) => System.Diagnostics.Debug.WriteLine(logEntry.ToString()), CancellationToken.None, LogId.System);
         }
     }
 }
