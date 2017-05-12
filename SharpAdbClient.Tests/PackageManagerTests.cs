@@ -86,8 +86,8 @@ namespace SharpAdbClient.Tests
             var adbClient = new DummyAdbClient();
 
             adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
-            adbClient.Commands.Add("pm install /storage/sdcard0/tmp/test.txt", string.Empty);
-            adbClient.Commands.Add("rm /storage/sdcard0/tmp/test.txt", string.Empty);
+            adbClient.Commands.Add("pm install /data/local/tmp/test.txt", string.Empty);
+            adbClient.Commands.Add("rm /data/local/tmp/test.txt", string.Empty);
 
             AdbClient.Instance = adbClient;
 
@@ -99,11 +99,11 @@ namespace SharpAdbClient.Tests
             PackageManager manager = new PackageManager(device);
             manager.InstallPackage("test.txt", false);
             Assert.AreEqual(3, adbClient.ReceivedCommands.Count);
-            Assert.AreEqual("pm install /storage/sdcard0/tmp/test.txt", adbClient.ReceivedCommands[1]);
-            Assert.AreEqual("rm /storage/sdcard0/tmp/test.txt", adbClient.ReceivedCommands[2]);
+            Assert.AreEqual("pm install /data/local/tmp/test.txt", adbClient.ReceivedCommands[1]);
+            Assert.AreEqual("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[2]);
 
             Assert.AreEqual(1, syncService.UploadedFiles.Count);
-            Assert.IsTrue(syncService.UploadedFiles.ContainsKey("/storage/sdcard0/tmp/test.txt"));
+            Assert.IsTrue(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
         }
 
         [TestMethod]
