@@ -52,19 +52,27 @@ namespace SharpAdbClient.DeviceCommands
                     // Samples include:
                     // package:/system/app/LegacyCamera.apk=com.android.camera
                     // package:mwc2015.be
+
+                    // Remove the "package:" prefix
+                    var package = line.Substring(8);
+
+                    // If there's a '=' included, use the last instance,
+                    // to accomodate for values like
+                    // "package:/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk=com.google.android.apps.plus"
                     string[] parts = line.Split(':', '=');
 
-                    if (parts.Length == 3)
+                    var separator = package.LastIndexOf('=');
+
+                    if (separator == -1)
                     {
-                        this.PackageManager.Packages.Add(parts[2], parts[1]);
-                    }
-                    else if (parts.Length == 2)
-                    {
-                        this.PackageManager.Packages.Add(parts[1], null);
+                        this.PackageManager.Packages.Add(package, null);
                     }
                     else
                     {
-                        Debug.WriteLine($"Received invalid input {line}");
+                        var path = package.Substring(0, separator);
+                        var name = package.Substring(separator + 1);
+
+                        this.PackageManager.Packages.Add(name, path);
                     }
                 }
             }
