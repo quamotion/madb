@@ -65,7 +65,10 @@ namespace SharpAdbClient.DeviceCommands
         /// <see cref="ISyncService"/> interface, that can be used to transfer files to and from
         /// a given device.
         /// </param>
-        public PackageManager(DeviceData device, bool thirdPartyOnly = false, IAdbClient client = null, Func<DeviceData, ISyncService> syncServiceFactory = null)
+        /// <param name="skipInit">
+        /// A value indicating whether to skip the initial refresh of the package list or not. Used mainly by unit tests.
+        /// </param>
+        public PackageManager(DeviceData device, bool thirdPartyOnly = false, IAdbClient client = null, Func<DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false)
         {
             if (device == null)
             {
@@ -95,7 +98,10 @@ namespace SharpAdbClient.DeviceCommands
                 this.syncServiceFactory = syncServiceFactory;
             }
 
-            this.RefreshPackages();
+            if (!skipInit)
+            {
+                this.RefreshPackages();
+            }
         }
 
         /// <summary>
