@@ -4,7 +4,7 @@
     <Description>SharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices.</Description>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (SharpAdbClient)</AssemblyTitle>
     <Title>.NET client for adb, Android Debug Bridge (SharpAdbClient)</Title>
-    <VersionPrefix>2.1.0</VersionPrefix>
+    <VersionPrefix>2.2.0</VersionPrefix>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion</Authors>
     <TargetFrameworks>netstandard1.3;net451</TargetFrameworks>
     <AssemblyName>SharpAdbClient</AssemblyName>
@@ -18,7 +18,6 @@
     <RepositoryUrl>http://github.com/quamotion/madb</RepositoryUrl>
     <PackageProjectUrl>http://github.com/quamotion/madb</PackageProjectUrl>
     <Product>SharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
-    <Version>2.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
