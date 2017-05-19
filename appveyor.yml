@@ -1,6 +1,6 @@
 image: Visual Studio 2017
 
-version: 2.0.{build}.0
+version: 2.2.{build}.0
 
 environment:
   NuGetApiKey:
@@ -26,5 +26,5 @@ test_script:
   - ps: '& (Join-Path $env:APPVEYOR_BUILD_FOLDER "appveyor-testresults.ps1")'
 
 on_success:
-  - ps: Push-AppveyorArtifact "$env:APPVEYOR_BUILD_FOLDER\SharpAdbClient\bin\Release\SharpAdbClient.2.1.0-beta$($env:APPVEYOR_BUILD_NUMBER).nupkg"
+  - ps: Push-AppveyorArtifact "$env:APPVEYOR_BUILD_FOLDER\SharpAdbClient\bin\Release\SharpAdbClient.2.2.0-beta$($env:APPVEYOR_BUILD_NUMBER).nupkg"
 
