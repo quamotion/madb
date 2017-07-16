@@ -1,29 +1,17 @@
-﻿// <copyright file="DeviceData.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
+// <copyright file="DeviceData.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
 namespace SharpAdbClient
 {
     using System;
-    using System.Text.RegularExpressions;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Represents a device that is connected to the Android Debug Bridge.
     /// </summary>
     public class DeviceData
     {
-        /// <summary>
-        /// A regular expression that can be used to parse the device information that is returned
-        /// by the Android Debut Bridge.
-        /// </summary>
-        internal const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|offline|unknown|bootloader|recovery|download|unauthorized|host)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+)\s+model\:(?<model>[\S]+)\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?$";
-
-        /// <summary>
-        /// A regular expression that can be used to parse the device information that is returned
-        /// by the Android Debut Bridge.
-        /// </summary>
-        private static readonly Regex Regex = new Regex(DeviceDataRegexString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         /// <summary>
         /// Gets or sets the device serial number.
         /// </summary>
@@ -91,32 +79,58 @@ namespace SharpAdbClient
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
-        /// <param name="data">
+        /// <param name="dataString">
         /// The data retrieved from the Android Debug Bridge that represents a device.
         /// </param>
         /// <returns>
         /// A <see cref="DeviceData"/> object that represents the device.
         /// </returns>
-        public static DeviceData CreateFromAdbData(string data)
+        public static DeviceData CreateFromAdbData(string dataString)
         {
-            Match m = Regex.Match(data);
-            if (m.Success)
+            string[] dataArr = dataString.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            if (dataArr.Length < 2) 
+                throw new ArgumentException($"Invalid device list data '{dataString}'");
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            for (int i = 0; i < dataArr.Length; i++) 
             {
-                return new DeviceData()
+                if (dataArr[i].Split(':').Length < 2) 
                 {
-                    Serial = m.Groups["serial"].Value,
-                    State = GetStateFromString(m.Groups["state"].Value),
-                    Model = m.Groups["model"].Value,
-                    Product = m.Groups["product"].Value,
-                    Name = m.Groups["device"].Value,
-                    Features = m.Groups["features"].Value,
-                    Usb = m.Groups["usb"].Value
-                };
+                    if (dataArr[i].Equals("device") ||
+                        dataArr[i].Equals("offline") ||
+                        dataArr[i].Equals("unknown") ||
+                        dataArr[i].Equals("bootloader") ||
+                        dataArr[i].Equals("recovery") ||
+                        dataArr[i].Equals("download") ||
+                        dataArr[i].Equals("unauthorized") ||
+                        dataArr[i].Equals("host"))
+                        dataArr[i] = "state:" + dataArr[i];
+                    else
+                        dataArr[i] = "serial:" + dataArr[i];
+                }
+                var x = dataArr[i].Split(':');
+                string val = x[1];
+                if (x.Length > 2) 
+                    for (int j = 2; j < x.Length; j++)
+                        val += ":" + x[j];
+                data.Add(x[0], x[1]);
             }
-            else
-            {
-                throw new ArgumentException($"Invalid device list data '{data}'");
-            }
+            string serial, state, model, product, device, features, usb;
+            data.TryGetValue("serial", out serial);
+            data.TryGetValue("state", out state);
+            data.TryGetValue("model", out model);
+            data.TryGetValue("product", out product);
+            data.TryGetValue("device", out device);
+            data.TryGetValue("features", out features);
+            data.TryGetValue("usb", out usb);
+			return new DeviceData() {
+                Serial = serial,
+                State = (DeviceState)Enum.Parse(typeof(DeviceState), state, true),
+                Model = model,
+                Product = product,
+                Name = device,
+                Features = features,
+				Usb = usb
+			};
         }
 
         /// <inheritdoc/>
