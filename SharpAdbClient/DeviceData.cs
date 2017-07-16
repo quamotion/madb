@@ -121,15 +121,15 @@ namespace SharpAdbClient
             data.TryGetValue("device", out device);
             data.TryGetValue("features", out features);
             data.TryGetValue("usb", out usb);
-			return new DeviceData() {
+            return new DeviceData() {
                 Serial = serial,
                 State = (DeviceState)Enum.Parse(typeof(DeviceState), state, true),
                 Model = model,
                 Product = product,
                 Name = device,
                 Features = features,
-				Usb = usb
-			};
+                Usb = usb
+            };
         }
 
         /// <inheritdoc/>
