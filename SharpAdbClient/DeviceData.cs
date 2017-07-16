@@ -85,13 +85,13 @@ namespace SharpAdbClient
         /// <returns>
         /// A <see cref="DeviceData"/> object that represents the device.
         /// </returns>
-        public static DeviceData CreateFromAdbData(string dataString)
-        {
             string[] dataArr = dataString.Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             if (dataArr.Length < 2) 
                 throw new ArgumentException($"Invalid device list data '{dataString}'");
             Dictionary<string, string> data = new Dictionary<string, string>();
-            for (int i = 0; i < dataArr.Length; i++) 
+            string serial, state, model, product, device, features, usb;
+            serial = dataArr[0];
+            for (int i = 1; i < dataArr.Length; i++) 
             {
                 if (dataArr[i].Split(':').Length < 2) 
                 {
@@ -104,8 +104,6 @@ namespace SharpAdbClient
                         dataArr[i].Equals("unauthorized") ||
                         dataArr[i].Equals("host"))
                         dataArr[i] = "state:" + dataArr[i];
-                    else
-                        dataArr[i] = "serial:" + dataArr[i];
                 }
                 var x = dataArr[i].Split(':');
                 string val = x[1];
@@ -114,9 +112,10 @@ namespace SharpAdbClient
                         val += ":" + x[j];
                 data.Add(x[0], x[1]);
             }
-            string serial, state, model, product, device, features, usb;
-            data.TryGetValue("serial", out serial);
+
             data.TryGetValue("state", out state);
+            if (state != null && state.Equals("device"))
+                state = "online";
             data.TryGetValue("model", out model);
             data.TryGetValue("product", out product);
             data.TryGetValue("device", out device);
