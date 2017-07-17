@@ -8,6 +8,7 @@ namespace SharpAdbClient
     using System;
     using System.Collections.Generic;
     using System.Drawing;
+    using System.IO;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -129,5 +130,18 @@ namespace SharpAdbClient
         /// The device on which to restart ADB without root privileges.
         /// </param>
         void Unroot(DeviceData device);
+
+        /// Installs an Android application on an device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to install the application.
+        /// </param>
+        /// <param name="apk">
+        /// A <see cref="Stream"/> which represents the application to install.
+        /// </param>
+        /// <param name="arguments">
+        /// The arguments to pass to <c>adb install</c>.
+        /// </param>
+        void Install(DeviceData device, Stream apk, params string[] arguments);
     }
 }

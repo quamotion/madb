@@ -488,6 +488,7 @@ namespace SharpAdbClient
             this.Root("unroot:", device);
         }
 
+        /// <inheritdoc/>
         protected void Root(string request, DeviceData device)
         {
             this.EnsureDevice(device);
@@ -516,6 +517,57 @@ namespace SharpAdbClient
                     // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
                     Task.Delay(3000).GetAwaiter().GetResult();
                 }
+            }
+	    }
+
+        public void Install(DeviceData device, Stream apk, params string[] arguments)
+        {
+            this.EnsureDevice(device);
+
+            if (apk == null)
+            {
+                throw new ArgumentNullException(nameof(apk));
+            }
+
+            if (!apk.CanRead || !apk.CanSeek)
+            {
+                throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
+            }
+
+            StringBuilder requestBuilder = new StringBuilder();
+            requestBuilder.Append("exec:cmd package");
+
+            if (arguments != null)
+            {
+                foreach (var argument in arguments)
+                {
+                    requestBuilder.Append(" ");
+                    requestBuilder.Append(argument);
+                }
+            }
+
+            // add size parameter [required for streaming installs]
+            // do last to override any user specified value
+            requestBuilder.Append($" -S {apk.Length}");
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                this.SetDevice(socket, device);
+
+                socket.SendAdbRequest(requestBuilder.ToString());
+                var response = socket.ReadAdbResponse();
+
+                byte[] buffer = new byte[1024];
+                int read = 0;
+
+                while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    socket.Send(buffer, read);
+                }
+
+                buffer = new byte[1024];
+
+                socket.Read(buffer);
             }
         }
 
