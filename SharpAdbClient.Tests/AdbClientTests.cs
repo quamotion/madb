@@ -470,6 +470,18 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
+        public void DisconnectTest()
+        {
+            var requests = new string[] { "host:disconnect:localhost:5555" };
+
+            this.RunTest(
+                OkResponse,
+                NoResponseMessages,
+                requests,
+                () => AdbClient.Instance.Disconnect(new DnsEndPoint("localhost", 5555)));
+        }
+
+        [TestMethod]
         [DeploymentItem("logcat.bin")]
         public void ReadLogTest()
         {

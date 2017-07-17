@@ -103,6 +103,14 @@ namespace SharpAdbClient
         /// <include file='IAdbClient.xml' path='/IAdbClient/Connect/*'/>
         void Connect(DnsEndPoint endpoint);
 
+        /// <summary>
+        /// Disconnects a remote device from this local ADB server.
+        /// </summary>
+        /// <param name="endpoint">
+        /// The endpoint of the remote device to disconnect.
+        /// </param>
+        void Disconnect(DnsEndPoint endpoint);
+
         /// <include file='IAdbClient.xml' path='/IAdbClient/SetDevice/*'/>
         void SetDevice(IAdbSocket socket, DeviceData device);
 

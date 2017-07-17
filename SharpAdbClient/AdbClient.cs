@@ -519,6 +519,20 @@ namespace SharpAdbClient
             }
         }
 
+        public void Disconnect(DnsEndPoint endpoint)
+        {
+            if (endpoint == null)
+            {
+                throw new ArgumentNullException(nameof(endpoint));
+            }
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
+                var response = socket.ReadAdbResponse();
+            }
+        }
+
         /// <summary>
         /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>
         /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
