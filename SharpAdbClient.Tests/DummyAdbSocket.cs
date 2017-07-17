@@ -100,14 +100,16 @@ namespace SharpAdbClient.Tests
             this.IsConnected = false;
         }
 
-        public void Read(byte[] data)
+        public int Read(byte[] data)
         {
             var actual = this.SyncDataReceived.Dequeue();
 
-            for (int i = 0; i < data.Length; i++)
+            for (int i = 0; i < data.Length && i < actual.Length; i++)
             {
                 data[i] = actual[i];
             }
+
+            return actual.Length;
         }
 
         public Task ReadAsync(byte[] data, CancellationToken cancellationToken)
@@ -183,13 +185,15 @@ namespace SharpAdbClient.Tests
             this.SyncDataSent.Enqueue(data.Take(length).ToArray());
         }
 
-        public void Read(byte[] data, int length)
+        public int Read(byte[] data, int length)
         {
             var actual = this.SyncDataReceived.Dequeue();
 
             Assert.AreEqual(actual.Length, length);
 
             Buffer.BlockCopy(actual, 0, data, 0, length);
+
+            return actual.Length;
         }
 
         public void SendSyncRequest(SyncCommand command, string path)

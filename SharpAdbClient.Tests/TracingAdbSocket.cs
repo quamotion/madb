@@ -74,28 +74,40 @@ namespace SharpAdbClient.Tests
             }
         }
 
-        public override void Read(byte[] data)
+        public override int Read(byte[] data)
         {
-            StackTrace trace = new StackTrace((Exception)null, false);
+#if NETCOREAPP1_1
+            StackTrace trace = null;
+#else
+            var trace = new StackTrace();
+#endif
+            
+            int read = base.Read(data);
 
-            base.Read(data);
-
-            if (trace.GetFrames()[0].GetMethod().DeclaringType != typeof(AdbSocket))
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
                 this.SyncDataReceived.Enqueue(data);
             }
+
+            return read;
         }
 
-        public override void Read(byte[] data, int length)
+        public override int Read(byte[] data, int length)
         {
-            StackTrace trace = new StackTrace((Exception)null, false);
+#if NETCOREAPP1_1
+            StackTrace trace = null;
+#else
+            var trace = new StackTrace();
+#endif
 
-            base.Read(data, length);
+            var read = base.Read(data, length);
 
-            if (trace.GetFrames()[0].GetMethod().DeclaringType != typeof(AdbSocket))
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
                 this.SyncDataReceived.Enqueue(data.Take(length).ToArray());
             }
+
+            return read;
         }
 
         public override AdbResponse ReadAdbResponse()
@@ -158,9 +170,13 @@ namespace SharpAdbClient.Tests
 
         public override void SendSyncRequest(SyncCommand command, int length)
         {
-            var trace = new StackTrace((Exception)null, false);
+#if NETCOREAPP1_1
+            StackTrace trace = null;
+#else
+            var trace = new StackTrace();
+#endif
 
-            if (trace.GetFrames()[0].GetMethod().DeclaringType != typeof(AdbSocket))
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
                 this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
             }
@@ -177,11 +193,15 @@ namespace SharpAdbClient.Tests
 
         public override void Send(byte[] data, int length)
         {
-            StackTrace trace = new StackTrace((Exception)null, false);
+#if NETCOREAPP1_1
+            StackTrace trace = null;
+#else
+            var trace = new StackTrace();
+#endif
 
             base.Send(data, length);
 
-            if (trace.GetFrames()[0].GetMethod().DeclaringType != typeof(AdbSocket))
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
                 this.SyncDataSent.Enqueue(data.Take(length).ToArray());
             }

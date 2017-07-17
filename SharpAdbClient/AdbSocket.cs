@@ -113,9 +113,9 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Read(byte[] data)
+        public virtual int Read(byte[] data)
         {
-            this.Read(data, data.Length);
+            return this.Read(data, data.Length);
         }
 
         /// <inheritdoc/>
@@ -339,7 +339,7 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Read(byte[] data, int length)
+        public virtual int Read(byte[] data, int length)
         {
             int expLen = length != -1 ? length : data.Length;
             int count = -1;
@@ -374,6 +374,8 @@ namespace SharpAdbClient
                     throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
                 }
             }
+
+            return totalRead;
         }
 
         /// <inheritdoc/>

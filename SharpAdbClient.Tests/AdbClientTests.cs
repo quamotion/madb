@@ -515,6 +515,74 @@ namespace SharpAdbClient.Tests
             }
         }
 
+        [TestMethod]
+        public void RootTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            var requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "root:"
+            };
+
+            byte[] expectedData = new byte[1024];
+            byte[] expectedString = Encoding.UTF8.GetBytes("adbd cannot run as root in production builds\n");
+            Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
+
+            Assert.ThrowsException<AdbException>(() => this.RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                new Tuple<SyncCommand, string>[] { },
+                new SyncCommand[] { },
+                new byte[][] {expectedData },
+                new byte[][] { },
+                () => AdbClient.Instance.Root(device)));
+        }
+
+        [TestMethod]
+        public void UnrootTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            var requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "unroot:"
+            };
+
+            byte[] expectedData = new byte[1024];
+            byte[] expectedString = Encoding.UTF8.GetBytes("adbd not running as root\n");
+            Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
+
+            Assert.ThrowsException<AdbException>(() => this.RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                new Tuple<SyncCommand, string>[] { },
+                new SyncCommand[] { },
+                new byte[][] { expectedData },
+                new byte[][] { },
+                () => AdbClient.Instance.Unroot(device)));
+        }
+
         private void RunConnectTest(Action test, string connectString)
         {
             var requests = new string[]

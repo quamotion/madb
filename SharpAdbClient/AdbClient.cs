@@ -476,6 +476,49 @@ namespace SharpAdbClient
             }
         }
 
+        /// <inheritdoc/>
+        public void Root(DeviceData device)
+        {
+            this.Root("root:", device);
+        }
+
+        /// <inheritdoc/>
+        public void Unroot(DeviceData device)
+        {
+            this.Root("unroot:", device);
+        }
+
+        protected void Root(string request, DeviceData device)
+        {
+            this.EnsureDevice(device);
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                this.SetDevice(socket, device);
+                socket.SendAdbRequest(request);
+                var response = socket.ReadAdbResponse();
+
+                // ADB will send some additional data
+                byte[] buffer = new byte[1024];
+                int read = socket.Read(buffer);
+
+                var responseMessage = Encoding.UTF8.GetString(buffer, 0, read);
+
+                // See https://android.googlesource.com/platform/system/core/+/master/adb/commandline.cpp#1026 (adb_root)
+                // for more information on how upstream does this.
+                if (!string.Equals(responseMessage, "restarting", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new AdbException(responseMessage);
+                }
+                else
+                {
+                    // Give adbd some time to kill itself and come back up.
+                    // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
+                    Task.Delay(3000).GetAwaiter().GetResult();
+                }
+            }
+        }
+
         /// <summary>
         /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>
         /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
