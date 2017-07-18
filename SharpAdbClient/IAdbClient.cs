@@ -143,5 +143,7 @@ namespace SharpAdbClient
         /// The arguments to pass to <c>adb install</c>.
         /// </param>
         void Install(DeviceData device, Stream apk, params string[] arguments);
+
+        List<string> GetFeatureSet();
     }
 }

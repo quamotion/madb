@@ -8,6 +8,7 @@ namespace SharpAdbClient
     using SharpAdbClient.Logs;
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.Globalization;
@@ -518,8 +519,23 @@ namespace SharpAdbClient
                     Task.Delay(3000).GetAwaiter().GetResult();
                 }
             }
-	    }
+        }
 
+        /// <inheritdoc/>
+        public List<string> GetFeatureSet()
+        {
+            using (var socket = this.adbSocketFactory(this.EndPoint))
+            {
+                socket.SendAdbRequest("host:features");
+                var response = socket.ReadAdbResponse();
+                var features = socket.ReadString();
+
+                var featureList = features.Split('\n').ToList();
+                return featureList;
+            }
+        }
+
+        /// <inheritdoc/>
         public void Install(DeviceData device, Stream apk, params string[] arguments)
         {
             this.EnsureDevice(device);
@@ -535,7 +551,7 @@ namespace SharpAdbClient
             }
 
             StringBuilder requestBuilder = new StringBuilder();
-            requestBuilder.Append("exec:cmd package");
+            requestBuilder.Append("exec:cmd package 'install' ");
 
             if (arguments != null)
             {
@@ -557,7 +573,7 @@ namespace SharpAdbClient
                 socket.SendAdbRequest(requestBuilder.ToString());
                 var response = socket.ReadAdbResponse();
 
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[32 * 1024];
                 int read = 0;
 
                 while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
@@ -565,9 +581,13 @@ namespace SharpAdbClient
                     socket.Send(buffer, read);
                 }
 
-                buffer = new byte[1024];
+                read = socket.Read(buffer);
+                var value = Encoding.UTF8.GetString(buffer, 0, read);
 
-                socket.Read(buffer);
+                if (!string.Equals(value, "Success"))
+                {
+                    throw new AdbException(value);
+                }
             }
         }
 

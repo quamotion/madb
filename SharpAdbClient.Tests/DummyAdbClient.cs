@@ -141,5 +141,10 @@ namespace SharpAdbClient.Tests
         {
             throw new NotImplementedException();
         }
+
+        public List<string> GetFeatureSet()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
