@@ -41,15 +41,16 @@ namespace SharpAdbClient
 
         protected void Initialize(bool integrationTest, bool doDispose)
         {
+            this.EndPoint = AdbClient.Instance.EndPoint;
+
 #if DEBUG
             // Use the tracing adb socket factory to run the tests on an actual device.
             // use the dummy socket factory to run unit tests.
             if (integrationTest)
             {
-                Factories.AdbSocketFactory = (endPoint) => new TracingAdbSocket(endPoint)
-                {
-                    DoDispose = doDispose
-                };
+                var tracingSocket = new TracingAdbSocket(this.EndPoint) { DoDispose = doDispose };
+
+                Factories.AdbSocketFactory = (endPoint) => tracingSocket;
             }
             else
             {
@@ -65,8 +66,6 @@ namespace SharpAdbClient
             Factories.AdbSocketFactory = (endPoint) => socket;
             this.IntegrationTest = false;
 #endif
-
-            this.EndPoint = AdbClient.Instance.EndPoint;
             this.Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(this.EndPoint);
 
             AdbClient.Instance = new AdbClient();
@@ -253,7 +252,7 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.AreEqual(0, this.Socket.SyncResponses);
+                    Assert.AreEqual(0, this.Socket.SyncResponses.Count);
                 }
 
                 if (syncDataReceived != null)

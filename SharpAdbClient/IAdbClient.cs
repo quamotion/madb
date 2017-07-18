@@ -105,5 +105,21 @@ namespace SharpAdbClient
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/SetDevice/*'/>
         void SetDevice(IAdbSocket socket, DeviceData device);
+
+        /// <summary>
+        /// Restarts the ADB daemon running on the device with root privileges.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to restart ADB with root privileges.
+        /// </param>
+        void Root(DeviceData device);
+
+        /// <summary>
+        /// Restarts the ADB daemon running on the device without root privileges.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to restart ADB without root privileges.
+        /// </param>
+        void Unroot(DeviceData device);
     }
 }

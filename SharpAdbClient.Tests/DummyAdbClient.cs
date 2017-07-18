@@ -121,5 +121,15 @@ namespace SharpAdbClient.Tests
         {
             throw new NotImplementedException();
         }
+
+        public void Root(DeviceData device)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Unroot(DeviceData device)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

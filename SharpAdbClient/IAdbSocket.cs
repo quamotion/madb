@@ -125,13 +125,12 @@ namespace SharpAdbClient
         /// The buffer to store the read data into.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> if the data was read successfully; otherwise,
-        /// <see langword="false"/>.
+        /// The total number of bytes read.
         /// </returns>
         /// <remarks>
         /// This uses the default time out value.
         /// </remarks>
-        void Read(byte[] data);
+        int Read(byte[] data);
 
         /// <summary>
         /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
@@ -200,12 +199,15 @@ namespace SharpAdbClient
         /// <param name="length">
         /// The length to read or -1 to fill the data buffer completely
         /// </param>
+        /// <returns>
+        /// The total number of bytes read.
+        /// </returns>
         /// <exception cref = "AdbException" >
         /// EOF
         /// or
         /// No Data to read: exception.Message
         /// </exception>
-        void Read(byte[] data, int length);
+        int Read(byte[] data, int length);
 
         /// <summary>
         /// Gets a <see cref="Stream"/> that can be used to send and receive shell output to and
