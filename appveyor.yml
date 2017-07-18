@@ -1,5 +1,9 @@
 image: Visual Studio 2017
 
+# Temporary workaround. See https://appveyor.statuspage.io/incidents/m2vdvw39kdk8
+hosts:
+  api.nuget.org: 93.184.221.200
+
 version: 2.2.{build}.0
 
 environment:

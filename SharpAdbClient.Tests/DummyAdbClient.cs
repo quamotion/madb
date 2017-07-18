@@ -131,5 +131,10 @@ namespace SharpAdbClient.Tests
         {
             throw new NotImplementedException();
         }
+
+        public void Disconnect(DnsEndPoint endpoint)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
