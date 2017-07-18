@@ -77,6 +77,22 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
+        public void CreateWithoutModelTest()
+        {
+            // As seen for devices in recovery mode
+            // See https://github.com/quamotion/madb/pull/85/files
+            string data = "ZY3222LBDC recovery usb:337641472X product:omni_cedric device:cedric";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("ZY3222LBDC", device.Serial);
+            Assert.AreEqual<DeviceState>(DeviceState.Recovery, device.State);
+            Assert.AreEqual<string>("337641472X", device.Usb);
+            Assert.AreEqual<string>(string.Empty, device.Model);
+            Assert.AreEqual("omni_cedric", device.Product);
+            Assert.AreEqual("cedric", device.Name);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void CreateFromInvalidDatatest()
         {
