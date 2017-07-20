@@ -8,15 +8,11 @@ namespace SharpAdbClient
     using SharpAdbClient.Logs;
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Drawing;
-    using System.Drawing.Imaging;
     using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
-    using System.Net.Sockets;
-    using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -522,15 +518,16 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public List<string> GetFeatureSet()
+        public List<string> GetFeatureSet(DeviceData device)
         {
             using (var socket = this.adbSocketFactory(this.EndPoint))
             {
-                socket.SendAdbRequest("host:features");
+                socket.SendAdbRequest($"host-serial:{device.Serial}:features");
+
                 var response = socket.ReadAdbResponse();
                 var features = socket.ReadString();
 
-                var featureList = features.Split('\n').ToList();
+                var featureList = features.Split(new char[] { '\n', ',' }).ToList();
                 return featureList;
             }
         }

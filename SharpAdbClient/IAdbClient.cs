@@ -144,6 +144,15 @@ namespace SharpAdbClient
         /// </param>
         void Install(DeviceData device, Stream apk, params string[] arguments);
 
-        List<string> GetFeatureSet();
+        /// <summary>
+        /// Lists all features supported by the current device.
+        /// </summary>
+        /// <param name="device">
+        /// The device for which to get the list of features supported.
+        /// </param>
+        /// <returns>
+        /// A list of all features supported by the current device.
+        /// </returns>
+        List<string> GetFeatureSet(DeviceData device);
     }
 }

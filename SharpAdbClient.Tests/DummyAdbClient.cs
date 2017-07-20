@@ -142,7 +142,7 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public List<string> GetFeatureSet()
+        public List<string> GetFeatureSet(DeviceData device)
         {
             throw new NotImplementedException();
         }
