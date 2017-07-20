@@ -584,7 +584,7 @@ namespace SharpAdbClient
                 read = socket.Read(buffer);
                 var value = Encoding.UTF8.GetString(buffer, 0, read);
 
-                if (!string.Equals(value, "Success"))
+                if (!string.Equals(value, "Success\n"))
                 {
                     throw new AdbException(value);
                 }

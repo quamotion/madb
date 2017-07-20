@@ -556,7 +556,7 @@ namespace SharpAdbClient.Tests
                 requests,
                 new Tuple<SyncCommand, string>[] { },
                 new SyncCommand[] { },
-                new byte[][] {expectedData },
+                new byte[][] { expectedData },
                 new byte[][] { },
                 () => AdbClient.Instance.Root(device)));
         }
@@ -593,6 +593,64 @@ namespace SharpAdbClient.Tests
                 new byte[][] { expectedData },
                 new byte[][] { },
                 () => AdbClient.Instance.Unroot(device)));
+        }
+
+        [TestMethod]
+        [DeploymentItem("testapp.apk")]
+        public void InstallTest()
+        {
+            var device = new DeviceData()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            var requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install'  -S 205774"
+            };
+
+            // The app data is sent in chunks of 32 kb
+            Collection<byte[]> applicationDataChuncks = new Collection<byte[]>();
+
+            using (Stream stream = File.OpenRead("testapp.apk"))
+            {
+                while (true)
+                {
+                    byte[] buffer = new byte[32 * 1024];
+                    int read = stream.Read(buffer, 0, buffer.Length);
+
+                    if (read == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        buffer = buffer.Take(read).ToArray();
+                        applicationDataChuncks.Add(buffer);
+                    }
+                }
+            }
+
+            byte[] response = Encoding.UTF8.GetBytes("Success\n");
+
+            using (Stream stream = File.OpenRead("testapp.apk"))
+            {
+                this.RunTest(
+                    new AdbResponse[]
+                    {
+                        AdbResponse.OK,
+                        AdbResponse.OK,
+                    },
+                    NoResponseMessages,
+                    requests,
+                    new Tuple<SyncCommand, string>[] { },
+                    new SyncCommand[] { },
+                    new byte[][] { response },
+                    applicationDataChuncks.ToArray(),
+                        () => AdbClient.Instance.Install(device, stream));
+            }
         }
 
         private void RunConnectTest(Action test, string connectString)
