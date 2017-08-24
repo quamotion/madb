@@ -29,7 +29,8 @@ SharpAdbClient does not communicate directly with your Android devices, but uses
 You can do so by either running `adb.exe` yourself (it comes as a part of the ADK, the Android Development Kit), or you can use the `AdbServer.StartServer` method like this:
 
 ```
-AdbServer.StartServer(@"C:\Program Files (x86)\android-sdk\platform-tools\adb.exe", restartServerIfNewer: false);
+AdbServer server = new AdbServer();
+var result = server.StartServer(@"C:\Program Files (x86)\android-sdk\platform-tools\adb.exe", restartServerIfNewer: false);
 ```
 
 ### List all Android devices currently connected
@@ -50,7 +51,7 @@ To receive notifications when devices connect to or disconnect from your PC, you
 ```
 void Test()
 {
-    var monitor = new DeviceMonitor(new AdbSocket());
+    var monitor new DeviceMonitor(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)));
     monitor.DeviceConnected += this.OnDeviceConnected;
     monitor.Start();
 }
@@ -74,17 +75,19 @@ void InstallApplication()
 ```
 
 ### Send or receive files
-To send files to or receive files from your Android device, you can use the `SyncService` class like this:
+To send files to or receive files from your Android device, you can use the `SyncService` class. When uploading a file, you need to specify
+the permissions of the file. These are standard Unix file permissions. For example, `444` will give everyone read permissions and `666` will
+give everyone write permissions. You also need to specify the date at which the file was last modified. A good default there is `DateTime.Now`.
 
 ```
 void DownloadFile()
 {
     var device = AdbClient.Instance.GetDevices().First();
     
-    using (SyncService service = new SyncService(new AdbSocket(), device))
+    using (SyncService service = new SyncService(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), device))
     using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
     {
-        service.Pull("/data/MyFile.txt", stream, null, CancellationToken.None);     
+        service.Pull("/data/local/tmp/MyFile.txt", stream, null, CancellationToken.None);
     }
 }
 
@@ -92,10 +95,10 @@ void UploadFile()
 {
     var device = AdbClient.Instance.GetDevices().First();
     
-    using (SyncService service = new SyncService(new AdbSocket(), device))
+    using (SyncService service = new SyncService(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), device))
     using (Stream stream = File.OpenRead(@"C:\MyFile.txt"))
     {
-        service.Push(stream, "/data/MyFile.txt", null, CancellationToken.None);     
+        service.Push(stream, "/data/local/tmp/MyFile.txt", 444, DateTime.Now, null, CancellationToken.None);
     }
 }
 ```
