@@ -80,7 +80,7 @@ namespace SharpAdbClient.DeviceCommands
                 return null;
             }
 
-            string versionCodeRegex = @"versionCode=(\d*) targetSdk=";
+            string versionCodeRegex = @"versionCode=(\d*)( targetSdk=(\d*))?$";
             Match match = Regex.Match(line, versionCodeRegex);
             if (match.Success)
             {

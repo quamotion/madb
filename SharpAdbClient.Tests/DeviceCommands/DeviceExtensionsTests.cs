@@ -133,6 +133,96 @@ Shared users:
         }
 
         [TestMethod]
+        public void GetPackageVersionTest2()
+        {
+            var adbClient = new DummyAdbClient();
+            AdbClient.Instance = adbClient;
+
+            adbClient.Commands.Add("pm list packages -f", "");
+            adbClient.Commands.Add("dumpsys package jp.co.cyberagent.stf",
+@"Activity Resolver Table:
+  Schemes:
+      package:
+        423fa100 jp.co.cyberagent.stf/.IconActivity filter 427ae628
+
+  Non-Data Actions:
+      jp.co.cyberagent.stf.ACTION_IDENTIFY:
+        423fa4d8 jp.co.cyberagent.stf/.IdentityActivity filter 427c76a8
+
+Service Resolver Table:
+  Non-Data Actions:
+      jp.co.cyberagent.stf.ACTION_STOP:
+        423fc3d8 jp.co.cyberagent.stf/.Service filter 427e4ca8
+      jp.co.cyberagent.stf.ACTION_START:
+        423fc3d8 jp.co.cyberagent.stf/.Service filter 427e4ca8
+
+Packages:
+  Package [jp.co.cyberagent.stf] (428c8c10):
+    userId=10153 gids=[3003, 1015, 1023, 1028]
+    sharedUser=null
+    pkg=Package{42884220 jp.co.cyberagent.stf}
+    codePath=/data/app/jp.co.cyberagent.stf-1.apk
+    resourcePath=/data/app/jp.co.cyberagent.stf-1.apk
+    nativeLibraryPath=/data/app-lib/jp.co.cyberagent.stf-1
+    versionCode=4
+    applicationInfo=ApplicationInfo{4287f2e0 jp.co.cyberagent.stf}
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    versionName=2.1.0
+    dataDir=/data/data/jp.co.cyberagent.stf
+    targetSdk=22
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    timeStamp=2017-09-08 15:52:21
+    firstInstallTime=2017-09-08 15:52:21
+    lastUpdateTime=2017-09-08 15:52:21
+    signatures=PackageSignatures{419a7e60 [41bb3628]}
+    permissionsFixed=true haveGids=true installStatus=1
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+    packageOnlyForOwnerUser: false
+    componentsOnlyForOwerUser:
+    User 0:  installed=true stopped=true notLaunched=true enabled=0
+    grantedPermissions:
+      android.permission.READ_EXTERNAL_STORAGE
+      android.permission.READ_PHONE_STATE
+      android.permission.DISABLE_KEYGUARD
+      android.permission.WRITE_EXTERNAL_STORAGE
+      android.permission.INTERNET
+      android.permission.CHANGE_WIFI_STATE
+      android.permission.MANAGE_ACCOUNTS
+      android.permission.ACCESS_WIFI_STATE
+      android.permission.GET_ACCOUNTS
+      android.permission.ACCESS_NETWORK_STATE
+      android.permission.WAKE_LOCK
+mPackagesOnlyForOwnerUser:
+  package : com.android.mms
+  package : com.android.phone
+  package : com.sec.knox.containeragent
+mComponentsOnlyForOwnerUser:
+  package : com.android.contacts
+    cmp : com.android.contacts.activities.DialtactsActivity
+
+mEnforceCopyingLibPackages:
+
+mSkippingApks:
+
+mSettings.mPackages:
+the number of packages is 223
+mPackages:
+the number of packages is 223
+End!!!!");
+
+            var device = new DeviceData();
+            device.State = DeviceState.Online;
+            var version = device.GetPackageVersion("jp.co.cyberagent.stf");
+
+            Assert.AreEqual(4, version.VersionCode);
+            Assert.AreEqual("2.1.0", version.VersionName);
+
+            Assert.AreEqual(2, adbClient.ReceivedCommands.Count);
+            Assert.AreEqual("pm list packages -f", adbClient.ReceivedCommands[0]);
+            Assert.AreEqual("dumpsys package jp.co.cyberagent.stf", adbClient.ReceivedCommands[1]);
+        }
+
+        [TestMethod]
         public void ListProcessesTest()
         {
             var adbClient = new DummyAdbClient();
