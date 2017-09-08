@@ -9,13 +9,10 @@ namespace SharpAdbClient
     using System;
     using System.Collections.Generic;
     using System.Drawing;
-    using System.Drawing.Imaging;
     using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
-    using System.Net.Sockets;
-    using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -488,6 +485,7 @@ namespace SharpAdbClient
             this.Root("unroot:", device);
         }
 
+        /// <inheritdoc/>
         protected void Root(string request, DeviceData device)
         {
             this.EnsureDevice(device);
@@ -515,6 +513,77 @@ namespace SharpAdbClient
                     // Give adbd some time to kill itself and come back up.
                     // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
                     Task.Delay(3000).GetAwaiter().GetResult();
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public List<string> GetFeatureSet(DeviceData device)
+        {
+            using (var socket = this.adbSocketFactory(this.EndPoint))
+            {
+                socket.SendAdbRequest($"host-serial:{device.Serial}:features");
+
+                var response = socket.ReadAdbResponse();
+                var features = socket.ReadString();
+
+                var featureList = features.Split(new char[] { '\n', ',' }).ToList();
+                return featureList;
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Install(DeviceData device, Stream apk, params string[] arguments)
+        {
+            this.EnsureDevice(device);
+
+            if (apk == null)
+            {
+                throw new ArgumentNullException(nameof(apk));
+            }
+
+            if (!apk.CanRead || !apk.CanSeek)
+            {
+                throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
+            }
+
+            StringBuilder requestBuilder = new StringBuilder();
+            requestBuilder.Append("exec:cmd package 'install' ");
+
+            if (arguments != null)
+            {
+                foreach (var argument in arguments)
+                {
+                    requestBuilder.Append(" ");
+                    requestBuilder.Append(argument);
+                }
+            }
+
+            // add size parameter [required for streaming installs]
+            // do last to override any user specified value
+            requestBuilder.Append($" -S {apk.Length}");
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                this.SetDevice(socket, device);
+
+                socket.SendAdbRequest(requestBuilder.ToString());
+                var response = socket.ReadAdbResponse();
+
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    socket.Send(buffer, read);
+                }
+
+                read = socket.Read(buffer);
+                var value = Encoding.UTF8.GetString(buffer, 0, read);
+
+                if (!string.Equals(value, "Success\n"))
+                {
+                    throw new AdbException(value);
                 }
             }
         }

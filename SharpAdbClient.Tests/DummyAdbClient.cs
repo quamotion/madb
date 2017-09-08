@@ -136,5 +136,15 @@ namespace SharpAdbClient.Tests
         {
             throw new NotImplementedException();
         }
+
+        public void Install(DeviceData device, Stream apk, params string[] arguments)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<string> GetFeatureSet(DeviceData device)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
