@@ -15,6 +15,8 @@ namespace SharpAdbClient
     using System.Net.Sockets;
     using System.Text.RegularExpressions;
     using System.Threading;
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Represents an Android device.
     /// </summary>
@@ -650,9 +652,9 @@ namespace SharpAdbClient
         /// <param name="logname">
         /// The names of the log files to retrieve.
         /// </param>
-        public IEnumerable<LogEntry> RunLogService(params LogId[] logNames)
+        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames)
         {
-            return AdbClient.Instance.RunLogService(this.DeviceData, logNames);
+            return AdbClient.Instance.RunLogServiceAsync(this.DeviceData, messageSink, cancellationToken, logNames);
         }
 
         /// <summary>
