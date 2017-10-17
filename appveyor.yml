@@ -1,14 +1,6 @@
 image: Visual Studio 2017
 
-# Temporary workaround. See https://appveyor.statuspage.io/incidents/m2vdvw39kdk8
-hosts:
-  api.nuget.org: 93.184.221.200
-
 version: 2.2.{build}.0
-
-environment:
-  NuGetApiKey:
-    secure: uNF4gY8KN67ODxKkGPBIz+5MDdf3MRtz4Vi+9McPhWYi4Z6YMQvOcTQRWZYd/N9b
 
 assembly_info:
   patch: true
@@ -29,6 +21,13 @@ test_script:
   - cmd: dotnet vstest bin\Debug\netcoreapp1.1\SharpAdbClient.Tests.dll /testcasefilter:"TestCategory!=IntegrationTest & TestCategory!=PerformanceTest" /logger:trx;LogFileName=testresults.trx
   - ps: '& (Join-Path $env:APPVEYOR_BUILD_FOLDER "appveyor-testresults.ps1")'
 
-on_success:
-  - ps: Push-AppveyorArtifact "$env:APPVEYOR_BUILD_FOLDER\SharpAdbClient\bin\Release\SharpAdbClient.2.2.0-beta$($env:APPVEYOR_BUILD_NUMBER).nupkg"
+artifacts:
+  - path: SharpAdbClient\bin\Release\SharpAdbClient.2.2.0-beta$(APPVEYOR_BUILD_NUMBER).nupkg
 
+deploy:
+  provider: NuGet
+  on:
+    branch: master
+  api_key:
+    secure: EE+SrSChcQWBbROVoNVqVmUNJLh7humtKClEyJoc05VUbV5gQWbhjndwQFuiu2kz
+  skip_symbols: true
