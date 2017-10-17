@@ -109,10 +109,10 @@ namespace SharpAdbClient.Logs
         /// <inheritdoc/>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            /*if (count == 0)
+            if (count == 0)
             {
                 return 0;
-            }*/
+            }
 
             // Read the raw data from the base stream. There may be a
             // 'pending byte' from a previous operation; if that's the case,
