@@ -10,6 +10,7 @@ namespace SharpAdbClient
     using System.Drawing;
     using System.IO;
     using System.Net;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -65,6 +66,32 @@ namespace SharpAdbClient
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
         Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse);
+
+        /// <summary>
+        /// Executes a command on the device.
+        /// </summary>
+        /// <param name="command">
+        /// The command to execute.
+        /// </param>
+        /// <param name="device">
+        /// The device on which to run the command.
+        /// </param>
+        /// <param name="receiver">
+        /// The receiver which will get the command output.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
+        /// </param>
+        /// <param name="maxTimeToOutputResponse">
+        /// A default timeout for the command.
+        /// </param>
+        /// <param name="encoding">
+        /// The encoding to use when parsing the command output.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> which represents the asynchronous operation.
+        /// </returns>
+        Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse, Encoding encoding);
 
         // shell: not implemented
         // remount: not implemented
