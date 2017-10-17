@@ -311,7 +311,13 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        {
+            return this.ExecuteRemoteCommandAsync(command, device, receiver, cancellationToken, maxTimeToOutputResponse, Encoding);
+        }
+
+        /// <inheritdoc/>
+        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse, Encoding encoding)
         {
             this.EnsureDevice(device);
 
@@ -325,7 +331,7 @@ namespace SharpAdbClient
 
                 try
                 {
-                    using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
+                    using (StreamReader reader = new StreamReader(socket.GetShellStream(), encoding))
                     {
                         // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
                         // break too soon in certain cases (about every 10 loops, so it appears to be a timing
