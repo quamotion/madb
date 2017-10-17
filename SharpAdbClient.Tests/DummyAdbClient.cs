@@ -7,6 +7,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace SharpAdbClient.Tests
 {
@@ -143,6 +144,11 @@ namespace SharpAdbClient.Tests
         }
 
         public List<string> GetFeatureSet(DeviceData device)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse, Encoding encoding)
         {
             throw new NotImplementedException();
         }
