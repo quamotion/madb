@@ -27,12 +27,12 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public void CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind)
+        public int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind)
         {
             throw new NotImplementedException();
         }
 
-        public void CreateForward(DeviceData device, string local, string remote, bool allowRebind)
+        public int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
             throw new NotImplementedException();
         }

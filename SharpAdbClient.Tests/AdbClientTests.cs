@@ -675,8 +675,15 @@ namespace SharpAdbClient.Tests
             };
 
             this.RunTest(
-                OkResponse,
-                NoResponseMessages,
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK
+                },
+                new string[]
+                {
+                    null
+                },
                 requests,
                 () => test(Device));
         }

@@ -246,7 +246,7 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void CreateForward(DeviceData device, string local, string remote, bool allowRebind)
+        public int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
             this.EnsureDevice(device);
 
@@ -256,13 +256,22 @@ namespace SharpAdbClient
 
                 socket.SendAdbRequest($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}");
                 var response = socket.ReadAdbResponse();
+                response = socket.ReadAdbResponse();
+                var portString = socket.ReadString();
+
+                if (portString != null && int.TryParse(portString, out int port))
+                {
+                    return port;
+                }
+
+                return 0;
             }
         }
 
         /// <inheritdoc/>
-        public void CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind)
+        public int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind)
         {
-            this.CreateForward(device, local?.ToString(), remote?.ToString(), allowRebind);
+            return this.CreateForward(device, local?.ToString(), remote?.ToString(), allowRebind);
         }
 
         /// <inheritdoc/>

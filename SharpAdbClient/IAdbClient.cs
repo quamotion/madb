@@ -49,11 +49,97 @@ namespace SharpAdbClient
         // <host-prefix>:get-devpath is not implemented
         // <host-prefix>:get-state is not implemented
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/CreateForward/*'/>
-        void CreateForward(DeviceData device, string local, string remote, bool allowRebind);
+        /// <summary>
+        /// Asks the ADB server to forward local connections from <paramref name="local"/>
+        /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
+        /// </summary>
+        /// <param name="device">
+        /// The device to which to forward the connections.
+        /// </param>
+        /// <param name="local">
+        /// <para>
+        /// The local address to forward. This value can be in one of:
+        /// </para>
+        /// <list type="ordered">
+        ///   <item>
+        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
+        ///   </item>
+        ///   <item>
+        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt;
+        ///   </item>
+        /// </list>
+        /// </param>
+        /// <param name="remote">
+        /// <para>
+        /// The remote address to forward. This value can be in one of:
+        /// </para>
+        /// <list type="ordered">
+        ///   <item>
+        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
+        ///   </item>
+        ///   <item>
+        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt; on device
+        ///   </item>
+        ///   <item>
+        ///     <c>jdwp:&lt;pid&gt;</c>: JDWP thread on VM process &lt;pid&gt; on device.
+        ///   </item>
+        /// </list>
+        /// </param>
+        /// <param name="allowRebind">
+        /// If set to <see langword="true"/>, the request will fail if there is already a forward
+        /// connection from <paramref name="local"/>.
+        /// </param>
+        /// <returns>
+        /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.
+        /// </returns>
+        int CreateForward(DeviceData device, string local, string remote, bool allowRebind);
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/CreateForward/*'/>
-        void CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind);
+        /// <summary>
+        /// Asks the ADB server to forward local connections from <paramref name="local"/>
+        /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
+        /// </summary>
+        /// <param name="device">
+        /// The device to which to forward the connections.
+        /// </param>
+        /// <param name="local">
+        /// <para>
+        /// The local address to forward. This value can be in one of:
+        /// </para>
+        /// <list type="ordered">
+        ///   <item>
+        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
+        ///   </item>
+        ///   <item>
+        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt;
+        ///   </item>
+        /// </list>
+        /// </param>
+        /// <param name="remote">
+        /// <para>
+        /// The remote address to forward. This value can be in one of:
+        /// </para>
+        /// <list type="ordered">
+        ///   <item>
+        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
+        ///   </item>
+        ///   <item>
+        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt; on device
+        ///   </item>
+        ///   <item>
+        ///     <c>jdwp:&lt;pid&gt;</c>: JDWP thread on VM process &lt;pid&gt; on device.
+        ///   </item>
+        /// </list>
+        /// </param>
+        /// <param name="allowRebind">
+        /// If set to <see langword="true"/>, the request will fail if there is already a forward
+        /// connection from <paramref name="local"/>.
+        /// </param>
+        /// <returns>
+        /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.
+        /// </returns>
+        int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind);
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/RemoveForward/*'/>
         void RemoveForward(DeviceData device, int localPort);
