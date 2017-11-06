@@ -37,9 +37,9 @@ namespace SharpAdbClient
         /// or
         /// Device rejected command:  + resp.Message
         /// </exception>
-        public static void CreateForward(this IAdbClient client, DeviceData device, int localPort, int remotePort)
+        public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, int remotePort)
         {
-            client.CreateForward(device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
+            return client.CreateForward(device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
         }
 
         /// <summary>
@@ -63,9 +63,9 @@ namespace SharpAdbClient
         /// <exception cref="AdbException">
         /// The device rejected command. The error message will include the error message provided by the device.
         /// </exception>
-        public static void CreateForward(this IAdbClient client, DeviceData device, int localPort, string remoteSocket)
+        public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, string remoteSocket)
         {
-            client.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
+            return client.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
         }
 
         /// <summary>

@@ -179,7 +179,13 @@ namespace SharpAdbClient
         {
             // The first 4 bytes contain the length of the string
             var reply = new byte[4];
-            this.Read(reply);
+            int read = this.Read(reply);
+
+            if (read == 0)
+            {
+                // There is no data to read
+                return null;
+            }
 
             // Convert the bytes to a hex string
             string lenHex = AdbClient.Encoding.GetString(reply);
