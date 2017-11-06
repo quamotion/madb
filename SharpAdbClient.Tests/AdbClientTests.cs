@@ -321,16 +321,6 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
-        public void CreateForwardIntegrationTest()
-        {
-            Factories.Reset();
-            AdbClient client = new AdbClient();
-            var device = client.GetDevices().Single();
-            Assert.AreEqual(0, client.CreateForward(device, 4321, 1234));
-            Assert.AreNotEqual(0, client.CreateForward(device, 0, 1234));
-        }
-
-        [TestMethod]
         public void CreateSocketForwardTest()
         {
             this.RunCreateForwardTest(
