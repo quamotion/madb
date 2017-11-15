@@ -171,7 +171,8 @@ namespace SharpAdbClient
 
             if (buffer.Length != this.Width * this.Height * (this.Bpp / 8))
             {
-                throw new ArgumentOutOfRangeException(nameof(buffer));
+                throw new ArgumentOutOfRangeException(nameof(buffer), $"The buffer length {buffer.Length} does not match the expected buffer " +
+                    $"length for a picture of width {this.Width}, height {this.Height} and pixel depth {this.Bpp}");
             }
 
             if (this.Width == 0 || this.Height == 0 || this.Bpp == 0)
@@ -188,13 +189,13 @@ namespace SharpAdbClient
                     || this.Blue.Length != 8
                     || this.Green.Length != 8)
                 {
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException($"The pixel format with with RGB lengths of {this.Red.Length}:{this.Blue.Length}:{this.Green.Length} is not supported");
                 }
 
                 // Alpha can be present or absent, but must be 8 bytes long
                 if (this.Alpha.Length != 0 && this.Alpha.Length != 8)
                 {
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException($"The alpha length {this.Alpha.Length} is not supported");
                 }
 
                 // Get the index at which the red, bue, green and alpha values are stored.
@@ -269,7 +270,7 @@ namespace SharpAdbClient
             }
 
             // If not caught by any of the statements before, the format is not supported.
-            throw new NotSupportedException();
+            throw new NotSupportedException($"Pixel depths of {this.Bpp} are not supported");
         }
     }
 }
