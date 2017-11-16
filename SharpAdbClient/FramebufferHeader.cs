@@ -29,6 +29,11 @@ namespace SharpAdbClient
         public uint Bpp { get; set; }
 
         /// <summary>
+        /// Gets or sets the color space. Only available starting with <see cref="Version"/> 2.
+        /// </summary>
+        public uint ColorSpace { get; set; }
+
+        /// <summary>
         /// Gets or sets the total size, in bits, of the framebuffer.
         /// </summary>
         public uint Size { get; set; }
@@ -82,7 +87,19 @@ namespace SharpAdbClient
             using (BinaryReader reader = new BinaryReader(stream, Encoding.ASCII, leaveOpen: true))
             {
                 header.Version = reader.ReadUInt32();
+
+                if (header.Version < 1 || header.Version > 2)
+                {
+                    throw new InvalidOperationException($"Framebuffer version {header.Version} is not supported");
+                }
+
                 header.Bpp = reader.ReadUInt32();
+
+                if (header.Version >= 2)
+                {
+                    header.ColorSpace = reader.ReadUInt32();
+                }
+
                 header.Size = reader.ReadUInt32();
                 header.Width = reader.ReadUInt32();
                 header.Height = reader.ReadUInt32();
