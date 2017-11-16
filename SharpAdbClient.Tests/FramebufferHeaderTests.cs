@@ -1,12 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpAdbClient.Tests
 {
@@ -33,6 +28,30 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual(2560u, header.Height);
             Assert.AreEqual(1440u, header.Width);
             Assert.AreEqual(1u, header.Version);
+            Assert.AreEqual(0u, header.ColorSpace);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"framebufferheader-v2.bin")]
+        public void ReadFramebufferv2Test()
+        {
+            var data = File.ReadAllBytes("framebufferheader-v2.bin");
+
+            var header = FramebufferHeader.Read(data);
+
+            Assert.AreEqual(8u, header.Alpha.Length);
+            Assert.AreEqual(24u, header.Alpha.Offset);
+            Assert.AreEqual(8u, header.Green.Length);
+            Assert.AreEqual(8u, header.Green.Offset);
+            Assert.AreEqual(8u, header.Red.Length);
+            Assert.AreEqual(0u, header.Red.Offset);
+            Assert.AreEqual(8u, header.Blue.Length);
+            Assert.AreEqual(16u, header.Blue.Offset);
+            Assert.AreEqual(32u, header.Bpp);
+            Assert.AreEqual(1920u, header.Height);
+            Assert.AreEqual(1080u, header.Width);
+            Assert.AreEqual(2u, header.Version);
+            Assert.AreEqual(0u, header.ColorSpace);
         }
 
         [TestMethod]
