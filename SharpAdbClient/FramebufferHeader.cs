@@ -88,8 +88,10 @@ namespace SharpAdbClient
             {
                 header.Version = reader.ReadUInt32();
 
-                if (header.Version < 1 || header.Version > 2)
+                if (header.Version > 2)
                 {
+                    // Technically, 0 is not a supported version either; we assume version 0 indicates
+                    // an empty framebuffer.
                     throw new InvalidOperationException($"Framebuffer version {header.Version} is not supported");
                 }
 
