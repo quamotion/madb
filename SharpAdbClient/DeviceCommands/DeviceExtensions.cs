@@ -149,6 +149,24 @@ namespace SharpAdbClient.DeviceCommands
         /// </returns>
         public static IEnumerable<AndroidProcess> ListProcesses(this DeviceData device)
         {
+            return ListProcesses(device, AdbClient.Instance);
+        }
+
+        /// <summary>
+        /// Lists all processes running on the device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to list the processes that are running.
+        /// </param>
+        /// <param name="client">
+        /// A connection to ADB.
+        /// </param>
+        /// <returns>
+        /// An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all
+        /// processes that are currently running on the device.
+        /// </returns>
+        public static IEnumerable<AndroidProcess> ListProcesses(this DeviceData device, IAdbClient client)
+        {
             // There are a couple of gotcha's when listing processes on an Android device.
             // One way would be to run ps and parse the output. However, the output of
             // ps differents from Android version to Android version, is not delimited, nor
@@ -177,7 +195,7 @@ namespace SharpAdbClient.DeviceCommands
             // on the API level. We do the branching on the device (inside a shell script) to avoid roundtrips.
             // This if/then/else syntax was tested on Android 2.x, 4.x and 7
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            device.ExecuteShellCommand(@"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
+            device.ExecuteShellCommand(client, @"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
 if [ $SDK -lt 24 ]
 then
     /system/bin/ls /proc/
@@ -221,7 +239,7 @@ fi".Replace("\r\n", "\n"), receiver);
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
-                    device.ExecuteShellCommand(catBuilder.ToString(), processOutputReceiver);
+                    device.ExecuteShellCommand(client, catBuilder.ToString(), processOutputReceiver);
                     catBuilder.Clear();
                     catBuilder.Append("cat ");
                 }
