@@ -93,6 +93,16 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
+        public void CreateNoPermissionTest()
+        {
+            string data = "009d1cd696d5194a     no permissions";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("009d1cd696d5194a", device.Serial);
+            Assert.AreEqual(DeviceState.NoPermissions, device.State);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void CreateFromInvalidDatatest()
         {
