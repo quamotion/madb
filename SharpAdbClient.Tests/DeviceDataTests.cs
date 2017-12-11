@@ -126,5 +126,19 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual(DeviceState.NoPermissions, DeviceData.GetStateFromString("no permissions"));
             Assert.AreEqual(DeviceState.Unknown, DeviceData.GetStateFromString("hello"));
         }
+        
+        [TestMethod]
+        public void CreateFromDeviceDataTransportIdTest()
+        {
+            string data = "R32D102SZAE            device transport_id:6";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("R32D102SZAE", device.Serial);
+            Assert.AreEqual<string>("", device.Product);
+            Assert.AreEqual<string>("", device.Model);
+            Assert.AreEqual<string>("", device.Name);
+            Assert.AreEqual<DeviceState>(DeviceState.Online, device.State);
+            Assert.AreEqual(string.Empty, device.Usb);
+        }
     }
 }
