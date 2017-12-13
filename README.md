@@ -127,6 +127,13 @@ void EchoTest()
 }
 ```
 
+## Consulting, Training and Support
+This repository is maintained by [Quamotion](http://quamotion.mobi). Quamotion develops test software for iOS and 
+Android applications, based on the WebDriver protocol.
+
+In certain cases, Quamotion also offers professional services - such as consulting, training and support - related
+to SharpAdbClient. Contact us at [info@quamotion.mobi](mailto:info@quamotion.mobi) for more information.
+
 ## History
 SharpAdbClient is a fork of [madb](https://github.com/camalot/madb); which in itself is a .NET port of the 
 [ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/). Credits for porting 
