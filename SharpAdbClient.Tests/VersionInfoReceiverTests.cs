@@ -26,10 +26,14 @@ namespace Quamotion.Test.Devices.Android
         public void GetVersionTest()
         {
             VersionInfoReceiver receiver = new VersionInfoReceiver();
-            Assert.AreEqual<int>(10210, (int)receiver.GetVersionCode("versionCode=10210 targetSdk=18"));
+
+            // Trick the receiver into thinking we're in the package section
+            Assert.IsNull(receiver.GetVersionCode("Packages:"));
+
+            Assert.AreEqual<int>(10210, (int)receiver.GetVersionCode(" versionCode=10210 targetSdk=18"));
             Assert.AreEqual<object>(null, receiver.GetVersionCode(null));
             Assert.AreEqual<object>(null, receiver.GetVersionCode(string.Empty));
-            Assert.AreEqual<object>(null, receiver.GetVersionCode("versionCode=10210targetSdk=18"));
+            Assert.AreEqual<object>(null, receiver.GetVersionCode(" versionCode=10210targetSdk=18"));
 
             Assert.AreEqual<string>("4.7.1", (string)receiver.GetVersionName("    versionName=4.7.1"));
             Assert.AreEqual<string>(null, (string)receiver.GetVersionName(null));
@@ -40,7 +44,7 @@ namespace Quamotion.Test.Devices.Android
             DeviceData device = new DeviceData();
 
             var dumpsys = string.Join(Environment.NewLine, File.ReadAllLines(@"dumpsys_package.txt"));
-
+            receiver = new VersionInfoReceiver();
 
             StringReader reader = new StringReader(dumpsys);
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpAdbClient.DeviceCommands;
 using System;
+using System.IO;
 
 namespace SharpAdbClient.Tests
 {
@@ -123,6 +124,25 @@ namespace SharpAdbClient.Tests
             // Command should execute correctly; if the wrong command is passed an exception
             // would be thrown.
             manager.UninstallPackage("com.android.gallery3d");
+        }
+
+        [TestMethod]
+        [DeploymentItem("gapps.txt")]
+        public void GetPackageVersionInfoTest()
+        {
+            DeviceData device = new DeviceData()
+            {
+                State = DeviceState.Online
+            };
+
+            DummyAdbClient client = new DummyAdbClient();
+            client.Commands.Add("dumpsys package com.google.android.gms", File.ReadAllText("gapps.txt"));
+            AdbClient.Instance = client;
+            PackageManager manager = new PackageManager(device, skipInit: true);
+
+            var versionInfo = manager.GetVersionInfo("com.google.android.gms");
+            Assert.AreEqual(11062448, versionInfo.VersionCode);
+            Assert.AreEqual("11.0.62 (448-160311229)", versionInfo.VersionName);
         }
     }
 }
