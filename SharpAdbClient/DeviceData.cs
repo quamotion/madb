@@ -2,6 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Linq;
+
 namespace SharpAdbClient
 {
     using System;
@@ -12,18 +14,6 @@ namespace SharpAdbClient
     /// </summary>
     public class DeviceData
     {
-        /// <summary>
-        /// A regular expression that can be used to parse the device information that is returned
-        /// by the Android Debut Bridge.
-        /// </summary>
-        internal const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|offline|unknown|bootloader|recovery|download|unauthorized|host|no permissions)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
-
-        /// <summary>
-        /// A regular expression that can be used to parse the device information that is returned
-        /// by the Android Debut Bridge.
-        /// </summary>
-        private static readonly Regex Regex = new Regex(DeviceDataRegexString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         /// <summary>
         /// Gets or sets the device serial number.
         /// </summary>
@@ -90,6 +80,7 @@ namespace SharpAdbClient
         /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
+        /// <para>device output format is described at here: <![CDATA[https://github.com/aosp-mirror/platform_system_core/blob/09d5e258ef493e823f18412bd7f159f489ddc8bb/adb/transport.cpp#L988</remarks>]]></para>
         /// </summary>
         /// <param name="data">
         /// The data retrieved from the Android Debug Bridge that represents a device.
@@ -99,24 +90,48 @@ namespace SharpAdbClient
         /// </returns>
         public static DeviceData CreateFromAdbData(string data)
         {
-            Match m = Regex.Match(data);
-            if (m.Success)
-            {
-                return new DeviceData()
-                {
-                    Serial = m.Groups["serial"].Value,
-                    State = GetStateFromString(m.Groups["state"].Value),
-                    Model = m.Groups["model"].Value,
-                    Product = m.Groups["product"].Value,
-                    Name = m.Groups["device"].Value,
-                    Features = m.Groups["features"].Value,
-                    Usb = m.Groups["usb"].Value
-                };
-            }
+            const string productKey = "product:";
+            const string modelKey = "model:";
+            const string deviceKey = "device:";
+            const string transportKey = " transport_id:";
+
+            int productIndex = data.IndexOf(productKey, StringComparison.Ordinal);
+            int modelIndex = data.IndexOf(modelKey, StringComparison.Ordinal);
+            int deviceIndex = data.IndexOf(deviceKey, StringComparison.Ordinal);
+            int transportIndex = data.IndexOf(transportKey, StringComparison.Ordinal);
+
+            int productKeyLength = productIndex + productKey.Length;
+            int modelKeyLength = modelIndex + modelKey.Length;
+            int deviceKeyLength = deviceIndex + deviceKey.Length;
+
+            // parse serial and state
+            var prefix = data.Substring(0, productIndex);
+            var splits = prefix.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            var serial = splits.First().Trim();
+            var state = GetStateFromString(splits.Last().Trim());
+
+            // parse product, model, device, transport_id
+            var product = data.Substring(productKeyLength, modelIndex - productKeyLength).Trim();
+            var model = data.Substring(modelKeyLength, deviceIndex - modelKeyLength).Trim();
+
+            string device;
+            if (transportIndex == -1) // if only one device is attached, no transport_id is given.
+                device = data.Substring(deviceKeyLength).Trim();
             else
             {
-                throw new ArgumentException($"Invalid device list data '{data}'");
+                device = data.Substring(deviceKeyLength, transportIndex - deviceKeyLength).Trim();
+                var transportId = int.Parse(data.Substring(data.LastIndexOf(":", StringComparison.Ordinal) + 1)); // use when applicable
             }
+
+            return new DeviceData()
+            {
+                Serial = serial,
+                State = state,
+                Model = model,
+                Product = product,
+                Name = device,
+            };
         }
 
         /// <inheritdoc/>
