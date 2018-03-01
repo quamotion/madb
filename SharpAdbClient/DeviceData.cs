@@ -80,7 +80,7 @@ namespace SharpAdbClient
         /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
-        /// <para>device output format is described at here: <![CDATA[https://github.com/aosp-mirror/platform_system_core/blob/09d5e258ef493e823f18412bd7f159f489ddc8bb/adb/transport.cpp#L988</remarks>]]></para>
+        /// <para>device output format is described at here: <![CDATA[https://github.com/aosp-mirror/platform_system_core/blob/09d5e258ef493e823f18412bd7f159f489ddc8bb/adb/transport.cpp#L988]]></para>
         /// </summary>
         /// <param name="data">
         /// The data retrieved from the Android Debug Bridge that represents a device.
