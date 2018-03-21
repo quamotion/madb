@@ -3,16 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAdbClient", "SharpAdbClient\SharpAdbClient.csproj", "{65473257-E70F-410B-9269-D0C0F771EA87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAdbClient", "SharpAdbClient\SharpAdbClient.csproj", "{65473257-E70F-410B-9269-D0C0F771EA87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAdbClient.Tests", "SharpAdbClient.Tests\SharpAdbClient.Tests.csproj", "{2C43B828-BE5E-47B6-93BB-A624B6B36633}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{9AA331B1-1F41-41B7-B04A-95E8656E560A}"
-	ProjectSection(SolutionItems) = preProject
-		Shared\SharedAssemblyInfo.cs = Shared\SharedAssemblyInfo.cs
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{AA1EF3B1-0792-405E-A5F1-0CE913FC8816}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpAdbClient.Tests", "SharpAdbClient.Tests\SharpAdbClient.Tests.csproj", "{2C43B828-BE5E-47B6-93BB-A624B6B36633}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpAdbClient.Extensions", "SharpAdbClient.Extensions\SharpAdbClient.Extensions.csproj", "{58030054-1E04-433E-BEB4-4D8143C64C09}"
 EndProject
@@ -45,5 +38,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0ACB9022-5726-46AD-868D-C43F8A25BD23}
 	EndGlobalSection
 EndGlobal
