@@ -88,6 +88,15 @@ namespace SharpAdbClient
         }
 
         /// <summary>
+        /// Gets or sets the transport ID for this device.
+        /// </summary>
+        public string TransportId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
@@ -110,7 +119,8 @@ namespace SharpAdbClient
                     Product = m.Groups["product"].Value,
                     Name = m.Groups["device"].Value,
                     Features = m.Groups["features"].Value,
-                    Usb = m.Groups["usb"].Value
+                    Usb = m.Groups["usb"].Value,
+                    TransportId = m.Groups["transport_id"].Value
                 };
             }
             else

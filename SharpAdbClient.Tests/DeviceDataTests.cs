@@ -103,6 +103,18 @@ namespace SharpAdbClient.Tests
         }
 
         [TestMethod]
+        public void CreateWithUnderscoresTest()
+        {
+            string data = "99000000               device product:if_s200n model:NL_V100KR device:if_s200n";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("99000000", device.Serial);
+            Assert.AreEqual("if_s200n", device.Product);
+            Assert.AreEqual("NL_V100KR", device.Model);
+            Assert.AreEqual("if_s200n", device.Name);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void CreateFromInvalidDatatest()
         {
@@ -126,7 +138,7 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual(DeviceState.NoPermissions, DeviceData.GetStateFromString("no permissions"));
             Assert.AreEqual(DeviceState.Unknown, DeviceData.GetStateFromString("hello"));
         }
-        
+
         [TestMethod]
         public void CreateFromDeviceDataTransportIdTest()
         {
@@ -137,6 +149,36 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual<string>("", device.Product);
             Assert.AreEqual<string>("", device.Model);
             Assert.AreEqual<string>("", device.Name);
+            Assert.AreEqual<DeviceState>(DeviceState.Online, device.State);
+            Assert.AreEqual(string.Empty, device.Usb);
+        }
+
+        [TestMethod]
+        public void CreateFromDeviceDataTransportIdTest2()
+        {
+            string data = "emulator-5554          device product:sdk_google_phone_x86 model:Android_SDK_built_for_x86 device:generic_x86 transport_id:1";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("emulator-5554", device.Serial);
+            Assert.AreEqual<string>("sdk_google_phone_x86", device.Product);
+            Assert.AreEqual<string>("Android_SDK_built_for_x86", device.Model);
+            Assert.AreEqual<string>("generic_x86", device.Name);
+            Assert.AreEqual<string>("1", device.TransportId);
+            Assert.AreEqual<DeviceState>(DeviceState.Online, device.State);
+            Assert.AreEqual(string.Empty, device.Usb);
+        }
+
+        [TestMethod]
+        public void CreateFromDeviceDataTransportIdTest3()
+        {
+            string data = "00bc13bcf4bacc62 device product:bullhead model:Nexus_5X device:bullhead transport_id:1";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("00bc13bcf4bacc62", device.Serial);
+            Assert.AreEqual<string>("bullhead", device.Product);
+            Assert.AreEqual<string>("Nexus_5X", device.Model);
+            Assert.AreEqual<string>("bullhead", device.Name);
+            Assert.AreEqual<string>("1", device.TransportId);
             Assert.AreEqual<DeviceState>(DeviceState.Online, device.State);
             Assert.AreEqual(string.Empty, device.Usb);
         }
