@@ -402,7 +402,7 @@ namespace SharpAdbClient
         /// <remarks>
         /// This uses the default time out value.
         /// </remarks>
-        protected bool Write(byte[] data)
+        internal bool Write(byte[] data)
         {
             try
             {

@@ -45,6 +45,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="InteractiveShell\AdbShell.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.23" PrivateAssets="all" />
   </ItemGroup>
 
