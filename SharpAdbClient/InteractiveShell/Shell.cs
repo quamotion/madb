@@ -22,6 +22,7 @@ namespace SharpAdbClient.InteractiveShell
             this.AdbClient = adbClient;
         }
 
+        //alterar depois
         public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             using (AdbSocket adbSocket = new AdbSocket(this.AdbClient.EndPoint))
@@ -33,7 +34,6 @@ namespace SharpAdbClient.InteractiveShell
 
                 ShellResponseEventArgs shellResponseEventArgs = new ShellResponseEventArgs(this);
                 shellResponseEventArgs.LastCommand = command;
-
                 try
                 {
                     var shellStream = (adbSocket.GetShellStream() as ShellStream);
@@ -56,8 +56,6 @@ namespace SharpAdbClient.InteractiveShell
                                     shellResponseEventArgs.NextCommand = null;
                                 }
                             }
-
-                            
                         }
                     }
                 }
@@ -74,6 +72,59 @@ namespace SharpAdbClient.InteractiveShell
                 }
             }
 
+        }
+
+
+        public void ExecuteRemoteCommand(string command, DeviceData device, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        {
+            //problems invoke event in control
+            //ExecuteRemoteCommandAsync(command, device, cancellationToken, maxTimeToOutputResponse).Wait();
+            using (AdbSocket adbSocket = new AdbSocket(this.AdbClient.EndPoint))
+            {
+                cancellationToken.Register(() => adbSocket.Dispose());
+                this.AdbClient.SetDevice(adbSocket, device);
+                adbSocket.SendAdbRequest($"shell:{command}");
+                var response = adbSocket.ReadAdbResponse();
+
+                ShellResponseEventArgs shellResponseEventArgs = new ShellResponseEventArgs(this);
+                shellResponseEventArgs.LastCommand = command;
+                try
+                {
+                    var shellStream = (adbSocket.GetShellStream() as ShellStream);
+
+                    using (StreamReader reader = new StreamReader(shellStream.Inner, AdbClient.Encoding))
+                    {
+                        while (!cancellationToken.IsCancellationRequested && shellResponseEventArgs.CloseShell == false)
+                        {
+                            var line = reader.ReadLine();
+
+                            if (ResponseAdb(line, shellResponseEventArgs))
+                            {
+                                if (String.IsNullOrEmpty(shellResponseEventArgs.NextCommand) == false)
+                                {
+                                    byte[] bytes = FormAdbNextRequest(shellResponseEventArgs.NextCommand);
+
+                                    (shellStream.Inner as System.Net.Sockets.NetworkStream).Write(bytes, 0, bytes.Length);
+                                    (shellStream.Inner as System.Net.Sockets.NetworkStream).Flush();
+                                    shellResponseEventArgs.LastCommand = shellResponseEventArgs.NextCommand;
+                                    shellResponseEventArgs.NextCommand = null;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        throw new ShellCommandUnresponsiveException(e);
+                    }
+                }
+                finally
+                {
+
+                }
+            }
         }
 
         public static byte[] FormAdbNextRequest(string req)
