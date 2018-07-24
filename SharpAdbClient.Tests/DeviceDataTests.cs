@@ -182,5 +182,21 @@ namespace SharpAdbClient.Tests
             Assert.AreEqual<DeviceState>(DeviceState.Online, device.State);
             Assert.AreEqual(string.Empty, device.Usb);
         }
+
+        [TestMethod]
+        public void CreateFromDeviceDataConnecting()
+        {
+            string data = "00bc13bcf4bacc62 connecting";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.AreEqual<string>("00bc13bcf4bacc62", device.Serial);
+            Assert.AreEqual(string.Empty, device.Product);
+            Assert.AreEqual(string.Empty, device.Model);
+            Assert.AreEqual(string.Empty, device.Name);
+            Assert.AreEqual(string.Empty, device.TransportId);
+            Assert.AreEqual<DeviceState>(DeviceState.Unknown, device.State);
+            Assert.AreEqual(string.Empty, device.Usb);
+        }
+
     }
 }
