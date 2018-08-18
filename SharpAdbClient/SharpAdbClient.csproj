@@ -18,6 +18,8 @@
     <RepositoryUrl>http://github.com/quamotion/madb</RepositoryUrl>
     <PackageProjectUrl>http://github.com/quamotion/madb</PackageProjectUrl>
     <Product>SharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0'">
@@ -46,6 +48,7 @@
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.23" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All"/>
   </ItemGroup>
 
 </Project>
