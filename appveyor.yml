@@ -12,7 +12,7 @@ test_script:
   - cmd: cd %APPVEYOR_BUILD_FOLDER%\SharpAdbClient.Tests\
   - cmd: dotnet restore
   - cmd: dotnet build
-  - cmd: dotnet test bin\Debug\netcoreapp2.0\SharpAdbClient.Tests.dll --filter "TestCategory!=IntegrationTest & TestCategory!=PerformanceTest" "--logger:trx;LogFileName=testresults.trx" /p:CollectCoverage=true
+  - cmd: dotnet test SharpAdbClient.Tests.csproj --filter "TestCategory!=IntegrationTest & TestCategory!=PerformanceTest" "--logger:trx;LogFileName=testresults.trx" /p:CollectCoverage=true
   - ps: '& (Join-Path $env:APPVEYOR_BUILD_FOLDER "appveyor-testresults.ps1")'
 
 artifacts:
