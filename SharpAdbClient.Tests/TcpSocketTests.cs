@@ -1,25 +1,21 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
+using Xunit;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class TcpSocketTests
     {
-        [TestMethod]
+        [Fact]
         public void LifecycleTest()
         {
             TcpSocket socket = new TcpSocket();
-            Assert.IsFalse(socket.Connected);
+            Assert.False(socket.Connected);
 
             socket.Connect(new DnsEndPoint("www.google.com", 80));
-            Assert.IsTrue(socket.Connected);
+            Assert.True(socket.Connected);
 
             byte[] data = Encoding.ASCII.GetBytes(@"GET / HTTP/1.1
 
@@ -33,37 +29,36 @@ namespace SharpAdbClient.Tests
             socket.Dispose();
         }
 
-        [TestMethod]
+        [Fact]
         public void ReconnectTest()
         {
             TcpSocket socket = new TcpSocket();
-            Assert.IsFalse(socket.Connected);
+            Assert.False(socket.Connected);
 
             socket.Connect(new DnsEndPoint("www.google.com", 80));
-            Assert.IsTrue(socket.Connected);
+            Assert.True(socket.Connected);
 
             socket.Dispose();
-            Assert.IsFalse(socket.Connected);
+            Assert.False(socket.Connected);
 
             socket.Reconnect();
-            Assert.IsTrue(socket.Connected);
+            Assert.True(socket.Connected);
         }
 
-        [TestMethod]
+        [Fact]
         public void BufferSizeTest()
         {
             TcpSocket socket = new TcpSocket();
             socket.ReceiveBufferSize = 1024;
-            Assert.AreEqual(1024, socket.ReceiveBufferSize);
+            Assert.Equal(1024, socket.ReceiveBufferSize);
             socket.Dispose();
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
+        [Fact]
         public void CreateUnsupportedSocketTest()
         {
             TcpSocket socket = new TcpSocket();
-            socket.Connect(new CustomEndPoint());
+            Assert.Throws<NotSupportedException>(() => socket.Connect(new CustomEndPoint()));
         }
     }
 }

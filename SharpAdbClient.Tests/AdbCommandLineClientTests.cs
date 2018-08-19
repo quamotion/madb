@@ -1,5 +1,5 @@
 ﻿using SharpAdbClient.Exceptions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,44 +10,41 @@ namespace SharpAdbClient.Tests
     /// <summary>
     /// Tests the <see cref="AdbCommandLineClient"/> class.
     /// </summary>
-    [TestClass]
     public class AdbCommandLineClientTests
     {
-        [TestMethod]
+        [Fact]
         public void GetVersionTest()
         {
             DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
             commandLine.Version = new Version(1, 0, 32);
 
-            Assert.AreEqual(new Version(1, 0, 32), commandLine.GetVersion());
+            Assert.Equal(new Version(1, 0, 32), commandLine.GetVersion());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AdbException))]
+        [Fact]
         public void GetVersionNullTest()
         {
             DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
             commandLine.Version = null;
-            commandLine.GetVersion();
+            Assert.Throws<AdbException>(() => commandLine.GetVersion());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AdbException))]
+        [Fact]
         public void GetOutdatedVersionTest()
         {
             DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
             commandLine.Version = new Version(1, 0, 1);
 
-            commandLine.GetVersion();
+            Assert.Throws<AdbException>(() => commandLine.GetVersion());
         }
 
-        [TestMethod]
+        [Fact]
         public void StartServerTest()
         {
             DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
-            Assert.IsFalse(commandLine.ServerStarted);
+            Assert.False(commandLine.ServerStarted);
             commandLine.StartServer();
-            Assert.IsTrue(commandLine.ServerStarted);
+            Assert.True(commandLine.ServerStarted);
         }
     }
 }

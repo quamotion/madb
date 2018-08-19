@@ -1,10 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+using Xunit;
 
 namespace SharpAdbClient.Tests
 {
@@ -21,8 +17,8 @@ namespace SharpAdbClient.Tests
             var message = "Hello, World";
             var ex = constructor(message);
 
-            Assert.AreEqual(message, ex.Message);
-            Assert.IsNull(ex.InnerException);
+            Assert.Equal(message, ex.Message);
+            Assert.Null(ex.InnerException);
         }
 
         public static void TestMessageAndInnerConstructor(Func<string, Exception, T> constructor)
@@ -31,8 +27,8 @@ namespace SharpAdbClient.Tests
             var inner = new Exception();
             var ex = constructor(message, inner);
 
-            Assert.AreEqual(message, ex.Message);
-            Assert.AreEqual(inner, ex.InnerException);
+            Assert.Equal(message, ex.Message);
+            Assert.Equal(inner, ex.InnerException);
         }
 
 #if !NETCOREAPP1_1

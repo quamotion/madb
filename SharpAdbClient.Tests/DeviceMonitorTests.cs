@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -6,39 +6,36 @@ using System.Threading;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class DeviceMonitorTests : SocketBasedTests
     {
-        [TestInitialize]
-        public void Initialize()
+        // Toggle the integration test flag to true to run on an actual adb server
+        // (and to build/validate the test cases), set to false to use the mocked
+        // adb sockets.
+        // In release mode, this flag is ignored and the mocked adb sockets are always used.
+        public DeviceMonitorTests()
+            : base(integrationTest: false, doDispose: true)
         {
-            // Toggle the integration test flag to true to run on an actual adb server
-            // (and to build/validate the test cases), set to false to use the mocked
-            // adb sockets.
-            // In release mode, this flag is ignored and the mocked adb sockets are always used.
-            base.Initialize(integrationTest: false, doDispose: true);
         }
 
-        [TestMethod]
+        [Fact]
         public void ConstructorTest()
         {
             using (DeviceMonitor monitor = new DeviceMonitor(this.Socket))
             {
-                Assert.IsNotNull(monitor.Devices);
-                Assert.AreEqual(0, monitor.Devices.Count);
-                Assert.AreEqual(this.Socket, monitor.Socket);
-                Assert.IsFalse(monitor.IsRunning);
+                Assert.NotNull(monitor.Devices);
+                Assert.Equal(0, monitor.Devices.Count);
+                Assert.Equal(this.Socket, monitor.Socket);
+                Assert.False(monitor.IsRunning);
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ConstructorNullTest()
         {
-            DeviceMonitor monitor = new DeviceMonitor(null);
+            Assert.Throws< ArgumentNullException>(() => new DeviceMonitor(null));
         }
 
-        [TestMethod]
+        [Fact]
         public void DeviceDisconnectedTest()
         {
             this.Socket.WaitForNewData = true;
@@ -47,7 +44,7 @@ namespace SharpAdbClient.Tests
             {
                 DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
 
-                Assert.AreEqual(0, monitor.Devices.Count);
+                Assert.Equal(0, monitor.Devices.Count);
 
                 // Start the monitor, detect the initial device.
                 base.RunTest(
@@ -58,10 +55,10 @@ namespace SharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.AreEqual(1, monitor.Devices.Count);
-                    Assert.AreEqual(1, sink.ConnectedEvents.Count);
-                    Assert.AreEqual(0, sink.ChangedEvents.Count);
-                    Assert.AreEqual(0, sink.DisconnectedEvents.Count);
+                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                 });
 
                 this.Socket.ResponseMessages.Clear();
@@ -78,16 +75,16 @@ namespace SharpAdbClient.Tests
                 () =>
                 {
                     eventWaiter.WaitOne(1000);
-                    Assert.AreEqual(0, monitor.Devices.Count);
-                    Assert.AreEqual(1, sink.ConnectedEvents.Count);
-                    Assert.AreEqual(0, sink.ChangedEvents.Count);
-                    Assert.AreEqual(1, sink.DisconnectedEvents.Count);
-                    Assert.AreEqual("169.254.109.177:5555", sink.DisconnectedEvents[0].Device.Serial);
+                    Assert.Equal(0, monitor.Devices.Count);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Single(sink.DisconnectedEvents);
+                    Assert.Equal("169.254.109.177:5555", sink.DisconnectedEvents[0].Device.Serial);
                 });
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void DeviceConnectedTest()
         {
             this.Socket.WaitForNewData = true;
@@ -96,7 +93,7 @@ namespace SharpAdbClient.Tests
             {
                 DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
 
-                Assert.AreEqual(0, monitor.Devices.Count);
+                Assert.Equal(0, monitor.Devices.Count);
 
                 // Start the monitor, detect the initial device.
                 base.RunTest(
@@ -107,10 +104,10 @@ namespace SharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.AreEqual(0, monitor.Devices.Count);
-                    Assert.AreEqual(0, sink.ConnectedEvents.Count);
-                    Assert.AreEqual(0, sink.ChangedEvents.Count);
-                    Assert.AreEqual(0, sink.DisconnectedEvents.Count);
+                    Assert.Equal(0, monitor.Devices.Count);
+                    Assert.Empty(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                 });
 
                 this.Socket.ResponseMessages.Clear();
@@ -128,16 +125,16 @@ namespace SharpAdbClient.Tests
                 {
                     eventWaiter.WaitOne(1000);
 
-                    Assert.AreEqual(1, monitor.Devices.Count);
-                    Assert.AreEqual(1, sink.ConnectedEvents.Count);
-                    Assert.AreEqual(0, sink.ChangedEvents.Count);
-                    Assert.AreEqual(0, sink.DisconnectedEvents.Count);
-                    Assert.AreEqual("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
+                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
+                    Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
                 });
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void StartInitialDeviceListTest()
         {
             this.Socket.WaitForNewData = true;
@@ -146,7 +143,7 @@ namespace SharpAdbClient.Tests
             {
                 DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
 
-                Assert.AreEqual(0, monitor.Devices.Count);
+                Assert.Equal(0, monitor.Devices.Count);
 
                 base.RunTest(
                 OkResponse,
@@ -156,17 +153,17 @@ namespace SharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.AreEqual(1, monitor.Devices.Count);
-                    Assert.AreEqual("169.254.109.177:5555", monitor.Devices.ElementAt(0).Serial);
-                    Assert.AreEqual(1, sink.ConnectedEvents.Count);
-                    Assert.AreEqual("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
-                    Assert.AreEqual(0, sink.ChangedEvents.Count);
-                    Assert.AreEqual(0, sink.DisconnectedEvents.Count);
+                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Equal("169.254.109.177:5555", monitor.Devices.ElementAt(0).Serial);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                 });
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void DeviceChangedTest()
         {
             this.Socket.WaitForNewData = true;
@@ -175,7 +172,7 @@ namespace SharpAdbClient.Tests
             {
                 DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
 
-                Assert.AreEqual(0, monitor.Devices.Count);
+                Assert.Equal(0, monitor.Devices.Count);
 
                 // Start the monitor, detect the initial device.
                 base.RunTest(
@@ -186,11 +183,11 @@ namespace SharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.AreEqual(1, monitor.Devices.Count);
-                    Assert.AreEqual(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
-                    Assert.AreEqual(1, sink.ConnectedEvents.Count);
-                    Assert.AreEqual(0, sink.ChangedEvents.Count);
-                    Assert.AreEqual(0, sink.DisconnectedEvents.Count);
+                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                 });
 
                 this.Socket.ResponseMessages.Clear();
@@ -208,12 +205,12 @@ namespace SharpAdbClient.Tests
                 {
                     eventWaiter.WaitOne(1000);
 
-                    Assert.AreEqual(1, monitor.Devices.Count);
-                    Assert.AreEqual(DeviceState.Online, monitor.Devices.ElementAt(0).State);
-                    Assert.AreEqual(1, sink.ConnectedEvents.Count);
-                    Assert.AreEqual(1, sink.ChangedEvents.Count);
-                    Assert.AreEqual(0, sink.DisconnectedEvents.Count);
-                    Assert.AreEqual("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
+                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Equal(DeviceState.Online, monitor.Devices.ElementAt(0).State);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Single(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
+                    Assert.Equal("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
                 });
             }
         }
@@ -222,7 +219,7 @@ namespace SharpAdbClient.Tests
         /// Tests the <see cref="DeviceMonitor"/> in a case where the adb server dies in the middle of the monitor
         /// loop. The <see cref="DeviceMonitor"/> should detect this condition and restart the adb server.
         /// </summary>
-        [TestMethod]
+        [Fact]
         public void AdbKilledTest()
         {
             var dummyAdbServer = new DummyAdbServer();
@@ -244,14 +241,13 @@ namespace SharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.IsTrue(this.Socket.DidReconnect);
-                    Assert.IsTrue(dummyAdbServer.WasRestarted);
+                    Assert.True(this.Socket.DidReconnect);
+                    Assert.True(dummyAdbServer.WasRestarted);
                 });
             }
         }
 
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
+        [Fact(Skip = "IntegrationTest")]
         public void DisposeMonitorTest()
         {
             using (DeviceMonitor monitor = new DeviceMonitor(new AdbSocket(AdbClient.Instance.EndPoint)))

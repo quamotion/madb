@@ -1,31 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using SharpAdbClient.Exceptions;
 
 namespace SharpAdbClient.Tests.Exceptions
 {
-    [TestClass]
     public class UnknownOptionExceptionTests
     {
-        [TestMethod]
+        [Fact]
         public void TestEmptyConstructor()
         {
             ExceptionTester<UnknownOptionException>.TestEmptyConstructor(() => new UnknownOptionException());
         }
 
-        [TestMethod]
+        [Fact]
         public void TestMessageConstructor()
         {
             ExceptionTester<UnknownOptionException>.TestMessageConstructor((message) => new UnknownOptionException(message));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestMessageAndInnerConstructor()
         {
             ExceptionTester<UnknownOptionException>.TestMessageAndInnerConstructor((message, inner) => new UnknownOptionException(message, inner));
         }
 
 #if !NETCOREAPP1_1
-        [TestMethod]
+        [Fact]
         public void TestSerializationConstructor()
         {
             ExceptionTester<UnknownOptionException>.TestSerializationConstructor((info, context) => new UnknownOptionException(info, context));

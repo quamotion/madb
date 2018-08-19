@@ -1,16 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Xunit;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class AdbServerStatusTests
     {
-        [TestMethod]
+        [Fact]
         public void ToStringTest()
         {
             AdbServerStatus s = new AdbServerStatus()
@@ -19,11 +14,11 @@ namespace SharpAdbClient.Tests
                 Version = new Version(1, 0, 32)
             };
 
-            Assert.AreEqual("Version 1.0.32 of the adb daemon is running.", s.ToString());
+            Assert.Equal("Version 1.0.32 of the adb daemon is running.", s.ToString());
 
             s.IsRunning = false;
 
-            Assert.AreEqual("The adb daemon is not running.", s.ToString());
+            Assert.Equal("The adb daemon is not running.", s.ToString());
         }
     }
 }

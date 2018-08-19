@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using SharpAdbClient.DeviceCommands;
 using System;
 using System.Collections.Generic;
@@ -8,50 +8,49 @@ using System.Threading.Tasks;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class InstallReceiverTests
     {
-        [TestMethod]
+        [Fact]
         public void ProcessFailureTest()
         {
             InstallReceiver receiver = new InstallReceiver();
             receiver.AddOutput("Failure [message]");
             receiver.Flush();
 
-            Assert.IsFalse(receiver.Success);
-            Assert.AreEqual("message", receiver.ErrorMessage);
+            Assert.False(receiver.Success);
+            Assert.Equal("message", receiver.ErrorMessage);
         }
 
-        [TestMethod]
+        [Fact]
         public void ProcessFailureEmptyMessageTest()
         {
             InstallReceiver receiver = new InstallReceiver();
             receiver.AddOutput("Failure [  ]");
             receiver.Flush();
 
-            Assert.IsFalse(receiver.Success);
-            Assert.AreEqual(InstallReceiver.UnknownError, receiver.ErrorMessage);
+            Assert.False(receiver.Success);
+            Assert.Equal(InstallReceiver.UnknownError, receiver.ErrorMessage);
         }
 
-        [TestMethod]
+        [Fact]
         public void ProcessFailureNoMessageTest()
         {
             InstallReceiver receiver = new InstallReceiver();
             receiver.AddOutput("Failure");
             receiver.Flush();
 
-            Assert.IsFalse(receiver.Success);
-            Assert.AreEqual(InstallReceiver.UnknownError, receiver.ErrorMessage);
+            Assert.False(receiver.Success);
+            Assert.Equal(InstallReceiver.UnknownError, receiver.ErrorMessage);
         }
 
-        [TestMethod]
+        [Fact]
         public void ProcessSuccessTest()
         {
             InstallReceiver receiver = new InstallReceiver();
             receiver.AddOutput("Success");
             receiver.Flush();
 
-            Assert.IsTrue(receiver.Success);
+            Assert.True(receiver.Success);
         }
     }
 }

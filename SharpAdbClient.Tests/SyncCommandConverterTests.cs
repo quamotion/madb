@@ -1,37 +1,32 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using System;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class SyncCommandConverterTests
     {
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void GetCommandNullTest()
         {
-            SyncCommandConverter.GetCommand(null);
+            Assert.Throws<ArgumentNullException>(() => SyncCommandConverter.GetCommand(null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        [Fact]
         public void GetCommandInvalidNumberOfBytesTest()
         {
-            SyncCommandConverter.GetCommand(new byte[] { });
+            Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand(new byte[] { }));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        [Fact]
         public void GetCommandInvalidCommandTest()
         {
-            SyncCommandConverter.GetCommand(new byte[] { (byte)'Q', (byte)'M', (byte)'T', (byte)'V' });
+            Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand(new byte[] { (byte)'Q', (byte)'M', (byte)'T', (byte)'V' }));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        [Fact]
         public void GetBytesInvalidCommandTest()
         {
-            SyncCommandConverter.GetBytes((SyncCommand)99);
+            Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetBytes((SyncCommand)99));
         }
     }
 }

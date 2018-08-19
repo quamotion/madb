@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,20 +7,18 @@ using System.Threading;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class SyncServiceTests : SocketBasedTests
     {
-        [TestInitialize]
-        public void Initialize()
+        // Toggle the integration test flag to true to run on an actual adb server
+        // (and to build/validate the test cases), set to false to use the mocked
+        // adb sockets.
+        // In release mode, this flag is ignored and the mocked adb sockets are always used.
+        public SyncServiceTests()
+            : base(integrationTest: false, doDispose: false)
         {
-            // Toggle the integration test flag to true to run on an actual adb server
-            // (and to build/validate the test cases), set to false to use the mocked
-            // adb sockets.
-            // In release mode, this flag is ignored and the mocked adb sockets are always used.
-            base.Initialize(integrationTest: false, doDispose: false);
         }
 
-        [TestMethod]
+        [Fact]
         public void StatTest()
         {
             DeviceData device = new DeviceData()
@@ -47,13 +45,13 @@ namespace SharpAdbClient.Tests
                     }
                 });
 
-            Assert.IsNotNull(value);
-            Assert.AreEqual(UnixFileMode.Regular, value.FileMode & UnixFileMode.TypeMask);
-            Assert.AreEqual(597, value.Size);
-            Assert.AreEqual(DateTimeHelper.Epoch.ToLocalTime(), value.Time);
+            Assert.NotNull(value);
+            Assert.Equal(UnixFileMode.Regular, value.FileMode & UnixFileMode.TypeMask);
+            Assert.Equal(597, value.Size);
+            Assert.Equal(DateTimeHelper.Epoch.ToLocalTime(), value.Time);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetListingTest()
         {
             DeviceData device = new DeviceData()
@@ -80,43 +78,42 @@ namespace SharpAdbClient.Tests
                 null,
                 () =>
                 {
-                    using (SyncService service = new SyncService(device))
+                    using (SyncService service = new SyncService(this.Socket, device))
                     {
                         value = service.GetDirectoryListing("/storage").ToList();
                     }
                 });
 
-            Assert.AreEqual(4, value.Count);
+            Assert.Equal(4, value.Count);
 
             var time = new DateTime(2015, 11, 3, 9, 47, 4, DateTimeKind.Utc).ToLocalTime();
 
             var dir = value[0];
-            Assert.AreEqual(".", dir.Path);
-            Assert.AreEqual((UnixFileMode)16873, dir.FileMode);
-            Assert.AreEqual(0, dir.Size);
-            Assert.AreEqual(time, dir.Time);
+            Assert.Equal(".", dir.Path);
+            Assert.Equal((UnixFileMode)16873, dir.FileMode);
+            Assert.Equal(0, dir.Size);
+            Assert.Equal(time, dir.Time);
 
             var parentDir = value[1];
-            Assert.AreEqual("..", parentDir.Path);
-            Assert.AreEqual((UnixFileMode)16877, parentDir.FileMode);
-            Assert.AreEqual(0, parentDir.Size);
-            Assert.AreEqual(time, parentDir.Time);
+            Assert.Equal("..", parentDir.Path);
+            Assert.Equal((UnixFileMode)16877, parentDir.FileMode);
+            Assert.Equal(0, parentDir.Size);
+            Assert.Equal(time, parentDir.Time);
 
             var sdcard0 = value[2];
-            Assert.AreEqual("sdcard0", sdcard0.Path);
-            Assert.AreEqual((UnixFileMode)41471, sdcard0.FileMode);
-            Assert.AreEqual(24, sdcard0.Size);
-            Assert.AreEqual(time, sdcard0.Time);
+            Assert.Equal("sdcard0", sdcard0.Path);
+            Assert.Equal((UnixFileMode)41471, sdcard0.FileMode);
+            Assert.Equal(24, sdcard0.Size);
+            Assert.Equal(time, sdcard0.Time);
 
             var emulated = value[3];
-            Assert.AreEqual("emulated", emulated.Path);
-            Assert.AreEqual((UnixFileMode)16749, emulated.FileMode);
-            Assert.AreEqual(0, emulated.Size);
-            Assert.AreEqual(time, emulated.Time);
+            Assert.Equal("emulated", emulated.Path);
+            Assert.Equal((UnixFileMode)16749, emulated.FileMode);
+            Assert.Equal(0, emulated.Size);
+            Assert.Equal(time, emulated.Time);
         }
 
-        [TestMethod]
-        [DeploymentItem(@"fstab.bin")]
+        [Fact]
         public void PullTest()
         {
             DeviceData device = new DeviceData()
@@ -151,11 +148,10 @@ namespace SharpAdbClient.Tests
                 });
 
             // Make sure the data that has been sent to the stream is the expected data
-            CollectionAssert.AreEqual(content, stream.ToArray());
+            Assert.Equal(content, stream.ToArray());
         }
 
-        [TestMethod]
-        [DeploymentItem(@"fstab.bin")]
+        [Fact]
         public void PushTest()
         {
             DeviceData device = new DeviceData()

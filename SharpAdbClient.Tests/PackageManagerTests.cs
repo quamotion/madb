@@ -1,21 +1,19 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using SharpAdbClient.DeviceCommands;
 using System;
 using System.IO;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class PackageManagerTests
     {
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ConstructorNullTest()
         {
-            new PackageManager(null);
+            Assert.Throws<ArgumentNullException>(() => new PackageManager(null));
         }
 
-        [TestMethod]
+        [Fact]
         public void PackagesPropertyTest()
         {
             DeviceData device = new DeviceData()
@@ -28,11 +26,11 @@ namespace SharpAdbClient.Tests
             AdbClient.Instance = client;
             PackageManager manager = new PackageManager(device);
 
-            Assert.IsTrue(manager.Packages.ContainsKey("com.android.gallery3d"));
-            Assert.AreEqual("/system/app/Gallery2/Gallery2.apk", manager.Packages["com.android.gallery3d"]);
+            Assert.True(manager.Packages.ContainsKey("com.android.gallery3d"));
+            Assert.Equal("/system/app/Gallery2/Gallery2.apk", manager.Packages["com.android.gallery3d"]);
         }
 
-        [TestMethod]
+        [Fact]
         public void PackagesPropertyTest2()
         {
             DeviceData device = new DeviceData()
@@ -45,11 +43,11 @@ namespace SharpAdbClient.Tests
             AdbClient.Instance = client;
             PackageManager manager = new PackageManager(device);
 
-            Assert.IsTrue(manager.Packages.ContainsKey("mwc2015.be"));
-            Assert.AreEqual(null, manager.Packages["mwc2015.be"]);
+            Assert.True(manager.Packages.ContainsKey("mwc2015.be"));
+            Assert.Null(manager.Packages["mwc2015.be"]);
         }
 
-        [TestMethod]
+        [Fact]
         public void InstallRemotePackageTest()
         {
             var adbClient = new DummyAdbClient();
@@ -68,17 +66,16 @@ namespace SharpAdbClient.Tests
             PackageManager manager = new PackageManager(device);
             manager.InstallRemotePackage("/data/test.apk", false);
 
-            Assert.AreEqual(2, adbClient.ReceivedCommands.Count);
-            Assert.AreEqual("pm install /data/test.apk", adbClient.ReceivedCommands[1]);
+            Assert.Equal(2, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm install /data/test.apk", adbClient.ReceivedCommands[1]);
 
             manager.InstallRemotePackage("/data/test.apk", true);
 
-            Assert.AreEqual(3, adbClient.ReceivedCommands.Count);
-            Assert.AreEqual("pm install -r /data/test.apk", adbClient.ReceivedCommands[2]);
+            Assert.Equal(3, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm install -r /data/test.apk", adbClient.ReceivedCommands[2]);
         }
 
-        [TestMethod]
-        [DeploymentItem("test.txt")]
+        [Fact]
         public void InstallPackageTest()
         {
             var syncService = new DummySyncService();
@@ -99,15 +96,15 @@ namespace SharpAdbClient.Tests
 
             PackageManager manager = new PackageManager(device);
             manager.InstallPackage("test.txt", false);
-            Assert.AreEqual(3, adbClient.ReceivedCommands.Count);
-            Assert.AreEqual("pm install /data/local/tmp/test.txt", adbClient.ReceivedCommands[1]);
-            Assert.AreEqual("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[2]);
+            Assert.Equal(3, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm install /data/local/tmp/test.txt", adbClient.ReceivedCommands[1]);
+            Assert.Equal("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[2]);
 
-            Assert.AreEqual(1, syncService.UploadedFiles.Count);
-            Assert.IsTrue(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
+            Assert.Single(syncService.UploadedFiles);
+            Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
         }
 
-        [TestMethod]
+        [Fact]
         public void UninstallPackageTest()
         {
             DeviceData device = new DeviceData()
@@ -126,8 +123,7 @@ namespace SharpAdbClient.Tests
             manager.UninstallPackage("com.android.gallery3d");
         }
 
-        [TestMethod]
-        [DeploymentItem("gapps.txt")]
+        [Fact]
         public void GetPackageVersionInfoTest()
         {
             DeviceData device = new DeviceData()
@@ -141,8 +137,8 @@ namespace SharpAdbClient.Tests
             PackageManager manager = new PackageManager(device, skipInit: true);
 
             var versionInfo = manager.GetVersionInfo("com.google.android.gms");
-            Assert.AreEqual(11062448, versionInfo.VersionCode);
-            Assert.AreEqual("11.0.62 (448-160311229)", versionInfo.VersionName);
+            Assert.Equal(11062448, versionInfo.VersionCode);
+            Assert.Equal("11.0.62 (448-160311229)", versionInfo.VersionName);
         }
     }
 }

@@ -1,22 +1,19 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using Moq;
 using System;
 using System.IO;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class AdbCommandLineClientExtensionsTests
     {
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void EnsureIsValidAdbFileNullValueTest()
         {
-            AdbCommandLineClientExtensions.EnsureIsValidAdbFile(null, "adb.exe");
+            Assert.Throws< ArgumentNullException>(() => AdbCommandLineClientExtensions.EnsureIsValidAdbFile(null, "adb.exe"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(FileNotFoundException))]
+        [Fact]
         public void EnsureIsValidAdbFileInvalidFileTest()
         {
             var clientMock = new Mock<IAdbCommandLineClient>();
@@ -24,7 +21,7 @@ namespace SharpAdbClient.Tests
 
             var client = clientMock.Object;
 
-            client.EnsureIsValidAdbFile("xyz.exe");
+            Assert.Throws<FileNotFoundException>(() => client.EnsureIsValidAdbFile("xyz.exe"));
         }
     }
 }

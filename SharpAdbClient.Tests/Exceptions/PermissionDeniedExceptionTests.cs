@@ -1,31 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using SharpAdbClient.Exceptions;
 
 namespace SharpAdbClient.Tests.Exceptions
 {
-    [TestClass]
     public class PermissionDeniedExceptionTests
     {
-        [TestMethod]
+        [Fact]
         public void TestEmptyConstructor()
         {
             ExceptionTester<PermissionDeniedException>.TestEmptyConstructor(() => new PermissionDeniedException());
         }
 
-        [TestMethod]
+        [Fact]
         public void TestMessageConstructor()
         {
             ExceptionTester<PermissionDeniedException>.TestMessageConstructor((message) => new PermissionDeniedException(message));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestMessageAndInnerConstructor()
         {
             ExceptionTester<PermissionDeniedException>.TestMessageAndInnerConstructor((message, inner) => new PermissionDeniedException(message, inner));
         }
 
 #if !NETCOREAPP1_1
-        [TestMethod]
+        [Fact]
         public void TestSerializationConstructor()
         {
             ExceptionTester<PermissionDeniedException>.TestSerializationConstructor((info, context) => new PermissionDeniedException(info, context));

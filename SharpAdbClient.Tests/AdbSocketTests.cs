@@ -1,54 +1,51 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpAdbClient.Exceptions;
+﻿using SharpAdbClient.Exceptions;
 using SharpAdbClient.Logs;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class AdbSocketTests
     {
-        [TestMethod]
+        [Fact]
         public void CloseTest()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
             AdbSocket socket = new AdbSocket(tcpSocket);
 
-            Assert.IsTrue(socket.Connected);
+            Assert.True(socket.Connected);
 
             socket.Dispose();
-            Assert.IsFalse(socket.Connected);
+            Assert.False(socket.Connected);
         }
 
-        [TestMethod]
+        [Fact]
         public void DisposeTest()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
             AdbSocket socket = new AdbSocket(tcpSocket);
 
-            Assert.IsTrue(socket.Connected);
+            Assert.True(socket.Connected);
 
             socket.Dispose();
-            Assert.IsFalse(socket.Connected);
+            Assert.False(socket.Connected);
         }
 
-        [TestMethod]
+        [Fact]
         public void IsOkayTest()
         {
             var okay = Encoding.ASCII.GetBytes("OKAY");
             var fail = Encoding.ASCII.GetBytes("FAIL");
 
-            Assert.IsTrue(AdbSocket.IsOkay(okay));
-            Assert.IsFalse(AdbSocket.IsOkay(fail));
+            Assert.True(AdbSocket.IsOkay(okay));
+            Assert.False(AdbSocket.IsOkay(fail));
         }
 
-        [TestMethod]
+        [Fact]
         public void SendSyncRequestTest()
         {
             this.RunTest(
@@ -56,7 +53,7 @@ namespace SharpAdbClient.Tests
                 new byte[] { (byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0 });
         }
 
-        [TestMethod]
+        [Fact]
         public void SendSyncRequestTest2()
         {
             this.RunTest(
@@ -64,7 +61,7 @@ namespace SharpAdbClient.Tests
                 new byte[] { (byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t' });
         }
 
-        [TestMethod]
+        [Fact]
         public void SendSyncRequest3()
         {
             this.RunTest(
@@ -72,16 +69,15 @@ namespace SharpAdbClient.Tests
                 new byte[] { (byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3' });
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void SendSyncNullRequestTest()
         {
-            this.RunTest(
-                (socket) => socket.SendSyncRequest(SyncCommand.DATA, null),
-                new byte[] { });
+            Assert.Throws<ArgumentNullException>(() => this.RunTest(
+               (socket) => socket.SendSyncRequest(SyncCommand.DATA, null),
+               new byte[] { }));
         }
 
-        [TestMethod]
+        [Fact]
         public void ReadSyncResponse()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
@@ -94,10 +90,10 @@ namespace SharpAdbClient.Tests
 
             tcpSocket.InputStream.Position = 0;
 
-            Assert.AreEqual(SyncCommand.DENT, socket.ReadSyncResponse());
+            Assert.Equal(SyncCommand.DENT, socket.ReadSyncResponse());
         }
 
-        [TestMethod]
+        [Fact]
         public void ReadSyncString()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
@@ -112,10 +108,10 @@ namespace SharpAdbClient.Tests
 
             tcpSocket.InputStream.Position = 0;
 
-            Assert.AreEqual("Hello", socket.ReadSyncString());
+            Assert.Equal("Hello", socket.ReadSyncString());
         }
 
-        [TestMethod]
+        [Fact]
         public async Task ReadStringAsyncTest()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
@@ -130,10 +126,10 @@ namespace SharpAdbClient.Tests
 
             tcpSocket.InputStream.Position = 0;
 
-            Assert.AreEqual("Hello", await socket.ReadStringAsync(CancellationToken.None));
+            Assert.Equal("Hello", await socket.ReadStringAsync(CancellationToken.None));
         }
 
-        [TestMethod]
+        [Fact]
         public void ReadAdbOkayResponseTest()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
@@ -147,14 +143,13 @@ namespace SharpAdbClient.Tests
             tcpSocket.InputStream.Position = 0;
 
             var response = socket.ReadAdbResponse();
-            Assert.IsTrue(response.IOSuccess);
-            Assert.AreEqual(string.Empty, response.Message);
-            Assert.IsTrue(response.Okay);
-            Assert.IsFalse(response.Timeout);
+            Assert.True(response.IOSuccess);
+            Assert.Equal(string.Empty, response.Message);
+            Assert.True(response.Okay);
+            Assert.False(response.Timeout);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AdbException))]
+        [Fact]
         public void ReadAdbFailResponseTest()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
@@ -169,10 +164,10 @@ namespace SharpAdbClient.Tests
 
             tcpSocket.InputStream.Position = 0;
 
-            var response = socket.ReadAdbResponse();
+            Assert.Throws<AdbException>(() => socket.ReadAdbResponse());
         }
 
-        [TestMethod]
+        [Fact]
         public void ReadTest()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
@@ -195,13 +190,13 @@ namespace SharpAdbClient.Tests
 
             for (int i = 0; i < 100; i++)
             {
-                Assert.AreEqual(received[i], (byte)i);
+                Assert.Equal(received[i], (byte)i);
             }
 
-            Assert.AreEqual(0, received[100]);
+            Assert.Equal(0, received[100]);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task ReadAsyncTest()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
@@ -224,13 +219,13 @@ namespace SharpAdbClient.Tests
 
             for (int i = 0; i < 100; i++)
             {
-                Assert.AreEqual(received[i], (byte)i);
+                Assert.Equal(received[i], (byte)i);
             }
 
-            Assert.AreEqual(0, received[100]);
+            Assert.Equal(0, received[100]);
         }
 
-        [TestMethod]
+        [Fact]
         public void SendAdbRequestTest()
         {
             this.RunTest(
@@ -238,17 +233,17 @@ namespace SharpAdbClient.Tests
                 Encoding.ASCII.GetBytes("0004Test\n"));
         }
 
-        [TestMethod]
+        [Fact]
         public void GetShellStreamTest()
         {
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
             AdbSocket socket = new AdbSocket(tcpSocket);
 
             var stream = socket.GetShellStream();
-            Assert.IsInstanceOfType(stream, typeof(ShellStream));
+            Assert.IsType<ShellStream>(stream);
 
             var shellStream = (ShellStream)stream;
-            Assert.AreEqual(tcpSocket.OutputStream, shellStream.Inner);
+            Assert.Equal(tcpSocket.OutputStream, shellStream.Inner);
         }
 
         private void RunTest(Action<IAdbSocket> test, byte[] expectedDataSent)
@@ -260,7 +255,7 @@ namespace SharpAdbClient.Tests
             test(socket);
 
             // Validate the data that was sent over the wire.
-            CollectionAssert.AreEqual(expectedDataSent, tcpSocket.GetBytesSent());
+            Assert.Equal(expectedDataSent, tcpSocket.GetBytesSent());
         }
     }
 }
