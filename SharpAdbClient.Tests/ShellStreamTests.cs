@@ -83,7 +83,7 @@ namespace SharpAdbClient.Tests
                 var read = shellStream.Read(buffer, 0, 100);
 
                 var actual = Encoding.ASCII.GetString(buffer, 0, read);
-                Assert.Equal(actual, "\n1\n2\n3\n4\n5");
+                Assert.Equal("\n1\n2\n3\n4\n5", actual);
                 Assert.Equal(10, read);
 
                 for (int i = 10; i < buffer.Length; i++)

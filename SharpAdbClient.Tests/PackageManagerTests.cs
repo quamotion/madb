@@ -44,7 +44,7 @@ namespace SharpAdbClient.Tests
             PackageManager manager = new PackageManager(device);
 
             Assert.True(manager.Packages.ContainsKey("mwc2015.be"));
-            Assert.Equal(null, manager.Packages["mwc2015.be"]);
+            Assert.Null(manager.Packages["mwc2015.be"]);
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace SharpAdbClient.Tests
             Assert.Equal("pm install /data/local/tmp/test.txt", adbClient.ReceivedCommands[1]);
             Assert.Equal("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[2]);
 
-            Assert.Equal(1, syncService.UploadedFiles.Count);
+            Assert.Single(syncService.UploadedFiles);
             Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
         }
 

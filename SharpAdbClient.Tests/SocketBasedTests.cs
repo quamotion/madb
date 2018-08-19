@@ -207,10 +207,10 @@ namespace SharpAdbClient
                 // were read, and the correct request was sent.
 
                 // Make sure the messages were read
-                Assert.Equal(0, this.Socket.ResponseMessages.Count);
-                Assert.Equal(0, this.Socket.Responses.Count);
-                Assert.Equal(0, this.Socket.SyncResponses.Count);
-                Assert.Equal(0, this.Socket.SyncDataReceived.Count);
+                Assert.Empty(this.Socket.ResponseMessages);
+                Assert.Empty(this.Socket.Responses);
+                Assert.Empty(this.Socket.SyncResponses);
+                Assert.Empty(this.Socket.SyncDataReceived);
 
                 // Make sure a request was sent
                 Assert.Equal(requests.ToList(), this.Socket.Requests);
@@ -221,7 +221,7 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.Equal(0, this.Socket.SyncRequests.Count);
+                    Assert.Empty(this.Socket.SyncRequests);
                 }
 
                 if (syncDataSent != null)
@@ -230,7 +230,7 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.Equal(0, this.Socket.SyncDataSent.Count);
+                    Assert.Empty(this.Socket.SyncDataSent);
                 }
             }
             else
@@ -245,7 +245,7 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.Equal(0, this.Socket.SyncRequests.Count);
+                    Assert.Empty(this.Socket.SyncRequests);
                 }
 
                 Assert.Equal(responses.ToList(), this.Socket.Responses);
@@ -257,7 +257,7 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.Equal(0, this.Socket.SyncResponses.Count);
+                    Assert.Empty(this.Socket.SyncResponses);
                 }
 
                 if (syncDataReceived != null)
@@ -266,7 +266,7 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.Equal(0, this.Socket.SyncDataReceived.Count);
+                    Assert.Empty(this.Socket.SyncDataReceived);
                 }
 
                 if (syncDataSent != null)
@@ -275,7 +275,7 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.Equal(0, this.Socket.SyncDataSent.Count);
+                    Assert.Empty(this.Socket.SyncDataSent);
                 }
             }
 

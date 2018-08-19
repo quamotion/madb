@@ -11,10 +11,10 @@ namespace SharpAdbClient.Tests
             string data = @"169.254.138.177:5555   offline product:VS Emulator Android Device - 480 x 800 model:Android_Device___480_x_800 device:donatello";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("169.254.138.177:5555", device.Serial);
-            Assert.Equal<string>("VS Emulator Android Device - 480 x 800", device.Product);
-            Assert.Equal<string>("Android_Device___480_x_800", device.Model);
-            Assert.Equal<string>("donatello", device.Name);
+            Assert.Equal("169.254.138.177:5555", device.Serial);
+            Assert.Equal("VS Emulator Android Device - 480 x 800", device.Product);
+            Assert.Equal("Android_Device___480_x_800", device.Model);
+            Assert.Equal("donatello", device.Name);
             Assert.Equal<DeviceState>(DeviceState.Offline, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
@@ -25,10 +25,10 @@ namespace SharpAdbClient.Tests
             string data = "R32D102SZAE            unauthorized";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("R32D102SZAE", device.Serial);
-            Assert.Equal<string>("", device.Product);
-            Assert.Equal<string>("", device.Model);
-            Assert.Equal<string>("", device.Name);
+            Assert.Equal("R32D102SZAE", device.Serial);
+            Assert.Equal("", device.Product);
+            Assert.Equal("", device.Model);
+            Assert.Equal("", device.Name);
             Assert.Equal<DeviceState>(DeviceState.Unauthorized, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
@@ -39,7 +39,7 @@ namespace SharpAdbClient.Tests
             string data = "emulator-5586          host features:shell_2";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("emulator-5586", device.Serial);
+            Assert.Equal("emulator-5586", device.Serial);
             Assert.Equal<DeviceState>(DeviceState.Host, device.State);
             Assert.Equal("shell_2", device.Features);
             Assert.Equal(string.Empty, device.Usb);
@@ -51,7 +51,7 @@ namespace SharpAdbClient.Tests
             string data = "0100a9ee51a18f2b device product:bullhead model:Nexus_5X device:bullhead features:shell_v2,cmd";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("0100a9ee51a18f2b", device.Serial);
+            Assert.Equal("0100a9ee51a18f2b", device.Serial);
             Assert.Equal<DeviceState>(DeviceState.Online, device.State);
             Assert.Equal("Nexus_5X", device.Model);
             Assert.Equal("bullhead", device.Product);
@@ -67,7 +67,7 @@ namespace SharpAdbClient.Tests
             string data = "EAOKCY112414           device usb:1-1 product:WW_K013 model:K013 device:K013_1";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("EAOKCY112414", device.Serial);
+            Assert.Equal("EAOKCY112414", device.Serial);
             Assert.Equal<DeviceState>(DeviceState.Online, device.State);
             Assert.Equal("K013", device.Model);
             Assert.Equal("WW_K013", device.Product);
@@ -83,10 +83,10 @@ namespace SharpAdbClient.Tests
             string data = "ZY3222LBDC recovery usb:337641472X product:omni_cedric device:cedric";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("ZY3222LBDC", device.Serial);
+            Assert.Equal("ZY3222LBDC", device.Serial);
             Assert.Equal<DeviceState>(DeviceState.Recovery, device.State);
-            Assert.Equal<string>("337641472X", device.Usb);
-            Assert.Equal<string>(string.Empty, device.Model);
+            Assert.Equal("337641472X", device.Usb);
+            Assert.Equal(string.Empty, device.Model);
             Assert.Equal("omni_cedric", device.Product);
             Assert.Equal("cedric", device.Name);
         }
@@ -97,7 +97,7 @@ namespace SharpAdbClient.Tests
             string data = "009d1cd696d5194a     no permissions";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("009d1cd696d5194a", device.Serial);
+            Assert.Equal("009d1cd696d5194a", device.Serial);
             Assert.Equal(DeviceState.NoPermissions, device.State);
         }
 
@@ -107,7 +107,7 @@ namespace SharpAdbClient.Tests
             string data = "99000000               device product:if_s200n model:NL_V100KR device:if_s200n";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("99000000", device.Serial);
+            Assert.Equal("99000000", device.Serial);
             Assert.Equal("if_s200n", device.Product);
             Assert.Equal("NL_V100KR", device.Model);
             Assert.Equal("if_s200n", device.Name);
@@ -143,10 +143,10 @@ namespace SharpAdbClient.Tests
             string data = "R32D102SZAE            device transport_id:6";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("R32D102SZAE", device.Serial);
-            Assert.Equal<string>("", device.Product);
-            Assert.Equal<string>("", device.Model);
-            Assert.Equal<string>("", device.Name);
+            Assert.Equal("R32D102SZAE", device.Serial);
+            Assert.Equal("", device.Product);
+            Assert.Equal("", device.Model);
+            Assert.Equal("", device.Name);
             Assert.Equal<DeviceState>(DeviceState.Online, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
@@ -157,11 +157,11 @@ namespace SharpAdbClient.Tests
             string data = "emulator-5554          device product:sdk_google_phone_x86 model:Android_SDK_built_for_x86 device:generic_x86 transport_id:1";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("emulator-5554", device.Serial);
-            Assert.Equal<string>("sdk_google_phone_x86", device.Product);
-            Assert.Equal<string>("Android_SDK_built_for_x86", device.Model);
-            Assert.Equal<string>("generic_x86", device.Name);
-            Assert.Equal<string>("1", device.TransportId);
+            Assert.Equal("emulator-5554", device.Serial);
+            Assert.Equal("sdk_google_phone_x86", device.Product);
+            Assert.Equal("Android_SDK_built_for_x86", device.Model);
+            Assert.Equal("generic_x86", device.Name);
+            Assert.Equal("1", device.TransportId);
             Assert.Equal<DeviceState>(DeviceState.Online, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
@@ -172,11 +172,11 @@ namespace SharpAdbClient.Tests
             string data = "00bc13bcf4bacc62 device product:bullhead model:Nexus_5X device:bullhead transport_id:1";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("00bc13bcf4bacc62", device.Serial);
-            Assert.Equal<string>("bullhead", device.Product);
-            Assert.Equal<string>("Nexus_5X", device.Model);
-            Assert.Equal<string>("bullhead", device.Name);
-            Assert.Equal<string>("1", device.TransportId);
+            Assert.Equal("00bc13bcf4bacc62", device.Serial);
+            Assert.Equal("bullhead", device.Product);
+            Assert.Equal("Nexus_5X", device.Model);
+            Assert.Equal("bullhead", device.Name);
+            Assert.Equal("1", device.TransportId);
             Assert.Equal<DeviceState>(DeviceState.Online, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
@@ -187,7 +187,7 @@ namespace SharpAdbClient.Tests
             string data = "00bc13bcf4bacc62 connecting";
 
             var device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal<string>("00bc13bcf4bacc62", device.Serial);
+            Assert.Equal("00bc13bcf4bacc62", device.Serial);
             Assert.Equal(string.Empty, device.Product);
             Assert.Equal(string.Empty, device.Model);
             Assert.Equal(string.Empty, device.Name);

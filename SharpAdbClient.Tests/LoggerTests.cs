@@ -63,7 +63,7 @@ namespace SharpAdbClient.Tests
                 var eventLog = (EventLogEntry)entry;
                 Assert.Equal(0, eventLog.Tag);
                 Assert.NotNull(eventLog.Values);
-                Assert.Equal(1, eventLog.Values.Count);
+                Assert.Single(eventLog.Values);
                 Assert.NotNull(eventLog.Values[0]);
                 Assert.IsType<Collection<object>>(eventLog.Values[0]);
 

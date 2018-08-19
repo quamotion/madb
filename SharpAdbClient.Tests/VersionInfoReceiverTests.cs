@@ -29,15 +29,15 @@ namespace Quamotion.Test.Devices.Android
             Assert.Null(receiver.GetVersionCode("Packages:"));
 
             Assert.Equal<int>(10210, (int)receiver.GetVersionCode(" versionCode=10210 targetSdk=18"));
-            Assert.Equal<object>(null, receiver.GetVersionCode(null));
-            Assert.Equal<object>(null, receiver.GetVersionCode(string.Empty));
-            Assert.Equal<object>(null, receiver.GetVersionCode(" versionCode=10210targetSdk=18"));
+            Assert.Null(receiver.GetVersionCode(null));
+            Assert.Null(receiver.GetVersionCode(string.Empty));
+            Assert.Null(receiver.GetVersionCode(" versionCode=10210targetSdk=18"));
 
-            Assert.Equal<string>("4.7.1", (string)receiver.GetVersionName("    versionName=4.7.1"));
-            Assert.Equal<string>(null, (string)receiver.GetVersionName(null));
-            Assert.Equal<string>(null, (string)receiver.GetVersionName(" test"));
-            Assert.Equal<string>(null, (string)receiver.GetVersionName("    versionName"));
-            Assert.Equal<string>(string.Empty, (string)receiver.GetVersionName("    versionName="));
+            Assert.Equal("4.7.1", (string)receiver.GetVersionName("    versionName=4.7.1"));
+            Assert.Null((string)receiver.GetVersionName(null));
+            Assert.Null((string)receiver.GetVersionName(" test"));
+            Assert.Null((string)receiver.GetVersionName("    versionName"));
+            Assert.Equal(string.Empty, (string)receiver.GetVersionName("    versionName="));
 
             DeviceData device = new DeviceData();
 

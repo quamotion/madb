@@ -49,25 +49,25 @@ namespace SharpAdbClient.Tests
         public void CombineTest()
         {
             String result = LinuxPath.Combine("/system", "busybox");
-            Assert.Equal<string>("/system/busybox", result);
+            Assert.Equal("/system/busybox", result);
 
             result = LinuxPath.Combine("/system/", "busybox");
-            Assert.Equal<string>("/system/busybox", result);
+            Assert.Equal("/system/busybox", result);
 
             result = LinuxPath.Combine("/system/xbin", "busybox");
-            Assert.Equal<string>("/system/xbin/busybox", result);
+            Assert.Equal("/system/xbin/busybox", result);
 
             result = LinuxPath.Combine("/system/xbin/", "busybox");
-            Assert.Equal<string>("/system/xbin/busybox", result);
+            Assert.Equal("/system/xbin/busybox", result);
 
             result = LinuxPath.Combine("/system//xbin", "busybox");
-            Assert.Equal<string>("/system/xbin/busybox", result);
+            Assert.Equal("/system/xbin/busybox", result);
 
             result = LinuxPath.Combine("/system", "xbin", "busybox");
-            Assert.Equal<string>("/system/xbin/busybox", result);
+            Assert.Equal("/system/xbin/busybox", result);
 
             result = LinuxPath.Combine("/system", "xbin", "really", "long", "path", "to", "nothing");
-            Assert.Equal<string>("/system/xbin/really/long/path/to/nothing", result);
+            Assert.Equal("/system/xbin/really/long/path/to/nothing", result);
         }
 
         [Fact]
@@ -81,35 +81,35 @@ namespace SharpAdbClient.Tests
         public void GetDirectoryNameTest()
         {
             String result = LinuxPath.GetDirectoryName("/system/busybox");
-            Assert.Equal<string>("/system/", result);
+            Assert.Equal("/system/", result);
 
             result = LinuxPath.GetDirectoryName("/");
-            Assert.Equal<string>("/", result);
+            Assert.Equal("/", result);
 
             result = LinuxPath.GetDirectoryName("/system/xbin/");
-            Assert.Equal<string>("/system/xbin/", result);
+            Assert.Equal("/system/xbin/", result);
 
             result = LinuxPath.GetDirectoryName("echo");
-            Assert.Equal<string>("./", result);
+            Assert.Equal("./", result);
 
             result = LinuxPath.GetDirectoryName(null);
-            Assert.Equal<string>(null, result);
+            Assert.Null(result);
         }
 
         [Fact]
         public void GetFileNameTest()
         {
             String result = LinuxPath.GetFileName("/system/busybox");
-            Assert.Equal<string>("busybox", result);
+            Assert.Equal("busybox", result);
 
             result = LinuxPath.GetFileName("/");
-            Assert.Equal<string>("", result);
+            Assert.Equal("", result);
 
             result = LinuxPath.GetFileName("/system/xbin/");
-            Assert.Equal<string>("", result);
+            Assert.Equal("", result);
 
             result = LinuxPath.GetFileName("/system/xbin/file.ext");
-            Assert.Equal<string>("file.ext", result);
+            Assert.Equal("file.ext", result);
 
             result = LinuxPath.GetFileName(null);
             Assert.Null(result);

@@ -56,9 +56,9 @@ namespace SharpAdbClient.Tests
                     monitor.Start();
 
                     Assert.Equal(1, monitor.Devices.Count);
-                    Assert.Equal(1, sink.ConnectedEvents.Count);
-                    Assert.Equal(0, sink.ChangedEvents.Count);
-                    Assert.Equal(0, sink.DisconnectedEvents.Count);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                 });
 
                 this.Socket.ResponseMessages.Clear();
@@ -76,9 +76,9 @@ namespace SharpAdbClient.Tests
                 {
                     eventWaiter.WaitOne(1000);
                     Assert.Equal(0, monitor.Devices.Count);
-                    Assert.Equal(1, sink.ConnectedEvents.Count);
-                    Assert.Equal(0, sink.ChangedEvents.Count);
-                    Assert.Equal(1, sink.DisconnectedEvents.Count);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Single(sink.DisconnectedEvents);
                     Assert.Equal("169.254.109.177:5555", sink.DisconnectedEvents[0].Device.Serial);
                 });
             }
@@ -105,9 +105,9 @@ namespace SharpAdbClient.Tests
                     monitor.Start();
 
                     Assert.Equal(0, monitor.Devices.Count);
-                    Assert.Equal(0, sink.ConnectedEvents.Count);
-                    Assert.Equal(0, sink.ChangedEvents.Count);
-                    Assert.Equal(0, sink.DisconnectedEvents.Count);
+                    Assert.Empty(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                 });
 
                 this.Socket.ResponseMessages.Clear();
@@ -126,9 +126,9 @@ namespace SharpAdbClient.Tests
                     eventWaiter.WaitOne(1000);
 
                     Assert.Equal(1, monitor.Devices.Count);
-                    Assert.Equal(1, sink.ConnectedEvents.Count);
-                    Assert.Equal(0, sink.ChangedEvents.Count);
-                    Assert.Equal(0, sink.DisconnectedEvents.Count);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                     Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
                 });
             }
@@ -155,10 +155,10 @@ namespace SharpAdbClient.Tests
 
                     Assert.Equal(1, monitor.Devices.Count);
                     Assert.Equal("169.254.109.177:5555", monitor.Devices.ElementAt(0).Serial);
-                    Assert.Equal(1, sink.ConnectedEvents.Count);
+                    Assert.Single(sink.ConnectedEvents);
                     Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
-                    Assert.Equal(0, sink.ChangedEvents.Count);
-                    Assert.Equal(0, sink.DisconnectedEvents.Count);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                 });
             }
         }
@@ -185,9 +185,9 @@ namespace SharpAdbClient.Tests
 
                     Assert.Equal(1, monitor.Devices.Count);
                     Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
-                    Assert.Equal(1, sink.ConnectedEvents.Count);
-                    Assert.Equal(0, sink.ChangedEvents.Count);
-                    Assert.Equal(0, sink.DisconnectedEvents.Count);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Empty(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                 });
 
                 this.Socket.ResponseMessages.Clear();
@@ -207,9 +207,9 @@ namespace SharpAdbClient.Tests
 
                     Assert.Equal(1, monitor.Devices.Count);
                     Assert.Equal(DeviceState.Online, monitor.Devices.ElementAt(0).State);
-                    Assert.Equal(1, sink.ConnectedEvents.Count);
-                    Assert.Equal(1, sink.ChangedEvents.Count);
-                    Assert.Equal(0, sink.DisconnectedEvents.Count);
+                    Assert.Single(sink.ConnectedEvents);
+                    Assert.Single(sink.ChangedEvents);
+                    Assert.Empty(sink.DisconnectedEvents);
                     Assert.Equal("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
                 });
             }

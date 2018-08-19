@@ -50,9 +50,9 @@ namespace SharpAdbClient.Tests
 
             var status = this.adbServer.GetStatus();
 
-            Assert.Equal(0, this.socket.Responses.Count);
-            Assert.Equal(0, this.socket.ResponseMessages.Count);
-            Assert.Equal(1, this.socket.Requests.Count);
+            Assert.Empty(this.socket.Responses);
+            Assert.Empty(this.socket.ResponseMessages);
+            Assert.Single(this.socket.Requests);
             Assert.Equal("host:version", this.socket.Requests[0]);
 
             Assert.True(status.IsRunning);
@@ -98,7 +98,7 @@ namespace SharpAdbClient.Tests
 
             Assert.Equal(StartServerResult.AlreadyRunning, result);
 
-            Assert.Equal(1, this.socket.Requests.Count);
+            Assert.Single(this.socket.Requests);
             Assert.Equal("host:version", this.socket.Requests[0]);
         }
 
@@ -197,7 +197,7 @@ namespace SharpAdbClient.Tests
 
             Assert.False(this.commandLineClient.ServerStarted);
 
-            Assert.Equal(1, this.socket.Requests.Count);
+            Assert.Single(this.socket.Requests);
             Assert.Equal("host:version", this.socket.Requests[0]);
         }
 

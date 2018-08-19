@@ -136,7 +136,7 @@ namespace SharpAdbClient.Tests
 
             // Make sure and the correct value is returned.
             Assert.NotNull(devices);
-            Assert.Equal(1, devices.Count);
+            Assert.Single(devices);
 
             var device = devices.Single();
 

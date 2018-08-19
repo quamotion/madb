@@ -39,7 +39,7 @@ namespace SharpAdbClient.Tests.DeviceCommands
 
             var variables = device.GetEnvironmentVariables();
             Assert.NotNull(variables);
-            Assert.Equal(1, variables.Keys.Count);
+            Assert.Single(variables.Keys);
             Assert.True(variables.ContainsKey("a"));
             Assert.Equal("b", variables["a"]);
         }
