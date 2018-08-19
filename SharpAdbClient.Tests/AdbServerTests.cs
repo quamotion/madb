@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using Moq;
 using SharpAdbClient.Exceptions;
 using System;
@@ -7,7 +7,6 @@ using System.Net.Sockets;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class AdbServerTests
     {
         private Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
@@ -17,8 +16,7 @@ namespace SharpAdbClient.Tests
         private AdbClient adbClient;
         private AdbServer adbServer;
 
-        [TestInitialize]
-        public void Initialize()
+        public AdbServerTests()
         {
             this.socket = new DummyAdbSocket();
             this.adbSocketFactory = (endPoint) => this.socket;
@@ -30,7 +28,7 @@ namespace SharpAdbClient.Tests
             this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetStatusNotRunningTest()
         {
             var adbClientMock = new Mock<IAdbClient>();
@@ -40,11 +38,11 @@ namespace SharpAdbClient.Tests
             var adbServer = new AdbServer(adbClientMock.Object, this.adbCommandLineClientFactory);
 
             var status = adbServer.GetStatus();
-            Assert.IsFalse(status.IsRunning);
-            Assert.IsNull(status.Version);
+            Assert.False(status.IsRunning);
+            Assert.Null(status.Version);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetStatusRunningTest()
         {
             this.socket.Responses.Enqueue(AdbResponse.OK);
@@ -52,17 +50,16 @@ namespace SharpAdbClient.Tests
 
             var status = this.adbServer.GetStatus();
 
-            Assert.AreEqual(0, this.socket.Responses.Count);
-            Assert.AreEqual(0, this.socket.ResponseMessages.Count);
-            Assert.AreEqual(1, this.socket.Requests.Count);
-            Assert.AreEqual("host:version", this.socket.Requests[0]);
+            Assert.Equal(0, this.socket.Responses.Count);
+            Assert.Equal(0, this.socket.ResponseMessages.Count);
+            Assert.Equal(1, this.socket.Requests.Count);
+            Assert.Equal("host:version", this.socket.Requests[0]);
 
-            Assert.IsTrue(status.IsRunning);
-            Assert.AreEqual(new Version(1, 0, 32), status.Version);
+            Assert.True(status.IsRunning);
+            Assert.Equal(new Version(1, 0, 32), status.Version);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(SocketException))]
+        [Fact]
         public void GetStatusOtherSocketExceptionTest()
         {
             this.adbSocketFactory = (endPoint) =>
@@ -73,11 +70,10 @@ namespace SharpAdbClient.Tests
             this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
             this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
 
-            var status = this.adbServer.GetStatus();
+            Assert.Throws<SocketException>(() => this.adbServer.GetStatus());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [Fact]
         public void GetStatusOtherExceptionTest()
         {
             this.adbSocketFactory = (endPoint) =>
@@ -88,10 +84,10 @@ namespace SharpAdbClient.Tests
             this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
             this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
 
-            var status = this.adbServer.GetStatus();
+            Assert.Throws<Exception>(() => this.adbServer.GetStatus());
         }
 
-        [TestMethod]
+        [Fact]
         public void StartServerAlreadyRunningTest()
         {
             this.commandLineClient.Version = new Version(1, 0, 20);
@@ -100,27 +96,22 @@ namespace SharpAdbClient.Tests
 
             var result = this.adbServer.StartServer(null, false);
 
-            Assert.AreEqual(StartServerResult.AlreadyRunning, result);
+            Assert.Equal(StartServerResult.AlreadyRunning, result);
 
-            Assert.AreEqual(1, this.socket.Requests.Count);
-            Assert.AreEqual("host:version", this.socket.Requests[0]);
+            Assert.Equal(1, this.socket.Requests.Count);
+            Assert.Equal("host:version", this.socket.Requests[0]);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AdbException))]
+        [Fact]
         public void StartServerOutdatedRunningNoExecutableTest()
         {
             this.socket.Responses.Enqueue(AdbResponse.OK);
             this.socket.ResponseMessages.Enqueue("0010");
 
-            var result = this.adbServer.StartServer(null, false);
-
-            Assert.AreEqual(1, this.socket.Requests.Count);
-            Assert.AreEqual("host:version", this.socket.Requests[0]);
+            Assert.Throws<AdbException>(() => this.adbServer.StartServer(null, false));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AdbException))]
+        [Fact]
         public void StartServerNotRunningNoExecutableTest()
         {
             this.adbSocketFactory = (endPoint) =>
@@ -131,10 +122,10 @@ namespace SharpAdbClient.Tests
             this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
             this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
 
-            var result = this.adbServer.StartServer(null, false);
+            Assert.Throws<AdbException>(() => this.adbServer.StartServer(null, false));
         }
 
-        [TestMethod]
+        [Fact]
         public void StartServerOutdatedRunningTest()
         {
             this.socket.Responses.Enqueue(AdbResponse.OK);
@@ -142,18 +133,18 @@ namespace SharpAdbClient.Tests
 
             this.commandLineClient.Version = new Version(1, 0, 32);
 
-            Assert.IsFalse(this.commandLineClient.ServerStarted);
+            Assert.False(this.commandLineClient.ServerStarted);
 
             var result = this.adbServer.StartServer("adb.exe", false);
 
-            Assert.IsTrue(this.commandLineClient.ServerStarted);
+            Assert.True(this.commandLineClient.ServerStarted);
 
-            Assert.AreEqual(2, this.socket.Requests.Count);
-            Assert.AreEqual("host:version", this.socket.Requests[0]);
-            Assert.AreEqual("host:kill", this.socket.Requests[1]);
+            Assert.Equal(2, this.socket.Requests.Count);
+            Assert.Equal("host:version", this.socket.Requests[0]);
+            Assert.Equal("host:kill", this.socket.Requests[1]);
         }
 
-        [TestMethod]
+        [Fact]
         public void StartServerNotRunningTest()
         {
             this.adbSocketFactory = (endPoint) =>
@@ -166,14 +157,14 @@ namespace SharpAdbClient.Tests
 
             this.commandLineClient.Version = new Version(1, 0, 32);
 
-            Assert.IsFalse(this.commandLineClient.ServerStarted);
+            Assert.False(this.commandLineClient.ServerStarted);
 
             var result = this.adbServer.StartServer("adb.exe", false);
 
-            Assert.IsTrue(this.commandLineClient.ServerStarted);
+            Assert.True(this.commandLineClient.ServerStarted);
         }
 
-        [TestMethod]
+        [Fact]
         public void StartServerIntermediateRestartRequestedRunningTest()
         {
             this.socket.Responses.Enqueue(AdbResponse.OK);
@@ -181,18 +172,18 @@ namespace SharpAdbClient.Tests
 
             this.commandLineClient.Version = new Version(1, 0, 32);
 
-            Assert.IsFalse(this.commandLineClient.ServerStarted);
+            Assert.False(this.commandLineClient.ServerStarted);
 
             var result = this.adbServer.StartServer("adb.exe", true);
 
-            Assert.IsTrue(this.commandLineClient.ServerStarted);
+            Assert.True(this.commandLineClient.ServerStarted);
 
-            Assert.AreEqual(2, this.socket.Requests.Count);
-            Assert.AreEqual("host:version", this.socket.Requests[0]);
-            Assert.AreEqual("host:kill", this.socket.Requests[1]);
+            Assert.Equal(2, this.socket.Requests.Count);
+            Assert.Equal("host:version", this.socket.Requests[0]);
+            Assert.Equal("host:kill", this.socket.Requests[1]);
         }
 
-        [TestMethod]
+        [Fact]
         public void StartServerIntermediateRestartNotRequestedRunningTest()
         {
             this.socket.Responses.Enqueue(AdbResponse.OK);
@@ -200,21 +191,20 @@ namespace SharpAdbClient.Tests
 
             this.commandLineClient.Version = new Version(1, 0, 32);
 
-            Assert.IsFalse(this.commandLineClient.ServerStarted);
+            Assert.False(this.commandLineClient.ServerStarted);
 
             var result = this.adbServer.StartServer("adb.exe", false);
 
-            Assert.IsFalse(this.commandLineClient.ServerStarted);
+            Assert.False(this.commandLineClient.ServerStarted);
 
-            Assert.AreEqual(1, this.socket.Requests.Count);
-            Assert.AreEqual("host:version", this.socket.Requests[0]);
+            Assert.Equal(1, this.socket.Requests.Count);
+            Assert.Equal("host:version", this.socket.Requests[0]);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ConstructorAdbClientNullTest()
         {
-            var adbServer = new AdbServer(null, this.adbCommandLineClientFactory);
+            Assert.Throws<ArgumentNullException>(() => new AdbServer(null, this.adbCommandLineClientFactory));
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using SharpAdbClient.Exceptions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -189,7 +189,7 @@ namespace SharpAdbClient.Tests
         {
             var actual = this.SyncDataReceived.Dequeue();
 
-            Assert.AreEqual(actual.Length, length);
+            Assert.Equal(actual.Length, length);
 
             Buffer.BlockCopy(actual, 0, data, 0, length);
 

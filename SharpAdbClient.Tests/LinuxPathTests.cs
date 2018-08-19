@@ -1,137 +1,131 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpAdbClient.DeviceCommands;
+﻿using SharpAdbClient.DeviceCommands;
 using System;
+using Xunit;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class LinuxPathTests
     {
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void CheckInvalidPathCharsNullTest()
         {
-            LinuxPath.CheckInvalidPathChars(null);
+            Assert.Throws<ArgumentNullException>(() => LinuxPath.CheckInvalidPathChars(null));
         }
 
-        [TestMethod]
+        [Fact]
         public void CheckInvalidPathCharsTest()
         {
             // Should not throw an exception.
             LinuxPath.CheckInvalidPathChars("/var/test");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void CheckInvalidPathCharsTest2()
         {
             // Should throw an exception.
-            LinuxPath.CheckInvalidPathChars("/var/test > out");
+            Assert.Throws<ArgumentException>(() => LinuxPath.CheckInvalidPathChars("/var/test > out"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void CheckInvalidPathCharsTest3()
         {
             // Should throw an exception.
-            LinuxPath.CheckInvalidPathChars("\t/var/test");
+            Assert.Throws<ArgumentException>(() => LinuxPath.CheckInvalidPathChars("\t/var/test"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void CombineNullTest()
         {
-            LinuxPath.Combine(null);
+            Assert.Throws<ArgumentNullException>(() => LinuxPath.Combine(null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void CombineNullTest2()
         {
-            LinuxPath.Combine(new string[] { "/test", "hi", null });
+            Assert.Throws<ArgumentNullException>(() => LinuxPath.Combine(new string[] { "/test", "hi", null }));
         }
 
-        [TestMethod]
+        [Fact]
         public void CombineTest()
         {
             String result = LinuxPath.Combine("/system", "busybox");
-            Assert.AreEqual<string>("/system/busybox", result);
+            Assert.Equal<string>("/system/busybox", result);
 
             result = LinuxPath.Combine("/system/", "busybox");
-            Assert.AreEqual<string>("/system/busybox", result);
+            Assert.Equal<string>("/system/busybox", result);
 
             result = LinuxPath.Combine("/system/xbin", "busybox");
-            Assert.AreEqual<string>("/system/xbin/busybox", result);
+            Assert.Equal<string>("/system/xbin/busybox", result);
 
             result = LinuxPath.Combine("/system/xbin/", "busybox");
-            Assert.AreEqual<string>("/system/xbin/busybox", result);
+            Assert.Equal<string>("/system/xbin/busybox", result);
 
             result = LinuxPath.Combine("/system//xbin", "busybox");
-            Assert.AreEqual<string>("/system/xbin/busybox", result);
+            Assert.Equal<string>("/system/xbin/busybox", result);
 
             result = LinuxPath.Combine("/system", "xbin", "busybox");
-            Assert.AreEqual<string>("/system/xbin/busybox", result);
+            Assert.Equal<string>("/system/xbin/busybox", result);
 
             result = LinuxPath.Combine("/system", "xbin", "really", "long", "path", "to", "nothing");
-            Assert.AreEqual<string>("/system/xbin/really/long/path/to/nothing", result);
+            Assert.Equal<string>("/system/xbin/really/long/path/to/nothing", result);
         }
 
-        [TestMethod]
+        [Fact]
         public void CombineCurrentDirTest()
         {
             var result = LinuxPath.Combine(".", "test.txt");
-            Assert.AreEqual("./test.txt", result);
+            Assert.Equal("./test.txt", result);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetDirectoryNameTest()
         {
             String result = LinuxPath.GetDirectoryName("/system/busybox");
-            Assert.AreEqual<string>("/system/", result);
+            Assert.Equal<string>("/system/", result);
 
             result = LinuxPath.GetDirectoryName("/");
-            Assert.AreEqual<string>("/", result);
+            Assert.Equal<string>("/", result);
 
             result = LinuxPath.GetDirectoryName("/system/xbin/");
-            Assert.AreEqual<string>("/system/xbin/", result);
+            Assert.Equal<string>("/system/xbin/", result);
 
             result = LinuxPath.GetDirectoryName("echo");
-            Assert.AreEqual<string>("./", result);
+            Assert.Equal<string>("./", result);
 
             result = LinuxPath.GetDirectoryName(null);
-            Assert.AreEqual<string>(null, result);
+            Assert.Equal<string>(null, result);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetFileNameTest()
         {
             String result = LinuxPath.GetFileName("/system/busybox");
-            Assert.AreEqual<string>("busybox", result);
+            Assert.Equal<string>("busybox", result);
 
             result = LinuxPath.GetFileName("/");
-            Assert.AreEqual<string>("", result);
+            Assert.Equal<string>("", result);
 
             result = LinuxPath.GetFileName("/system/xbin/");
-            Assert.AreEqual<string>("", result);
+            Assert.Equal<string>("", result);
 
             result = LinuxPath.GetFileName("/system/xbin/file.ext");
-            Assert.AreEqual<string>("file.ext", result);
+            Assert.Equal<string>("file.ext", result);
 
             result = LinuxPath.GetFileName(null);
-            Assert.IsNull(result);
+            Assert.Null(result);
         }
 
-        [TestMethod]
+        [Fact]
         public void IsPathRootedTest()
         {
             bool result = LinuxPath.IsPathRooted("/system/busybox");
-            Assert.AreEqual<bool>(true, result);
+            Assert.Equal<bool>(true, result);
 
             result = LinuxPath.IsPathRooted("/system/xbin/");
-            Assert.AreEqual<bool>(true, result);
+            Assert.Equal<bool>(true, result);
 
             result = LinuxPath.IsPathRooted("system/xbin/");
-            Assert.AreEqual<bool>(false, result);
+            Assert.Equal<bool>(false, result);
         }
     }
 }

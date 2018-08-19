@@ -1,18 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class FramebufferTests
     {
-        [TestCategory("PerformanceTest")]
-        [TestMethod]
+        [Fact(Skip = "PerformanceTest")]
         public void GetFramebufferAsyncPerformanceTest()
         {
             var device = AdbClient.Instance.GetDevices().First();
@@ -23,8 +18,7 @@ namespace SharpAdbClient.Tests
             }
         }
 
-        [TestCategory("PerformanceTest")]
-        [TestMethod]
+        [Fact(Skip = "PerformanceTest")]
         public async Task RefreshFramebufferAsyncPerformanceTest()
         {
             var device = AdbClient.Instance.GetDevices().First();

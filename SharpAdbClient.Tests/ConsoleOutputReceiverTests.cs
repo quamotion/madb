@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using SharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,9 @@ using System.Threading.Tasks;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class ConsoleOutputReceiverTests
     {
-        [TestMethod]
+        [Fact]
         public void ToStringTest()
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
@@ -21,11 +20,11 @@ namespace SharpAdbClient.Tests
 
             receiver.Flush();
 
-            Assert.AreEqual("Hello, World!\r\nSee you!\r\n",
+            Assert.Equal("Hello, World!\r\nSee you!\r\n",
                 receiver.ToString());
         }
 
-        [TestMethod]
+        [Fact]
         public void ToStringIgnoredLineTest()
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
@@ -34,11 +33,11 @@ namespace SharpAdbClient.Tests
 
             receiver.Flush();
 
-            Assert.AreEqual("See you!\r\n",
+            Assert.Equal("See you!\r\n",
                 receiver.ToString());
         }
 
-        [TestMethod]
+        [Fact]
         public void ToStringIgnoredLineTest2()
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
@@ -47,11 +46,11 @@ namespace SharpAdbClient.Tests
 
             receiver.Flush();
 
-            Assert.AreEqual("Hello, World!\r\n",
+            Assert.Equal("Hello, World!\r\n",
                 receiver.ToString());
         }
 
-        [TestMethod]
+        [Fact]
         public void TrowOnErrorTest()
         {
             AssertTrowsException<FileNotFoundException>("/dev/test: not found");
@@ -71,20 +70,7 @@ namespace SharpAdbClient.Tests
             where T : Exception
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-
-            try
-            {
-                receiver.ThrowOnError(line);
-                throw new AssertFailedException($"An exception of type {typeof(T).FullName} was not thrown");
-            }
-            catch (T)
-            {
-                // All OK - an exception of type T was thrown
-            }
-            catch (Exception ex)
-            {
-                throw new AssertFailedException($"An exception of type {typeof(T).FullName} was expected, but of type {ex.GetType().FullName} was thrown instead.");
-            }
+            Assert.Throws<T>(() => receiver.ThrowOnError(line));
         }
     }
 }

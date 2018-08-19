@@ -1,20 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using Moq;
 using SharpAdbClient.DeviceCommands;
 using System.Linq;
 
 namespace SharpAdbClient.Tests.DeviceCommands
 {
-    [TestClass]
     public class DeviceExtensionsTests
     {
-        [TestInitialize]
-        public void Initialize()
+        public DeviceExtensionsTests()
         {
             Factories.Reset();
         }
 
-        [TestMethod]
+        [Fact]
         public void StatTest()
         {
             FileStatistics stats = new FileStatistics();
@@ -26,10 +24,10 @@ namespace SharpAdbClient.Tests.DeviceCommands
 
             var device = new DeviceData();
 
-            Assert.AreEqual(stats, device.Stat("/test"));
+            Assert.Equal(stats, device.Stat("/test"));
         }
 
-        [TestMethod]
+        [Fact]
         public void GetEnvironmentVariablesTest()
         {
             var adbClient = new DummyAdbClient();
@@ -40,14 +38,13 @@ namespace SharpAdbClient.Tests.DeviceCommands
             var device = new DeviceData();
 
             var variables = device.GetEnvironmentVariables();
-            Assert.IsNotNull(variables);
-            Assert.AreEqual(1, variables.Keys.Count);
-            Assert.IsTrue(variables.ContainsKey("a"));
-            Assert.AreEqual("b", variables["a"]);
+            Assert.NotNull(variables);
+            Assert.Equal(1, variables.Keys.Count);
+            Assert.True(variables.ContainsKey("a"));
+            Assert.Equal("b", variables["a"]);
         }
 
-        [TestMethod]
-        [TestCategory("IntegrationTest")]
+        [Fact(Skip = "IntegrationTest")]
         public void ListProcessesIntegrationTest()
         {
             var adbClient = new AdbClient();
@@ -59,7 +56,7 @@ namespace SharpAdbClient.Tests.DeviceCommands
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void UninstallPackageTests()
         {
             var adbClient = new DummyAdbClient();
@@ -72,12 +69,12 @@ namespace SharpAdbClient.Tests.DeviceCommands
             device.State = DeviceState.Online;
             device.UninstallPackage("com.example");
 
-            Assert.AreEqual(2, adbClient.ReceivedCommands.Count);
-            Assert.AreEqual("pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.AreEqual("pm uninstall com.example", adbClient.ReceivedCommands[1]);
+            Assert.Equal(2, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
+            Assert.Equal("pm uninstall com.example", adbClient.ReceivedCommands[1]);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetPackageVersionTest()
         {
             var adbClient = new DummyAdbClient();
@@ -124,15 +121,15 @@ Shared users:
             device.State = DeviceState.Online;
             var version = device.GetPackageVersion("com.example");
 
-            Assert.AreEqual(22, version.VersionCode);
-            Assert.AreEqual("5.1-eng.buildbot.20151117.204057", version.VersionName);
+            Assert.Equal(22, version.VersionCode);
+            Assert.Equal("5.1-eng.buildbot.20151117.204057", version.VersionName);
 
-            Assert.AreEqual(2, adbClient.ReceivedCommands.Count);
-            Assert.AreEqual("pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.AreEqual("dumpsys package com.example", adbClient.ReceivedCommands[1]);
+            Assert.Equal(2, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
+            Assert.Equal("dumpsys package com.example", adbClient.ReceivedCommands[1]);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetPackageVersionTest2()
         {
             var adbClient = new DummyAdbClient();
@@ -214,15 +211,15 @@ End!!!!");
             device.State = DeviceState.Online;
             var version = device.GetPackageVersion("jp.co.cyberagent.stf");
 
-            Assert.AreEqual(4, version.VersionCode);
-            Assert.AreEqual("2.1.0", version.VersionName);
+            Assert.Equal(4, version.VersionCode);
+            Assert.Equal("2.1.0", version.VersionName);
 
-            Assert.AreEqual(2, adbClient.ReceivedCommands.Count);
-            Assert.AreEqual("pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.AreEqual("dumpsys package jp.co.cyberagent.stf", adbClient.ReceivedCommands[1]);
+            Assert.Equal(2, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
+            Assert.Equal("dumpsys package jp.co.cyberagent.stf", adbClient.ReceivedCommands[1]);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetPackageVersionTest3()
         {
             var adbClient = new DummyAdbClient();
@@ -358,15 +355,15 @@ Compiler stats:
             device.State = DeviceState.Online;
             var version = device.GetPackageVersion("jp.co.cyberagent.stf");
 
-            Assert.AreEqual(4, version.VersionCode);
-            Assert.AreEqual("2.1.0", version.VersionName);
+            Assert.Equal(4, version.VersionCode);
+            Assert.Equal("2.1.0", version.VersionName);
 
-            Assert.AreEqual(2, adbClient.ReceivedCommands.Count);
-            Assert.AreEqual("pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.AreEqual("dumpsys package jp.co.cyberagent.stf", adbClient.ReceivedCommands[1]);
+            Assert.Equal(2, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
+            Assert.Equal("dumpsys package jp.co.cyberagent.stf", adbClient.ReceivedCommands[1]);
         }
 
-        [TestMethod]
+        [Fact]
         public void ListProcessesTest()
         {
             var adbClient = new DummyAdbClient();
@@ -399,10 +396,10 @@ asound");
             var device = new DeviceData();
             var processes = device.ListProcesses().ToArray();
 
-            Assert.AreEqual(3, processes.Length);
-            Assert.AreEqual("init", processes[0].Name);
-            Assert.AreEqual("kthreadd", processes[1].Name);
-            Assert.AreEqual("ksoftirqd/0", processes[2].Name);
+            Assert.Equal(3, processes.Length);
+            Assert.Equal("init", processes[0].Name);
+            Assert.Equal("kthreadd", processes[1].Name);
+            Assert.Equal("ksoftirqd/0", processes[2].Name);
         }
     }
 }

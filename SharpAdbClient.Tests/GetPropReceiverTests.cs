@@ -1,12 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using SharpAdbClient.DeviceCommands;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class GetPropReceiverTests
     {
-        [TestMethod]
+        [Fact]
         public void ListPropertiesTest()
         {
             DeviceData device = new DeviceData()
@@ -21,15 +20,15 @@ namespace SharpAdbClient.Tests
             AdbClient.Instance = client;
 
             var properties = device.GetProperties();
-            Assert.IsNotNull(properties);
-            Assert.AreEqual(3, properties.Count);
-            Assert.IsTrue(properties.ContainsKey("init.svc.BGW"));
-            Assert.IsTrue(properties.ContainsKey("init.svc.MtkCodecService"));
-            Assert.IsTrue(properties.ContainsKey("init.svc.bootanim"));
+            Assert.NotNull(properties);
+            Assert.Equal(3, properties.Count);
+            Assert.True(properties.ContainsKey("init.svc.BGW"));
+            Assert.True(properties.ContainsKey("init.svc.MtkCodecService"));
+            Assert.True(properties.ContainsKey("init.svc.bootanim"));
 
-            Assert.AreEqual("running", properties["init.svc.BGW"]);
-            Assert.AreEqual("running", properties["init.svc.MtkCodecService"]);
-            Assert.AreEqual("stopped", properties["init.svc.bootanim"]);
+            Assert.Equal("running", properties["init.svc.BGW"]);
+            Assert.Equal("running", properties["init.svc.MtkCodecService"]);
+            Assert.Equal("stopped", properties["init.svc.bootanim"]);
         }
     }
 }

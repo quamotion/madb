@@ -1,19 +1,18 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class ForwardDataTests
     {
-        [TestMethod]
+        [Fact]
         public void SpecTests()
         {
             ForwardData data = new ForwardData();
             data.Local = "tcp:1234";
             data.Remote = "tcp:4321";
 
-            Assert.AreEqual("tcp:1234", data.LocalSpec.ToString());
-            Assert.AreEqual("tcp:4321", data.RemoteSpec.ToString());
+            Assert.Equal("tcp:1234", data.LocalSpec.ToString());
+            Assert.Equal("tcp:4321", data.RemoteSpec.ToString());
         }
     }
 }

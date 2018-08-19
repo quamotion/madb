@@ -1,31 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Xunit;
 using SharpAdbClient.Exceptions;
 
 namespace SharpAdbClient.Tests.Exceptions
 {
-    [TestClass]
     public class AdbExceptionTests
     {
-        [TestMethod]
+        [Fact]
         public void TestEmptyConstructor()
         {
             ExceptionTester<AdbException>.TestEmptyConstructor(() => new AdbException());
         }
 
-        [TestMethod]
+        [Fact]
         public void TestMessageConstructor()
         {
             ExceptionTester<AdbException>.TestMessageConstructor((message) => new AdbException(message));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestMessageAndInnerConstructor()
         {
             ExceptionTester<AdbException>.TestMessageAndInnerConstructor((message, inner) => new AdbException(message, inner));
         }
 
 #if !NETCOREAPP1_1
-        [TestMethod]
+        [Fact]
         public void TestSerializationConstructor()
         {
             ExceptionTester<AdbException>.TestSerializationConstructor((info, context) => new AdbException(info, context));

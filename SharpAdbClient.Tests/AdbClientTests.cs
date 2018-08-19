@@ -1,75 +1,70 @@
 ﻿using SharpAdbClient.Exceptions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Drawing.Imaging;
-using System.IO;
-using SharpAdbClient.Logs;
 using System.Threading;
-using System.Collections.ObjectModel;
+using Xunit;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class AdbClientTests : SocketBasedTests
     {
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        // Toggle the integration test flag to true to run on an actual adb server
+        // (and to build/validate the test cases), set to false to use the mocked
+        // adb sockets.
+        // In release mode, this flag is ignored and the mocked adb sockets are always used.
+        public AdbClientTests()
+            : base(integrationTest: false, doDispose: false)
+        {
+            Factories.Reset();
+        }
+
+        [Fact]
         public void ConstructorNullTest()
         {
-            new AdbClient(null, Factories.AdbSocketFactory);
+            Assert.Throws<ArgumentNullException>(() => new AdbClient(null, Factories.AdbSocketFactory));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
+        [Fact]
         public void ConstructorInvalidEndPointTest()
         {
-            new AdbClient(new CustomEndPoint(), Factories.AdbSocketFactory);
+            Assert.Throws<NotSupportedException>(() => new AdbClient(new CustomEndPoint(), Factories.AdbSocketFactory));
         }
 
-        [TestMethod]
+        [Fact]
         public void ConstructorTest()
         {
             var adbClient = new AdbClient();
-            Assert.IsNotNull(adbClient);
-            Assert.IsNotNull(adbClient.EndPoint);
-            Assert.IsInstanceOfType(adbClient.EndPoint, typeof(IPEndPoint));
+            Assert.NotNull(adbClient);
+            Assert.NotNull(adbClient.EndPoint);
+            Assert.IsType<IPEndPoint>(adbClient.EndPoint);
 
             var endPoint = (IPEndPoint)adbClient.EndPoint;
 
-            Assert.AreEqual(IPAddress.Loopback, endPoint.Address);
-            Assert.AreEqual(AdbClient.AdbServerPort, endPoint.Port);
+            Assert.Equal(IPAddress.Loopback, endPoint.Address);
+            Assert.Equal(AdbClient.AdbServerPort, endPoint.Port);
         }
 
-        [TestMethod]
+        [Fact]
         public void FormAdbRequestTest()
         {
-            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0009host:kill\n"), AdbClient.FormAdbRequest("host:kill"));
-            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("000Chost:version\n"), AdbClient.FormAdbRequest("host:version"));
+            Assert.Equal(Encoding.ASCII.GetBytes("0009host:kill\n"), AdbClient.FormAdbRequest("host:kill"));
+            Assert.Equal(Encoding.ASCII.GetBytes("000Chost:version\n"), AdbClient.FormAdbRequest("host:version"));
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateAdbForwardRequestTest()
         {
-            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0008tcp:1984\n"), AdbClient.CreateAdbForwardRequest(null, 1984));
-            CollectionAssert.AreEqual(Encoding.ASCII.GetBytes("0012tcp:1981:127.0.0.1\n"), AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
+            Assert.Equal(Encoding.ASCII.GetBytes("0008tcp:1984\n"), AdbClient.CreateAdbForwardRequest(null, 1984));
+            Assert.Equal(Encoding.ASCII.GetBytes("0012tcp:1981:127.0.0.1\n"), AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
         }
 
-        [TestInitialize]
-        public void Initialize()
-        {
-            Factories.Reset();
-            // Toggle the integration test flag to true to run on an actual adb server
-            // (and to build/validate the test cases), set to false to use the mocked
-            // adb sockets.
-            // In release mode, this flag is ignored and the mocked adb sockets are always used.
-            base.Initialize(integrationTest: false, doDispose: false);
-        }
-
-        [TestMethod]
+        [Fact]
         public void KillAdbTest()
         {
             var requests = new string[]
@@ -83,11 +78,11 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    AdbClient.Instance.KillAdb();
+                    this.TestClient.KillAdb();
                 });
         }
 
-        [TestMethod]
+        [Fact]
         public void GetAdbVersionTest()
         {
             var responseMessages = new string[]
@@ -108,14 +103,14 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    version = AdbClient.Instance.GetAdbVersion();
+                    version = this.TestClient.GetAdbVersion();
                 });
 
             // Make sure and the correct value is returned.
-            Assert.AreEqual(32, version);
+            Assert.Equal(32, version);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetDevicesTest()
         {
             var responseMessages = new string[]
@@ -136,22 +131,22 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    devices = AdbClient.Instance.GetDevices();
+                    devices = this.TestClient.GetDevices();
                 });
 
             // Make sure and the correct value is returned.
-            Assert.IsNotNull(devices);
-            Assert.AreEqual(1, devices.Count);
+            Assert.NotNull(devices);
+            Assert.Equal(1, devices.Count);
 
             var device = devices.Single();
 
-            Assert.AreEqual("169.254.109.177:5555", device.Serial);
-            Assert.AreEqual(DeviceState.Online, device.State);
-            Assert.AreEqual("5__KitKat__4_4__XXHDPI_Phone", device.Model);
-            Assert.AreEqual("donatello", device.Name);
+            Assert.Equal("169.254.109.177:5555", device.Serial);
+            Assert.Equal(DeviceState.Online, device.State);
+            Assert.Equal("5__KitKat__4_4__XXHDPI_Phone", device.Model);
+            Assert.Equal("donatello", device.Name);
         }
 
-        [TestMethod]
+        [Fact]
         public void SetDeviceTest()
         {
             var requests = new string[]
@@ -165,12 +160,11 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    AdbClient.Instance.SetDevice(this.Socket, Device);
+                    this.TestClient.SetDevice(this.Socket, Device);
                 });
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(DeviceNotFoundException))]
+        [Fact]
         public void SetInvalidDeviceTest()
         {
             var requests = new string[]
@@ -178,18 +172,17 @@ namespace SharpAdbClient.Tests
                 "host:transport:169.254.109.177:5555"
             };
 
-            this.RunTest(
+            Assert.Throws<DeviceNotFoundException>(() => this.RunTest(
                 new AdbResponse[] { AdbResponse.FromError("device not found") },
                 NoResponseMessages,
                 requests,
                 () =>
                 {
-                    AdbClient.Instance.SetDevice(this.Socket, Device);
-                });
+                    this.TestClient.SetDevice(this.Socket, Device);
+                }));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AdbException))]
+        [Fact]
         public void SetDeviceOtherException()
         {
             var requests = new string[]
@@ -197,17 +190,17 @@ namespace SharpAdbClient.Tests
                 "host:transport:169.254.109.177:5555"
             };
 
-            this.RunTest(
+            Assert.Throws<AdbException>(() => this.RunTest(
                 new AdbResponse[] { AdbResponse.FromError("Too many cats.") },
                 NoResponseMessages,
                 requests,
                 () =>
                 {
-                    AdbClient.Instance.SetDevice(this.Socket, Device);
-                });
+                    this.TestClient.SetDevice(this.Socket, Device);
+                }));
         }
 
-        [TestMethod]
+        [Fact]
         public void RebootTest()
         {
             var requests = new string[]
@@ -222,11 +215,11 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    AdbClient.Instance.Reboot(Device);
+                    this.TestClient.Reboot(Device);
                 });
         }
 
-        [TestMethod]
+        [Fact]
         public void ExecuteRemoteCommandTest()
         {
             var device = new DeviceData()
@@ -261,14 +254,13 @@ namespace SharpAdbClient.Tests
                 shellStream,
                 () =>
                 {
-                    AdbClient.Instance.ExecuteRemoteCommand("echo Hello, World", device, receiver);
+                    this.TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver);
                 });
 
-            Assert.AreEqual("Hello, World\r\n", receiver.ToString());
+            Assert.Equal("Hello, World\r\n", receiver.ToString());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ShellCommandUnresponsiveException))]
+        [Fact]
         public void ExecuteRemoteCommandUnresponsiveTest()
         {
             var device = new DeviceData()
@@ -293,43 +285,42 @@ namespace SharpAdbClient.Tests
 
             var receiver = new ConsoleOutputReceiver();
 
-            this.RunTest(
+            Assert.Throws<ShellCommandUnresponsiveException>(() => this.RunTest(
                 responses,
                 responseMessages,
                 requests,
                 null,
                 () =>
                 {
-                    AdbClient.Instance.ExecuteRemoteCommand("echo Hello, World", device, receiver);
-                });
+                    this.TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver);
+                }));
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateForwardTest()
         {
             this.RunCreateForwardTest(
-                (device) => AdbClient.Instance.CreateForward(device, "tcp:1", "tcp:2", true),
+                (device) => this.TestClient.CreateForward(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateTcpForwardTest()
         {
             this.RunCreateForwardTest(
-                (device) => AdbClient.Instance.CreateForward(device, 3, 4),
+                (device) => this.TestClient.CreateForward(device, 3, 4),
                 "tcp:3;tcp:4");
         }
 
-        [TestMethod]
+        [Fact]
         public void CreateSocketForwardTest()
         {
             this.RunCreateForwardTest(
-                (device) => AdbClient.Instance.CreateForward(device, 5, "/socket/1"),
+                (device) => this.TestClient.CreateForward(device, 5, "/socket/1"),
                 "tcp:5;local:/socket/1");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(AdbException))]
+        [Fact]
         public void CreateDuplicateForwardTest()
         {
             var responses = new AdbResponse[]
@@ -342,17 +333,17 @@ namespace SharpAdbClient.Tests
                 "host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"
             };
 
-            this.RunTest(
+            Assert.Throws<AdbException>(() => this.RunTest(
                 responses,
                 NoResponseMessages,
                 requests,
                 () =>
                 {
-                    AdbClient.Instance.CreateForward(Device, "tcp:1", "tcp:2", false);
-                });
+                    this.TestClient.CreateForward(Device, "tcp:1", "tcp:2", false);
+                }));
         }
 
-        [TestMethod]
+        [Fact]
         public void ListForwardTest()
         {
             var responseMessages = new string[] {
@@ -370,16 +361,16 @@ namespace SharpAdbClient.Tests
                 OkResponse,
                 responseMessages,
                 requests,
-                () => forwards = AdbClient.Instance.ListForward(Device).ToArray());
+                () => forwards = this.TestClient.ListForward(Device).ToArray());
 
-            Assert.IsNotNull(forwards);
-            Assert.AreEqual(3, forwards.Length);
-            Assert.AreEqual("169.254.109.177:5555", forwards[0].SerialNumber);
-            Assert.AreEqual("tcp:1", forwards[0].Local);
-            Assert.AreEqual("tcp:2", forwards[0].Remote);
+            Assert.NotNull(forwards);
+            Assert.Equal(3, forwards.Length);
+            Assert.Equal("169.254.109.177:5555", forwards[0].SerialNumber);
+            Assert.Equal("tcp:1", forwards[0].Local);
+            Assert.Equal("tcp:2", forwards[0].Remote);
         }
 
-        [TestMethod]
+        [Fact]
         public void RemoveForwardTest()
         {
             var requests = new string[]
@@ -391,10 +382,10 @@ namespace SharpAdbClient.Tests
                 OkResponse,
                 NoResponseMessages,
                 requests,
-                () => AdbClient.Instance.RemoveForward(Device, 1));
+                () => this.TestClient.RemoveForward(Device, 1));
         }
 
-        [TestMethod]
+        [Fact]
         public void RemoveAllForwardsTest()
         {
             var requests = new string[]
@@ -406,70 +397,66 @@ namespace SharpAdbClient.Tests
                 OkResponse,
                 NoResponseMessages,
                 requests,
-                () => AdbClient.Instance.RemoveAllForwards(Device));
+                () => this.TestClient.RemoveAllForwards(Device));
         }
 
-        [TestMethod]
+        [Fact]
         public void ConnectIPAddressTest()
         {
             this.RunConnectTest(
-                () => AdbClient.Instance.Connect(IPAddress.Loopback),
+                () => this.TestClient.Connect(IPAddress.Loopback),
                 "127.0.0.1:5555");
         }
 
-        [TestMethod]
+        [Fact]
         public void ConnectDnsEndpointTest()
         {
             this.RunConnectTest(
-                () => AdbClient.Instance.Connect(new DnsEndPoint("localhost", 1234)),
+                () => this.TestClient.Connect(new DnsEndPoint("localhost", 1234)),
                 "localhost:1234");
         }
 
-        [TestMethod]
+        [Fact]
         public void ConnectIPEndpointTest()
         {
             this.RunConnectTest(
-                () => AdbClient.Instance.Connect(new IPEndPoint(IPAddress.Loopback, 4321)),
+                () => this.TestClient.Connect(new IPEndPoint(IPAddress.Loopback, 4321)),
                 "127.0.0.1:4321");
         }
 
-        [TestMethod]
+        [Fact]
         public void ConnectHostEndpointTest()
         {
             this.RunConnectTest(
-                () => AdbClient.Instance.Connect("localhost"),
+                () => this.TestClient.Connect("localhost"),
                 "localhost:5555");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ConnectIPAddressNullTest()
         {
-            AdbClient.Instance.Connect((IPAddress)null);
+            Assert.Throws<ArgumentNullException>(() => this.TestClient.Connect((IPAddress)null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ConnectDnsEndpointNullTest()
         {
-            AdbClient.Instance.Connect((DnsEndPoint)null);
+            Assert.Throws<ArgumentNullException>(() => this.TestClient.Connect((DnsEndPoint)null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ConnectIPEndpointNullTest()
         {
-            AdbClient.Instance.Connect((IPEndPoint)null);
+            Assert.Throws<ArgumentNullException>(() => this.TestClient.Connect((IPEndPoint)null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void ConnectHostEndpointNullTest()
         {
-            AdbClient.Instance.Connect((string)null);
+            Assert.Throws<ArgumentNullException>(() => this.TestClient.Connect((string)null));
         }
 
-        [TestMethod]
+        [Fact]
         public void DisconnectTest()
         {
             var requests = new string[] { "host:disconnect:localhost:5555" };
@@ -478,11 +465,10 @@ namespace SharpAdbClient.Tests
                 OkResponse,
                 NoResponseMessages,
                 requests,
-                () => AdbClient.Instance.Disconnect(new DnsEndPoint("localhost", 5555)));
+                () => this.TestClient.Disconnect(new DnsEndPoint("localhost", 5555)));
         }
 
-        [TestMethod]
-        [DeploymentItem("logcat.bin")]
+        [Fact]
         public void ReadLogTest()
         {
             var device = new DeviceData()
@@ -520,14 +506,14 @@ namespace SharpAdbClient.Tests
                     shellStream,
                     () =>
                     {
-                        AdbClient.Instance.RunLogServiceAsync(device, sink, CancellationToken.None, Logs.LogId.System).Wait();
+                        this.TestClient.RunLogServiceAsync(device, sink, CancellationToken.None, Logs.LogId.System).Wait();
                     });
 
-                Assert.AreEqual(3, logs.Count());
+                Assert.Equal(3, logs.Count());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void RootTest()
         {
             var device = new DeviceData()
@@ -546,7 +532,7 @@ namespace SharpAdbClient.Tests
             byte[] expectedString = Encoding.UTF8.GetBytes("adbd cannot run as root in production builds\n");
             Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
 
-            Assert.ThrowsException<AdbException>(() => this.RunTest(
+            Assert.Throws<AdbException>(() => this.RunTest(
                 new AdbResponse[]
                 {
                     AdbResponse.OK,
@@ -558,10 +544,10 @@ namespace SharpAdbClient.Tests
                 new SyncCommand[] { },
                 new byte[][] { expectedData },
                 new byte[][] { },
-                () => AdbClient.Instance.Root(device)));
+                () => this.TestClient.Root(device)));
         }
 
-        [TestMethod]
+        [Fact]
         public void UnrootTest()
         {
             var device = new DeviceData()
@@ -580,7 +566,7 @@ namespace SharpAdbClient.Tests
             byte[] expectedString = Encoding.UTF8.GetBytes("adbd not running as root\n");
             Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
 
-            Assert.ThrowsException<AdbException>(() => this.RunTest(
+            Assert.Throws<AdbException>(() => this.RunTest(
                 new AdbResponse[]
                 {
                     AdbResponse.OK,
@@ -592,11 +578,10 @@ namespace SharpAdbClient.Tests
                 new SyncCommand[] { },
                 new byte[][] { expectedData },
                 new byte[][] { },
-                () => AdbClient.Instance.Unroot(device)));
+                () => this.TestClient.Unroot(device)));
         }
 
-        [TestMethod]
-        [DeploymentItem("testapp.apk")]
+        [Fact]
         public void InstallTest()
         {
             var device = new DeviceData()
@@ -649,7 +634,7 @@ namespace SharpAdbClient.Tests
                     new SyncCommand[] { },
                     new byte[][] { response },
                     applicationDataChuncks.ToArray(),
-                        () => AdbClient.Instance.Install(device, stream));
+                        () => this.TestClient.Install(device, stream));
             }
         }
 

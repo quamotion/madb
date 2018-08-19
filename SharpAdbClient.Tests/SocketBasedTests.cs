@@ -1,45 +1,22 @@
 ﻿using SharpAdbClient.Tests;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+using Xunit;
 
 namespace SharpAdbClient
 {
     public class SocketBasedTests
     {
-        protected static readonly AdbResponse[] NoResponses = new AdbResponse[] { };
-        protected static readonly AdbResponse[] OkResponse = new AdbResponse[] { AdbResponse.OK };
-        protected static readonly string[] NoResponseMessages = new string[] { };
-        protected static readonly DeviceData Device = new DeviceData()
-        {
-            Serial = "169.254.109.177:5555",
-            State = DeviceState.Online
-        };
-
-        protected IDummyAdbSocket Socket
+        protected AdbClient TestClient
         {
             get;
-            set;
+            private set;
         }
 
-        public EndPoint EndPoint
-        {
-            get;
-            set;
-        }
-
-        public bool IntegrationTest
-        {
-            get;
-            set;
-        }
-
-        protected void Initialize(bool integrationTest, bool doDispose)
+        protected SocketBasedTests(bool integrationTest, bool doDispose)
         {
             this.EndPoint = AdbClient.Instance.EndPoint;
 
@@ -68,7 +45,35 @@ namespace SharpAdbClient
 #endif
             this.Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(this.EndPoint);
 
-            AdbClient.Instance = new AdbClient();
+            this.TestClient = new AdbClient();
+            AdbClient.Instance = this.TestClient;
+        }
+
+        protected static readonly AdbResponse[] NoResponses = new AdbResponse[] { };
+        protected static readonly AdbResponse[] OkResponse = new AdbResponse[] { AdbResponse.OK };
+        protected static readonly string[] NoResponseMessages = new string[] { };
+        protected static readonly DeviceData Device = new DeviceData()
+        {
+            Serial = "169.254.109.177:5555",
+            State = DeviceState.Online
+        };
+
+        protected IDummyAdbSocket Socket
+        {
+            get;
+            set;
+        }
+
+        public EndPoint EndPoint
+        {
+            get;
+            set;
+        }
+
+        public bool IntegrationTest
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -202,21 +207,21 @@ namespace SharpAdbClient
                 // were read, and the correct request was sent.
 
                 // Make sure the messages were read
-                Assert.AreEqual(0, this.Socket.ResponseMessages.Count);
-                Assert.AreEqual(0, this.Socket.Responses.Count);
-                Assert.AreEqual(0, this.Socket.SyncResponses.Count);
-                Assert.AreEqual(0, this.Socket.SyncDataReceived.Count);
+                Assert.Equal(0, this.Socket.ResponseMessages.Count);
+                Assert.Equal(0, this.Socket.Responses.Count);
+                Assert.Equal(0, this.Socket.SyncResponses.Count);
+                Assert.Equal(0, this.Socket.SyncDataReceived.Count);
 
                 // Make sure a request was sent
-                CollectionAssert.AreEqual(requests.ToList(), this.Socket.Requests);
+                Assert.Equal(requests.ToList(), this.Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    CollectionAssert.AreEqual(syncRequests.ToList(), this.Socket.SyncRequests);
+                    Assert.Equal(syncRequests.ToList(), this.Socket.SyncRequests);
                 }
                 else
                 {
-                    Assert.AreEqual(0, this.Socket.SyncRequests.Count);
+                    Assert.Equal(0, this.Socket.SyncRequests.Count);
                 }
 
                 if (syncDataSent != null)
@@ -225,34 +230,34 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.AreEqual(0, this.Socket.SyncDataSent.Count);
+                    Assert.Equal(0, this.Socket.SyncDataSent.Count);
                 }
             }
             else
             {
                 // Make sure the traffic sent on the wire matches the traffic
                 // we have defined in our unit test.
-                CollectionAssert.AreEqual(requests.ToList(), this.Socket.Requests);
+                Assert.Equal(requests.ToList(), this.Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    CollectionAssert.AreEqual(syncRequests.ToList(), this.Socket.SyncRequests);
+                    Assert.Equal(syncRequests.ToList(), this.Socket.SyncRequests);
                 }
                 else
                 {
-                    Assert.AreEqual(0, this.Socket.SyncRequests.Count);
+                    Assert.Equal(0, this.Socket.SyncRequests.Count);
                 }
 
-                CollectionAssert.AreEqual(responses.ToList(), this.Socket.Responses);
-                CollectionAssert.AreEqual(responseMessages.ToList(), this.Socket.ResponseMessages);
+                Assert.Equal(responses.ToList(), this.Socket.Responses);
+                Assert.Equal(responseMessages.ToList(), this.Socket.ResponseMessages);
 
                 if (syncResponses != null)
                 {
-                    CollectionAssert.AreEqual(syncResponses.ToList(), this.Socket.SyncResponses);
+                    Assert.Equal(syncResponses.ToList(), this.Socket.SyncResponses);
                 }
                 else
                 {
-                    Assert.AreEqual(0, this.Socket.SyncResponses.Count);
+                    Assert.Equal(0, this.Socket.SyncResponses.Count);
                 }
 
                 if (syncDataReceived != null)
@@ -261,7 +266,7 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.AreEqual(0, this.Socket.SyncDataReceived.Count);
+                    Assert.Equal(0, this.Socket.SyncDataReceived.Count);
                 }
 
                 if (syncDataSent != null)
@@ -270,7 +275,7 @@ namespace SharpAdbClient
                 }
                 else
                 {
-                    Assert.AreEqual(0, this.Socket.SyncDataSent.Count);
+                    Assert.Equal(0, this.Socket.SyncDataSent.Count);
                 }
             }
 
@@ -318,11 +323,11 @@ namespace SharpAdbClient
 
         private void AssertEqual(IList<byte[]> expected, IList<byte[]> actual)
         {
-            Assert.AreEqual(expected.Count, actual.Count);
+            Assert.Equal(expected.Count, actual.Count);
 
             for (int i = 0; i < expected.Count; i++)
             {
-                CollectionAssert.AreEqual(expected[i], actual[i]);
+                Assert.Equal(expected[i], actual[i]);
             }
         }
     }

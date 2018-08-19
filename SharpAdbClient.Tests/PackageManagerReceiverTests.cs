@@ -1,15 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpAdbClient.DeviceCommands;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using SharpAdbClient.DeviceCommands;
+using Xunit;
 
 namespace SharpAdbClient.Tests
 {
-    [TestClass]
     public class PackageManagerReceiverTests
     {
-        [TestMethod]
+        [Fact]
         public void ParseThirdPartyPackage()
         {
             // Arrange
@@ -31,12 +27,12 @@ namespace SharpAdbClient.Tests
             receiver.Flush();
 
             // Assert
-            Assert.AreEqual(3, manager.Packages.Count);
-            Assert.IsTrue(manager.Packages.ContainsKey("com.google.android.apps.plus"));
-            Assert.IsTrue(manager.Packages.ContainsKey("com.android.camera"));
-            Assert.IsTrue(manager.Packages.ContainsKey("mwc2015.be"));
+            Assert.Equal(3, manager.Packages.Count);
+            Assert.True(manager.Packages.ContainsKey("com.google.android.apps.plus"));
+            Assert.True(manager.Packages.ContainsKey("com.android.camera"));
+            Assert.True(manager.Packages.ContainsKey("mwc2015.be"));
 
-            Assert.AreEqual("/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk", manager.Packages["com.google.android.apps.plus"]);
+            Assert.Equal("/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk", manager.Packages["com.google.android.apps.plus"]);
         }
     }
 }

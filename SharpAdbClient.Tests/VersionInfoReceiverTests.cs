@@ -4,42 +4,40 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpAdbClient;
 using SharpAdbClient.DeviceCommands;
 using System;
 using System.IO;
+using Xunit;
 
 namespace Quamotion.Test.Devices.Android
 {
     /// <summary>
     /// Tests the <see cref="VersionInfoReceiver"/> class.
     /// </summary>
-    [TestClass]
     public class VersionInfoReceiverTests
     {
         /// <summary>
         /// Tests the <see cref="VersionInfoReceiver.GetVersionName(string)"/> and the <see cref="VersionInfoReceiver.GetVersionCode(string)"/> methods
         /// </summary>
-        [TestMethod]
-        [DeploymentItem(@"dumpsys_package.txt")]
+        [Fact]
         public void GetVersionTest()
         {
             VersionInfoReceiver receiver = new VersionInfoReceiver();
 
             // Trick the receiver into thinking we're in the package section
-            Assert.IsNull(receiver.GetVersionCode("Packages:"));
+            Assert.Null(receiver.GetVersionCode("Packages:"));
 
-            Assert.AreEqual<int>(10210, (int)receiver.GetVersionCode(" versionCode=10210 targetSdk=18"));
-            Assert.AreEqual<object>(null, receiver.GetVersionCode(null));
-            Assert.AreEqual<object>(null, receiver.GetVersionCode(string.Empty));
-            Assert.AreEqual<object>(null, receiver.GetVersionCode(" versionCode=10210targetSdk=18"));
+            Assert.Equal<int>(10210, (int)receiver.GetVersionCode(" versionCode=10210 targetSdk=18"));
+            Assert.Equal<object>(null, receiver.GetVersionCode(null));
+            Assert.Equal<object>(null, receiver.GetVersionCode(string.Empty));
+            Assert.Equal<object>(null, receiver.GetVersionCode(" versionCode=10210targetSdk=18"));
 
-            Assert.AreEqual<string>("4.7.1", (string)receiver.GetVersionName("    versionName=4.7.1"));
-            Assert.AreEqual<string>(null, (string)receiver.GetVersionName(null));
-            Assert.AreEqual<string>(null, (string)receiver.GetVersionName(" test"));
-            Assert.AreEqual<string>(null, (string)receiver.GetVersionName("    versionName"));
-            Assert.AreEqual<string>(string.Empty, (string)receiver.GetVersionName("    versionName="));
+            Assert.Equal<string>("4.7.1", (string)receiver.GetVersionName("    versionName=4.7.1"));
+            Assert.Equal<string>(null, (string)receiver.GetVersionName(null));
+            Assert.Equal<string>(null, (string)receiver.GetVersionName(" test"));
+            Assert.Equal<string>(null, (string)receiver.GetVersionName("    versionName"));
+            Assert.Equal<string>(string.Empty, (string)receiver.GetVersionName("    versionName="));
 
             DeviceData device = new DeviceData();
 
@@ -55,8 +53,8 @@ namespace Quamotion.Test.Devices.Android
 
             receiver.Flush();
 
-            Assert.AreEqual(10210, receiver.VersionInfo.VersionCode);
-            Assert.AreEqual("4.7.1", receiver.VersionInfo.VersionName);
+            Assert.Equal(10210, receiver.VersionInfo.VersionCode);
+            Assert.Equal("4.7.1", receiver.VersionInfo.VersionName);
         }
     }
 }

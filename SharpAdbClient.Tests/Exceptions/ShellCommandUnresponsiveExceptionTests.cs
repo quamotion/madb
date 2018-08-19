@@ -1,32 +1,30 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharpAdbClient.Exceptions;
-using SharpAdbClient.Tests;
+﻿using SharpAdbClient.Exceptions;
+using Xunit;
 
 namespace SharpAdbClient.Tests.Exceptions
 {
-    [TestClass]
     public class ShellCommandUnresponsiveExceptionTests
     {
-        [TestMethod]
+        [Fact]
         public void TestEmptyConstructor()
         {
             ExceptionTester<ShellCommandUnresponsiveException>.TestEmptyConstructor(() => new ShellCommandUnresponsiveException());
         }
 
-        [TestMethod]
+        [Fact]
         public void TestMessageConstructor()
         {
             ExceptionTester<ShellCommandUnresponsiveException>.TestMessageConstructor((message) => new ShellCommandUnresponsiveException(message));
         }
 
-        [TestMethod]
+        [Fact]
         public void TestMessageAndInnerConstructor()
         {
             ExceptionTester<ShellCommandUnresponsiveException>.TestMessageAndInnerConstructor((message, inner) => new ShellCommandUnresponsiveException(message, inner));
         }
 
 #if !NETCOREAPP1_1
-        [TestMethod]
+        [Fact]
         public void TestSerializationConstructor()
         {
             ExceptionTester<ShellCommandUnresponsiveException>.TestSerializationConstructor((info, context) => new ShellCommandUnresponsiveException(info, context));
