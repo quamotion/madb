@@ -18,7 +18,7 @@ namespace SharpAdbClient.DeviceCommands
         /// <summary>
         /// The path to a temporary directory to use when pushing files to the device.
         /// </summary>
-        public const string TempInstallationDirectory = "/data/local/tmp/";
+        public const string TempInstallationDirectory = "/sdcard/tmp/";
 
         /// <summary>
         /// The command that list all packages installed on the device.
