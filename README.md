@@ -51,7 +51,7 @@ To receive notifications when devices connect to or disconnect from your PC, you
 ```
 void Test()
 {
-    var monitor new DeviceMonitor(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)));
+    var monitor = new DeviceMonitor(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)));
     monitor.DeviceConnected += this.OnDeviceConnected;
     monitor.Start();
 }
