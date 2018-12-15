@@ -63,7 +63,7 @@ void OnDeviceConnected(object sender, DeviceDataEventArgs e)
 ```
 
 ### Manage applications
-To install or uninstall applications, you can use the `ApplicationManager` class:
+To install or uninstall applications, you can use the `PackageManager` class:
 
 ```
 void InstallApplication()
