@@ -20,6 +20,22 @@ namespace SharpAdbClient.Tests
         }
 
         [Fact]
+        public void CreateFromDeviceDataAuthorizingTest()
+        {
+            string data = "52O00ULA01             authorizing usb:9-1.4.1 transport_id:8149";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.Equal("52O00ULA01", device.Serial);
+            Assert.Equal(string.Empty, device.Product);
+            Assert.Equal(string.Empty, device.Model);
+            Assert.Equal(string.Empty, device.Name);
+            Assert.Equal(string.Empty, device.Features);
+            Assert.Equal<DeviceState>(DeviceState.Authorizing, device.State);
+            Assert.Equal("9-1.4.1", device.Usb);
+            Assert.Equal("8149", device.TransportId);
+        }
+
+        [Fact]
         public void CreateFromDeviceDataUnauthorizedTest()
         {
             string data = "R32D102SZAE            unauthorized";
