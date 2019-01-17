@@ -54,6 +54,11 @@ namespace SharpAdbClient
         Unauthorized,
 
         /// <summary>
+        /// The device is connected to adb, but adb authorizing for remote debugging of this device.
+        /// </summary>
+        Authorizing,
+
+        /// <summary>
         /// The device state is unknown.
         /// </summary>
         Unknown
