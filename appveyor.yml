@@ -23,5 +23,5 @@ deploy:
   on:
     branch: master
   api_key:
-    secure: EE+SrSChcQWBbROVoNVqVmUNJLh7humtKClEyJoc05VUbV5gQWbhjndwQFuiu2kz
+    secure: 9mlPwPUoNfB6CeV5y319zv0v9dl16VhKKAbdrIiPYQD0W1ogYzBZ04X9kjuNMo5I
   skip_symbols: true
