@@ -31,6 +31,7 @@ namespace SharpAdbClient.Tests
             Assert.Equal(string.Empty, device.Name);
             Assert.Equal(string.Empty, device.Features);
             Assert.Equal<DeviceState>(DeviceState.NoPermissions, device.State);
+            Assert.Equal(" (user in plugdev group; are your udev rules wrong?); see [http://developer.android.com/tools/device.html", device.Message);
             Assert.Equal(string.Empty, device.Usb);
             Assert.Equal(string.Empty, device.TransportId);
         }
