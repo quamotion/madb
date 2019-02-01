@@ -20,6 +20,22 @@ namespace SharpAdbClient.Tests
         }
 
         [Fact]
+        public void CreateFromDeviceNoPermissionTest2()
+        {
+            string data = "009d1cd696d5194a        no permissions (user in plugdev group; are your udev rules wrong?); see [http://developer.android.com/tools/device.html";
+
+            var device = DeviceData.CreateFromAdbData(data);
+            Assert.Equal("009d1cd696d5194a", device.Serial);
+            Assert.Equal(string.Empty, device.Product);
+            Assert.Equal(string.Empty, device.Model);
+            Assert.Equal(string.Empty, device.Name);
+            Assert.Equal(string.Empty, device.Features);
+            Assert.Equal<DeviceState>(DeviceState.NoPermissions, device.State);
+            Assert.Equal(string.Empty, device.Usb);
+            Assert.Equal(string.Empty, device.TransportId);
+        }
+
+        [Fact]
         public void CreateFromDeviceDataAuthorizingTest()
         {
             string data = "52O00ULA01             authorizing usb:9-1.4.1 transport_id:8149";
