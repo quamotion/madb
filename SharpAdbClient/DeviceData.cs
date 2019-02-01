@@ -16,7 +16,7 @@ namespace SharpAdbClient
         /// A regular expression that can be used to parse the device information that is returned
         /// by the Android Debut Bridge.
         /// </summary>
-        internal const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|download|authorizing|unauthorized|host|no permissions)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
+        internal const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|download|authorizing|unauthorized|host|no permissions)(?<message>.*?)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
 
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned
@@ -97,6 +97,15 @@ namespace SharpAdbClient
         }
 
         /// <summary>
+        /// Gets or sets the device info message. Currently only seen for NoPermissions state.
+        /// </summary>
+        public string Message
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
@@ -120,7 +129,8 @@ namespace SharpAdbClient
                     Name = m.Groups["device"].Value,
                     Features = m.Groups["features"].Value,
                     Usb = m.Groups["usb"].Value,
-                    TransportId = m.Groups["transport_id"].Value
+                    TransportId = m.Groups["transport_id"].Value,
+                    Message = m.Groups["message"].Value
                 };
             }
             else
