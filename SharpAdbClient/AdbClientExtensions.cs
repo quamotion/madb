@@ -67,6 +67,30 @@ namespace SharpAdbClient
         {
             return client.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
         }
+        /// <summary>
+        ///  Creates a reverse port forwarding between a local and a remote port.
+        /// </summary>
+        /// <param name="client">
+        /// An instance of a class that implements the <see cref="IAdbClient"/> interface.
+        /// </param>
+        /// <param name="device">
+        /// The device to which to reverse forward the connections.
+        /// </param>
+        /// <param name="localPort">
+        /// The local port to forward (i.e., device local port). Specify 0 for randomly assigned available port.
+        /// </param>
+        /// <param name="remotePort">
+        /// The remote port to forward to (i.e., local machine port). Must be explicitly defined.
+        /// </param>
+        /// <exception cref="AdbException">
+        /// failed to submit the forward command.
+        /// or
+        /// Device rejected command:  + resp.Message
+        /// </exception>
+        public static int CreateReverse(this IAdbClient client, DeviceData device, int localPort, int remotePort)
+        {
+            return client.CreateReverse(device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
+        }
 
         /// <summary>
         /// Executes a shell command on the remote device

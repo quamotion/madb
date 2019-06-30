@@ -150,6 +150,8 @@ namespace SharpAdbClient
         /// <include file='IAdbClient.xml' path='/IAdbClient/ListForward/*'/>
         IEnumerable<ForwardData> ListForward(DeviceData device);
 
+        int CreateReverse(DeviceData device, string local, string remote, bool allowRebind);
+     
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
         Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse);
 

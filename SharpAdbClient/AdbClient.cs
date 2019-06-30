@@ -316,6 +316,33 @@ namespace SharpAdbClient
             }
         }
 
+        public int CreateReverse(DeviceData device, string local, string remote, bool allowRebind)
+        {
+            this.EnsureDevice(device);
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                string rebind = allowRebind ? string.Empty : "norebind:";
+
+                var str1 = $"host:transport:{device.Serial}";
+                socket.SendAdbRequest(str1);
+                var response = socket.ReadAdbResponse();
+
+                var str2 = $"reverse:forward:{local};{remote}";
+                socket.SendAdbRequest(str2);
+                var response2 = socket.ReadAdbResponse();
+                response2 = socket.ReadAdbResponse();
+
+                var portString = socket.ReadString();
+
+                if (portString != null && int.TryParse(portString, out int port))
+                {
+                    return port;
+                }
+
+                return 0;
+            }
+        }
         /// <inheritdoc/>
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
