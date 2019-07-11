@@ -107,7 +107,7 @@ namespace SharpAdbClient.DeviceCommands
             // numeric.
             // So we parse the pid & process name manually, to account for this, and do the string.split afterwards :-)
             var processNameStart = line.IndexOf('(');
-            var processNameEnd = line.IndexOf(')');
+            var processNameEnd = line.LastIndexOf(')');
 
             int pid = 0;
             string comm = string.Empty;
