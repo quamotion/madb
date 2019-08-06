@@ -230,7 +230,7 @@ namespace SharpAdbClient.Tests
         {
             this.RunTest(
                 (socket) => socket.SendAdbRequest("Test"),
-                Encoding.ASCII.GetBytes("0004Test\n"));
+                Encoding.ASCII.GetBytes("0004Test"));
         }
 
         [Fact]
