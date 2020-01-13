@@ -39,28 +39,7 @@ namespace SharpAdbClient.Tests
 
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
-            this.ReceivedCommands.Add(command);
-
-            if (this.Commands.ContainsKey(command))
-            {
-                if (receiver != null)
-                {
-                    StringReader reader = new StringReader(this.Commands[command]);
-
-                    while (reader.Peek() != -1)
-                    {
-                        receiver.AddOutput(reader.ReadLine());
-                    }
-
-                    receiver.Flush();
-                }
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{command}' was unexpected");
-            }
-
-            return Task.FromResult(true);
+            return this.ExecuteRemoteCommandAsync(command, device, receiver, cancellationToken, maxTimeToOutputResponse, AdbClient.Encoding);
         }
 
         public int GetAdbVersion()
@@ -150,7 +129,28 @@ namespace SharpAdbClient.Tests
 
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse, Encoding encoding)
         {
-            throw new NotImplementedException();
+            this.ReceivedCommands.Add(command);
+
+            if (this.Commands.ContainsKey(command))
+            {
+                if (receiver != null)
+                {
+                    StringReader reader = new StringReader(this.Commands[command]);
+
+                    while (reader.Peek() != -1)
+                    {
+                        receiver.AddOutput(encoding.GetString(encoding.GetBytes(reader.ReadLine())));
+                    }
+
+                    receiver.Flush();
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{command}' was unexpected");
+            }
+
+            return Task.FromResult(true);
         }
     }
 }

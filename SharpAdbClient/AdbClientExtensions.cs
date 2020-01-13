@@ -76,10 +76,10 @@ namespace SharpAdbClient
         /// </param>
         /// <param name="command">The command to execute</param>
         /// <param name="device">The device to execute on</param>
-        /// <param name="rcvr">The shell output receiver</param>
-        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver rcvr)
+        /// <param name="receiver">The shell output receiver</param>
+        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver receiver)
         {
-            ExecuteRemoteCommand(client, command, device, rcvr, AdbClient.Encoding);
+            ExecuteRemoteCommand(client, command, device, receiver, AdbClient.Encoding);
         }
 
         /// <summary>
@@ -90,13 +90,13 @@ namespace SharpAdbClient
         /// </param>
         /// <param name="command">The command to execute</param>
         /// <param name="device">The device to execute on</param>
-        /// <param name="rcvr">The shell output receiver</param>
+        /// <param name="receiver">The shell output receiver</param>
         /// <param name="encoding">The encoding to use.</param>
-        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver rcvr, Encoding encoding)
+        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding)
         {
             try
             {
-                client.ExecuteRemoteCommandAsync(command, device, rcvr, CancellationToken.None, int.MaxValue).Wait();
+                client.ExecuteRemoteCommandAsync(command, device, receiver, CancellationToken.None, int.MaxValue, encoding).Wait();
             }
             catch (AggregateException ex)
             {
