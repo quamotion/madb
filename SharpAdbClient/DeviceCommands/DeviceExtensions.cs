@@ -2,6 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Threading.Tasks;
+
 namespace SharpAdbClient.DeviceCommands
 {
     using Receivers;
@@ -41,6 +43,27 @@ namespace SharpAdbClient.DeviceCommands
         /// <param name="device">
         /// The device on which to run the command.
         /// </param>
+        /// <param name="command">
+        /// The command to execute.
+        /// </param>
+        /// <param name="receiver">
+        /// Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.
+        /// </param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the Task.</param>
+        /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
+        public static Task ExecuteShellCommandAsync(
+            this DeviceData device, string command, IShellOutputReceiver receiver, CancellationToken cancellationToken,
+            int maxTimeToOutputResponse = int.MaxValue)
+        {
+            return AdbClient.Instance.ExecuteRemoteCommandAsync(command, device, receiver, cancellationToken, maxTimeToOutputResponse);
+        }
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to run the command.
+        /// </param>
         /// <param name="client">
         /// The <see cref="IAdbClient"/> to use when executing the command.
         /// </param>
@@ -53,6 +76,30 @@ namespace SharpAdbClient.DeviceCommands
         public static void ExecuteShellCommand(this DeviceData device, IAdbClient client, string command, IShellOutputReceiver receiver)
         {
             client.ExecuteRemoteCommand(command, device, receiver);
+        }
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to run the command.
+        /// </param>
+        /// <param name="client">
+        /// The <see cref="IAdbClient"/> to use when executing the command.
+        /// </param>
+        /// <param name="command">
+        /// The command to execute.
+        /// </param>
+        /// <param name="receiver">
+        /// Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.
+        /// </param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the Task.</param>
+        /// <param name="maxTimeToOutputResponse">The max time to output response.</param>
+        public static Task ExecuteShellCommandAsync(
+            this DeviceData device, IAdbClient client, string command, IShellOutputReceiver receiver, CancellationToken cancellationToken,
+            int maxTimeToOutputResponse = int.MaxValue)
+        {
+            return client.ExecuteRemoteCommandAsync(command, device, receiver, cancellationToken, maxTimeToOutputResponse);
         }
 
         /// <summary>
