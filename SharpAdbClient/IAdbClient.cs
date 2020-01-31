@@ -141,6 +141,70 @@ namespace SharpAdbClient
         /// </returns>
         int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind);
 
+        /// <summary>
+        /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
+        /// to the <paramref name="local"/> address on the <paramref name="device"/>.
+        /// </summary>
+        /// <param name="device">
+        /// The device to which to reverse forward the connections.
+        /// </param>
+        /// <param name="remote">
+        /// <para>
+        /// The remote address to reverse forward. This value can be in one of:
+        /// </para>
+        /// <list type="ordered">
+        ///   <item>
+        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
+        ///   </item>
+        ///   <item>
+        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt; on device
+        ///   </item>
+        ///   <item>
+        ///     <c>jdwp:&lt;pid&gt;</c>: JDWP thread on VM process &lt;pid&gt; on device.
+        ///   </item>
+        /// </list>
+        /// </param>
+        /// <param name="local">
+        /// <para>
+        /// The local address to reverse forward. This value can be in one of:
+        /// </para>
+        /// <list type="ordered">
+        ///   <item>
+        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
+        ///   </item>
+        ///   <item>
+        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt;
+        ///   </item>
+        /// </list>
+        /// </param>
+        /// <param name="allowRebind">
+        /// If set to <see langword="true"/>, the request will fail if if the specified socket is already bound through a previous reverse command.
+        /// </param>
+        /// <returns>
+        /// If your requested to start reverse to remote port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.
+        /// </returns>
+        int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind);
+
+
+        /// <summary>
+        /// Remove a reverse port forwarding between a remote and a local port.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to remove the reverse port forwarding
+        /// <param name="remote">
+        /// Specification of the remote that was forwarded
+        /// </param>
+        void RemoveReverseForward(DeviceData device, string remote);
+
+        /// <summary>
+        /// Removes all reverse forwards for a given device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to remove all reverse port forwarding
+        /// </param>
+        void RemoveAllReverseForwards(DeviceData device);
+
         /// <include file='IAdbClient.xml' path='/IAdbClient/RemoveForward/*'/>
         void RemoveForward(DeviceData device, int localPort);
 
@@ -149,6 +213,17 @@ namespace SharpAdbClient
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ListForward/*'/>
         IEnumerable<ForwardData> ListForward(DeviceData device);
+
+        /// <summary>
+        /// List all existing reverse forward connections from this server.
+        /// </summary>
+        /// <param name = "device" >
+        /// The device for which to list the existing reverse foward connections.
+        /// </param>
+        /// <returns>
+        /// A<see cref="ForwardData"/> entry for each existing reverse forward connection.
+        /// </returns>
+        IEnumerable<ForwardData> ListReverseForward(DeviceData device);
 
         /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
         Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse);

@@ -246,6 +246,57 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
+        public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind)
+        {
+            this.EnsureDevice(device);
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                this.SetDevice(socket, device);
+
+                string rebind = allowRebind ? string.Empty : "norebind:";
+
+                socket.SendAdbRequest($"reverse:forward:{rebind}{remote};{local}");
+                var response = socket.ReadAdbResponse();
+                response = socket.ReadAdbResponse();
+                var portString = socket.ReadString();
+
+                if (portString != null && int.TryParse(portString, out int port))
+                {
+                    return port;
+                }
+
+                return 0;
+            }
+        }
+
+        public void RemoveReverseForward(DeviceData device, string remote)
+        {
+            this.EnsureDevice(device);
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                this.SetDevice(socket, device);
+
+                socket.SendAdbRequest($"reverse:killforward:{remote}");
+                var response = socket.ReadAdbResponse();
+            }
+        }
+
+        public void RemoveAllReverseForwards(DeviceData device)
+        {
+            this.EnsureDevice(device);
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                this.SetDevice(socket, device);
+
+                socket.SendAdbRequest($"reverse:killforward-all");
+                var response = socket.ReadAdbResponse();
+            }
+        }
+
+        /// <inheritdoc/>
         public int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
             this.EnsureDevice(device);
@@ -306,6 +357,25 @@ namespace SharpAdbClient
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
+                var response = socket.ReadAdbResponse();
+
+                var data = socket.ReadString();
+
+                var parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                return parts.Select(p => ForwardData.FromString(p));
+            }
+        }
+
+        public IEnumerable<ForwardData> ListReverseForward(DeviceData device)
+        {
+            this.EnsureDevice(device);
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                this.SetDevice(socket, device);
+
+                socket.SendAdbRequest($"reverse:list-forward");
                 var response = socket.ReadAdbResponse();
 
                 var data = socket.ReadString();
