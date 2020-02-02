@@ -37,6 +37,12 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
+        public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
         {
             this.ReceivedCommands.Add(command);
@@ -88,6 +94,11 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
+        public IEnumerable<ForwardData> ListReverseForward(DeviceData device)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<ForwardData> ListForward(DeviceData device)
         {
             throw new NotImplementedException();
@@ -104,6 +115,16 @@ namespace SharpAdbClient.Tests
         }
 
         public void RemoveForward(DeviceData device, int localPort)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveAllReverseForwards(DeviceData device)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveReverseForward(DeviceData device, string remote)
         {
             throw new NotImplementedException();
         }
