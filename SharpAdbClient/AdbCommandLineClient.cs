@@ -12,6 +12,7 @@ namespace SharpAdbClient
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
+    using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -45,13 +46,8 @@ namespace SharpAdbClient
                 throw new ArgumentNullException(nameof(adbPath));
             }
 
-#if NETSTANDARD1_3
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             bool isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-#else
-            bool isWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
-            bool isUnix = Environment.OSVersion.Platform == PlatformID.MacOSX || Environment.OSVersion.Platform == PlatformID.Unix;
-#endif
 
             if (isWindows)
             {
@@ -272,11 +268,7 @@ namespace SharpAdbClient
             ProcessStartInfo psi = new ProcessStartInfo(this.AdbPath, command)
             {
                 CreateNoWindow = true,
-
-#if !NETSTANDARD1_3
                 WindowStyle = ProcessWindowStyle.Hidden,
-#endif
-
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true

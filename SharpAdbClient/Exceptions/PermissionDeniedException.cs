@@ -5,12 +5,7 @@
 namespace SharpAdbClient.Exceptions
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-#if !NETSTANDARD1_3
     using System.Runtime.Serialization;
-#endif
-    using System.Text;
 
     /// <summary>
     /// The exception that is thrown when the permission to a resource was denied.
@@ -34,7 +29,6 @@ namespace SharpAdbClient.Exceptions
         {
         }
 
-#if !NETSTANDARD1_3
         /// <summary>
         /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
         /// </summary>
@@ -44,7 +38,6 @@ namespace SharpAdbClient.Exceptions
             : base(serializationInfo, context)
         {
         }
-#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
