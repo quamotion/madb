@@ -1,8 +1,8 @@
 strategy:
     matrix:
       # https://source.android.com/setup/start/build-numbers
-      android_9:
-        apiLevel: '28'
+      android_8_1:
+        apiLevel: '27'
 
 pool:
   vmImage: macOS-10.14
