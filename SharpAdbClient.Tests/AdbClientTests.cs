@@ -160,7 +160,7 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    this.TestClient.SetDevice(this.Socket, Device);
+                    this.Socket.SetDevice(Device);
                 });
         }
 
@@ -178,7 +178,7 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    this.TestClient.SetDevice(this.Socket, Device);
+                    this.Socket.SetDevice(Device);
                 }));
         }
 
@@ -196,7 +196,7 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    this.TestClient.SetDevice(this.Socket, Device);
+                    this.Socket.SetDevice(Device);
                 }));
         }
 

@@ -17,57 +17,43 @@ namespace SharpAdbClient.Tests.DeviceCommands
         {
             FileStatistics stats = new FileStatistics();
 
+            var client = new Mock<IAdbClient>();
             var mock = new Mock<ISyncService>();
             mock.Setup(m => m.Stat("/test")).Returns(stats);
 
-            Factories.SyncServiceFactory = (d) => mock.Object;
+            Factories.SyncServiceFactory = (c, d) => mock.Object;
 
             var device = new DeviceData();
-
-            Assert.Equal(stats, device.Stat("/test"));
+            Assert.Equal(stats, client.Object.Stat(device, "/test"));
         }
 
         [Fact]
         public void GetEnvironmentVariablesTest()
         {
             var adbClient = new DummyAdbClient();
-            AdbClient.Instance = adbClient;
 
             adbClient.Commands.Add(EnvironmentVariablesReceiver.PrintEnvCommand, "a=b");
 
             var device = new DeviceData();
 
-            var variables = device.GetEnvironmentVariables();
+            var variables = adbClient.GetEnvironmentVariables(device);
             Assert.NotNull(variables);
             Assert.Single(variables.Keys);
             Assert.True(variables.ContainsKey("a"));
             Assert.Equal("b", variables["a"]);
         }
 
-        [Fact(Skip = "IntegrationTest")]
-        public void ListProcessesIntegrationTest()
-        {
-            var adbClient = new AdbClient();
-            var devices = adbClient.GetDevices().ToArray();
-
-            foreach (var device in devices)
-            {
-                var processes = device.ListProcesses().ToArray();
-            }
-        }
-
         [Fact]
         public void UninstallPackageTests()
         {
             var adbClient = new DummyAdbClient();
-            AdbClient.Instance = adbClient;
 
             adbClient.Commands.Add("pm list packages -f", "");
             adbClient.Commands.Add("pm uninstall com.example", "");
 
             var device = new DeviceData();
             device.State = DeviceState.Online;
-            device.UninstallPackage("com.example");
+            adbClient.UninstallPackage(device, "com.example");
 
             Assert.Equal(2, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
@@ -78,7 +64,6 @@ namespace SharpAdbClient.Tests.DeviceCommands
         public void GetPackageVersionTest()
         {
             var adbClient = new DummyAdbClient();
-            AdbClient.Instance = adbClient;
 
             adbClient.Commands.Add("pm list packages -f", "");
             adbClient.Commands.Add("dumpsys package com.example",
@@ -119,7 +104,7 @@ Shared users:
 
             var device = new DeviceData();
             device.State = DeviceState.Online;
-            var version = device.GetPackageVersion("com.example");
+            var version = adbClient.GetPackageVersion(device, "com.example");
 
             Assert.Equal(22, version.VersionCode);
             Assert.Equal("5.1-eng.buildbot.20151117.204057", version.VersionName);
@@ -133,7 +118,6 @@ Shared users:
         public void GetPackageVersionTest2()
         {
             var adbClient = new DummyAdbClient();
-            AdbClient.Instance = adbClient;
 
             adbClient.Commands.Add("pm list packages -f", "");
             adbClient.Commands.Add("dumpsys package jp.co.cyberagent.stf",
@@ -209,7 +193,7 @@ End!!!!");
 
             var device = new DeviceData();
             device.State = DeviceState.Online;
-            var version = device.GetPackageVersion("jp.co.cyberagent.stf");
+            var version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
 
             Assert.Equal(4, version.VersionCode);
             Assert.Equal("2.1.0", version.VersionName);
@@ -223,7 +207,6 @@ End!!!!");
         public void GetPackageVersionTest3()
         {
             var adbClient = new DummyAdbClient();
-            AdbClient.Instance = adbClient;
 
             adbClient.Commands.Add("pm list packages -f", "");
             adbClient.Commands.Add("dumpsys package jp.co.cyberagent.stf",
@@ -353,7 +336,7 @@ Compiler stats:
 
             var device = new DeviceData();
             device.State = DeviceState.Online;
-            var version = device.GetPackageVersion("jp.co.cyberagent.stf");
+            var version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
 
             Assert.Equal(4, version.VersionCode);
             Assert.Equal("2.1.0", version.VersionName);
@@ -367,7 +350,6 @@ Compiler stats:
         public void ListProcessesTest()
         {
             var adbClient = new DummyAdbClient();
-            AdbClient.Instance = adbClient;
 
             adbClient.Commands.Add(@"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
 if [ $SDK -lt 24 ]
@@ -394,7 +376,7 @@ asound");
 3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0");
 
             var device = new DeviceData();
-            var processes = device.ListProcesses().ToArray();
+            var processes = adbClient.ListProcesses(device).ToArray();
 
             Assert.Equal(3, processes.Length);
             Assert.Equal("init", processes[0].Name);

@@ -15,9 +15,8 @@ namespace SharpAdbClient.Tests
             };
 
             DummyAdbClient client = new DummyAdbClient();
-            AdbClient.Instance = client;
 
-            PackageManager manager = new PackageManager(device, thirdPartyOnly: false, client: client, syncServiceFactory: null, skipInit: true);
+            PackageManager manager = new PackageManager(client, device, thirdPartyOnly: false, syncServiceFactory: null, skipInit: true);
             PackageManagerReceiver receiver = new PackageManagerReceiver(device, manager);
 
             // Act

@@ -392,6 +392,33 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
+        public void SetDevice(DeviceData device)
+        {
+            // if the device is not null, then we first tell adb we're looking to talk
+            // to a specific device
+            if (device != null)
+            {
+                this.SendAdbRequest($"host:transport:{device.Serial}");
+
+                try
+                {
+                    var response = this.ReadAdbResponse();
+                }
+                catch (AdbException e)
+                {
+                    if (string.Equals("device not found", e.AdbError, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new DeviceNotFoundException(device.Serial);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
+
+        /// <inheritdoc/>
         public Stream GetShellStream()
         {
             var stream = this.socket.GetStream();

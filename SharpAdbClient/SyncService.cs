@@ -55,11 +55,14 @@ namespace SharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
+        /// <param name="client">
+        /// A connection to an adb server.
+        /// </param>
         /// <param name="device">
         /// The device on which to interact with the files.
         /// </param>
-        public SyncService(DeviceData device)
-            : this(Factories.AdbSocketFactory(AdbClient.Instance.EndPoint), device)
+        public SyncService(IAdbClient client, DeviceData device)
+            : this(Factories.AdbSocketFactory(client.EndPoint), device)
         {
         }
 
@@ -115,7 +118,7 @@ namespace SharpAdbClient
         public void Open()
         {
             // target a specific device
-            AdbClient.Instance.SetDevice(this.Socket, this.Device);
+            this.Socket.SetDevice(this.Device);
 
             this.Socket.SendAdbRequest("sync:");
             var resp = this.Socket.ReadAdbResponse();

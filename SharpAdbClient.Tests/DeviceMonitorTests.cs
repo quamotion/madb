@@ -246,15 +246,5 @@ namespace SharpAdbClient.Tests
                 });
             }
         }
-
-        [Fact(Skip = "IntegrationTest")]
-        public void DisposeMonitorTest()
-        {
-            using (DeviceMonitor monitor = new DeviceMonitor(new AdbSocket(AdbClient.Instance.EndPoint)))
-            {
-                monitor.Start();
-                Thread.Sleep(1000);
-            }
-        }
     }
 }

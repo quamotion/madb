@@ -17,9 +17,8 @@ namespace SharpAdbClient.Tests
             client.Commands.Add("/system/bin/getprop", @"[init.svc.BGW]: [running]
 [init.svc.MtkCodecService]: [running]
 [init.svc.bootanim]: [stopped]");
-            AdbClient.Instance = client;
 
-            var properties = device.GetProperties();
+            var properties = client.GetProperties(device);
             Assert.NotNull(properties);
             Assert.Equal(3, properties.Count);
             Assert.True(properties.ContainsKey("init.svc.BGW"));

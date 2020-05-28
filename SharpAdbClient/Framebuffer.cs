@@ -97,7 +97,7 @@ namespace SharpAdbClient
             using (var socket = Factories.AdbSocketFactory(this.client.EndPoint))
             {
                 // Select the target device
-                this.client.SetDevice(socket, this.Device);
+                socket.SetDevice(this.Device);
 
                 // Send the framebuffer command
                 socket.SendAdbRequest("framebuffer:");

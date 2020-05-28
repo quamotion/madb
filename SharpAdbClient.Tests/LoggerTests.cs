@@ -77,12 +77,5 @@ namespace SharpAdbClient.Tests
                 entry = await reader.ReadEntry(CancellationToken.None);
             }
         }
-
-        [Fact (Skip = "IntegrationTest")]
-        public async Task ReadLogEntryTest()
-        {
-            var device = AdbClient.Instance.GetDevices().Single();
-            await AdbClient.Instance.RunLogServiceAsync(device, (logEntry) => System.Diagnostics.Debug.WriteLine(logEntry.ToString()), CancellationToken.None, LogId.System);
-        }
     }
 }
