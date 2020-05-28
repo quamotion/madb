@@ -118,14 +118,9 @@ namespace SharpAdbClient.Tests
         [Fact]
         public void IsPathRootedTest()
         {
-            bool result = LinuxPath.IsPathRooted("/system/busybox");
-            Assert.Equal<bool>(true, result);
-
-            result = LinuxPath.IsPathRooted("/system/xbin/");
-            Assert.Equal<bool>(true, result);
-
-            result = LinuxPath.IsPathRooted("system/xbin/");
-            Assert.Equal<bool>(false, result);
+            Assert.True(LinuxPath.IsPathRooted("/system/busybox"));
+            Assert.True(LinuxPath.IsPathRooted("/system/xbin/"));
+            Assert.False(LinuxPath.IsPathRooted("system/xbin/"));
         }
     }
 }
