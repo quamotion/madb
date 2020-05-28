@@ -6,6 +6,8 @@ namespace SharpAdbClient.Logs
 {
     using System;
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// <para>
@@ -181,6 +183,102 @@ namespace SharpAdbClient.Logs
             if (read > 0 && buffer[offset + read - 1] == 0x0d)
             {
                 int nextByte = this.Inner.ReadByte();
+
+                if (nextByte == 0x0a)
+                {
+                    // If the next byte is 0x0a, set the last byte to 0x0a. The underlying
+                    // stream has already advanced because of the ReadByte call, so all is good.
+                    buffer[offset + read - 1] = 0x0a;
+                }
+                else
+                {
+                    // If the next byte was not 0x0a, store it as the 'pending byte' --
+                    // the next read operation will fetch this byte. We can't do a Seek here,
+                    // because e.g. the network stream doesn't support seeking.
+                    this.pendingByte = (byte)nextByte;
+                }
+            }
+
+            return read;
+        }
+
+        /// <inheritdoc/>
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            if (count == 0)
+            {
+                return 0;
+            }
+
+            // Read the raw data from the base stream. There may be a
+            // 'pending byte' from a previous operation; if that's the case,
+            // consume it.
+            int read = 0;
+
+            if (this.pendingByte != null)
+            {
+                buffer[offset] = this.pendingByte.Value;
+                read = await this.Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
+                read++;
+                this.pendingByte = null;
+            }
+            else
+            {
+                read = await this.Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+            }
+
+            byte[] minibuffer = new byte[1];
+
+            // Loop over the data, and find a LF (0x0d) character. If it is
+            // followed by a CR (0x0a) character, remove the LF chracter and
+            // keep only the LF character intact.
+            for (int i = offset; i < offset + read - 1; i++)
+            {
+                if (buffer[i] == 0x0d && buffer[i + 1] == 0x0a)
+                {
+                    buffer[i] = 0x0a;
+
+                    for (int j = i + 1; j < offset + read - 1; j++)
+                    {
+                        buffer[j] = buffer[j + 1];
+                    }
+
+                    // Reset unused data to \0
+                    buffer[offset + read - 1] = 0;
+
+                    // We have removed one byte from the array of bytes which has
+                    // been read; but the caller asked for a fixed number of bytes.
+                    // So we need to get the next byte from the base stream.
+                    // If less bytes were received than asked, we know no more data is
+                    // available so we can skip this step
+                    if (read < count)
+                    {
+                        read--;
+                        continue;
+                    }
+
+                    int miniRead = await this.Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+
+                    if (miniRead == 0)
+                    {
+                        // If no byte was read, no more data is (currently) available, and reduce the
+                        // number of bytes by 1.
+                        read--;
+                    }
+                    else
+                    {
+                        // Append the byte to the buffer.
+                        buffer[offset + read - 1] = minibuffer[0];
+                    }
+                }
+            }
+
+            // The last byte is a special case, to find out if the next byte is 0x0a
+            // we need to read one more byte from the inner stream.
+            if (read > 0 && buffer[offset + read - 1] == 0x0d)
+            {
+                int miniRead = await this.Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+                int nextByte = minibuffer[0];
 
                 if (nextByte == 0x0a)
                 {
