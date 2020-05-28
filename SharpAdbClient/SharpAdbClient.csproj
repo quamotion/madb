@@ -6,7 +6,7 @@
     <Title>.NET client for adb, Android Debug Bridge (SharpAdbClient)</Title>
     <VersionPrefix>2.2.0</VersionPrefix>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion</Authors>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <AssemblyName>SharpAdbClient</AssemblyName>
     <AssemblyOriginatorKeyFile>SharpAdbClient.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
