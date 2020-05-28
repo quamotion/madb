@@ -41,7 +41,7 @@ namespace SharpAdbClient
         /// <summary>
         /// Gets or sets the time of last modification.
         /// </summary>
-        public DateTime Time
+        public DateTimeOffset Time
         {
             get;
             set;

@@ -122,7 +122,7 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (stream == null)
             {
@@ -198,7 +198,7 @@ namespace SharpAdbClient
             }
 
             // create the DONE message
-            int time = (int)timestamp.ToUnixEpoch();
+            int time = (int)timestamp.ToUnixTimeSeconds();
             this.Socket.SendSyncRequest(SyncCommand.DONE, time);
 
             // read the result, in a byte array containing 2 ints
@@ -365,7 +365,7 @@ namespace SharpAdbClient
 
             value.FileMode = (UnixFileMode)BitConverter.ToInt32(statResult, 0);
             value.Size = BitConverter.ToInt32(statResult, 4);
-            value.Time = DateTimeHelper.Epoch.AddSeconds(BitConverter.ToInt32(statResult, 8)).ToLocalTime();
+            value.Time = DateTimeOffset.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
         }
     }
 }

@@ -44,7 +44,7 @@ namespace SharpAdbClient
         /// <param name="cancellationToken">
         /// A <see cref="CancellationToken"/> that can be used to cancel the task.
         /// </param>
-        void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken);
+        void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken);
 
         /// <summary>
         /// Pulls (downloads) a file from the remote device.

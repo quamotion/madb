@@ -57,7 +57,7 @@ namespace SharpAdbClient.DeviceCommands
                     }
                     else
                     {
-                        var m = line.Match(FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        var m = Regex.Match(line, FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                         this.ErrorMessage = UnknownError;
 
                         if (m.Success)

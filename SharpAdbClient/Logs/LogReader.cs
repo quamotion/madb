@@ -121,8 +121,7 @@ namespace SharpAdbClient.Logs
                 return null;
             }
 
-            DateTime timestamp = DateTimeHelper.Epoch.AddSeconds(sec);
-            timestamp = timestamp.AddMilliseconds(nsec / 1000000d);
+            var timestamp = DateTimeOffset.FromUnixTimeSeconds(sec);
 
             switch ((LogId)id)
             {

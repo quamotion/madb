@@ -59,7 +59,7 @@ namespace SharpAdbClient.DeviceCommands
                     continue;
                 }
 
-                var m = line.Match(GetpropRegex, RegexOptions.Compiled);
+                var m = Regex.Match(line, GetpropRegex, RegexOptions.Compiled);
                 if (m.Success)
                 {
                     string label = m.Groups[1].Value.Trim();
