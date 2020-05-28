@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace SharpAdbClient.Tests
 {
@@ -9,7 +10,7 @@ namespace SharpAdbClient.Tests
     internal class DummyAdbCommandLineClient : AdbCommandLineClient
     {
         public DummyAdbCommandLineClient()
-            : base("adb.exe")
+            : base(ServerName)
         {
         }
 
@@ -61,5 +62,7 @@ namespace SharpAdbClient.Tests
 
             return 0;
         }
+
+        private static string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";
     }
 }
