@@ -5,6 +5,8 @@
 namespace SharpAdbClient
 {
     using Exceptions;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
@@ -21,9 +23,25 @@ namespace SharpAdbClient
         private const string Tag = nameof(ConsoleOutputReceiver);
 
         /// <summary>
+        /// The logger to use when logging messages.
+        /// </summary>
+        private readonly ILogger<ConsoleOutputReceiver> logger;
+
+        /// <summary>
         /// A <see cref="StringBuilder"/> which receives all output from the device.
         /// </summary>
         private readonly StringBuilder output = new StringBuilder();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConsoleOutputReceiver"/> class.
+        /// </summary>
+        /// <param name="logger">
+        /// The logger to use when logging.
+        /// </param>
+        public ConsoleOutputReceiver(ILogger<ConsoleOutputReceiver> logger = null)
+        {
+            this.logger = logger ?? NullLogger<ConsoleOutputReceiver>.Instance;
+        }
 
         /// <summary>
         /// Gets a <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
@@ -48,27 +66,27 @@ namespace SharpAdbClient
             {
                 if (line.EndsWith(": not found"))
                 {
-                    Log.Warn(Tag, $"The remote execution returned: '{line}'");
+                    this.logger.LogWarning($"The remote execution returned: '{line}'");
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
                 }
 
                 if (line.EndsWith("No such file or directory"))
                 {
-                    Log.Warn(Tag, $"The remote execution returned: {line}");
+                    this.logger.LogWarning($"The remote execution returned: {line}");
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
                 }
 
                 // for "unknown options"
                 if (line.Contains("Unknown option"))
                 {
-                    Log.Warn(Tag, $"The remote execution returned: {line}");
+                    this.logger.LogWarning($"The remote execution returned: {line}");
                     throw new UnknownOptionException($"The remote execution returned: '{line}'");
                 }
 
                 // for "aborting" commands
                 if (line.IsMatch("Aborting.$"))
                 {
-                    Log.Warn(Tag, $"The remote execution returned: {line}");
+                    this.logger.LogWarning($"The remote execution returned: {line}");
                     throw new CommandAbortingException($"The remote execution returned: '{line}'");
                 }
 
@@ -76,7 +94,7 @@ namespace SharpAdbClient
                 // cmd: applet not found
                 if (line.IsMatch("applet not found$"))
                 {
-                    Log.Warn(Tag, $"The remote execution returned: '{line}'");
+                    this.logger.LogWarning($"The remote execution returned: '{line}'");
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
                 }
 
@@ -84,7 +102,7 @@ namespace SharpAdbClient
                 // workitem: 16822
                 if (line.IsMatch("(permission|access) denied$"))
                 {
-                    Log.Warn(Tag, $"The remote execution returned: '{line}'");
+                    this.logger.LogWarning($"The remote execution returned: '{line}'");
                     throw new PermissionDeniedException($"The remote execution returned: '{line}'");
                 }
             }
@@ -105,7 +123,7 @@ namespace SharpAdbClient
 
                 this.output.AppendLine(line);
 
-                Log.Debug(Tag, line);
+                this.logger.LogDebug(line);
             }
         }
     }

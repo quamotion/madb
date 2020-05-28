@@ -4,13 +4,14 @@
 
 namespace SharpAdbClient
 {
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using SharpAdbClient.Exceptions;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
-    using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -19,14 +20,14 @@ namespace SharpAdbClient
     public class AdbCommandLineClient : IAdbCommandLineClient
     {
         /// <summary>
-        /// The tag to use when logging.
-        /// </summary>
-        private const string Tag = nameof(AdbCommandLineClient);
-
-        /// <summary>
         /// The regex pattern for getting the adb version from the <c>adb version</c> command.
         /// </summary>
         private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
+        
+        /// <summary>
+        /// The logger to use when logging messages.
+        /// </summary>
+        private readonly ILogger<AdbCommandLineClient> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
@@ -34,7 +35,10 @@ namespace SharpAdbClient
         /// <param name="adbPath">
         /// The path to the <c>adb.exe</c> executable.
         /// </param>
-        public AdbCommandLineClient(string adbPath)
+        /// <param name="logger">
+        /// The logger to use when logging.
+        /// </param>
+        public AdbCommandLineClient(string adbPath, ILogger<AdbCommandLineClient> logger = null)
         {
             if (string.IsNullOrWhiteSpace(adbPath))
             {
@@ -71,6 +75,7 @@ namespace SharpAdbClient
             this.EnsureIsValidAdbFile(adbPath);
 
             this.AdbPath = adbPath;
+            this.logger = logger ?? NullLogger<AdbCommandLineClient>.Instance;
         }
 
         /// <summary>
@@ -105,9 +110,9 @@ namespace SharpAdbClient
 
             if (version < AdbServer.RequiredAdbVersion)
             {
-                string message = $"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}";
-                Log.LogAndDisplay(LogLevel.Error, Tag, message);
-                throw new AdbException(message);
+                var ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
+                this.logger.LogError(ex, ex.Message);
+                throw ex;
             }
 
             return version;

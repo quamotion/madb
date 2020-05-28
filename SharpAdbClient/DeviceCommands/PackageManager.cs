@@ -5,6 +5,8 @@
 namespace SharpAdbClient.DeviceCommands
 {
     using Exceptions;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -31,9 +33,9 @@ namespace SharpAdbClient.DeviceCommands
         private const string ListThirdPartyOnly = "pm list packages -f -3";
 
         /// <summary>
-        /// The tag to use when logging messages.
+        /// The logger to use when logging messages.
         /// </summary>
-        private const string Tag = nameof(PackageManager);
+        private readonly ILogger<PackageManager> logger;
 
         /// <summary>
         /// The <see cref="IAdbClient"/> to use when communicating with the device.
@@ -68,7 +70,10 @@ namespace SharpAdbClient.DeviceCommands
         /// <param name="skipInit">
         /// A value indicating whether to skip the initial refresh of the package list or not. Used mainly by unit tests.
         /// </param>
-        public PackageManager(DeviceData device, bool thirdPartyOnly = false, IAdbClient client = null, Func<DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false)
+        /// <param name="logger">
+        /// The logger to use when logging.
+        /// </param>
+        public PackageManager(DeviceData device, bool thirdPartyOnly = false, IAdbClient client = null, Func<DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager> logger = null)
         {
             if (device == null)
             {
@@ -102,6 +107,8 @@ namespace SharpAdbClient.DeviceCommands
             {
                 this.RefreshPackages();
             }
+
+            this.logger = logger ?? NullLogger<PackageManager>.Instance;
         }
 
         /// <summary>
@@ -244,13 +251,12 @@ namespace SharpAdbClient.DeviceCommands
                 // workitem: 19711
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
-                Log.Debug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
+                this.logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
 
                 using (ISyncService sync = this.syncServiceFactory(this.Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
-                    string message = $"Uploading file onto device '{this.Device.Serial}'";
-                    Log.Debug(Tag, message);
+                    this.logger.LogDebug($"Uploading file onto device '{this.Device.Serial}'");
 
                     sync.Push(stream, remoteFilePath, 644, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
                 }
@@ -259,7 +265,7 @@ namespace SharpAdbClient.DeviceCommands
             }
             catch (IOException e)
             {
-                Log.Error(Tag, $"Unable to open sync connection! reason: {e.Message}");
+                this.logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
                 throw;
             }
         }
@@ -278,7 +284,7 @@ namespace SharpAdbClient.DeviceCommands
             }
             catch (IOException e)
             {
-                Log.Error(Tag, $"Failed to delete temporary package: {e.Message}");
+                this.logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
                 throw;
             }
         }
