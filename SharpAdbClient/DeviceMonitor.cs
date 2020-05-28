@@ -5,10 +5,11 @@
 namespace SharpAdbClient
 {
     using Exceptions;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -39,9 +40,9 @@ namespace SharpAdbClient
     public class DeviceMonitor : IDeviceMonitor, IDisposable
     {
         /// <summary>
-        /// Logging tag
+        /// The logger to use when logging messages.
         /// </summary>
-        private const string Tag = nameof(DeviceMonitor);
+        private readonly ILogger<DeviceMonitor> logger;
 
         /// <summary>
         /// The list of devices currently connected to the Android Debug Bridge.
@@ -71,7 +72,10 @@ namespace SharpAdbClient
         /// <param name="socket">
         /// The <see cref="IAdbSocket"/> that manages the connection with the adb server.
         /// </param>
-        public DeviceMonitor(IAdbSocket socket)
+        /// <param name="logger">
+        /// The logger to use when logging.
+        /// </param>
+        public DeviceMonitor(IAdbSocket socket, ILogger<DeviceMonitor> logger = null)
         {
             if (socket == null)
             {
@@ -81,6 +85,7 @@ namespace SharpAdbClient
             this.Socket = socket;
             this.devices = new List<DeviceData>();
             this.Devices = this.devices.AsReadOnly();
+            this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;
         }
 
         /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceChanged/*'/>
@@ -224,7 +229,7 @@ namespace SharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-                        Log.Error(Tag, ex);
+                        this.logger.LogError(ex, ex.Message);
                         throw;
                     }
                 }
@@ -240,7 +245,7 @@ namespace SharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-                        Log.Error(Tag, ex);
+                        this.logger.LogError(ex, ex.Message);
                         throw;
                     }
                 }
@@ -261,7 +266,7 @@ namespace SharpAdbClient
                 catch (Exception ex)
                 {
                     // The exception was unexpected, so log it & rethrow.
-                    Log.Error(Tag, ex);
+                    this.logger.LogError(ex, ex.Message);
                     throw;
                 }
             }
