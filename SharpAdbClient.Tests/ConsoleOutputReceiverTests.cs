@@ -21,7 +21,8 @@ namespace SharpAdbClient.Tests
             receiver.Flush();
 
             Assert.Equal("Hello, World!\r\nSee you!\r\n",
-                receiver.ToString());
+                receiver.ToString(),
+                ignoreLineEndingDifferences: true);
         }
 
         [Fact]
@@ -34,7 +35,8 @@ namespace SharpAdbClient.Tests
             receiver.Flush();
 
             Assert.Equal("See you!\r\n",
-                receiver.ToString());
+                receiver.ToString(),
+                ignoreLineEndingDifferences: true);
         }
 
         [Fact]
@@ -47,7 +49,8 @@ namespace SharpAdbClient.Tests
             receiver.Flush();
 
             Assert.Equal("Hello, World!\r\n",
-                receiver.ToString());
+                receiver.ToString(),
+                ignoreLineEndingDifferences: true);
         }
 
         [Fact]

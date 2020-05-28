@@ -1,9 +1,10 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using SharpAdbClient.Exceptions;
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using Xunit;
 
 namespace SharpAdbClient.Tests
 {
@@ -135,7 +136,7 @@ namespace SharpAdbClient.Tests
 
             Assert.False(this.commandLineClient.ServerStarted);
 
-            var result = this.adbServer.StartServer("adb.exe", false);
+            var result = this.adbServer.StartServer(this.ServerName, false);
 
             Assert.True(this.commandLineClient.ServerStarted);
 
@@ -159,7 +160,7 @@ namespace SharpAdbClient.Tests
 
             Assert.False(this.commandLineClient.ServerStarted);
 
-            var result = this.adbServer.StartServer("adb.exe", false);
+            var result = this.adbServer.StartServer(this.ServerName, false);
 
             Assert.True(this.commandLineClient.ServerStarted);
         }
@@ -174,7 +175,7 @@ namespace SharpAdbClient.Tests
 
             Assert.False(this.commandLineClient.ServerStarted);
 
-            var result = this.adbServer.StartServer("adb.exe", true);
+            var result = this.adbServer.StartServer(this.ServerName, true);
 
             Assert.True(this.commandLineClient.ServerStarted);
 
@@ -193,7 +194,7 @@ namespace SharpAdbClient.Tests
 
             Assert.False(this.commandLineClient.ServerStarted);
 
-            var result = this.adbServer.StartServer("adb.exe", false);
+            var result = this.adbServer.StartServer(this.ServerName, false);
 
             Assert.False(this.commandLineClient.ServerStarted);
 
@@ -206,5 +207,7 @@ namespace SharpAdbClient.Tests
         {
             Assert.Throws<ArgumentNullException>(() => new AdbServer(null, this.adbCommandLineClientFactory));
         }
+
+        private string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";
     }
 }
