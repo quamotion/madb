@@ -1,0 +1,47 @@
+strategy:
+    matrix:
+      # https://source.android.com/setup/start/build-numbers
+      android_9:
+        apiLevel: '28'
+
+pool:
+  vmImage: macOS-10.14
+
+steps:
+- script: |
+    brew install mono-libgdiplus
+  displayName: "Install libgdiplus"
+
+- script: |
+    dotnet pack SharpAdbClient/SharpAdbClient.csproj -c Release -o $(Build.ArtifactStagingDirectory)
+  displayName: "Build and package SharpAdbClient"
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: nuget
+  displayName: Publish SharpAdbClient
+
+- script: |
+    dotnet test SharpAdbClient.Tests/SharpAdbClient.Tests.csproj --filter "TestCategory!=IntegrationTest & TestCategory!=PerformanceTest" "--logger:trx;LogFileName=$(Build.ArtifactStagingDirectory)/testresults.trx" /p:CollectCoverage=true
+  displayName: "Run unit tests"
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: $(Build.ArtifactStagingDirectory)/*.trx
+  condition: true
+  displayName: "Publish unit test results"
+
+- script: |
+    echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install 'system-images;android-$(apiLevel);google_apis;x86'
+  displayName: "Install AVD files"
+- script: |
+    echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd -n android_emulator -k 'system-images;android-$(apiLevel);google_apis;x86' --force
+  displayName: "Create emulator"
+- script:
+    nohup $ANDROID_HOME/emulator/emulator -avd android_emulator -no-snapshot > /dev/null 2>&1 &
+    $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
+
+    $ANDROID_HOME/platform-tools/adb devices
+  displayName: "Starting emulator"
