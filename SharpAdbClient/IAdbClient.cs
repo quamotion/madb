@@ -288,13 +288,10 @@ namespace SharpAdbClient
         /// <param name="cancellationToken">
         /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// </param>
-        /// <param name="maxTimeToOutputResponse">
-        /// A default timeout for the command.
-        /// </param>
         /// <returns>
         /// A <see cref="Task"/> which represents the asynchronous operation.
         /// </returns>
-        Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse);
+        Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken);
 
         /// <summary>
         /// Executes a command on the device.
@@ -308,19 +305,16 @@ namespace SharpAdbClient
         /// <param name="receiver">
         /// The receiver which will get the command output.
         /// </param>
-        /// <param name="cancellationToken">
-        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
-        /// </param>
-        /// <param name="maxTimeToOutputResponse">
-        /// A default timeout for the command.
-        /// </param>
         /// <param name="encoding">
         /// The encoding to use when parsing the command output.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// </param>
         /// <returns>
         /// A <see cref="Task"/> which represents the asynchronous operation.
         /// </returns>
-        Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse, Encoding encoding);
+        Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken);
 
         // shell: not implemented
         // remount: not implemented

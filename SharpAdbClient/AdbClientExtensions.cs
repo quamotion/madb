@@ -96,7 +96,7 @@ namespace SharpAdbClient
         {
             try
             {
-                client.ExecuteRemoteCommandAsync(command, device, rcvr, CancellationToken.None, int.MaxValue).Wait();
+                client.ExecuteRemoteCommandAsync(command, device, rcvr, CancellationToken.None).Wait();
             }
             catch (AggregateException ex)
             {
