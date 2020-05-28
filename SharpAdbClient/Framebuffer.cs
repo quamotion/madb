@@ -5,9 +5,7 @@
 namespace SharpAdbClient
 {
     using System;
-#if !NET451
     using System.Buffers;
-#endif
     using System.Drawing;
     using System.Runtime.InteropServices;
     using System.Threading;
@@ -116,7 +114,6 @@ namespace SharpAdbClient
 
                 if (this.Data == null || this.Data.Length < this.Header.Size)
                 {
-#if !NET451
                     // Optimization on .NET Core: Use the BufferPool to rent buffers
                     if (this.Data != null)
                     {
@@ -124,9 +121,6 @@ namespace SharpAdbClient
                     }
 
                     this.Data = ArrayPool<byte>.Shared.Rent((int)this.Header.Size);
-#else
-                    this.Data = new byte[(int)this.Header.Size];
-#endif
                 }
 
                 // followed by the actual framebuffer content
@@ -155,12 +149,10 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public void Dispose()
         {
-#if !NET451
             if (this.Data != null)
             {
                 ArrayPool<byte>.Shared.Return(this.Data, clearArray: false);
             }
-#endif
 
             this.headerData = null;
             this.headerInitialized = false;

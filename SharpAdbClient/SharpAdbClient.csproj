@@ -12,7 +12,7 @@
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>SharpAdbClient</PackageId>
-    <PackageTags>.net451;android;adb;netcore</PackageTags>
+    <PackageTags>android;adb</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Product>SharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
