@@ -5,13 +5,8 @@
 namespace SharpAdbClient.Exceptions
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Net.Sockets;
-#if !NETSTANDARD1_3
     using System.Runtime.Serialization;
-#endif
-    using System.Text;
 
     /// <summary>
     /// Represents an exception with communicating with ADB
@@ -71,7 +66,6 @@ namespace SharpAdbClient.Exceptions
             this.Response = response;
         }
 
-#if !NETSTANDARD1_3
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbException"/> class.
         /// </summary>
@@ -81,7 +75,6 @@ namespace SharpAdbClient.Exceptions
             : base(serializationInfo, context)
         {
         }
-#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbException"/> class.
