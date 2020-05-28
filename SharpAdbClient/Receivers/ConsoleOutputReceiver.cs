@@ -10,6 +10,7 @@ namespace SharpAdbClient
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// Recieves console output, and makes the console output available as a <see cref="string"/>. To
@@ -17,10 +18,7 @@ namespace SharpAdbClient
     /// </summary>
     public class ConsoleOutputReceiver : MultiLineReceiver
     {
-        /// <summary>
-        /// Logging tag
-        /// </summary>
-        private const string Tag = nameof(ConsoleOutputReceiver);
+        private const RegexOptions DefaultRegexOptions = RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase;
 
         /// <summary>
         /// The logger to use when logging messages.
@@ -84,7 +82,7 @@ namespace SharpAdbClient
                 }
 
                 // for "aborting" commands
-                if (line.IsMatch("Aborting.$"))
+                if (Regex.IsMatch(line, "Aborting.$", DefaultRegexOptions))
                 {
                     this.logger.LogWarning($"The remote execution returned: {line}");
                     throw new CommandAbortingException($"The remote execution returned: '{line}'");
@@ -92,7 +90,7 @@ namespace SharpAdbClient
 
                 // for busybox applets
                 // cmd: applet not found
-                if (line.IsMatch("applet not found$"))
+                if (Regex.IsMatch(line, "applet not found$", DefaultRegexOptions))
                 {
                     this.logger.LogWarning($"The remote execution returned: '{line}'");
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
@@ -100,7 +98,7 @@ namespace SharpAdbClient
 
                 // checks if the permission to execute the command was denied.
                 // workitem: 16822
-                if (line.IsMatch("(permission|access) denied$"))
+                if (Regex.IsMatch(line, "(permission|access) denied$", DefaultRegexOptions))
                 {
                     this.logger.LogWarning($"The remote execution returned: '{line}'");
                     throw new PermissionDeniedException($"The remote execution returned: '{line}'");

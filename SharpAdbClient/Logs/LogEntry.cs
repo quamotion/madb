@@ -27,7 +27,7 @@ namespace SharpAdbClient.Logs
         /// <summary>
         /// Gets or sets the date and time at which the message was logged.
         /// </summary>
-        public DateTime TimeStamp { get; set; }
+        public DateTimeOffset TimeStamp { get; set; }
 
         /// <summary>
         /// Gets or sets the log id (v3) of the payload effective UID of logger (v2);
