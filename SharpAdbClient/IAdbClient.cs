@@ -28,13 +28,40 @@ namespace SharpAdbClient
         // The individual services are listed in the same order as
         // https://android.googlesource.com/platform/system/core/+/master/adb/SERVICES.TXT
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/GetAdbVersion/*'/>
+        /// <summary>
+        /// Ask the ADB server for its internal version number.
+        /// </summary>
+        /// <returns>
+        /// The ADB version number.
+        /// </returns>
         int GetAdbVersion();
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/KillAdb/*'/>
+        /// <summary>
+        /// Ask the ADB server to quit immediately. This is used when the
+        /// ADB client detects that an obsolete server is running after an
+        /// upgrade.
+        /// </summary>
         void KillAdb();
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/GetDevices/*'/>
+        /// <summary>
+        /// Gets the devices that are available for communication.
+        /// </summary>
+        /// <returns>
+        /// A list of devices that are connected.
+        /// </returns>
+        /// <example>
+        /// <para>
+        /// The following example list all Android devices that are currently connected to this PC:
+        /// </para>
+        /// <code>
+        /// var devices = AdbClient.Instance.GetDevices();
+        /// 
+        /// foreach(var device in devices)
+        /// {
+        ///     Console.WriteLine(device.Name);
+        /// }
+        /// </code>
+        /// </example>
         List<DeviceData> GetDevices();
 
         // host:track-devices is implemented by the DeviceMonitor.
@@ -205,13 +232,34 @@ namespace SharpAdbClient
         /// </param>
         void RemoveAllReverseForwards(DeviceData device);
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/RemoveForward/*'/>
+        /// <summary>
+        /// Remove a port forwarding between a local and a remote port.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to remove the port forwarding.
+        /// </param>
+        /// <param name="localPort">
+        /// Specification of the local port that was forwarded.
+        /// </param>
         void RemoveForward(DeviceData device, int localPort);
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/RemoveAllForwards/*'/>
+        /// <summary>
+        /// Removes all forwards for a given device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to remove the port forwarding.
+        /// </param>
         void RemoveAllForwards(DeviceData device);
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/ListForward/*'/>
+        /// <summary>
+        /// List all existing forward connections from this server.
+        /// </summary>
+        /// <param name="device">
+        /// The device for which to list the existing forward connections.
+        /// </param>
+        /// <returns>
+        /// A <see cref="ForwardData"/> entry for each existing forward connection.
+        /// </returns>
         IEnumerable<ForwardData> ListForward(DeviceData device);
 
         /// <summary>
@@ -225,7 +273,27 @@ namespace SharpAdbClient
         /// </returns>
         IEnumerable<ForwardData> ListReverseForward(DeviceData device);
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/ExecuteRemoteCommand/*'/>
+        /// <summary>
+        /// Executes a command on the device.
+        /// </summary>
+        /// <param name="command">
+        /// The command to execute.
+        /// </param>
+        /// <param name="device">
+        /// The device on which to run the command.
+        /// </param>
+        /// <param name="receiver">
+        /// The receiver which will get the command output.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
+        /// </param>
+        /// <param name="maxTimeToOutputResponse">
+        /// A default timeout for the command.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> which represents the asynchronous operation.
+        /// </returns>
         Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse);
 
         /// <summary>
@@ -275,7 +343,24 @@ namespace SharpAdbClient
         /// </returns>
         Framebuffer CreateRefreshableFramebuffer(DeviceData device);
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/GetFrameBuffer/*'/>
+        /// <summary>
+        /// Gets the frame buffer from the specified end point.
+        /// </summary>
+        /// <param name="device">
+        /// The device for which to get the framebuffer.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> that can be used to cancel the asynchronous task.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> which returns the raw frame buffer.
+        /// </returns>
+        /// <exception cref="AdbException">
+        /// failed asking for frame buffer
+        /// </exception>
+        /// <exception cref="AdbException">
+        /// failed nudging
+        /// </exception>
         Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken);
 
         // jdwp:<pid>: not implemented
@@ -283,13 +368,44 @@ namespace SharpAdbClient
         // sync: not implemented
         // reverse:<forward-command>: not implemented
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/RunLogService/*'/>
+        /// <summary>
+        /// Asynchronously runs the event log service on a device.
+        /// </summary>
+        /// <param name="device">
+        /// The device on which to run the event log service.
+        /// </param>
+        /// <param name="messageSink">
+        /// A callback which will receive the event log messages as they are received.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> which can be used to cancel the event log service. Use this
+        /// to stop reading from the event log.
+        /// </param>
+        /// <param name="logNames">
+        /// Optionally, the names of the logs to receive.
+        /// </param>
+        /// <returns>
+        /// An <see cref="Task"/> which represents the asynchronous operation.
+        /// </returns>
         Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames);
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/Reboot/*'/>
+        /// <summary>
+        /// Reboots the specified device in to the specified mode.
+        /// </summary>
+        /// <param name="into">
+        /// The mode into which to reboot the device.
+        /// </param>
+        /// <param name="device">
+        /// The device to reboot.
+        /// </param>
         void Reboot(string into, DeviceData device);
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/Connect/*'/>
+        /// <summary>
+        /// Connect to a device via TCP/IP.
+        /// </summary>
+        /// <param name="endpoint">
+        /// The DNS endpoint at which the <c>adb</c> server on the device is running.
+        /// </param>
         void Connect(DnsEndPoint endpoint);
 
         /// <summary>
@@ -300,7 +416,22 @@ namespace SharpAdbClient
         /// </param>
         void Disconnect(DnsEndPoint endpoint);
 
-        /// <include file='IAdbClient.xml' path='/IAdbClient/SetDevice/*'/>
+        /// <summary>
+        /// Ask to switch the connection to the device/emulator identified by
+        /// <paramref name="device"/>. After this request, every client request will
+        /// be sent directly to the adbd daemon running on the device.
+        /// </summary>
+        /// <param name="socket">
+        /// An instance of the <see cref="IAdbSocket"/> class which is connected to
+        /// the Android Debug Bridge.
+        /// </param>
+        /// <param name="device">
+        /// The device to which to connect.
+        /// </param>
+        /// <remarks>
+        /// If <paramref name="device"/> is <see langword="null"/>, this method
+        /// does nothing.
+        /// </remarks>
         void SetDevice(IAdbSocket socket, DeviceData device);
 
         /// <summary>

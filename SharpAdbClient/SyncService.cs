@@ -102,7 +102,7 @@ namespace SharpAdbClient
         /// </summary>
         public IAdbSocket Socket { get; private set; }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
+        /// <inheritdoc/>
         public bool IsOpen
         {
             get
@@ -111,7 +111,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
+        /// <inheritdoc/>
         public void Open()
         {
             // target a specific device
@@ -121,7 +121,7 @@ namespace SharpAdbClient
             var resp = this.Socket.ReadAdbResponse();
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
+        /// <inheritdoc/>
         public void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (stream == null)
@@ -217,7 +217,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
+        /// <inheritdoc/>
         public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (remoteFilepath == null)
@@ -287,7 +287,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Stat/*'/>
+        /// <inheritdoc/>
         public FileStatistics Stat(string remotePath)
         {
             // create the stat request message.
@@ -308,7 +308,7 @@ namespace SharpAdbClient
             return value;
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/GetDirectoryListing/*'/>
+        /// <inheritdoc/>
         public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
             Collection<FileStatistics> value = new Collection<FileStatistics>();

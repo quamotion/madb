@@ -13,19 +13,29 @@ namespace SharpAdbClient
     /// </summary>
     public interface IDeviceMonitor : IDisposable
     {
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceChanged/*'/>
+        /// <summary>
+        /// Occurs when the status of one of the connected devices has changed.
+        /// </summary>
         event EventHandler<DeviceDataEventArgs> DeviceChanged;
 
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceConnected/*'/>
+        /// <summary>
+        /// Occurs when a device has connected to the Android Debug Bridge.
+        /// </summary>
         event EventHandler<DeviceDataEventArgs> DeviceConnected;
 
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceDisconnected/*'/>
+        /// <summary>
+        /// Occurs when a device has disconnected from the Android Debug Bridge.
+        /// </summary>
         event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Devices/*'/>
+        /// <summary>
+        /// Gets the devices that are currently connected to the Android Debug Bridge.
+        /// </summary>
         IReadOnlyCollection<DeviceData> Devices { get; }
 
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Start/*'/>
+        /// <summary>
+        /// Starts the monitoring.
+        /// </summary>
         void Start();
     }
 }

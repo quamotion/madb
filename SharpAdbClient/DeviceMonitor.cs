@@ -88,16 +88,16 @@ namespace SharpAdbClient
             this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;
         }
 
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceChanged/*'/>
+        /// <inheritdoc/>
         public event EventHandler<DeviceDataEventArgs> DeviceChanged;
 
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceConnected/*'/>
+        /// <inheritdoc/>
         public event EventHandler<DeviceDataEventArgs> DeviceConnected;
 
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/DeviceDisconnected/*'/>
+        /// <inheritdoc/>
         public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Devices/*'/>
+        /// <inheritdoc/>
         public IReadOnlyCollection<DeviceData> Devices { get; private set; }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace SharpAdbClient
         /// </value>
         public bool IsRunning { get; private set; }
 
-        /// <include file='IDeviceMonitor.xml' path='/IDeviceMonitor/Start/*'/>
+        /// <inheritdoc/>
         public void Start()
         {
             if (this.monitorTask == null)
