@@ -5,7 +5,7 @@
 namespace SharpAdbClient
 {
     using System;
-#if !NETFX
+#if !NET451
     using System.Buffers;
 #endif
     using System.Drawing;
@@ -116,7 +116,7 @@ namespace SharpAdbClient
 
                 if (this.Data == null || this.Data.Length < this.Header.Size)
                 {
-#if !NETFX
+#if !NET451
                     // Optimization on .NET Core: Use the BufferPool to rent buffers
                     if (this.Data != null)
                     {
@@ -155,7 +155,7 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public void Dispose()
         {
-#if !NETFX
+#if !NET451
             if (this.Data != null)
             {
                 ArrayPool<byte>.Shared.Return(this.Data, clearArray: false);
