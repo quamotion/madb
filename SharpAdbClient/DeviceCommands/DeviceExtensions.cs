@@ -21,36 +21,19 @@ namespace SharpAdbClient.DeviceCommands
         /// <summary>
         /// Executes a shell command on the device.
         /// </summary>
-        /// <param name="device">
-        /// The device on which to run the command.
-        /// </param>
-        /// <param name="command">
-        /// The command to execute.
-        /// </param>
-        /// <param name="receiver">
-        /// Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.
-        /// </param>
-        public static void ExecuteShellCommand(this DeviceData device, string command, IShellOutputReceiver receiver)
-        {
-            device.ExecuteShellCommand(AdbClient.Instance, command, receiver);
-        }
-
-        /// <summary>
-        /// Executes a shell command on the device.
-        /// </summary>
-        /// <param name="device">
-        /// The device on which to run the command.
-        /// </param>
         /// <param name="client">
         /// The <see cref="IAdbClient"/> to use when executing the command.
         /// </param>
+        /// <param name="device">
+        /// The device on which to run the command.
+        /// </param>
         /// <param name="command">
         /// The command to execute.
         /// </param>
         /// <param name="receiver">
         /// Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.
         /// </param>
-        public static void ExecuteShellCommand(this DeviceData device, IAdbClient client, string command, IShellOutputReceiver receiver)
+        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver)
         {
             client.ExecuteRemoteCommand(command, device, receiver);
         }
@@ -58,6 +41,9 @@ namespace SharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the file statistics of a given file.
         /// </summary>
+        /// <param name="client">
+        /// The <see cref="IAdbClient"/> to use when executing the command.
+        /// </param>
         /// <param name="device">
         /// The device on which to look for the file.
         /// </param>
@@ -67,9 +53,9 @@ namespace SharpAdbClient.DeviceCommands
         /// <returns>
         /// A <see cref="FileStatistics"/> object that represents the file.
         /// </returns>
-        public static FileStatistics Stat(this DeviceData device, string path)
+        public static FileStatistics Stat(this IAdbClient client, DeviceData device, string path)
         {
-            using (ISyncService service = Factories.SyncServiceFactory(device))
+            using (ISyncService service = Factories.SyncServiceFactory(client, device))
             {
                 return service.Stat(path);
             }
@@ -78,47 +64,56 @@ namespace SharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the properties of a device.
         /// </summary>
+        /// <param name="client">
+        /// The connection to the adb server.
+        /// </param>
         /// <param name="device">
         /// The device for which to list the properties.
         /// </param>
         /// <returns>
         /// A dictionary containing the properties of the device, and their values.
         /// </returns>
-        public static Dictionary<string, string> GetProperties(this DeviceData device)
+        public static Dictionary<string, string> GetProperties(this IAdbClient client, DeviceData device)
         {
             var receiver = new GetPropReceiver();
-            AdbClient.Instance.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
+            client.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
             return receiver.Properties;
         }
 
         /// <summary>
         /// Gets the environment variables currently defined on a device.
         /// </summary>
+        /// <param name="client">
+        /// The connection to the adb server.
+        /// </param>
         /// <param name="device">
         /// The device for which to list the environment variables.
         /// </param>
         /// <returns>
         /// A dictionary containing the environment variables of the device, and their values.
         /// </returns>
-        public static Dictionary<string, string> GetEnvironmentVariables(this DeviceData device)
+        public static Dictionary<string, string> GetEnvironmentVariables(this IAdbClient client, DeviceData device)
         {
             var receiver = new EnvironmentVariablesReceiver();
-            AdbClient.Instance.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
+            client.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
             return receiver.EnvironmentVariables;
         }
 
         /// <summary>
         /// Uninstalls a package from the device.
         /// </summary>
+        /// <param name="client">
+        /// The connection to the adb server.
+        /// </param>
         /// <param name="device">
         /// The device on which to uninstall the package.
         /// </param>
         /// <param name="packageName">
         /// The name of the package to uninstall.
         /// </param>
-        public static void UninstallPackage(this DeviceData device, string packageName)
+        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName)
         {
-            PackageManager manager = new PackageManager(device);
+            PackageManager manager = new PackageManager(client, device);
             manager.UninstallPackage(packageName);
         }
 
@@ -131,41 +126,26 @@ namespace SharpAdbClient.DeviceCommands
         /// <param name="packageName">
         /// The name of the package from which to get the application version.
         /// </param>
-        public static VersionInfo GetPackageVersion(this DeviceData device, string packageName)
+        public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
         {
-            PackageManager manager = new PackageManager(device);
+            PackageManager manager = new PackageManager(client, device);
             return manager.GetVersionInfo(packageName);
         }
 
         /// <summary>
         /// Lists all processes running on the device.
         /// </summary>
-        /// <param name="device">
-        /// The device on which to list the processes that are running.
-        /// </param>
-        /// <returns>
-        /// An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all
-        /// processes that are currently running on the device.
-        /// </returns>
-        public static IEnumerable<AndroidProcess> ListProcesses(this DeviceData device)
-        {
-            return ListProcesses(device, AdbClient.Instance);
-        }
-
-        /// <summary>
-        /// Lists all processes running on the device.
-        /// </summary>
-        /// <param name="device">
-        /// The device on which to list the processes that are running.
-        /// </param>
         /// <param name="client">
         /// A connection to ADB.
         /// </param>
+        /// <param name="device">
+        /// The device on which to list the processes that are running.
+        /// </param>
         /// <returns>
         /// An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all
         /// processes that are currently running on the device.
         /// </returns>
-        public static IEnumerable<AndroidProcess> ListProcesses(this DeviceData device, IAdbClient client)
+        public static IEnumerable<AndroidProcess> ListProcesses(this IAdbClient client, DeviceData device)
         {
             // There are a couple of gotcha's when listing processes on an Android device.
             // One way would be to run ps and parse the output. However, the output of
@@ -195,7 +175,7 @@ namespace SharpAdbClient.DeviceCommands
             // on the API level. We do the branching on the device (inside a shell script) to avoid roundtrips.
             // This if/then/else syntax was tested on Android 2.x, 4.x and 7
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            device.ExecuteShellCommand(client, @"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
+            client.ExecuteShellCommand(device, @"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
 if [ $SDK -lt 24 ]
 then
     /system/bin/ls /proc/
@@ -239,7 +219,7 @@ fi".Replace("\r\n", "\n"), receiver);
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
-                    device.ExecuteShellCommand(client, catBuilder.ToString(), processOutputReceiver);
+                    client.ExecuteShellCommand(device, catBuilder.ToString(), processOutputReceiver);
                     catBuilder.Clear();
                     catBuilder.Append("cat ");
                 }

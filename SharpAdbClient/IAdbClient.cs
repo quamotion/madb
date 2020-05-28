@@ -417,24 +417,6 @@ namespace SharpAdbClient
         void Disconnect(DnsEndPoint endpoint);
 
         /// <summary>
-        /// Ask to switch the connection to the device/emulator identified by
-        /// <paramref name="device"/>. After this request, every client request will
-        /// be sent directly to the adbd daemon running on the device.
-        /// </summary>
-        /// <param name="socket">
-        /// An instance of the <see cref="IAdbSocket"/> class which is connected to
-        /// the Android Debug Bridge.
-        /// </param>
-        /// <param name="device">
-        /// The device to which to connect.
-        /// </param>
-        /// <remarks>
-        /// If <paramref name="device"/> is <see langword="null"/>, this method
-        /// does nothing.
-        /// </remarks>
-        void SetDevice(IAdbSocket socket, DeviceData device);
-
-        /// <summary>
         /// Restarts the ADB daemon running on the device with root privileges.
         /// </summary>
         /// <param name="device">

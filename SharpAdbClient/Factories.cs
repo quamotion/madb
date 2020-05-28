@@ -51,7 +51,7 @@ namespace SharpAdbClient
         /// <see cref="ISyncService"/> interface, that can be used to transfer files to and from
         /// a given device.
         /// </summary>
-        public static Func<DeviceData, ISyncService> SyncServiceFactory
+        public static Func<IAdbClient, DeviceData, ISyncService> SyncServiceFactory
         { get; set; }
 
         /// <summary>
@@ -62,8 +62,7 @@ namespace SharpAdbClient
             AdbSocketFactory = (endPoint) => new AdbSocket(endPoint);
             AdbClientFactory = (endPoint) => new AdbClient(endPoint, Factories.AdbSocketFactory);
             AdbCommandLineClientFactory = (path) => new AdbCommandLineClient(path);
-            SyncServiceFactory = (device) => new SyncService(device);
-            AdbClient.Instance = new AdbClient();
+            SyncServiceFactory = (client, device) => new SyncService(client, device);
         }
     }
 }
