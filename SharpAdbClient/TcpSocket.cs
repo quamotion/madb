@@ -19,14 +19,12 @@ namespace SharpAdbClient
     {
         private Socket socket;
         private EndPoint endPoint;
-        private bool connected;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpSocket"/> class.
         /// </summary>
         public TcpSocket()
         {
-            this.connected = false;
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
@@ -70,11 +68,6 @@ namespace SharpAdbClient
         /// <inheritdoc/>
         public void Connect(EndPoint endPoint)
         {
-            if (this.connected)
-            {
-                throw new Exception("To reconnect you must use the Reconnect method.");
-            }
-
             if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint))
             {
                 throw new NotSupportedException();
@@ -83,17 +76,11 @@ namespace SharpAdbClient
             this.socket.Connect(endPoint);
             this.socket.Blocking = true;
             this.endPoint = endPoint;
-            this.connected = true;
         }
 
         /// <inheritdoc/>
         public Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken)
         {
-            if (this.connected)
-            {
-                throw new Exception("To reconnect you must use the ReconnectAsync method.");
-            }
-
             if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint))
             {
                 throw new NotSupportedException();
@@ -122,7 +109,6 @@ namespace SharpAdbClient
                 {
                     this.socket.Blocking = true;
                     this.endPoint = endPoint;
-                    this.connected = true;
                 }
                 if (cancellationToken.IsCancellationRequested)
                     throw new TaskCanceledException();
@@ -138,7 +124,6 @@ namespace SharpAdbClient
                 return Task.CompletedTask;
             }
 
-            this.socket.Dispose();
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             return this.ConnectAsync(this.endPoint, cancellationToken);
         }
@@ -152,7 +137,6 @@ namespace SharpAdbClient
                 return;
             }
 
-            this.socket.Dispose();
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             this.Connect(this.endPoint);
         }
