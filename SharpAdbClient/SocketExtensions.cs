@@ -61,7 +61,7 @@ namespace SharpAdbClient
         }
 
         /// <summary>
-        /// Asynchronously sends data from a connected socket.
+        /// Asynchronously sends data to a connected socket.
         /// </summary>
         /// <param name="socket">
         /// The socket from which to read data.
