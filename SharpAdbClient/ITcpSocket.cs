@@ -37,6 +37,16 @@ namespace SharpAdbClient
         }
 
         /// <summary>
+        ///  Gets or sets a value that specifies the amount of time after which a synchronous
+        //   Receive call will time out.
+        /// </summary>
+        int ReceiveTimeout
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Establishes a connection to a remote host.
         /// </summary>
         /// <param name="endPoint">
@@ -45,10 +55,30 @@ namespace SharpAdbClient
         void Connect(EndPoint endPoint);
 
         /// <summary>
+        /// Establishes a connection to a remote host asynchronously.
+        /// </summary>
+        /// <param name="endPoint">
+        /// An <see cref="EndPoint"/> that represents the remote device.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.
+        /// </param>
+        Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
         /// socket to disconnect.
         /// </summary>
         void Reconnect();
+
+        /// <summary>
+        /// Re-establishes the connection to a remote host asynchronously. Assumes you have resolved the reason 
+        /// that caused the socket to disconnect.
+        /// </summary>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.
+        /// </param>
+        Task ReconnectAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Sends the specified number of bytes of data to a connected
@@ -71,6 +101,32 @@ namespace SharpAdbClient
         /// The number of bytes sent to the Socket.
         /// </returns>
         int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags);
+
+
+        /// <summary>
+        /// Sends the specified number of bytes of data asynchronously to a connected
+        /// <see cref="ITcpSocket"/>, starting at the specified <paramref name="offset"/>,
+        /// and using the specified <paramref name="socketFlags"/>.
+        /// </summary>
+        /// <param name="buffer">
+        /// An array of type Byte that contains the data to be sent.
+        /// </param>
+        /// <param name="offset">
+        /// The position in the data buffer at which to begin sending data.
+        /// </param>
+        /// <param name="size">
+        /// The number of bytes to send.
+        /// </param>
+        /// <param name="socketFlags">
+        /// A bitwise combination of the SocketFlags values.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.
+        /// </param>
+        /// <returns>
+        /// The number of bytes sent to the Socket.
+        /// </returns>
+        Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
 
         /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/> into the specified offset position of the
