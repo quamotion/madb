@@ -52,6 +52,20 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
+        public int ReceiveTimeout
+        {
+            get
+            {
+                return this.socket.ReceiveTimeout;
+            }
+
+            set
+            {
+                this.socket.ReceiveTimeout = value;
+            }
+        }
+
+        /// <inheritdoc/>
         public void Connect(EndPoint endPoint)
         {
             if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint))
@@ -62,6 +76,56 @@ namespace SharpAdbClient
             this.socket.Connect(endPoint);
             this.socket.Blocking = true;
             this.endPoint = endPoint;
+        }
+
+        /// <inheritdoc/>
+        public Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken)
+        {
+            if (!(endPoint is IPEndPoint || endPoint is DnsEndPoint))
+            {
+                throw new NotSupportedException();
+            }
+
+            return Task.Run(() =>
+            {
+                var completedEvent = new ManualResetEvent(false);
+                bool successful = false;
+                var asyncEvent = new SocketAsyncEventArgs();
+                asyncEvent.RemoteEndPoint = endPoint;
+                asyncEvent.Completed += (sender, args) =>
+                {
+                    successful = true;
+                    completedEvent.Set();
+                };
+                cancellationToken.Register(() =>
+                {
+                    Socket.CancelConnectAsync(asyncEvent);
+                    completedEvent.Set();
+                });
+
+                this.socket.ConnectAsync(asyncEvent);
+                completedEvent.WaitOne();
+                if (successful)
+                {
+                    this.socket.Blocking = true;
+                    this.endPoint = endPoint;
+                }
+                if (cancellationToken.IsCancellationRequested)
+                    throw new TaskCanceledException();
+            });
+        }
+
+        /// <inheritdoc/>
+        public Task ReconnectAsync(CancellationToken cancellationToken)
+        {
+            if (this.socket.Connected)
+            {
+                // Already connected - nothing to do.
+                return Task.CompletedTask;
+            }
+
+            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            return this.ConnectAsync(this.endPoint, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -90,9 +154,9 @@ namespace SharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Stream GetStream()
+        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken)
         {
-            return new NetworkStream(this.socket);
+            return this.socket.SendAsync(buffer, offset, size, socketFlags, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -105,6 +169,12 @@ namespace SharpAdbClient
         public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken)
         {
             return this.socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Stream GetStream()
+        {
+            return new NetworkStream(this.socket);
         }
     }
 }

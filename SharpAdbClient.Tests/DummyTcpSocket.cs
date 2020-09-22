@@ -26,6 +26,8 @@ namespace SharpAdbClient.Tests
 
         public int ReceiveBufferSize
         { get; set; } = 1024;
+        public int ReceiveTimeout 
+        { get; set; } = -1;
 
         public void Close()
         {
@@ -35,6 +37,23 @@ namespace SharpAdbClient.Tests
         public void Connect(EndPoint endPoint)
         {
             this.Connected = true;
+        }
+
+        public Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken)
+        {
+            Connect(endPoint);
+            return Task.CompletedTask;
+        }
+
+        public void Reconnect()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ReconnectAsync(CancellationToken cancellationToken)
+        {
+            Reconnect();
+            return Task.CompletedTask;
         }
 
         public void Dispose()
@@ -64,14 +83,15 @@ namespace SharpAdbClient.Tests
             return size;
         }
 
+        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken)
+        {
+            this.OutputStream.Write(buffer, offset, size);
+            return Task.FromResult(size);
+        }
+
         public byte[] GetBytesSent()
         {
             return this.OutputStream.ToArray();
-        }
-
-        public void Reconnect()
-        {
-            throw new NotImplementedException();
         }
     }
 }
