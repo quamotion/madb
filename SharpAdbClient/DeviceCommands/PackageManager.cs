@@ -248,7 +248,8 @@ namespace SharpAdbClient.DeviceCommands
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
                     this.logger.LogDebug($"Uploading file onto device '{this.Device.Serial}'");
-                    //As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
+
+                    // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
                     sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
                 }
 
