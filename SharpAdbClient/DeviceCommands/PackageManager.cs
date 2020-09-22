@@ -249,7 +249,7 @@ namespace SharpAdbClient.DeviceCommands
                 {
                     this.logger.LogDebug($"Uploading file onto device '{this.Device.Serial}'");
 
-                    sync.Push(stream, remoteFilePath, 644, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
+                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
                 }
 
                 return remoteFilePath;
