@@ -51,10 +51,14 @@ namespace SharpAdbClient
 
             if (isWindows)
             {
-                if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
+                if (!adbPath.Contains("Adb.exe"))
                 {
                     throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
                 }
+                //if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
+                //}
             }
             else if (isUnix)
             {
