@@ -51,7 +51,7 @@ namespace SharpAdbClient
 
             if (isWindows)
             {
-                if (!adbPath.Contains("Adb.exe"))
+                if (!adbPath.ToLower().Contains("adb.exe"))
                 {
                     throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
                 }
