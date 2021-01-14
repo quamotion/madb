@@ -2,6 +2,7 @@
 using SharpAdbClient.DeviceCommands;
 using System;
 using System.IO;
+using Moq;
 
 namespace SharpAdbClient.Tests
 {
@@ -10,7 +11,9 @@ namespace SharpAdbClient.Tests
         [Fact]
         public void ConstructorNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => new PackageManager(null));
+            Assert.Throws<ArgumentNullException>(() => new PackageManager(null, null));
+            Assert.Throws<ArgumentNullException>(() => new PackageManager(null, new DeviceData()));
+            Assert.Throws<ArgumentNullException>(() => new PackageManager(Mock.Of<IAdbClient>(), null));
         }
 
         [Fact]
@@ -23,8 +26,7 @@ namespace SharpAdbClient.Tests
 
             DummyAdbClient client = new DummyAdbClient();
             client.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
-            AdbClient.Instance = client;
-            PackageManager manager = new PackageManager(device);
+            PackageManager manager = new PackageManager(client, device);
 
             Assert.True(manager.Packages.ContainsKey("com.android.gallery3d"));
             Assert.Equal("/system/app/Gallery2/Gallery2.apk", manager.Packages["com.android.gallery3d"]);
@@ -40,8 +42,7 @@ namespace SharpAdbClient.Tests
 
             DummyAdbClient client = new DummyAdbClient();
             client.Commands.Add("pm list packages -f", "package:mwc2015.be");
-            AdbClient.Instance = client;
-            PackageManager manager = new PackageManager(device);
+            PackageManager manager = new PackageManager(client, device);
 
             Assert.True(manager.Packages.ContainsKey("mwc2015.be"));
             Assert.Null(manager.Packages["mwc2015.be"]);
@@ -56,14 +57,12 @@ namespace SharpAdbClient.Tests
             adbClient.Commands.Add("pm install /data/test.apk", string.Empty);
             adbClient.Commands.Add("pm install -r /data/test.apk", string.Empty);
 
-            AdbClient.Instance = adbClient;
-
             DeviceData device = new DeviceData()
             {
                 State = DeviceState.Online
             };
 
-            PackageManager manager = new PackageManager(device);
+            PackageManager manager = new PackageManager(adbClient, device);
             manager.InstallRemotePackage("/data/test.apk", false);
 
             Assert.Equal(2, adbClient.ReceivedCommands.Count);
@@ -79,7 +78,7 @@ namespace SharpAdbClient.Tests
         public void InstallPackageTest()
         {
             var syncService = new DummySyncService();
-            Factories.SyncServiceFactory = (d) => syncService;
+            Factories.SyncServiceFactory = (c, d) => syncService;
 
             var adbClient = new DummyAdbClient();
 
@@ -87,14 +86,12 @@ namespace SharpAdbClient.Tests
             adbClient.Commands.Add("pm install /data/local/tmp/test.txt", string.Empty);
             adbClient.Commands.Add("rm /data/local/tmp/test.txt", string.Empty);
 
-            AdbClient.Instance = adbClient;
-
             DeviceData device = new DeviceData()
             {
                 State = DeviceState.Online
             };
 
-            PackageManager manager = new PackageManager(device);
+            PackageManager manager = new PackageManager(adbClient, device);
             manager.InstallPackage("test.txt", false);
             Assert.Equal(3, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm install /data/local/tmp/test.txt", adbClient.ReceivedCommands[1]);
@@ -115,8 +112,7 @@ namespace SharpAdbClient.Tests
             DummyAdbClient client = new DummyAdbClient();
             client.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
             client.Commands.Add("pm uninstall com.android.gallery3d", "Success");
-            AdbClient.Instance = client;
-            PackageManager manager = new PackageManager(device);
+            PackageManager manager = new PackageManager(client, device);
 
             // Command should execute correctly; if the wrong command is passed an exception
             // would be thrown.
@@ -133,8 +129,7 @@ namespace SharpAdbClient.Tests
 
             DummyAdbClient client = new DummyAdbClient();
             client.Commands.Add("dumpsys package com.google.android.gms", File.ReadAllText("gapps.txt"));
-            AdbClient.Instance = client;
-            PackageManager manager = new PackageManager(device, skipInit: true);
+            PackageManager manager = new PackageManager(client, device, skipInit: true);
 
             var versionInfo = manager.GetVersionInfo("com.google.android.gms");
             Assert.Equal(11062448, versionInfo.VersionCode);

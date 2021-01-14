@@ -55,11 +55,14 @@ namespace SharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
+        /// <param name="client">
+        /// A connection to an adb server.
+        /// </param>
         /// <param name="device">
         /// The device on which to interact with the files.
         /// </param>
-        public SyncService(DeviceData device)
-            : this(Factories.AdbSocketFactory(AdbClient.Instance.EndPoint), device)
+        public SyncService(IAdbClient client, DeviceData device)
+            : this(Factories.AdbSocketFactory(client.EndPoint), device)
         {
         }
 
@@ -102,7 +105,7 @@ namespace SharpAdbClient
         /// </summary>
         public IAdbSocket Socket { get; private set; }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/IsOpen/*'/>
+        /// <inheritdoc/>
         public bool IsOpen
         {
             get
@@ -111,18 +114,18 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Open/*'/>
+        /// <inheritdoc/>
         public void Open()
         {
             // target a specific device
-            AdbClient.Instance.SetDevice(this.Socket, this.Device);
+            this.Socket.SetDevice(this.Device);
 
             this.Socket.SendAdbRequest("sync:");
             var resp = this.Socket.ReadAdbResponse();
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Push/*'/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTime timestamp, IProgress<int> progress, CancellationToken cancellationToken)
+        /// <inheritdoc/>
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (stream == null)
             {
@@ -198,7 +201,7 @@ namespace SharpAdbClient
             }
 
             // create the DONE message
-            int time = (int)timestamp.ToUnixEpoch();
+            int time = (int)timestamp.ToUnixTimeSeconds();
             this.Socket.SendSyncRequest(SyncCommand.DONE, time);
 
             // read the result, in a byte array containing 2 ints
@@ -217,7 +220,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/PullFile2/*'/>
+        /// <inheritdoc/>
         public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (remoteFilepath == null)
@@ -287,7 +290,7 @@ namespace SharpAdbClient
             }
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/Stat/*'/>
+        /// <inheritdoc/>
         public FileStatistics Stat(string remotePath)
         {
             // create the stat request message.
@@ -308,7 +311,7 @@ namespace SharpAdbClient
             return value;
         }
 
-        /// <include file='.\ISyncService.xml' path='/SyncService/GetDirectoryListing/*'/>
+        /// <inheritdoc/>
         public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
             Collection<FileStatistics> value = new Collection<FileStatistics>();
@@ -365,7 +368,7 @@ namespace SharpAdbClient
 
             value.FileMode = (UnixFileMode)BitConverter.ToInt32(statResult, 0);
             value.Size = BitConverter.ToInt32(statResult, 4);
-            value.Time = DateTimeHelper.Epoch.AddSeconds(BitConverter.ToInt32(statResult, 8)).ToLocalTime();
+            value.Time = DateTimeOffset.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
         }
     }
 }

@@ -5,9 +5,7 @@
 namespace SharpAdbClient.Exceptions
 {
     using System;
-#if !NETSTANDARD1_3
     using System.Runtime.Serialization;
-#endif
 
     /// <summary>
     /// The exception that is thrown when a shell command becomes unresponsive.
@@ -64,7 +62,6 @@ namespace SharpAdbClient.Exceptions
         {
         }
 
-#if !NETSTANDARD1_3
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellCommandUnresponsiveException"/> class with serialized
         /// data.
@@ -81,6 +78,5 @@ namespace SharpAdbClient.Exceptions
             : base(info, context)
         {
         }
-#endif
     }
 }

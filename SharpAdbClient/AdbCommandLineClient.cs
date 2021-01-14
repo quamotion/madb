@@ -4,6 +4,8 @@
 
 namespace SharpAdbClient
 {
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using SharpAdbClient.Exceptions;
     using System;
     using System.Collections.Generic;
@@ -19,14 +21,14 @@ namespace SharpAdbClient
     public class AdbCommandLineClient : IAdbCommandLineClient
     {
         /// <summary>
-        /// The tag to use when logging.
-        /// </summary>
-        private const string Tag = nameof(AdbCommandLineClient);
-
-        /// <summary>
         /// The regex pattern for getting the adb version from the <c>adb version</c> command.
         /// </summary>
         private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
+        
+        /// <summary>
+        /// The logger to use when logging messages.
+        /// </summary>
+        private readonly ILogger<AdbCommandLineClient> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
@@ -34,20 +36,18 @@ namespace SharpAdbClient
         /// <param name="adbPath">
         /// The path to the <c>adb.exe</c> executable.
         /// </param>
-        public AdbCommandLineClient(string adbPath)
+        /// <param name="logger">
+        /// The logger to use when logging.
+        /// </param>
+        public AdbCommandLineClient(string adbPath, ILogger<AdbCommandLineClient> logger = null)
         {
             if (string.IsNullOrWhiteSpace(adbPath))
             {
                 throw new ArgumentNullException(nameof(adbPath));
             }
 
-#if NETSTANDARD1_3
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             bool isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-#else
-            bool isWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
-            bool isUnix = Environment.OSVersion.Platform == PlatformID.MacOSX || Environment.OSVersion.Platform == PlatformID.Unix;
-#endif
 
             if (isWindows)
             {
@@ -71,6 +71,7 @@ namespace SharpAdbClient
             this.EnsureIsValidAdbFile(adbPath);
 
             this.AdbPath = adbPath;
+            this.logger = logger ?? NullLogger<AdbCommandLineClient>.Instance;
         }
 
         /// <summary>
@@ -105,9 +106,9 @@ namespace SharpAdbClient
 
             if (version < AdbServer.RequiredAdbVersion)
             {
-                string message = $"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}";
-                Log.LogAndDisplay(LogLevel.Error, Tag, message);
-                throw new AdbException(message);
+                var ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
+                this.logger.LogError(ex, ex.Message);
+                throw ex;
             }
 
             return version;
@@ -267,11 +268,7 @@ namespace SharpAdbClient
             ProcessStartInfo psi = new ProcessStartInfo(this.AdbPath, command)
             {
                 CreateNoWindow = true,
-
-#if !NETSTANDARD1_3
                 WindowStyle = ProcessWindowStyle.Hidden,
-#endif
-
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true

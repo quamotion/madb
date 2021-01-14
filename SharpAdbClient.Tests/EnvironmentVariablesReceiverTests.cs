@@ -27,19 +27,5 @@ namespace SharpAdbClient.Tests
             Assert.Equal("xim", receiver.EnvironmentVariables["CLUTTER_IM_MODULE"]);
             Assert.Equal(string.Empty, receiver.EnvironmentVariables["GNOME_KEYRING_PID"]);
         }
-
-        [Fact(Skip = "IntegrationTest")]
-        public void EnvironmentVariablesReceiverTest2()
-        {
-            var device = AdbClient.Instance.GetDevices().First();
-
-            for (int i = 0; i < 1000; i++)
-            {
-                EnvironmentVariablesReceiver receiver = new EnvironmentVariablesReceiver();
-                AdbClient.Instance.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
-
-                Assert.Equal(16, receiver.EnvironmentVariables.Count);
-            }
-        }
     }
 }

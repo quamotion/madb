@@ -56,48 +56,8 @@ namespace SharpAdbClient
             // and convert to a TaskCancelledException - which is the exception we expect.
             var cancellationTokenRegistration = cancellationToken.Register(() => socket.Dispose());
 
-#if NETSTANDARD1_3
             ArraySegment<byte> array = new ArraySegment<byte>(buffer, offset, size);
             return socket.ReceiveAsync(array, socketFlags);
-#else
-            var tcs = new TaskCompletionSource<int>(socket);
-
-            socket.BeginReceive(
-                buffer,
-                offset,
-                size,
-                socketFlags,
-                iar =>
-                {
-                    var t = (TaskCompletionSource<int>)iar.AsyncState;
-                    var s = (Socket)t.Task.AsyncState;
-                    try
-                    {
-                        t.TrySetResult(s.EndReceive(iar));
-                    }
-                    catch (Exception ex)
-                    {
-                        // Did the cancellationToken's request for cancellation cause the socket to be closed
-                        // and an ObjectDisposedException to be thrown? If so, indicate the caller that we were
-                        // cancelled. If not, bubble up the original exception.
-                        if (ex is ObjectDisposedException && cancellationToken.IsCancellationRequested)
-                        {
-                            t.TrySetCanceled();
-                        }
-                        else
-                        {
-                            t.TrySetException(ex);
-                        }
-                    }
-                    finally
-                    {
-                        cancellationTokenRegistration.Dispose();
-                    }
-                },
-                tcs);
-
-            return tcs.Task;
-#endif
         }
     }
 }

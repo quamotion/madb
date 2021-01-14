@@ -43,7 +43,7 @@ namespace SharpAdbClient.Tests
         }
 
 
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse)
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken)
         {
             this.ReceivedCommands.Add(command);
 
@@ -134,11 +134,6 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public void SetDevice(IAdbSocket socket, DeviceData device)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerable<LogEntry> RunLogService(DeviceData device, CancellationToken cancellationToken, params LogId[] logNames)
         {
             throw new NotImplementedException();
@@ -169,7 +164,7 @@ namespace SharpAdbClient.Tests
             throw new NotImplementedException();
         }
 
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken, int maxTimeToOutputResponse, Encoding encoding)
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

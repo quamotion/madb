@@ -30,7 +30,7 @@ namespace SharpAdbClient.Tests
                 Assert.Equal(3u, log.Id);
                 Assert.NotNull(log.Data);
                 Assert.Equal(179, log.Data.Length);
-                Assert.Equal(new DateTime(2015, 11, 14, 23, 38, 20, 590, DateTimeKind.Utc), log.TimeStamp);
+                Assert.Equal(new DateTime(2015, 11, 14, 23, 38, 20, DateTimeKind.Utc), log.TimeStamp);
 
                 var androidLog = (AndroidLogEntry)log;
                 Assert.Equal(Priority.Info, androidLog.Priority);
@@ -58,7 +58,7 @@ namespace SharpAdbClient.Tests
                 Assert.Equal(2u, entry.Id);
                 Assert.NotNull(entry.Data);
                 Assert.Equal(39, entry.Data.Length);
-                Assert.Equal(new DateTime(2015, 11, 16, 1, 48, 40, 525, DateTimeKind.Utc), entry.TimeStamp);
+                Assert.Equal(new DateTime(2015, 11, 16, 1, 48, 40, DateTimeKind.Utc), entry.TimeStamp);
 
                 var eventLog = (EventLogEntry)entry;
                 Assert.Equal(0, eventLog.Tag);
@@ -76,13 +76,6 @@ namespace SharpAdbClient.Tests
                 entry = await reader.ReadEntry(CancellationToken.None);
                 entry = await reader.ReadEntry(CancellationToken.None);
             }
-        }
-
-        [Fact (Skip = "IntegrationTest")]
-        public async Task ReadLogEntryTest()
-        {
-            var device = AdbClient.Instance.GetDevices().Single();
-            await AdbClient.Instance.RunLogServiceAsync(device, (logEntry) => System.Diagnostics.Debug.WriteLine(logEntry.ToString()), CancellationToken.None, LogId.System);
         }
     }
 }

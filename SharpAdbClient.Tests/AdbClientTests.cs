@@ -160,7 +160,7 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    this.TestClient.SetDevice(this.Socket, Device);
+                    this.Socket.SetDevice(Device);
                 });
         }
 
@@ -178,7 +178,7 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    this.TestClient.SetDevice(this.Socket, Device);
+                    this.Socket.SetDevice(Device);
                 }));
         }
 
@@ -196,7 +196,7 @@ namespace SharpAdbClient.Tests
                 requests,
                 () =>
                 {
-                    this.TestClient.SetDevice(this.Socket, Device);
+                    this.Socket.SetDevice(Device);
                 }));
         }
 
@@ -257,7 +257,7 @@ namespace SharpAdbClient.Tests
                     this.TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver);
                 });
 
-            Assert.Equal("Hello, World\r\n", receiver.ToString());
+            Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
         }
 
         [Fact]

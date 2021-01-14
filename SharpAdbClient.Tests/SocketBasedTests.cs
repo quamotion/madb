@@ -18,7 +18,7 @@ namespace SharpAdbClient
 
         protected SocketBasedTests(bool integrationTest, bool doDispose)
         {
-            this.EndPoint = AdbClient.Instance.EndPoint;
+            // this.EndPoint = AdbClient.Instance.EndPoint;
 
 #if DEBUG
             // Use the tracing adb socket factory to run the tests on an actual device.
@@ -46,7 +46,6 @@ namespace SharpAdbClient
             this.Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(this.EndPoint);
 
             this.TestClient = new AdbClient();
-            AdbClient.Instance = this.TestClient;
         }
 
         protected static readonly AdbResponse[] NoResponses = new AdbResponse[] { };

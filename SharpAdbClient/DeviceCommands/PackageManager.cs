@@ -5,6 +5,8 @@
 namespace SharpAdbClient.DeviceCommands
 {
     using Exceptions;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -31,9 +33,9 @@ namespace SharpAdbClient.DeviceCommands
         private const string ListThirdPartyOnly = "pm list packages -f -3";
 
         /// <summary>
-        /// The tag to use when logging messages.
+        /// The logger to use when logging messages.
         /// </summary>
-        private const string Tag = nameof(PackageManager);
+        private readonly ILogger<PackageManager> logger;
 
         /// <summary>
         /// The <see cref="IAdbClient"/> to use when communicating with the device.
@@ -45,20 +47,20 @@ namespace SharpAdbClient.DeviceCommands
         /// <see cref="ISyncService"/> interface, that can be used to transfer files to and from
         /// a given device.
         /// </summary>
-        private readonly Func<DeviceData, ISyncService> syncServiceFactory;
+        private readonly Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
         /// </summary>
+        /// <param name="client">
+        /// The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.
+        /// </param>
         /// <param name="device">
         /// The device on which to look for packages.
         /// </param>
         /// <param name="thirdPartyOnly">
         /// <see langword="true"/> to only indicate third party applications;
         /// <see langword="false"/> to also include built-in applications.
-        /// </param>
-        /// <param name="client">
-        /// The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.
         /// </param>
         /// <param name="syncServiceFactory">
         /// A function which returns a new instance of a class that implements the
@@ -68,7 +70,10 @@ namespace SharpAdbClient.DeviceCommands
         /// <param name="skipInit">
         /// A value indicating whether to skip the initial refresh of the package list or not. Used mainly by unit tests.
         /// </param>
-        public PackageManager(DeviceData device, bool thirdPartyOnly = false, IAdbClient client = null, Func<DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false)
+        /// <param name="logger">
+        /// The logger to use when logging.
+        /// </param>
+        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager> logger = null)
         {
             if (device == null)
             {
@@ -78,16 +83,7 @@ namespace SharpAdbClient.DeviceCommands
             this.Device = device;
             this.Packages = new Dictionary<string, string>();
             this.ThirdPartyOnly = thirdPartyOnly;
-
-            // Default to AdbClient.Instance
-            if (client == null)
-            {
-                this.client = AdbClient.Instance;
-            }
-            else
-            {
-                this.client = client;
-            }
+            this.client = client ?? throw new ArgumentNullException(nameof(client));
 
             if (syncServiceFactory == null)
             {
@@ -102,6 +98,8 @@ namespace SharpAdbClient.DeviceCommands
             {
                 this.RefreshPackages();
             }
+
+            this.logger = logger ?? NullLogger<PackageManager>.Instance;
         }
 
         /// <summary>
@@ -136,11 +134,11 @@ namespace SharpAdbClient.DeviceCommands
 
             if (this.ThirdPartyOnly)
             {
-                this.Device.ExecuteShellCommand(this.client, ListThirdPartyOnly, pmr);
+                this.client.ExecuteShellCommand(this.Device, ListThirdPartyOnly, pmr);
             }
             else
             {
-                this.Device.ExecuteShellCommand(this.client, ListFull, pmr);
+                this.client.ExecuteShellCommand(this.Device, ListFull, pmr);
             }
         }
 
@@ -176,7 +174,7 @@ namespace SharpAdbClient.DeviceCommands
             var reinstallSwitch = reinstall ? "-r " : string.Empty;
 
             string cmd = $"pm install {reinstallSwitch}{remoteFilePath}";
-            this.Device.ExecuteShellCommand(this.client, cmd, receiver);
+            this.client.ExecuteShellCommand(this.Device, cmd, receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -195,7 +193,7 @@ namespace SharpAdbClient.DeviceCommands
             this.ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            this.Device.ExecuteShellCommand(this.client, $"pm uninstall {packageName}", receiver);
+            this.client.ExecuteShellCommand(this.Device, $"pm uninstall {packageName}", receiver);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
@@ -213,7 +211,7 @@ namespace SharpAdbClient.DeviceCommands
             this.ValidateDevice();
 
             VersionInfoReceiver receiver = new VersionInfoReceiver();
-            this.Device.ExecuteShellCommand(this.client, $"dumpsys package {packageName}", receiver);
+            this.client.ExecuteShellCommand(this.Device, $"dumpsys package {packageName}", receiver);
             return receiver.VersionInfo;
         }
 
@@ -244,22 +242,22 @@ namespace SharpAdbClient.DeviceCommands
                 // workitem: 19711
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
-                Log.Debug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
+                this.logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
 
-                using (ISyncService sync = this.syncServiceFactory(this.Device))
+                using (ISyncService sync = this.syncServiceFactory(this.client, this.Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
-                    string message = $"Uploading file onto device '{this.Device.Serial}'";
-                    Log.Debug(Tag, message);
+                    this.logger.LogDebug($"Uploading file onto device '{this.Device.Serial}'");
 
-                    sync.Push(stream, remoteFilePath, 644, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
+                    // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
+                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
                 }
 
                 return remoteFilePath;
             }
             catch (IOException e)
             {
-                Log.Error(Tag, $"Unable to open sync connection! reason: {e.Message}");
+                this.logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
                 throw;
             }
         }
@@ -274,11 +272,11 @@ namespace SharpAdbClient.DeviceCommands
             // now we delete the app we sync'ed
             try
             {
-                this.Device.ExecuteShellCommand(this.client, "rm " + remoteFilePath, null);
+                this.client.ExecuteShellCommand(this.Device, "rm " + remoteFilePath, null);
             }
             catch (IOException e)
             {
-                Log.Error(Tag, $"Failed to delete temporary package: {e.Message}");
+                this.logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
                 throw;
             }
         }

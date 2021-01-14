@@ -6,6 +6,8 @@ namespace SharpAdbClient
 {
     using Exceptions;
     using Logs;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using System;
     using System.Globalization;
     using System.IO;
@@ -34,14 +36,14 @@ namespace SharpAdbClient
     public class AdbSocket : IAdbSocket, IDisposable
     {
         /// <summary>
-        /// Logging tag
-        /// </summary>
-        private const string TAG = nameof(AdbSocket);
-
-        /// <summary>
         /// The underlying TCP socket that manages the connection with the ADB server.
         /// </summary>
         private readonly ITcpSocket socket;
+
+        /// <summary>
+        /// The logger to use when logging messages.
+        /// </summary>
+        private readonly ILogger<AdbSocket> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
@@ -50,11 +52,15 @@ namespace SharpAdbClient
         /// The <see cref="EndPoint"/> at which the Android Debug Bridge is listening
         /// for clients.
         /// </param>
-        public AdbSocket(EndPoint endPoint)
+        /// <param name="logger">
+        /// The logger to use when logging.
+        /// </param>
+        public AdbSocket(EndPoint endPoint, ILogger<AdbSocket> logger = null)
         {
             this.socket = new TcpSocket();
             this.socket.Connect(endPoint);
             this.socket.ReceiveBufferSize = ReceiveBufferSize;
+            this.logger = logger ?? NullLogger<AdbSocket>.Instance;
         }
 
         /// <summary>
@@ -67,6 +73,7 @@ namespace SharpAdbClient
         public AdbSocket(ITcpSocket socket)
         {
             this.socket = socket;
+            this.logger = NullLogger<AdbSocket>.Instance;
         }
 
         /// <summary>
@@ -284,7 +291,7 @@ namespace SharpAdbClient
             }
             catch (SocketException sex)
             {
-                Log.Error(TAG, sex);
+                this.logger.LogError(sex, sex.Message);
                 throw;
             }
         }
@@ -323,12 +330,12 @@ namespace SharpAdbClient
 
                     if (count < 0)
                     {
-                        Log.Error(TAG, "read: channel EOF");
+                        this.logger.LogError("read: channel EOF");
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-                        Log.Info(TAG, "DONE with Read");
+                        this.logger.LogInformation("DONE with Read");
                     }
                     else
                     {
@@ -362,12 +369,12 @@ namespace SharpAdbClient
                     count = this.socket.Receive(buffer, buflen, SocketFlags.None);
                     if (count < 0)
                     {
-                        Log.Error(TAG, "read: channel EOF");
+                        this.logger.LogError("read: channel EOF");
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-                        Log.Info(TAG, "DONE with Read");
+                        this.logger.LogInformation("DONE with Read");
                     }
                     else
                     {
@@ -382,6 +389,33 @@ namespace SharpAdbClient
             }
 
             return totalRead;
+        }
+
+        /// <inheritdoc/>
+        public void SetDevice(DeviceData device)
+        {
+            // if the device is not null, then we first tell adb we're looking to talk
+            // to a specific device
+            if (device != null)
+            {
+                this.SendAdbRequest($"host:transport:{device.Serial}");
+
+                try
+                {
+                    var response = this.ReadAdbResponse();
+                }
+                catch (AdbException e)
+                {
+                    if (string.Equals("device not found", e.AdbError, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new DeviceNotFoundException(device.Serial);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -410,7 +444,7 @@ namespace SharpAdbClient
             }
             catch (IOException e)
             {
-                Log.Error(TAG, e);
+                this.logger.LogError(e, e.Message);
                 return false;
             }
 
@@ -445,7 +479,7 @@ namespace SharpAdbClient
             {
                 var message = this.ReadString();
                 resp.Message = message;
-                Log.Error(TAG, "Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
+                this.logger.LogError("Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
             }
 
             return resp;
@@ -469,7 +503,7 @@ namespace SharpAdbClient
             }
             catch (DecoderFallbackException uee)
             {
-                Log.Error(TAG, uee);
+                this.logger.LogError(uee, uee.Message);
                 result = string.Empty;
             }
 
