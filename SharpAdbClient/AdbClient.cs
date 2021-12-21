@@ -536,7 +536,7 @@ namespace SharpAdbClient
 
                 // See https://android.googlesource.com/platform/system/core/+/master/adb/commandline.cpp#1026 (adb_root)
                 // for more information on how upstream does this.
-                if (!string.Equals(responseMessage, "restarting", StringComparison.OrdinalIgnoreCase))
+                if (responseMessage.IndexOf("restarting", StringComparison.OrdinalIgnoreCase) == -1)
                 {
                     throw new AdbException(responseMessage);
                 }
