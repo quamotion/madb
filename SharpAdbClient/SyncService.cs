@@ -214,7 +214,11 @@ namespace SharpAdbClient
 
                 throw new AdbException(message);
             }
-            else if (result != SyncCommand.OKAY)
+            else if (result == SyncCommand.OKAY)
+            {
+                this.Socket.ReadSyncString();
+            }
+            else
             {
                 throw new AdbException($"The server sent an invali repsonse {result}");
             }
@@ -323,18 +327,20 @@ namespace SharpAdbClient
             {
                 var response = this.Socket.ReadSyncResponse();
 
-                if (response == SyncCommand.DONE)
+                if (response == SyncCommand.FAIL)
                 {
-                    break;
-                }
-                else if (response != SyncCommand.DENT)
-                {
-                    throw new AdbException($"The server returned an invalid sync response.");
+                    var message = this.Socket.ReadSyncString();
+                    throw new AdbException(message);
                 }
 
                 FileStatistics entry = new FileStatistics();
                 this.ReadStatistics(entry);
                 entry.Path = this.Socket.ReadSyncString();
+
+                if (response == SyncCommand.DONE)
+                {
+                    break;
+                }
 
                 value.Add(entry);
             }
