@@ -340,7 +340,8 @@ namespace SharpAdbClient
                 }
                 else if (response == SyncCommand.DONE)
                 {
-                    this.Socket.ReadSyncString();
+                    var ignoreBuf = new byte[16];
+                    this.Socket.Read(ignoreBuf);
                     break;
                 }
                 else if (response == SyncCommand.FAIL)
