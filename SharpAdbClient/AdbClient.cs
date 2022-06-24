@@ -39,7 +39,7 @@ namespace SharpAdbClient
         /// <summary>
         /// The default encoding
         /// </summary>
-        public const string DefaultEncoding = "ISO-8859-1";
+        public const string DefaultEncoding = "UTF-8";
 
         /// <summary>
         /// The port at which the Android Debug Bridge server listens by default.
